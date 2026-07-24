@@ -1,0 +1,109 @@
+import { useState } from "react";
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise } from "./shared";
+
+function ExerciseChart({ ex, data, compoundIdx }) {
+  var [metric, setMetric] = useState("weight");
+  var isC = ["Squat", "Bench Press", "Deadlift", "Overhead Press", "Barbell Row", "Clean & Jerk", "Snatch", "Power Clean", "Front Squat", "Overhead Squat", "Log Press", "Axle Press", "Yoke Carry", "Farmer's Walk", "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Box Squat", "Floor Press", "Pause Squat", "Pause Bench"].indexOf(ex) !== -1;
+  var exColor = (function () { var EX_COLORS = { "Overhead Press": "#ef4444", "Barbell Row": "#22c55e", Squat: "#3b82f6", Deadlift: "#111111", "Bench Press": "#fb923c", "Sumo Deadlift": "#6b7280", "Romanian Deadlift": "#9ca3af" }; var EX_FALLBACK = ["#a78bfa", "#f472b6", "#60a5fa", "#f59e0b", "#e879f9", "#34d399", "#818cf8", "#fb7185"]; return EX_COLORS[ex] || EX_FALLBACK[compoundIdx % EX_FALLBACK.length]; })();
+  var cs = { color: "#e2e8f0", fontSize: 10 };
+  var tt = { background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 8, fontSize: 12 };
+  var sessions = data.workouts.filter(function (w) { return w.exercise === ex; });
+  var cd = sessions.map(function (w) {
+    var mw = Math.max.apply(null, w.sets.map(function (s) { return s.weight || 0; }));
+    var vol = w.sets.reduce(function (a, s) { return a + ((s.weight || 0) * (s.reps || 0)); }, 0);
+    var mr = Math.max.apply(null, w.sets.map(function (s) { return s.reps || 0; }));
+    return { date: w.date, weight: mw, volume: Math.round(vol), reps: mr };
+  });
+  var pr = cd.length ? Math.max.apply(null, cd.map(function (d) { return d.weight; })) : 0;
+  var latest = cd.length ? cd[cd.length - 1] : null;
+  var trend = cd.length >= 2 ? cd[cd.length - 1].weight - cd[cd.length - 2].weight : null;
+
+  return (
+    <div style={{ background: "#2a2a38", border: "1px solid #3a3a4a", borderRadius: 14, padding: 18, marginBottom: 14 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontWeight: 800, fontSize: 15, color: "#e2e8f0" }}>{ex}</span>
+            {isC && <span style={{ background: exColor + "33", color: exColor, border: "1px solid " + exColor + "55", borderRadius: 20, padding: "1px 8px", fontSize: 10, fontWeight: 700 }}>Compound</span>}
+          </div>
+          <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{sessions.length} session{sessions.length !== 1 ? "s" : ""}</div>
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <div style={{ fontSize: 11, color: "#6b7280" }}>PR</div>
+          <div style={{ fontWeight: 900, color: exColor, fontSize: 18 }}>{pr}<span style={{ fontSize: 11, color: "#9ca3af" }}> kg</span></div>
+          {trend !== null && <div style={{ fontSize: 11, color: trend > 0 ? GREEN : trend < 0 ? "#f87171" : "#6b7280" }}>{trend > 0 ? "▲ +" : trend < 0 ? "▼ " : "–"}{trend !== 0 ? Math.abs(trend) + " kg" : "no change"}</div>}
+        </div>
+      </div>
+      {latest && <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>{[{ label: "Last Weight", val: latest.weight + " kg", color: exColor }, { label: "Last Volume", val: latest.volume + " kg", color: ORANGE }, { label: "Max Reps", val: latest.reps, color: GREEN }].map(function (s) { return <div key={s.label} style={{ flex: 1, background: "#1e1e2e", borderRadius: 8, padding: "7px 8px", textAlign: "center" }}><div style={{ fontSize: 9, color: "#6b7280", marginBottom: 2 }}>{s.label}</div><div style={{ fontWeight: 800, color: s.color, fontSize: 13 }}>{s.val}</div></div>; })}</div>}
+      {cd.length < 2 ? <div style={{ color: "#6b7280", fontSize: 12, textAlign: "center", padding: "10px 0" }}>Log 2+ sessions to see chart</div> : <div><div style={{ display: "flex", gap: 6, marginBottom: 8 }}>{["weight", "volume", "reps"].map(function (m) { return <button key={m} onClick={function () { setMetric(m); }} style={{ padding: "4px 11px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 600, background: metric === m ? exColor : "#2d2d3a", color: metric === m ? "#fff" : "#a0aec0" }}>{m === "weight" ? "Max Weight" : m === "volume" ? "Volume" : "Max Reps"}</button>; })}</div><div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}><ResponsiveContainer width="100%" height={140}><LineChart data={cd}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} /><Line type="monotone" dataKey={metric} stroke={exColor} strokeWidth={2} dot={{ fill: exColor, r: 3 }} /></LineChart></ResponsiveContainer></div></div>}
+    </div>
+  );
+}
+
+export default function ProgressPage({ data }) {
+  var COMPOUNDS = ["Squat", "Bench Press", "Deadlift", "Overhead Press", "Barbell Row", "Clean & Jerk", "Snatch", "Power Clean", "Front Squat", "Overhead Squat", "Log Press", "Axle Press", "Yoke Carry", "Farmer's Walk", "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Box Squat", "Floor Press", "Pause Squat", "Pause Bench"];
+  var normalizedWorkouts = data.workouts.map(function (w) { return Object.assign({}, w, { exercise: resolveExercise(w.exercise) }); });
+  var normalizedData = Object.assign({}, data, { workouts: normalizedWorkouts });
+  var allEx = Array.from(new Set(normalizedWorkouts.map(function (w) { return w.exercise; })));
+  var compounds = COMPOUNDS.filter(function (c) { return allEx.indexOf(c) !== -1; });
+  var isolations = allEx.filter(function (e) { return COMPOUNDS.indexOf(e) === -1; }).sort();
+  var bwChart = data.bodyLogs.map(function (l) { return { date: l.date, weight: l.weight }; });
+  var bfChart = data.bodyComp.filter(function (e) { return e.bf; }).map(function (e) { return { date: e.date, bf: e.bf }; });
+  var calDates = []; for (var i = 6; i >= 0; i--) { var dd = new Date(); dd.setDate(dd.getDate() - i); calDates.push(dd.toLocaleDateString()); }
+  var calChart = calDates.map(function (date) { return { date: date.slice(0, 5), cal: data.calories.filter(function (e) { return e.date === date; }).reduce(function (a, e) { return a + e.calories; }, 0) }; });
+  var cs = { color: "#e2e8f0", fontSize: 10 }, tt = { background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 8, fontSize: 12 };
+
+  return (
+    <div>
+      <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 14 }}>📈 Progress</div>
+      {allEx.length === 0 ? <Card><div style={{ color: "#6b7280", fontSize: 13, textAlign: "center", padding: "20px 0" }}>No workouts logged yet.</div></Card> : <div>
+        {compounds.length > 0 && <div style={{ fontSize: 12, color: ACCENT, fontWeight: 700, marginBottom: 10, letterSpacing: 1 }}>🏋️ COMPOUND LIFTS</div>}
+        {compounds.map(function (ex, i) { return <ExerciseChart key={ex} ex={ex} data={normalizedData} compoundIdx={i} />; })}
+        {compounds.length > 1 && (function () {
+          var allDates = [];
+          compounds.forEach(function (ex) {
+            normalizedWorkouts.filter(function (w) { return w.exercise === ex; }).forEach(function (w) { if (allDates.indexOf(w.date) === -1) allDates.push(w.date); });
+          });
+          allDates.sort(function (a, b) { return new Date(a) - new Date(b); });
+          var seriesMap = {};
+          compounds.forEach(function (ex) { seriesMap[ex] = {}; normalizedWorkouts.filter(function (w) { return w.exercise === ex; }).forEach(function (w) { seriesMap[ex][w.date] = Math.max.apply(null, w.sets.map(function (s) { return s.weight || 0; })); }); });
+          var chartData = allDates.map(function (date) { var point = { date: date.slice(0, 5) }; compounds.forEach(function (ex) { point[ex] = seriesMap[ex][date] != null ? seriesMap[ex][date] : null; }); return point; });
+          var COLORS = ["#3b82f6", "#fb923c", "#111111", "#ef4444", "#22c55e", "#a78bfa", "#f472b6", "#f59e0b", "#818cf8"];
+          return <Card style={{ marginBottom: 14, background: "#2a2a38" }}><div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4 }}>📊 Combined Compound Lifts</div><div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}><ResponsiveContainer width="100%" height={180}><LineChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} />{compounds.map(function (ex, idx) { return <Line key={ex} type="monotone" dataKey={ex} stroke={COLORS[idx % COLORS.length]} strokeWidth={2} dot={{ r: 2 }} connectNulls={true} />; })}</LineChart></ResponsiveContainer></div></Card>;
+        })()}
+        {(isolations.length > 0) && <div style={{ fontSize: 12, color: ACCENT, fontWeight: 700, margin: "16px 0 10px", letterSpacing: 1 }}>💪 ISOLATION LIFTS</div>}
+        {isolations.map(function (ex, i) { return <ExerciseChart key={ex} ex={ex} data={normalizedData} compoundIdx={i} />; })}
+        <Card style={{ background: "#2a2a38" }}>
+          <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 8 }}>📉 Body Weight & Body Fat</div>
+          <div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}>
+            <ResponsiveContainer width="100%" height={160}>
+              <LineChart data={bwChart.length ? bwChart : []}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
+                <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
+                <YAxis tick={cs} width={35} />
+                <Tooltip contentStyle={tt} />
+                <Line type="monotone" dataKey="weight" stroke={ACCENT} strokeWidth={2} dot={{ fill: ACCENT, r: 3 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          {bfChart.length > 0 && <div style={{ marginTop: 12 }}><div style={{ fontSize: 12, color: PINK, fontWeight: 700, marginBottom: 6 }}>Body Fat %</div><div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}><ResponsiveContainer width="100%" height={140}><LineChart data={bfChart}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} /><Line type="monotone" dataKey="bf" stroke={PINK} strokeWidth={2} dot={{ fill: PINK, r: 3 }} /></LineChart></ResponsiveContainer></div></div>}
+        </Card>
+        <Card style={{ background: "#2a2a38" }}>
+          <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 8 }}>🔥 Calorie Intake Trend</div>
+          <div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}>
+            <ResponsiveContainer width="100%" height={160}>
+              <LineChart data={calChart}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
+                <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
+                <YAxis tick={cs} width={35} />
+                <Tooltip contentStyle={tt} />
+                <Line type="monotone" dataKey="cal" stroke={ORANGE} strokeWidth={2} dot={{ fill: ORANGE, r: 3 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+      </div>}
+    </div>
+  );
+}
