@@ -93,6 +93,21 @@ export function resolveExercise(raw) {
   return text.replace(/[:\-]/g, "").trim().replace(/\w\S*/g, function (w) { return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); });
 }
 
+export function formatDate(date) {
+  if (!date) return "";
+  if (typeof date === "string" && /^\d{2}-\d{2}-\d{4}$/.test(date)) {
+    return date;
+  }
+  var d = date instanceof Date ? date : new Date(date);
+  if (isNaN(d.getTime())) {
+    return typeof date === "string" ? date : "";
+  }
+  var day = String(d.getDate()).padStart(2, '0');
+  var month = String(d.getMonth() + 1).padStart(2, '0');
+  var year = d.getFullYear();
+  return day + '-' + month + '-' + year;
+}
+
 export function parseWorkoutText(text) {
   var lines = text.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(function (l) { return l.length > 0; });
   var date = null;
@@ -102,7 +117,7 @@ export function parseWorkoutText(text) {
 
   function flushEntry() {
     if (currentExercise && currentSets.length) {
-      entries.push({ exercise: resolveExercise(currentExercise), sets: currentSets, date: date || new Date().toLocaleDateString(), time: "" });
+      entries.push({ exercise: resolveExercise(currentExercise), sets: currentSets, date: date || formatDate(new Date()), time: "" });
     }
     currentExercise = null;
     currentSets = [];
@@ -122,6 +137,8 @@ export function parseWorkoutText(text) {
     
     // Strip Obsidian markdown headers (#, ##) before date matching
     var dateLine = line.replace(/^#+\s*/, "");
+    
+    // Match text month formats: "24 July 2026" or "July 24, 2026"
     var dm = dateLine.match(/^(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})$/i) || dateLine.match(/^([a-zA-Z]+)\s+(\d{1,2})[,\s]+(\d{4})$/i);
     if (dm) {
       var day, mon, yr;
@@ -129,9 +146,31 @@ export function parseWorkoutText(text) {
       else { day = parseInt(dm[1]); mon = MONTH_MAP[dm[2].toLowerCase()]; yr = parseInt(dm[3]); }
       if (mon !== undefined) {
         flushEntry();
-        date = new Date(yr, mon, day).toLocaleDateString();
+        date = formatDate(new Date(yr, mon, day));
         continue;
       }
+    }
+
+    // Match numeric formats: YYYY-MM-DD or YYYY/MM/DD
+    var numericYMD = dateLine.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+    if (numericYMD) {
+      var yr = parseInt(numericYMD[1]);
+      var mon = parseInt(numericYMD[2]) - 1;
+      var day = parseInt(numericYMD[3]);
+      flushEntry();
+      date = formatDate(new Date(yr, mon, day));
+      continue;
+    }
+
+    // Match numeric formats: DD-MM-YYYY or DD/MM/YYYY
+    var numericDMY = dateLine.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+    if (numericDMY) {
+      var day = parseInt(numericDMY[1]);
+      var mon = parseInt(numericDMY[2]) - 1;
+      var yr = parseInt(numericDMY[3]);
+      flushEntry();
+      date = formatDate(new Date(yr, mon, day));
+      continue;
     }
 
     var normalized = line.replace(/(\d)\s*:\s*(\d)/g, "$1:$2");
@@ -212,7 +251,7 @@ export function restStr(t1, t2) {
 }
 
 export function Card({ children, style }) {
-  return <div style={Object.assign({ background: "#18181f", border: "1px solid #2d2d3a", borderRadius: 14, padding: 18, marginBottom: 14 }, style || {})}>{children}</div>;
+  return <div style={Object.assign({ background: "#18181f", border: "1px solid #2d2d3a", borderRadius: 14, padding: 20, marginBottom: 16 }, style || {})}>{children}</div>;
 }
 
 export function StatBox({ label, value, unit, color }) {
@@ -231,5 +270,53 @@ export function Collapse({ emoji, label, defaultOpen, children }) {
 }
 
 export function inp(ex) {
-  return Object.assign({ background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 8, color: "#e2e8f0", padding: "8px 10px", outline: "none", boxSizing: "border-box" }, ex || {});
+  return Object.assign({ background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 8, color: "#e2e8f0", padding: "10px 12px", outline: "none", boxSizing: "border-box", fontSize: 14, transition: "border-color 0.2s ease, box-shadow 0.2s ease" }, ex || {});
+}
+
+export function btnPrimary(ex) {
+  return Object.assign({ background: ACCENT, color: "#0f0f13", border: "none", borderRadius: 10, padding: "12px 16px", fontWeight: 800, cursor: "pointer", fontSize: 14, transition: "all 0.2s ease", minHeight: 44, outline: "none" }, ex || {});
+}
+
+export function btnSecondary(ex) {
+  return Object.assign({ background: "#2d2d3a", color: ACCENT, border: "1px solid " + ACCENT + "44", borderRadius: 10, padding: "10px 14px", fontWeight: 700, cursor: "pointer", fontSize: 13, transition: "all 0.2s ease", minHeight: 40, outline: "none" }, ex || {});
+}
+
+export function btnDanger(ex) {
+  return Object.assign({ background: "#3d1c1c", color: "#f87171", border: "1px solid #f87171", borderRadius: 10, padding: "10px 14px", fontWeight: 700, cursor: "pointer", fontSize: 13, transition: "all 0.2s ease", minHeight: 40, outline: "none" }, ex || {});
+}
+
+export function btnPrimaryHover() {
+  return {
+    "&:hover": {
+      background: "#b794f6",
+      transform: "translateY(-1px)"
+    }
+  };
+}
+
+export function btnSecondaryHover() {
+  return {
+    "&:hover": {
+      background: "#3d3d4a",
+      transform: "translateY(-1px)"
+    }
+  };
+}
+
+export function btnDangerHover() {
+  return {
+    "&:hover": {
+      background: "#4d2c2c",
+      transform: "translateY(-1px)"
+    }
+  };
+}
+
+export function focusStyles() {
+  return {
+    "&:focus-visible": {
+      outline: "2px solid " + ACCENT,
+      outlineOffset: "2px"
+    }
+  };
 }

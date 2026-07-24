@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ACCENT, BLUE, GREEN, ORANGE, PINK, ACTIVITY, Card, Collapse } from "./shared";
+import { ACCENT, BLUE, GREEN, ORANGE, PINK, ACTIVITY, Card, Collapse, btnPrimary, btnSecondary, inp } from "./shared";
 
 export default function CaloriePage({ data, save }) {
   var [food, setFood] = useState(""), [cal, setCal] = useState(""), [protein, setProtein] = useState(""), [carbs, setCarbs] = useState(""), [fat, setFat] = useState("");
@@ -23,7 +23,7 @@ export default function CaloriePage({ data, save }) {
   var lastBC = data.bodyComp.length ? data.bodyComp[data.bodyComp.length - 1] : null;
   var bmr = lastBC ? (lastBC.BMR_Mifflin || lastBC.BMR_Katch || null) : null;
   var tdee = bmr ? Math.round(bmr * ACTIVITY[actIdx].mult) : null;
-  var cell = { background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 8, color: "#e2e8f0", padding: "7px 8px", fontSize: 13, outline: "none", boxSizing: "border-box" };
+  var cell = inp({});
 
   function addEntry(name, c, p, cb, f) { save({ workouts: data.workouts, bodyLogs: data.bodyLogs, bodyComp: data.bodyComp, calories: [...data.calories, { food: name, calories: parseFloat(c) || 0, protein: parseFloat(p) || 0, carbs: parseFloat(cb) || 0, fat: parseFloat(f) || 0, date: selDateStr }] }); setFood(""); setCal(""); setProtein(""); setCarbs(""); setFat(""); setMsg("Added!"); setTimeout(function () { setMsg(""); }, 1500); }
   function startEdit(gi, e) { setEditIdx(gi); setEditForm({ food: e.food, calories: e.calories, protein: e.protein || "", carbs: e.carbs || "", fat: e.fat || "" }); }
@@ -32,7 +32,7 @@ export default function CaloriePage({ data, save }) {
 
   return (
     <div>
-      <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 14 }}>🍽️ Calories</div>
+      <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 20, letterSpacing: "-0.02em" }}>🍽️ Calories</div>
       <Card>
         <div style={{ fontWeight: 700, marginBottom: 10 }}>🔥 BMR & TDEE</div>
         {!bmr ? <div style={{ color: "#6b7280", fontSize: 13 }}>Log a Body Comp entry with weight, height, age and sex to calculate BMR.</div> : <div>
@@ -74,19 +74,22 @@ export default function CaloriePage({ data, save }) {
         <div style={{ display: "flex", gap: 8 }}>{[["Protein", totals.p, ACCENT], ["Carbs", totals.c, ORANGE], ["Fat", totals.f, PINK]].map(function (r) { return <div key={r[0]} style={{ flex: 1, background: "#23232f", borderRadius: 10, padding: "10px", textAlign: "center" }}><div style={{ fontSize: 11, color: "#6b7280" }}>{r[0]}</div><div style={{ fontWeight: 800, color: r[2], fontSize: 18 }}>{Math.round(r[1])}<span style={{ fontSize: 11, color: "#9ca3af" }}>g</span></div></div>; })}</div>
       </Card>
       <Collapse emoji="✏️" label="Custom Entry" defaultOpen={false}>
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: 6, marginBottom: 10 }}>
-          <input placeholder="Food" value={food} onChange={function (e) { setFood(e.target.value); }} style={Object.assign({}, cell, {})} />
-          <input type="number" placeholder="kcal" value={cal} onChange={function (e) { setCal(e.target.value); }} style={Object.assign({}, cell, {})} />
-          <input type="number" placeholder="P(g)" value={protein} onChange={function (e) { setProtein(e.target.value); }} style={Object.assign({}, cell, {})} />
-          <input type="number" placeholder="C(g)" value={carbs} onChange={function (e) { setCarbs(e.target.value); }} style={Object.assign({}, cell, {})} />
-          <input type="number" placeholder="F(g)" value={fat} onChange={function (e) { setFat(e.target.value); }} style={Object.assign({}, cell, {})} />
+        <div style={{ marginBottom: 12 }}>
+          <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 6, letterSpacing: "0.05em", textTransform: "uppercase" }}>Food Details</div>
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: 6 }}>
+            <input placeholder="Food" value={food} onChange={function (e) { setFood(e.target.value); }} style={Object.assign({}, cell, {})} />
+            <input type="number" placeholder="kcal" value={cal} onChange={function (e) { setCal(e.target.value); }} style={Object.assign({}, cell, {})} />
+            <input type="number" placeholder="P(g)" value={protein} onChange={function (e) { setProtein(e.target.value); }} style={Object.assign({}, cell, {})} />
+            <input type="number" placeholder="C(g)" value={carbs} onChange={function (e) { setCarbs(e.target.value); }} style={Object.assign({}, cell, {})} />
+            <input type="number" placeholder="F(g)" value={fat} onChange={function (e) { setFat(e.target.value); }} style={Object.assign({}, cell, {})} />
+          </div>
         </div>
-        <button onClick={function () { if (food && cal) addEntry(food, cal, protein, carbs, fat); else setMsg("Enter food and calories."); }} style={{ background: ACCENT, color: "#0f0f13", border: "none", borderRadius: 10, padding: "10px", fontWeight: 800, cursor: "pointer", width: "100%" }}>Add Entry</button>
+        <button onClick={function () { if (food && cal) addEntry(food, cal, protein, carbs, fat); else setMsg("Enter food and calories."); }} style={Object.assign({}, btnPrimary({}), { width: "100%" })}>Add Entry</button>
         {msg && <div style={{ marginTop: 8, color: GREEN, fontSize: 13, textAlign: "center" }}>{msg}</div>}
       </Collapse>
       <Collapse emoji="📋" label={"Log for " + displayDate(selDate)} defaultOpen={true}>
-        {selEntries.length === 0 ? <div style={{ color: "#6b7280", fontSize: 13 }}>Nothing logged for this date.</div> : selEntries.map(function (e, i) { var gi = data.calories.indexOf(e); return <div key={i} style={{ padding: "8px 0", borderBottom: "1px solid #2d2d3a" }}>
-          {editIdx === gi ? <div><div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: 5, marginBottom: 8 }}><input value={editForm.food} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { food: ev.target.value })); }} style={Object.assign({}, cell, { fontSize: 12 })} /><input type="number" placeholder="kcal" value={editForm.calories} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { calories: ev.target.value })); }} style={Object.assign({}, cell, { fontSize: 12 })} /><input type="number" placeholder="P" value={editForm.protein} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { protein: ev.target.value })); }} style={Object.assign({}, cell, { fontSize: 12 })} /><input type="number" placeholder="C" value={editForm.carbs} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { carbs: ev.target.value })); }} style={Object.assign({}, cell, { fontSize: 12 })} /><input type="number" placeholder="F" value={editForm.fat} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { fat: ev.target.value })); }} style={Object.assign({}, cell, { fontSize: 12 })} /></div><div style={{ display: "flex", gap: 6 }}><button onClick={saveEdit} style={{ background: GREEN, color: "#0f0f13", border: "none", borderRadius: 6, padding: "5px 14px", fontWeight: 700, cursor: "pointer", fontSize: 12 }}>Save</button><button onClick={function () { setEditIdx(null); }} style={{ background: "#2d2d3a", color: "#a0aec0", border: "none", borderRadius: 6, padding: "5px 14px", cursor: "pointer", fontSize: 12 }}>Cancel</button></div></div> : <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><div><div style={{ fontSize: 13, color: "#e2e8f0" }}>{e.food}</div><div style={{ fontSize: 11, color: "#6b7280" }}>P:{e.protein || 0}g C:{e.carbs || 0}g F:{e.fat || 0}g</div></div><div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ color: ORANGE, fontWeight: 700, fontSize: 13 }}>{e.calories} kcal</span><button onClick={function () { startEdit(gi, e); }} style={{ background: "#2d2d3a", color: ACCENT, border: "none", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 11 }}>✏️</button><button onClick={function () { delEntry(gi); }} style={{ background: "#3d1c1c", color: "#f87171", border: "none", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 11 }}>🗑</button></div></div>}</div>; })}
+        {selEntries.length === 0 ? <div style={{color:"#6b7280",fontSize:13,padding:"24px 0",textAlign:"center"}}><div style={{fontSize:40,marginBottom:12}}>🍽️</div><div>Nothing logged for this date.</div><div style={{marginTop:8,fontSize:12}}>Add your meals to track calories!</div></div> : selEntries.map(function (e, i) { var gi = data.calories.indexOf(e); return <div key={i} style={{padding:"8px 0",borderBottom:"1px solid #2d2d3a"}}>
+          {editIdx === gi ? <div><div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: 5, marginBottom: 8 }}><input value={editForm.food} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { food: ev.target.value })); }} style={Object.assign({}, cell, { fontSize: 12 })} /><input type="number" placeholder="kcal" value={editForm.calories} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { calories: ev.target.value })); }} style={Object.assign({}, cell, { fontSize: 12 })} /><input type="number" placeholder="P" value={editForm.protein} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { protein: ev.target.value })); }} style={Object.assign({}, cell, { fontSize: 12 })} /><input type="number" placeholder="C" value={editForm.carbs} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { carbs: ev.target.value })); }} style={Object.assign({}, cell, { fontSize: 12 })} /><input type="number" placeholder="F" value={editForm.fat} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { fat: ev.target.value })); }} style={Object.assign({}, cell, { fontSize: 12 })} /></div><div style={{ display: "flex", gap: 6 }}><button onClick={saveEdit} style={{ background: GREEN, color: "#0f0f13", border: "none", borderRadius: 8, padding: "8px 14px", fontWeight: 700, cursor: "pointer", fontSize: 13, minHeight: 36, transition: "all 0.2s ease" }}>Save</button><button onClick={function () { setEditIdx(null); }} style={btnSecondary({ padding: "8px 14px", fontSize: 13, minHeight: 36 })}>Cancel</button></div></div> : <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><div><div style={{ fontSize: 13, color: "#e2e8f0" }}>{e.food}</div><div style={{ fontSize: 11, color: "#6b7280" }}>P:{e.protein || 0}g C:{e.carbs || 0}g F:{e.fat || 0}g</div></div><div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ color: ORANGE, fontWeight: 700, fontSize: 13 }}>{e.calories} kcal</span><button onClick={function () { startEdit(gi, e); }} style={{ background: "#2d2d3a", color: ACCENT, border: "none", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 11 }}>✏️</button><button onClick={function () { delEntry(gi); }} style={{ background: "#3d1c1c", color: "#f87171", border: "none", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 11 }}>🗑</button></div></div>}</div>; })}
       </Collapse>
     </div>
   );

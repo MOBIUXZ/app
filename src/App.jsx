@@ -37,9 +37,9 @@ export default function App() {
       <div style={{ background: "#18181f", borderBottom: "1px solid #2d2d3a", padding: "14px 18px" }}>
         <span style={{ fontSize: 22, fontWeight: 900, color: ACCENT }}>⚡ FitTrack</span>
       </div>
-      <div style={{ display: "flex", gap: 4, padding: "10px 12px", background: "#18181f", borderBottom: "1px solid #2d2d3a", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: 8, padding: "12px 16px", background: "#18181f", borderBottom: "1px solid #2d2d3a", flexWrap: "wrap" }}>
         {NAV.map(function (n) {
-          return <button key={n} onClick={function () { setTab(n); }} style={{ padding: "7px 14px", borderRadius: 20, border: "none", cursor: "pointer", fontWeight: 700, fontSize: 12, background: tab === n ? ACCENT : "#2d2d3a", color: tab === n ? "#0f0f13" : "#a0aec0" }}>{n}</button>;
+          return <button key={n} onClick={function () { setTab(n); }} style={{ padding: "10px 16px", borderRadius: 24, border: "none", cursor: "pointer", fontWeight: 700, fontSize: 13, background: tab === n ? ACCENT : "#2d2d3a", color: tab === n ? "#0f0f13" : "#a0aec0", transition: "all 0.2s ease", minHeight: 44, outline: "none" }}>{n}</button>;
         })}
       </div>
       <div style={{ padding: "18px 14px", maxWidth: 680, margin: "0 auto" }}>

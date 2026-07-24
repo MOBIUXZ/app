@@ -56,7 +56,7 @@ export default function ProgressPage({ data }) {
 
   return (
     <div>
-      <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 14 }}>📈 Progress</div>
+      <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 20, letterSpacing: "-0.02em" }}>📈 Progress</div>
       {allEx.length === 0 ? <Card><div style={{ color: "#6b7280", fontSize: 13, textAlign: "center", padding: "20px 0" }}>No workouts logged yet.</div></Card> : <div>
         {compounds.length > 0 && <div style={{ fontSize: 12, color: ACCENT, fontWeight: 700, marginBottom: 10, letterSpacing: 1 }}>🏋️ COMPOUND LIFTS</div>}
         {compounds.map(function (ex, i) { return <ExerciseChart key={ex} ex={ex} data={normalizedData} compoundIdx={i} />; })}
