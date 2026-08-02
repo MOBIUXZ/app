@@ -54,6 +54,41 @@ export default function ProgressPage({ data }) {
   var calChart = calDates.map(function (date) { return { date: date.slice(0, 5), cal: data.calories.filter(function (e) { return e.date === date; }).reduce(function (a, e) { return a + e.calories; }, 0) }; });
   var cs = { color: "#e2e8f0", fontSize: 10 }, tt = { background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 8, fontSize: 12 };
 
+  function parseChartDate(value) {
+    if (!value) return null;
+    if (value instanceof Date) {
+      return isNaN(value.getTime()) ? null : value;
+    }
+    if (typeof value !== "string") return null;
+    var trimmed = value.trim();
+    var ymd = trimmed.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+    if (ymd) {
+      return new Date(parseInt(ymd[1], 10), parseInt(ymd[2], 10) - 1, parseInt(ymd[3], 10));
+    }
+    var dmy = trimmed.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+    if (dmy) {
+      return new Date(parseInt(dmy[3], 10), parseInt(dmy[2], 10) - 1, parseInt(dmy[1], 10));
+    }
+    var parsed = new Date(trimmed);
+    return isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  function formatChartDate(value) {
+    var parsed = parseChartDate(value);
+    if (!parsed) return value || "";
+    return parsed.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  }
+
+  function getMaxWeight(sets) {
+    if (!sets || !sets.length) return null;
+    var weights = sets.map(function (s) {
+      if (typeof s.weight === "number" && !isNaN(s.weight)) return s.weight;
+      var parsed = parseFloat(s.weight);
+      return isNaN(parsed) ? null : parsed;
+    }).filter(function (value) { return value != null && !isNaN(value); });
+    return weights.length ? Math.max.apply(null, weights) : null;
+  }
+
   return (
     <div>
       <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 20, letterSpacing: "-0.02em" }}>📈 Progress</div>
@@ -61,14 +96,30 @@ export default function ProgressPage({ data }) {
         {compounds.length > 0 && <div style={{ fontSize: 12, color: ACCENT, fontWeight: 700, marginBottom: 10, letterSpacing: 1 }}>🏋️ COMPOUND LIFTS</div>}
         {compounds.map(function (ex, i) { return <ExerciseChart key={ex} ex={ex} data={normalizedData} compoundIdx={i} />; })}
         {compounds.length > 1 && (function () {
-          var allDates = [];
-          compounds.forEach(function (ex) {
-            normalizedWorkouts.filter(function (w) { return w.exercise === ex; }).forEach(function (w) { if (allDates.indexOf(w.date) === -1) allDates.push(w.date); });
+          var allDates = Array.from(new Set(normalizedWorkouts.map(function (w) { return w.date; }))).filter(function (date) { return !!date; });
+          allDates.sort(function (a, b) {
+            var pa = parseChartDate(a);
+            var pb = parseChartDate(b);
+            if (pa && pb) return pa - pb;
+            if (pa) return -1;
+            if (pb) return 1;
+            return String(a).localeCompare(String(b));
           });
-          allDates.sort(function (a, b) { return new Date(a) - new Date(b); });
           var seriesMap = {};
-          compounds.forEach(function (ex) { seriesMap[ex] = {}; normalizedWorkouts.filter(function (w) { return w.exercise === ex; }).forEach(function (w) { seriesMap[ex][w.date] = Math.max.apply(null, w.sets.map(function (s) { return s.weight || 0; })); }); });
-          var chartData = allDates.map(function (date) { var point = { date: date.slice(0, 5) }; compounds.forEach(function (ex) { point[ex] = seriesMap[ex][date] != null ? seriesMap[ex][date] : null; }); return point; });
+          compounds.forEach(function (ex) {
+            seriesMap[ex] = {};
+            normalizedWorkouts.filter(function (w) { return w.exercise === ex; }).forEach(function (w) {
+              var maxWeight = getMaxWeight(w.sets);
+              if (maxWeight != null) seriesMap[ex][w.date] = maxWeight;
+            });
+          });
+          var chartData = allDates.map(function (date) {
+            var point = { date: formatChartDate(date) };
+            compounds.forEach(function (ex) {
+              point[ex] = seriesMap[ex][date] != null ? seriesMap[ex][date] : null;
+            });
+            return point;
+          });
           var COLORS = ["#3b82f6", "#fb923c", "#111111", "#ef4444", "#22c55e", "#a78bfa", "#f472b6", "#f59e0b", "#818cf8"];
           return <Card style={{ marginBottom: 14, background: "#2a2a38" }}><div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4 }}>📊 Combined Compound Lifts</div><div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}><ResponsiveContainer width="100%" height={180}><LineChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} />{compounds.map(function (ex, idx) { return <Line key={ex} type="monotone" dataKey={ex} stroke={COLORS[idx % COLORS.length]} strokeWidth={2} dot={{ r: 2 }} connectNulls={true} />; })}</LineChart></ResponsiveContainer></div></Card>;
         })()}
