@@ -5,7 +5,7 @@ import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise } from "./shar
 function ExerciseChart({ ex, data, compoundIdx }) {
   var [metric, setMetric] = useState("weight");
   var isC = ["Squat", "Bench Press", "Deadlift", "Overhead Press", "Barbell Row", "Clean & Jerk", "Snatch", "Power Clean", "Front Squat", "Overhead Squat", "Log Press", "Axle Press", "Yoke Carry", "Farmer's Walk", "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Box Squat", "Floor Press", "Pause Squat", "Pause Bench"].indexOf(ex) !== -1;
-  var exColor = (function () { var EX_COLORS = { "Overhead Press": "#ef4444", "Barbell Row": "#22c55e", Squat: "#3b82f6", Deadlift: "#111111", "Bench Press": "#fb923c", "Sumo Deadlift": "#6b7280", "Romanian Deadlift": "#9ca3af" }; var EX_FALLBACK = ["#a78bfa", "#f472b6", "#60a5fa", "#f59e0b", "#e879f9", "#34d399", "#818cf8", "#fb7185"]; return EX_COLORS[ex] || EX_FALLBACK[compoundIdx % EX_FALLBACK.length]; })();
+  var exColor = (function () { var EX_COLORS = { "Overhead Press": "#ef4444", "Barbell Row": "#22c55e", Squat: "#3b82f6", Deadlift: "#8b5a2b", "Bench Press": "#fb923c", "Sumo Deadlift": "#6b7280", "Romanian Deadlift": "#9ca3af" }; var EX_FALLBACK = ["#a78bfa", "#f472b6", "#60a5fa", "#f59e0b", "#e879f9", "#34d399", "#818cf8", "#fb7185"]; return EX_COLORS[ex] || EX_FALLBACK[compoundIdx % EX_FALLBACK.length]; })();
   var cs = { color: "#e2e8f0", fontSize: 10 };
   var tt = { background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 8, fontSize: 12 };
   var sessions = data.workouts.filter(function (w) { return w.exercise === ex; });
@@ -120,8 +120,8 @@ export default function ProgressPage({ data }) {
             });
             return point;
           });
-          var COLORS = ["#3b82f6", "#fb923c", "#111111", "#ef4444", "#22c55e", "#a78bfa", "#f472b6", "#f59e0b", "#818cf8"];
-          return <Card style={{ marginBottom: 14, background: "#2a2a38" }}><div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4 }}>📊 Combined Compound Lifts</div><div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}><ResponsiveContainer width="100%" height={180}><LineChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} />{compounds.map(function (ex, idx) { return <Line key={ex} type="monotone" dataKey={ex} stroke={COLORS[idx % COLORS.length]} strokeWidth={2} dot={{ r: 2 }} connectNulls={true} />; })}</LineChart></ResponsiveContainer></div></Card>;
+          var COLORS = ["#3b82f6", "#fb923c", "#8b5a2b", "#ef4444", "#22c55e", "#a78bfa", "#f472b6", "#f59e0b", "#818cf8"];
+          return <Card style={{ marginBottom: 14, background: "#2a2a38" }}><div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4 }}>📊 Combined Compound Lifts</div><div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}><ResponsiveContainer width="100%" height={180}><LineChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} />{compounds.map(function (ex, idx) { return <Line key={ex} type="monotone" dataKey={ex} stroke={ex === "Deadlift" ? "#8b5a2b" : COLORS[idx % COLORS.length]} strokeWidth={2} dot={{ r: 2 }} connectNulls={true} />; })}</LineChart></ResponsiveContainer></div></Card>;
         })()}
         {(isolations.length > 0) && <div style={{ fontSize: 12, color: ACCENT, fontWeight: 700, margin: "16px 0 10px", letterSpacing: 1 }}>💪 ISOLATION LIFTS</div>}
         {isolations.map(function (ex, i) { return <ExerciseChart key={ex} ex={ex} data={normalizedData} compoundIdx={i} />; })}
