@@ -87,6 +87,20 @@ export default function WorkoutPage({ data, save }) {
   function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
   function firstDay(y, m) { return new Date(y, m, 1).getDay(); }
 
+  // Robust parser for stored date strings (supports DD-MM-YYYY and YYYY-MM-DD)
+  function parseDateString(s) {
+    if (!s) return null;
+    if (s instanceof Date) return isNaN(s.getTime()) ? null : s;
+    if (typeof s !== "string") return null;
+    s = s.trim();
+    var dmy = s.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+    if (dmy) return new Date(parseInt(dmy[3], 10), parseInt(dmy[2], 10) - 1, parseInt(dmy[1], 10));
+    var ymd = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (ymd) return new Date(parseInt(ymd[1], 10), parseInt(ymd[2], 10) - 1, parseInt(ymd[3], 10));
+    var parsed = new Date(s);
+    return isNaN(parsed.getTime()) ? null : parsed;
+  }
+
   function prevMonth() {
     setViewMonth(function (m) {
       if (m === 0) {
@@ -229,8 +243,8 @@ export default function WorkoutPage({ data, save }) {
           var ref = new Date();
           if (data.workouts.length > 0) {
             var sorted = data.workouts
-              .filter(function (w) { return !!w.date; })
-              .map(function (w) { return new Date(w.date); })
+              .map(function (w) { return parseDateString(w.date); })
+              .filter(function (d) { return d; })
               .sort(function (a, b) { return b - a; });
             if (sorted.length > 0) ref = sorted[0];
           }
