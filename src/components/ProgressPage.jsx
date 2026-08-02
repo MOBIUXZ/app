@@ -42,6 +42,7 @@ function ExerciseChart({ ex, data, compoundIdx }) {
 }
 
 export default function ProgressPage({ data }) {
+  var [compoundMetric, setCompoundMetric] = useState("weight");
   var COMPOUNDS = ["Squat", "Bench Press", "Deadlift", "Overhead Press", "Barbell Row", "Clean & Jerk", "Snatch", "Power Clean", "Front Squat", "Overhead Squat", "Log Press", "Axle Press", "Yoke Carry", "Farmer's Walk", "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Box Squat", "Floor Press", "Pause Squat", "Pause Bench"];
   var normalizedWorkouts = data.workouts.map(function (w) { return Object.assign({}, w, { exercise: resolveExercise(w.exercise) }); });
   var normalizedData = Object.assign({}, data, { workouts: normalizedWorkouts });
@@ -89,6 +90,22 @@ export default function ProgressPage({ data }) {
     return weights.length ? Math.max.apply(null, weights) : null;
   }
 
+  function getWorkoutMetrics(workout) {
+    var maxWeight = getMaxWeight(workout.sets);
+    var volume = workout.sets.reduce(function (sum, set) {
+      var weight = typeof set.weight === "number" && !isNaN(set.weight) ? set.weight : parseFloat(set.weight);
+      var reps = typeof set.reps === "number" && !isNaN(set.reps) ? set.reps : parseFloat(set.reps);
+      if (isNaN(weight)) weight = 0;
+      if (isNaN(reps)) reps = 0;
+      return sum + (weight * reps);
+    }, 0);
+    var maxReps = workout.sets.reduce(function (max, set) {
+      var reps = typeof set.reps === "number" && !isNaN(set.reps) ? set.reps : parseFloat(set.reps);
+      return isNaN(reps) ? max : Math.max(max, reps);
+    }, 0);
+    return { weight: maxWeight, volume: Math.round(volume), reps: maxReps };
+  }
+
   return (
     <div>
       <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 20, letterSpacing: "-0.02em" }}>📈 Progress</div>
@@ -109,8 +126,15 @@ export default function ProgressPage({ data }) {
           compounds.forEach(function (ex) {
             seriesMap[ex] = {};
             normalizedWorkouts.filter(function (w) { return w.exercise === ex; }).forEach(function (w) {
-              var maxWeight = getMaxWeight(w.sets);
-              if (maxWeight != null) seriesMap[ex][w.date] = maxWeight;
+              var metrics = getWorkoutMetrics(w);
+              var metricValue = metrics[compoundMetric];
+              if (metricValue != null) {
+                if (compoundMetric === "volume") {
+                  seriesMap[ex][w.date] = (seriesMap[ex][w.date] || 0) + metricValue;
+                } else {
+                  seriesMap[ex][w.date] = Math.max(seriesMap[ex][w.date] || 0, metricValue);
+                }
+              }
             });
           });
           var chartData = allDates.map(function (date) {
@@ -121,7 +145,7 @@ export default function ProgressPage({ data }) {
             return point;
           });
           var COLORS = ["#3b82f6", "#fb923c", "#8b5a2b", "#ef4444", "#22c55e", "#a78bfa", "#f472b6", "#f59e0b", "#818cf8"];
-          return <Card style={{ marginBottom: 14, background: "#2a2a38" }}><div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4 }}>📊 Combined Compound Lifts</div><div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}><ResponsiveContainer width="100%" height={180}><LineChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} />{compounds.map(function (ex, idx) { return <Line key={ex} type="monotone" dataKey={ex} stroke={ex === "Deadlift" ? "#8b5a2b" : COLORS[idx % COLORS.length]} strokeWidth={2} dot={{ r: 2 }} connectNulls={true} />; })}</LineChart></ResponsiveContainer></div></Card>;
+          return <Card style={{ marginBottom: 14, background: "#2a2a38" }}><div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4 }}>📊 Combined Compound Lifts</div><div style={{ display: "flex", gap: 6, marginBottom: 8 }}>{["weight", "volume", "reps"].map(function (m) { return <button key={m} onClick={function () { setCompoundMetric(m); }} style={{ padding: "4px 11px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 600, background: compoundMetric === m ? "#8b5a2b" : "#2d2d3a", color: compoundMetric === m ? "#fff" : "#a0aec0" }}>{m === "weight" ? "Max Weight" : m === "volume" ? "Volume" : "Max Reps"}</button>; })}</div><div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}><ResponsiveContainer width="100%" height={180}><LineChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} />{compounds.map(function (ex, idx) { return <Line key={ex} type="monotone" dataKey={ex} stroke={ex === "Deadlift" ? "#8b5a2b" : COLORS[idx % COLORS.length]} strokeWidth={2} dot={{ r: 2 }} connectNulls={true} />; })}</LineChart></ResponsiveContainer></div></Card>;
         })()}
         {(isolations.length > 0) && <div style={{ fontSize: 12, color: ACCENT, fontWeight: 700, margin: "16px 0 10px", letterSpacing: 1 }}>💪 ISOLATION LIFTS</div>}
         {isolations.map(function (ex, i) { return <ExerciseChart key={ex} ex={ex} data={normalizedData} compoundIdx={i} />; })}
