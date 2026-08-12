@@ -24,6 +24,13 @@ export const NO_SPLIT_LIFTS = [
   "Front Squat", "Incline Bench",
 ];
 
+export const COMPOUND_LIFTS = [
+  "Squat", "Bench Press", "Deadlift", "Overhead Press", "Push Press", "Barbell Row",
+  "Clean & Jerk", "Snatch", "Power Clean", "Power Snatch", "Front Squat", "Overhead Squat",
+  "Log Press", "Axle Press", "Yoke Carry", "Farmer's Walk",
+  "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Box Squat", "Floor Press", "Pause Squat", "Pause Bench",
+];
+
 export const ACTIVITY = [
   { label: "Sedentary", desc: "Little/no exercise", mult: 1.2 },
   { label: "Light", desc: "1-3 days/week", mult: 1.375 },
@@ -50,6 +57,7 @@ var EXERCISE_ALIASES = {
   sumo: "Sumo Deadlift",
   "sumo deadlift": "Sumo Deadlift",
   "barbell row": "Barbell Row",
+  "barbell rows": "Barbell Row",
   "bb row": "Barbell Row",
   "bent over row": "Barbell Row",
   row: "Barbell Row",
@@ -58,6 +66,8 @@ var EXERCISE_ALIASES = {
   snatch: "Snatch",
   "power clean": "Power Clean",
   "push press": "Push Press",
+  pushpress: "Push Press",
+  "push-press": "Push Press",
   "front squat": "Front Squat",
   fs: "Front Squat",
   "log press": "Log Press",
@@ -81,6 +91,13 @@ var EXERCISE_ALIASES = {
   incline: "Incline Bench",
   "lateral raise": "Lateral Raise",
   "face pull": "Face Pull",
+  "single arm latpulldown": "Single Arm Lat Pulldown",
+  "single arm lat pulldown": "Single Arm Lat Pulldown",
+  "rear delt machine flyes": "Rear Delt Machine Fly",
+  "rear delt machine fly": "Rear Delt Machine Fly",
+  "alternate dumbell hammer curls": "Alternate Dumbbell Hammer Curl",
+  "alternate dumbbell hammer curls": "Alternate Dumbbell Hammer Curl",
+  "alternate dumbbell hammer curl": "Alternate Dumbbell Hammer Curl",
   "hip thrust": "Hip Thrust",
   "farmers walk": "Farmer's Walk",
   "farmer's walk": "Farmer's Walk",
@@ -102,6 +119,10 @@ export function resolveExercise(raw) {
 
 export function isNoSplitLift(exercise) {
   return NO_SPLIT_LIFTS.indexOf(resolveExercise(exercise)) !== -1;
+}
+
+export function isCompoundLift(exercise) {
+  return COMPOUND_LIFTS.indexOf(resolveExercise(exercise)) !== -1;
 }
 
 export function formatDate(date) {
@@ -128,14 +149,32 @@ export function parseWorkoutText(text) {
 
   function flushEntry() {
     if (currentExercise && currentSets.length) {
-      entries.push({ exercise: resolveExercise(currentExercise), sets: currentSets, date: date || formatDate(new Date()), time: "" });
+      entries.push({ exercise: resolveExercise(currentExercise), sets: currentSets.map(mapParsedSet), date: date || formatDate(new Date()), time: "" });
     }
     currentExercise = null;
     currentSets = [];
   }
 
   function cleanNote(text) {
-    return text.replace(/\b\d+(?:st|nd|rd|th)\s*rep(?:s)?\b/gi, "").replace(/\b\d{1,2}:\d{2}\b/g, "").replace(/[()]/g, "").replace(/^[\s:.-]+|[\s:.-]+$/g, "").replace(/\s+/g, " ").trim();
+    return text
+      .replace(/\b(right|left)\b\s*[-:–—]?\s*(?:\d+(?:\.\d+)?(?:\s*(?:reps?|rep))?)?/gi, "")
+      .replace(/\b\d+(?:st|nd|rd|th)\s*rep(?:s)?\b/gi, "")
+      .replace(/\b\d{1,2}:\d{2}\b/g, "")
+      .replace(/[(),]/g, "")
+      .replace(/^[\s:.-]+|[\s:.-]+$/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function mapParsedSet(set) {
+    var mapped = {
+      weight: parseFloat(set.weight),
+      reps: typeof set.reps === "number" ? set.reps : parseFloat(set.reps),
+      time: set.time || "",
+      note: set.note || "",
+    };
+    if (set.side) mapped.side = set.side;
+    return mapped;
   }
 
   for (var i = 0; i < lines.length; i++) {
@@ -184,7 +223,9 @@ export function parseWorkoutText(text) {
       continue;
     }
 
-    var normalized = line.replace(/(\d)\s*:\s*(\d)/g, "$1:$2");
+    var normalized = line.replace(/\s+/g, " ").trim();
+    normalized = normalized.replace(/(\d)\s*:\s*(\d)/g, "$1:$2");
+    normalized = normalized.replace(/((?:reps?|rep))\.(?=\s*\d{1,2}:)/gi, "$1 ");
     var timeMatch = normalized.match(/(\d{1,2}:\d{2})/);
 
     var setMatch = normalized.match(/^(?:\s*)(\d+\.?\d*)\s*(?:kg|kgs)?\s*[-–—:]\s*(.*)$/i);
@@ -251,8 +292,8 @@ export function parseWorkoutText(text) {
     }
 
     if (!/^\d/.test(line)) {
-      var cleaned = line.replace(/[:\-]+$/, "").trim();
-      if (cleaned.length > 0 && cleaned.length < 80) {
+      var cleaned = line.replace(/^#+\s*/, "").replace(/^==+|==+$/g, "").replace(/^\*\*|\*\*$/g, "").replace(/[:\-]+$/, "").trim();
+      if (cleaned.length > 0 && cleaned.length < 80 && !/^\d{1,2}\s+[a-zA-Z]+\s+\d{4}$/i.test(cleaned) && !/^[a-zA-Z]+\s+\d{1,2}[,\s]+\d{4}$/i.test(cleaned)) {
         flushEntry();
         currentExercise = cleaned;
       }

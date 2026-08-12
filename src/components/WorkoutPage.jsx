@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, btnPrimary, btnSecondary, btnDanger, inp, Card, formatDate } from "./shared";
+import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, isCompoundLift, btnPrimary, btnSecondary, btnDanger, inp, Card, formatDate } from "./shared";
 
 function OneRMCalc({ data }) {
   var [weight, setWeight] = useState(""); var [reps, setReps] = useState(""); var [formula, setFormula] = useState("Epley"); var [autoEx, setAutoEx] = useState("");
@@ -40,9 +40,7 @@ function OneRMCalc({ data }) {
 }
 
 
-var COMPOUND_LIFTS = ["Squat", "Bench Press", "Deadlift", "Overhead Press", "Push Press", "Clean & Jerk", "Snatch", "Power Clean", "Power Snatch", "Front Squat", "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Pause Squat", "Pause Bench", "Box Squat", "Floor Press"];
-function isCompoundLift(exercise) { return COMPOUND_LIFTS.includes(exercise); }
-function formatExerciseName(exercise) { return isCompoundLift(exercise) ? exercise.toUpperCase() : exercise; }
+function formatExerciseName(exercise) { return isCompoundLift(exercise) ? resolveExercise(exercise).toUpperCase() : resolveExercise(exercise); }
 
 export default function WorkoutPage({ data, save }) {
   var [cat, setCat] = useState("Powerlifting");
@@ -169,6 +167,7 @@ export default function WorkoutPage({ data, save }) {
     var r = parseWorkoutText(pasteText);
     if (!r.entries || !r.entries.length) { setParseMsg("Could not find any sets. Check format."); return; }
     var preview = Object.assign({}, r, { entries: r.entries.map(function (entry) { return Object.assign({}, entry, { exercise: resolveExercise(entry.exercise) }); }) });
+    setParsePreview(preview);
     save({ workouts: [...data.workouts, ...preview.entries.map(function (entry) { return Object.assign({}, entry, { date: entry.date || (r.date || formatDate(new Date())), time: entry.time || "" }); })], bodyLogs: data.bodyLogs, bodyComp: data.bodyComp, calories: data.calories });
     setPasteText("");
     setParsePreview(null);
@@ -630,7 +629,7 @@ Bench Press
                       {entry.sets.map(function (s, sIdx) {
                         return (
                           <div key={sIdx} style={{ fontSize: 13, color: "#9ca3af", marginBottom: 3 }}>
-                            <span>{s.weight + "kg × " + s.reps + (s.time ? " @" + s.time : "")}</span>
+                            <span>{s.weight + "kg × " + s.reps + (s.side === "left" ? " (L)" : s.side === "right" ? " (R)" : "") + (s.time ? " @" + s.time : "")}</span>
                             {s.note ? <span style={{ color: "#fbbf24", marginLeft: 6 }}>• {s.note}</span> : null}
                           </div>
                         );
