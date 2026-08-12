@@ -1,19 +1,47 @@
 import { useState } from "react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
-import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise } from "./shared";
+import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, isNoSplitLift } from "./shared";
 
 function ExerciseChart({ ex, data, compoundIdx, onPointSelect, formatChartDate, getChartDateKey }) {
   var [metric, setMetric] = useState("weight");
-  var isC = ["Squat", "Bench Press", "Deadlift", "Overhead Press", "Barbell Row", "Clean & Jerk", "Snatch", "Power Clean", "Front Squat", "Overhead Squat", "Log Press", "Axle Press", "Yoke Carry", "Farmer's Walk", "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Box Squat", "Floor Press", "Pause Squat", "Pause Bench"].indexOf(ex) !== -1;
+  var isC = ["Squat", "Bench Press", "Deadlift", "Overhead Press", "Push Press", "Barbell Row", "Clean & Jerk", "Snatch", "Power Clean", "Front Squat", "Overhead Squat", "Log Press", "Axle Press", "Yoke Carry", "Farmer's Walk", "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Box Squat", "Floor Press", "Pause Squat", "Pause Bench"].indexOf(ex) !== -1;
   var exColor = (function () { var EX_COLORS = { "Overhead Press": "#ef4444", "Barbell Row": "#22c55e", Squat: "#3b82f6", Deadlift: "#8b5a2b", "Bench Press": "#fb923c", "Sumo Deadlift": "#6b7280", "Romanian Deadlift": "#9ca3af" }; var EX_FALLBACK = ["#a78bfa", "#f472b6", "#60a5fa", "#f59e0b", "#e879f9", "#34d399", "#818cf8", "#fb7185"]; return EX_COLORS[ex] || EX_FALLBACK[compoundIdx % EX_FALLBACK.length]; })();
   var cs = { color: "#e2e8f0", fontSize: 10 };
   var tt = { background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 8, fontSize: 12 };
   var sessions = data.workouts.filter(function (w) { return w.exercise === ex; });
+  var hasSides = sessions.some(function (w) { return (w.sets || []).some(function (s) { return s && (s.side === 'left' || s.side === 'right'); }); });
+  var showSplit = hasSides && !isNoSplitLift(ex);
+  var [viewMode, setViewMode] = useState(showSplit ? 'split' : 'combined');
   var cd = sessions.map(function (w) {
-    var mw = Math.max.apply(null, w.sets.map(function (s) { return s.weight || 0; }));
-    var vol = w.sets.reduce(function (a, s) { return a + ((s.weight || 0) * (s.reps || 0)); }, 0);
-    var mr = Math.max.apply(null, w.sets.map(function (s) { return s.reps || 0; }));
-    return { date: w.date, weight: mw, volume: Math.round(vol), reps: mr };
+    var all = w.sets || [];
+    var totalVol = 0;
+    var leftVol = 0, rightVol = 0;
+    var leftWeights = [], rightWeights = [], leftReps = [], rightReps = [];
+    all.forEach(function (s) {
+      var wt = typeof s.weight === "number" && !isNaN(s.weight) ? s.weight : parseFloat(s.weight) || 0;
+      var rp = typeof s.reps === "number" && !isNaN(s.reps) ? s.reps : parseFloat(s.reps) || 0;
+      totalVol += wt * rp;
+      var side = s.side || 'both';
+      if (side === 'left') {
+        leftVol += wt * rp;
+        leftWeights.push(wt);
+        leftReps.push(rp);
+      } else if (side === 'right') {
+        rightVol += wt * rp;
+        rightWeights.push(wt);
+        rightReps.push(rp);
+      } else {
+        // both / unspecified -> count for both sides
+        leftVol += wt * rp; rightVol += wt * rp;
+        leftWeights.push(wt); rightWeights.push(wt);
+        leftReps.push(rp); rightReps.push(rp);
+      }
+    });
+    var lw = leftWeights.length ? Math.max.apply(null, leftWeights) : 0;
+    var rw = rightWeights.length ? Math.max.apply(null, rightWeights) : 0;
+    var lrep = leftReps.length ? Math.max.apply(null, leftReps) : 0;
+    var rrep = rightReps.length ? Math.max.apply(null, rightReps) : 0;
+    return { date: w.date, weight: Math.max(lw, rw), weight_left: lw, weight_right: rw, volume: Math.round(totalVol), volume_left: Math.round(leftVol), volume_right: Math.round(rightVol), reps: Math.max(lrep, rrep), reps_left: lrep, reps_right: rrep };
   });
   var chartData = cd.map(function (point) {
     var dateKey = getChartDateKey(point.date);
@@ -40,7 +68,56 @@ function ExerciseChart({ ex, data, compoundIdx, onPointSelect, formatChartDate, 
         </div>
       </div>
       {latest && <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>{[{ label: "Last Weight", val: latest.weight + " kg", color: exColor }, { label: "Last Volume", val: latest.volume + " kg", color: ORANGE }, { label: "Max Reps", val: latest.reps, color: GREEN }].map(function (s) { return <div key={s.label} style={{ flex: 1, background: "#1e1e2e", borderRadius: 8, padding: "7px 8px", textAlign: "center" }}><div style={{ fontSize: 9, color: "#6b7280", marginBottom: 2 }}>{s.label}</div><div style={{ fontWeight: 800, color: s.color, fontSize: 13 }}>{s.val}</div></div>; })}</div>}
-      {cd.length < 2 ? <div style={{ color: "#6b7280", fontSize: 12, textAlign: "center", padding: "10px 0" }}>Log 2+ sessions to see chart</div> : <div><div style={{ display: "flex", gap: 6, marginBottom: 8 }}>{["weight", "volume", "reps"].map(function (m) { return <button key={m} onClick={function () { setMetric(m); }} style={{ padding: "4px 11px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 600, background: metric === m ? exColor : "#2d2d3a", color: metric === m ? "#fff" : "#a0aec0" }}>{m === "weight" ? "Max Weight" : m === "volume" ? "Volume" : "Max Reps"}</button>; })}</div><div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}><ResponsiveContainer width="100%" height={140}><LineChart data={chartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0] && onPointSelect) { onPointSelect(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} /><Line type="monotone" dataKey={metric} stroke={exColor} strokeWidth={2} dot={{ fill: exColor, r: 3 }} /></LineChart></ResponsiveContainer></div></div>}
+      {cd.length < 2 ? <div style={{ color: "#6b7280", fontSize: 12, textAlign: "center", padding: "10px 0" }}>Log 2+ sessions to see chart</div> : <div>
+        <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+          {["weight", "volume", "reps"].map(function (m) { return <button key={m} onClick={function () { setMetric(m); }} style={{ padding: "4px 11px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 600, background: metric === m ? exColor : "#2d2d3a", color: metric === m ? "#fff" : "#a0aec0" }}>{m === "weight" ? "Max Weight" : m === "volume" ? "Volume" : "Max Reps"}</button>; })}
+          {showSplit && <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+            <button onClick={function () { setViewMode('combined'); }} style={{ padding: "4px 11px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 700, background: viewMode === 'combined' ? exColor : "#2d2d3a", color: viewMode === 'combined' ? "#fff" : "#a0aec0" }}>Combined</button>
+            <button onClick={function () { setViewMode('split'); }} style={{ padding: "4px 11px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 700, background: viewMode === 'split' ? exColor : "#2d2d3a", color: viewMode === 'split' ? "#fff" : "#a0aec0" }}>Split</button>
+          </div>}
+        </div>
+        <div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}>
+          <ResponsiveContainer width="100%" height={140}>
+            <LineChart data={chartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0] && onPointSelect) { onPointSelect(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
+              <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
+              <YAxis tick={cs} width={35} />
+              <Tooltip contentStyle={tt} />
+              {(!showSplit || viewMode === 'combined') && <Line type="monotone" dataKey={metric} stroke={exColor} strokeWidth={2} dot={{ fill: exColor, r: 3 }} />}
+                  {showSplit && viewMode === 'split' && <div style={{ display: 'flex', gap: 8 }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 11, color: '#9ca3af', margin: '0 8px 6px' }}>Left</div>
+                      <div style={{ background: 'transparent' }}>
+                        <ResponsiveContainer width="100%" height={140}>
+                          <LineChart data={chartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0] && onPointSelect) { onPointSelect(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
+                            <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
+                            <YAxis tick={cs} width={35} />
+                            <Tooltip contentStyle={tt} />
+                            <Line type="monotone" dataKey={metric + '_left'} stroke={BLUE} strokeWidth={2} dot={{ fill: BLUE, r: 3 }} />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 11, color: '#9ca3af', margin: '0 8px 6px' }}>Right</div>
+                      <div style={{ background: 'transparent' }}>
+                        <ResponsiveContainer width="100%" height={140}>
+                          <LineChart data={chartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0] && onPointSelect) { onPointSelect(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
+                            <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
+                            <YAxis tick={cs} width={35} />
+                            <Tooltip contentStyle={tt} />
+                            <Line type="monotone" dataKey={metric + '_right'} stroke={PINK} strokeWidth={2} dot={{ fill: PINK, r: 3 }} />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  </div>}
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>}
     </div>
   );
 }
@@ -48,7 +125,7 @@ function ExerciseChart({ ex, data, compoundIdx, onPointSelect, formatChartDate, 
 export default function ProgressPage({ data }) {
   var [compoundMetric, setCompoundMetric] = useState("weight");
   var [selectedDate, setSelectedDate] = useState(null);
-  var COMPOUNDS = ["Squat", "Bench Press", "Deadlift", "Overhead Press", "Barbell Row", "Clean & Jerk", "Snatch", "Power Clean", "Front Squat", "Overhead Squat", "Log Press", "Axle Press", "Yoke Carry", "Farmer's Walk", "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Box Squat", "Floor Press", "Pause Squat", "Pause Bench"];
+  var COMPOUNDS = ["Squat", "Bench Press", "Deadlift", "Overhead Press", "Push Press", "Barbell Row", "Clean & Jerk", "Snatch", "Power Clean", "Front Squat", "Overhead Squat", "Log Press", "Axle Press", "Yoke Carry", "Farmer's Walk", "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Box Squat", "Floor Press", "Pause Squat", "Pause Bench"];
   var normalizedWorkouts = data.workouts.map(function (w) { return Object.assign({}, w, { exercise: resolveExercise(w.exercise) }); });
   var normalizedData = Object.assign({}, data, { workouts: normalizedWorkouts });
   var allEx = Array.from(new Set(normalizedWorkouts.map(function (w) { return w.exercise; })));

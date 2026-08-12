@@ -40,7 +40,7 @@ function OneRMCalc({ data }) {
 }
 
 
-var COMPOUND_LIFTS = ["Squat", "Bench Press", "Deadlift", "Overhead Press", "Clean & Jerk", "Snatch", "Power Clean", "Power Snatch", "Front Squat", "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Pause Squat", "Pause Bench", "Box Squat", "Floor Press"];
+var COMPOUND_LIFTS = ["Squat", "Bench Press", "Deadlift", "Overhead Press", "Push Press", "Clean & Jerk", "Snatch", "Power Clean", "Power Snatch", "Front Squat", "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Pause Squat", "Pause Bench", "Box Squat", "Floor Press"];
 function isCompoundLift(exercise) { return COMPOUND_LIFTS.includes(exercise); }
 function formatExerciseName(exercise) { return isCompoundLift(exercise) ? exercise.toUpperCase() : exercise; }
 

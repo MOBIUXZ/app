@@ -8,7 +8,7 @@ export const BLUE = "#60a5fa";
 
 export const EXERCISE_CATEGORIES = {
   "Powerlifting": ["Squat", "Bench Press", "Deadlift", "Pause Squat", "Pause Bench", "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Box Squat", "Floor Press"],
-  "Weightlifting": ["Clean & Jerk", "Snatch", "Power Clean", "Power Snatch", "Hang Clean", "Hang Snatch", "Clean Pull", "Snatch Pull", "Front Squat", "Overhead Squat"],
+  "Weightlifting": ["Clean & Jerk", "Snatch", "Power Clean", "Power Snatch", "Push Press", "Hang Clean", "Hang Snatch", "Clean Pull", "Snatch Pull", "Front Squat", "Overhead Squat"],
   "Calisthenics": ["Pull-up", "Push-up", "Dip", "Muscle-up", "Handstand Push-up", "Pistol Squat", "L-sit", "Front Lever", "Back Lever", "Human Flag"],
   "Street Lifting": ["Weighted Pull-up", "Weighted Dip", "Weighted Push-up", "Weighted Muscle-up", "Ring Dip", "Ring Pull-up", "Ring Muscle-up", "Bar Muscle-up", "360 Pull-up", "Typewriter Pull-up"],
   "Strongman": ["Log Press", "Axle Press", "Farmer's Walk", "Atlas Stone", "Yoke Carry", "Tire Flip", "Sandbag Carry", "Keg Toss", "Circus Dumbbell", "Car Deadlift"],
@@ -17,6 +17,12 @@ export const EXERCISE_CATEGORIES = {
 };
 
 export const ALL_EXERCISES = Object.values(EXERCISE_CATEGORIES).reduce(function (a, b) { return a.concat(b); }, []);
+
+export const NO_SPLIT_LIFTS = [
+  "Squat", "Bench Press", "Deadlift", "Overhead Press", "Barbell Row", "Push Press",
+  "Pause Squat", "Pause Bench", "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Box Squat", "Floor Press",
+  "Front Squat", "Incline Bench",
+];
 
 export const ACTIVITY = [
   { label: "Sedentary", desc: "Little/no exercise", mult: 1.2 },
@@ -51,6 +57,7 @@ var EXERCISE_ALIASES = {
   "clean & jerk": "Clean & Jerk",
   snatch: "Snatch",
   "power clean": "Power Clean",
+  "push press": "Push Press",
   "front squat": "Front Squat",
   fs: "Front Squat",
   "log press": "Log Press",
@@ -91,6 +98,10 @@ export function resolveExercise(raw) {
     if (key === ALL_EXERCISES[e].toLowerCase() || key.indexOf(ALL_EXERCISES[e].toLowerCase()) !== -1) return ALL_EXERCISES[e];
   }
   return text.replace(/[:\-]/g, "").trim().replace(/\w\S*/g, function (w) { return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); });
+}
+
+export function isNoSplitLift(exercise) {
+  return NO_SPLIT_LIFTS.indexOf(resolveExercise(exercise)) !== -1;
 }
 
 export function formatDate(date) {
@@ -207,7 +218,19 @@ export function parseWorkoutText(text) {
         }
       }
       if (!currentExercise) currentExercise = "Untitled Exercise";
-      currentSets.push({ weight: parseFloat(setMatch[1]), reps: reps, time: timeMatch ? timeMatch[1] : "", note: note });
+      // Detect side-specific reps like "RIGHT - 7REPS, LEFT - 5REPS" and create individual sets
+      var sideRegex = /(?:\b(right|left)\b)\s*[-:–—]?\s*(\d+(?:\.\d+)?)(?:\s*(?:reps?|rep))?/ig;
+      var sideMatches = Array.from(body.matchAll(sideRegex));
+      if (sideMatches && sideMatches.length) {
+        sideMatches.forEach(function (m) {
+          var side = (m[1] || "").toLowerCase();
+          var repVal = m[2] ? parseFloat(m[2]) : reps;
+          currentSets.push({ weight: parseFloat(setMatch[1]), reps: repVal, time: timeMatch ? timeMatch[1] : "", note: note, side: side === "right" ? "right" : "left" });
+        });
+      } else {
+        // No side info: mark as 'both' so it can count toward both left and right when visualizing
+        currentSets.push({ weight: parseFloat(setMatch[1]), reps: reps, time: timeMatch ? timeMatch[1] : "", note: note, side: 'both' });
+      }
       continue;
     }
 
