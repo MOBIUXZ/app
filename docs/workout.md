@@ -33,10 +33,17 @@ See [shared-utilities.md](./shared-utilities.md#smart-parser) for supported form
 
 **Supported input features:**
 - Obsidian-style date headers (`# 11 AUGUST 2026`)
-- Exercise headers with `==EXERCISE NAME==`
+- Exercise headers with `==EXERCISE NAME==` (also tolerates missing `=` on one side)
 - Set lines: `60KG - 10REPS 7:52`
 - Dot-separated times: `12REPS.8:54`
 - Left/right sets: `60KG - ( RIGHT - 7REPS , LEFT - 5REPS ) 8:28`
+- Bodyweight lines: `BW = 68KG ==BW PUSHUPS== - 34REPS`
+- Weighted calisthenics: `BW = 68KG WEIGHTED = 5.35KG ==WTD PUSHUPS== - 27REPS`
+- Time holds: `BW = 68KG ==PLANK HOLD== - 60 SECONDS`
+- Dropsets: `{ 60KG - 7REPS 50KG - 2REPS } DROPSET`
+- Failure / partial attempts → 0 reps
+- Plus notation: `20KG - 10 + REPS`
+- Multi-line set notes (continuation lines merged into prior set)
 - Multiple exercises in one paste
 - Import preview with L/R side labels
 

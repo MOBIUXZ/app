@@ -106,6 +106,17 @@ var EXERCISE_ALIASES = {
   yoke: "Yoke Carry",
   "atlas stone": "Atlas Stone",
   "tire flip": "Tire Flip",
+  "bw pushups": "Push-up",
+  "bw pushup": "Push-up",
+  "bw pullups": "Pull-up",
+  "bw pullup": "Pull-up",
+  "bw dips": "Dip",
+  "bw dip": "Dip",
+  "wtd pushups": "Weighted Push-up",
+  "wtd pushup": "Weighted Push-up",
+  "wtd pullups": "Weighted Pull-up",
+  "wtd pullup": "Weighted Pull-up",
+  "rear delt machine lfyes": "Rear Delt Machine Fly",
 };
 
 export function resolveExercise(raw) {
@@ -164,6 +175,7 @@ export function parseWorkoutText(text) {
   var entries = [];
   var currentExercise = null;
   var currentSets = [];
+  var currentBw = null;
 
   function flushEntry() {
     if (currentExercise && currentSets.length) {
@@ -177,8 +189,9 @@ export function parseWorkoutText(text) {
     return text
       .replace(/\b(right|left)\b\s*[-:–—]?\s*(?:\d+(?:\.\d+)?(?:\s*(?:reps?|rep))?)?/gi, "")
       .replace(/\b\d+(?:st|nd|rd|th)\s*rep(?:s)?\b/gi, "")
+      .replace(/\b\d+(?:\.\d+)?\s*seconds?\b/gi, "")
       .replace(/\b\d{1,2}:\d{2}\b/g, "")
-      .replace(/[(),]/g, "")
+      .replace(/[(),{}]/g, "")
       .replace(/^[\s:.-]+|[\s:.-]+$/g, "")
       .replace(/\s+/g, " ")
       .trim();
@@ -195,23 +208,149 @@ export function parseWorkoutText(text) {
     return mapped;
   }
 
+  function isFailureLanguage(body) {
+    return /\bfailed\b|\bfail\b|couldn't|could not|racked\s*,?\s*but|failed to rack|failed attempt|just racked|unstable|barely made|could not rack|couldn't rack/i.test(body);
+  }
+
+  function parseRepsFromBody(body) {
+    if (/^\d{1,2}:\d{2}\s*$/.test(body.trim())) {
+      return { reps: 1, note: "", isHold: false };
+    }
+
+    var work = body.replace(/\b\d{1,2}:\d{2}\b/g, "").trim();
+
+    var secMatch = work.match(/(\d+(?:\.\d+)?)\s*seconds?\b/i);
+    if (secMatch) {
+      return { reps: parseFloat(secMatch[1]), note: "hold", isHold: true };
+    }
+
+    var plusMatch = work.match(/(\d+)\s*\+\s*(?:reps?|rep)\b/i);
+    if (plusMatch) {
+      return { reps: parseInt(plusMatch[1], 10), note: cleanNote(work.replace(plusMatch[0], "")), isHold: false };
+    }
+
+    var partialMatch = work.match(/(\d+(?:\.\d+)?)\s+partial\s*(?:reps?|rep)\b/i);
+    if (partialMatch) {
+      return { reps: parseFloat(partialMatch[1]), note: cleanNote(work.replace(partialMatch[0], "") + " partial"), isHold: false };
+    }
+
+    var fractionalMatch = work.match(/(\d+)\s*(?:1\/2|½)\s*(?:reps?|rep)?\b/i);
+    if (fractionalMatch) {
+      return { reps: parseFloat(fractionalMatch[1]) + 0.5, note: cleanNote(work.replace(fractionalMatch[0], "")), isHold: false };
+    }
+
+    var rangeMatch = work.match(/(\d+)\s*or\s*(\d+)\s*(?:reps?|rep)?\b/i);
+    if (rangeMatch) {
+      return { reps: Math.max(parseInt(rangeMatch[1], 10), parseInt(rangeMatch[2], 10)), note: cleanNote(work.replace(rangeMatch[0], "")), isHold: false };
+    }
+
+    var repsMatch = work.match(/(\d+(?:\.\d+)?)\s*(?:reps?|rep)\b/i);
+    if (repsMatch) {
+      return { reps: parseFloat(repsMatch[1]), note: cleanNote(work.replace(repsMatch[0], "")), isHold: false };
+    }
+
+    var ordinalMatch = work.match(/(\d+)(?:st|nd|rd|th)\s*rep\b/i);
+    if (ordinalMatch) {
+      return { reps: parseInt(ordinalMatch[1], 10), note: cleanNote(work.replace(ordinalMatch[0], "")), isHold: false };
+    }
+
+    if (isFailureLanguage(work) || (/\bpartial\b/i.test(work) && !/\d/.test(work))) {
+      return { reps: 0, note: cleanNote(work), isHold: false };
+    }
+
+    if (/racked|lockout|partial|failed|could not|couldn't/i.test(work)) {
+      return { reps: 0, note: cleanNote(work), isHold: false };
+    }
+
+    return { reps: null, note: cleanNote(work), isHold: false };
+  }
+
+  function appendSet(weight, body, timeStr, extraNote) {
+    var parsed = parseRepsFromBody(body);
+    if (parsed.reps === null) return false;
+    var note = [parsed.note, extraNote].filter(function (s) { return s; }).join(" | ");
+    if (parsed.isHold && note.indexOf("hold") === -1) note = note ? note + " | hold" : "hold";
+
+    var sideRegex = /(?:\b(right|left)\b)\s*[-:–—]?\s*(\d+(?:\.\d+)?)(?:\s*(?:reps?|rep))?/ig;
+    var sideMatches = Array.from(body.matchAll(sideRegex));
+    if (sideMatches.length) {
+      sideMatches.forEach(function (m) {
+        var side = (m[1] || "").toLowerCase();
+        var repVal = m[2] ? parseFloat(m[2]) : parsed.reps;
+        currentSets.push({ weight: weight, reps: repVal, time: timeStr || "", note: note, side: side === "right" ? "right" : "left" });
+      });
+    } else {
+      currentSets.push({ weight: weight, reps: parsed.reps, time: timeStr || "", note: note, side: "both" });
+    }
+    return true;
+  }
+
+  function parseSetsFromLine(normalized, dropsetNote) {
+    var timeMatch = normalized.match(/(\d{1,2}:\d{2})/);
+    var timeStr = timeMatch ? timeMatch[1] : "";
+    var working = normalized.replace(/[{}]/g, " ").replace(/\bdropset\b/gi, " ").replace(/\s+/g, " ").trim();
+    var setPattern = /(\d+\.?\d*)\s*(?:kg|kgs)?\s*[-–—:]\s*([^]*?)(?=\s+\d+\.?\d*\s*(?:kg|kgs)?\s*[-–—:]|$)/gi;
+    var matches = Array.from(working.matchAll(setPattern));
+    if (!matches.length) return false;
+    if (!currentExercise) currentExercise = "Untitled Exercise";
+    var tag = dropsetNote || "";
+    matches.forEach(function (match, idx) {
+      appendSet(parseFloat(match[1]), match[2].trim(), idx === matches.length - 1 ? timeStr : "", tag);
+    });
+    return true;
+  }
+
+  function stripExerciseHeader(raw) {
+    return raw.replace(/^#+\s*/, "").replace(/^=+|=+$/g, "").replace(/^\*\*|\*\*$/g, "").replace(/[:\-]+$/, "").trim();
+  }
+
+  function handleBwLine(line) {
+    var bwCtx = line.match(/BW\s*=\s*(\d+(?:\.\d+)?)(?:\s*-\s*(\d+(?:\.\d+)?))?\s*(?:KG)?/i);
+    if (bwCtx) currentBw = parseFloat(bwCtx[1]);
+
+    var wtdMatch = line.match(/WEIGHTED\s*=?\s*(\d+(?:\.\d+)?)\s*(?:KG)?/i) || line.match(/WEIGHTED\s+(\d+(?:\.\d+)?)\s*(?:KG)?/i);
+    var addedWeight = wtdMatch ? parseFloat(wtdMatch[1]) : 0;
+
+    var exInline = line.match(/==+([^=]+?)==+/);
+    if (exInline) {
+      flushEntry();
+      currentExercise = exInline[1].trim();
+    }
+
+    var dashMatch = line.match(/[-–—]\s*(.+)$/);
+    if (!dashMatch) return true;
+
+    var body = dashMatch[1].trim();
+    body = body.replace(/(\d)\s*:\s*(\d)/g, "$1:$2");
+    body = body.replace(/((?:reps?|rep))\.(?=\s*\d{1,2}:)/gi, "$1 ");
+    var timeMatch = body.match(/(\d{1,2}:\d{2})/);
+    var load = (currentBw || 0) + addedWeight;
+
+    if (exInline || (currentExercise && /BW\s*=\s*\d/i.test(line))) {
+      if (!currentExercise && exInline) currentExercise = exInline[1].trim();
+      appendSet(load, body, timeMatch ? timeMatch[1] : "", addedWeight > 0 ? "weighted +" + addedWeight + "kg" : "bodyweight");
+      return true;
+    }
+    return true;
+  }
+
   for (var i = 0; i < lines.length; i++) {
     var line = lines[i].replace(/\s+/g, " ").trim();
-    
-    // Skip non-workout lines: horizontal rules, bodyweight lines
-    if (/^(<hr>|---|\*\*\*|___|BW\s*=)/i.test(line)) {
+
+    if (/^(<hr>|---|\*\*\*|___)/i.test(line)) continue;
+
+    if (/^BW\s*=/i.test(line)) {
+      handleBwLine(line);
       continue;
     }
-    
-    // Strip Obsidian markdown headers (#, ##) before date matching
+
     var dateLine = line.replace(/^#+\s*/, "");
-    
-    // Match text month formats: "24 July 2026" or "July 24, 2026"
+
     var dm = dateLine.match(/^(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})$/i) || dateLine.match(/^([a-zA-Z]+)\s+(\d{1,2})[,\s]+(\d{4})$/i);
     if (dm) {
       var day, mon, yr;
-      if (isNaN(parseInt(dm[1]))) { mon = MONTH_MAP[dm[1].toLowerCase()]; day = parseInt(dm[2]); yr = parseInt(dm[3]); }
-      else { day = parseInt(dm[1]); mon = MONTH_MAP[dm[2].toLowerCase()]; yr = parseInt(dm[3]); }
+      if (isNaN(parseInt(dm[1], 10))) { mon = MONTH_MAP[dm[1].toLowerCase()]; day = parseInt(dm[2], 10); yr = parseInt(dm[3], 10); }
+      else { day = parseInt(dm[1], 10); mon = MONTH_MAP[dm[2].toLowerCase()]; yr = parseInt(dm[3], 10); }
       if (mon !== undefined) {
         flushEntry();
         date = formatDate(new Date(yr, mon, day));
@@ -219,25 +358,17 @@ export function parseWorkoutText(text) {
       }
     }
 
-    // Match numeric formats: YYYY-MM-DD or YYYY/MM/DD
     var numericYMD = dateLine.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
     if (numericYMD) {
-      var yr = parseInt(numericYMD[1]);
-      var mon = parseInt(numericYMD[2]) - 1;
-      var day = parseInt(numericYMD[3]);
       flushEntry();
-      date = formatDate(new Date(yr, mon, day));
+      date = formatDate(new Date(parseInt(numericYMD[1], 10), parseInt(numericYMD[2], 10) - 1, parseInt(numericYMD[3], 10)));
       continue;
     }
 
-    // Match numeric formats: DD-MM-YYYY or DD/MM/YYYY
     var numericDMY = dateLine.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
     if (numericDMY) {
-      var day = parseInt(numericDMY[1]);
-      var mon = parseInt(numericDMY[2]) - 1;
-      var yr = parseInt(numericDMY[3]);
       flushEntry();
-      date = formatDate(new Date(yr, mon, day));
+      date = formatDate(new Date(parseInt(numericDMY[3], 10), parseInt(numericDMY[2], 10) - 1, parseInt(numericDMY[1], 10)));
       continue;
     }
 
@@ -245,51 +376,16 @@ export function parseWorkoutText(text) {
     normalized = normalized.replace(/(\d)\s*:\s*(\d)/g, "$1:$2");
     normalized = normalized.replace(/((?:reps?|rep))\.(?=\s*\d{1,2}:)/gi, "$1 ");
     var timeMatch = normalized.match(/(\d{1,2}:\d{2})/);
+    var dropsetNote = /dropset/i.test(normalized) ? "dropset" : "";
+
+    if (/[{}]/.test(normalized) || dropsetNote) {
+      if (parseSetsFromLine(normalized, dropsetNote)) continue;
+    }
 
     var setMatch = normalized.match(/^(?:\s*)(\d+\.?\d*)\s*(?:kg|kgs)?\s*[-–—:]\s*(.*)$/i);
     if (setMatch && setMatch[2]) {
-      var body = setMatch[2].trim();
-      var reps;
-      var note;
-      
-      // Check for failed sets
-      if (/failed|fail|couldn't/i.test(body)) {
-        reps = 0;
-        note = cleanNote(body.replace(/\b\d{1,2}:\d{2}\b/g, ""));
-      } else {
-        // Check for fractional reps: 6 1/2REPS or 6½REPS
-        var fractionalMatch = body.match(/(\d+)\s*(?:1\/2|½)\s*(?:reps?|rep)?\b/i);
-        if (fractionalMatch) {
-          reps = parseFloat(fractionalMatch[1]) + 0.5;
-          note = cleanNote(body.replace(/(\d+)\s*(?:1\/2|½)\s*(?:reps?|rep)?\b/gi, ""));
-        } else {
-          // Check for range reps: 4 OR 5REPS
-          var rangeMatch = body.match(/(\d+)\s*or\s*(\d+)\s*(?:reps?|rep)?\b/i);
-          if (rangeMatch) {
-            reps = Math.max(parseInt(rangeMatch[1]), parseInt(rangeMatch[2]));
-            note = cleanNote(body.replace(/(\d+)\s*or\s*(\d+)\s*(?:reps?|rep)?\b/gi, ""));
-          } else {
-            var repsMatch = body.match(/(\d+)\s*(?:reps?|rep)\b/i);
-            var ordinalMatch = body.match(/(\d+)(?:st|nd|rd|th)\s*rep\b/i);
-            reps = repsMatch ? parseInt(repsMatch[1]) : (ordinalMatch ? parseInt(ordinalMatch[1]) : 1);
-            note = cleanNote(body.replace(/(\d+)\s*(?:reps?|rep)\b/gi, "").replace(/(\d+)(?:st|nd|rd|th)\s*rep\b/gi, ""));
-          }
-        }
-      }
       if (!currentExercise) currentExercise = "Untitled Exercise";
-      // Detect side-specific reps like "RIGHT - 7REPS, LEFT - 5REPS" and create individual sets
-      var sideRegex = /(?:\b(right|left)\b)\s*[-:–—]?\s*(\d+(?:\.\d+)?)(?:\s*(?:reps?|rep))?/ig;
-      var sideMatches = Array.from(body.matchAll(sideRegex));
-      if (sideMatches && sideMatches.length) {
-        sideMatches.forEach(function (m) {
-          var side = (m[1] || "").toLowerCase();
-          var repVal = m[2] ? parseFloat(m[2]) : reps;
-          currentSets.push({ weight: parseFloat(setMatch[1]), reps: repVal, time: timeMatch ? timeMatch[1] : "", note: note, side: side === "right" ? "right" : "left" });
-        });
-      } else {
-        // No side info: mark as 'both' so it can count toward both left and right when visualizing
-        currentSets.push({ weight: parseFloat(setMatch[1]), reps: reps, time: timeMatch ? timeMatch[1] : "", note: note, side: 'both' });
-      }
+      appendSet(parseFloat(setMatch[1]), setMatch[2].trim(), timeMatch ? timeMatch[1] : "", dropsetNote);
       continue;
     }
 
@@ -302,6 +398,17 @@ export function parseWorkoutText(text) {
       continue;
     }
 
+    if (currentSets.length && !/^==/.test(normalized) && !/^\*\*/.test(normalized)) {
+      var contMatch = normalized.match(/^(\d+\.?\d*)\s*(?:kg|kgs)?\s*[-–—:]\s*(.*)$/i);
+      if (!contMatch && (timeMatch || /partial|failed|racked|lockout|&/i.test(normalized))) {
+        var last = currentSets[currentSets.length - 1];
+        var contNote = cleanNote(normalized.replace(/&/g, ""));
+        if (contNote) last.note = [last.note, contNote].filter(function (s) { return s; }).join(" | ");
+        if (timeMatch) last.time = timeMatch[1];
+        continue;
+      }
+    }
+
     var exMatch = normalized.match(/^([A-Za-z0-9&/\-'() ]+?)\s*(?:[:\-]\s*)?(\d+\.?\d*)\s*(?:kg|kgs)?\s*(?:x|×|\*|-|\/)\s*(\d+)/i);
     if (exMatch && exMatch[1]) {
       flushEntry();
@@ -310,7 +417,7 @@ export function parseWorkoutText(text) {
     }
 
     if (!/^\d/.test(line)) {
-      var cleaned = line.replace(/^#+\s*/, "").replace(/^==+|==+$/g, "").replace(/^\*\*|\*\*$/g, "").replace(/[:\-]+$/, "").trim();
+      var cleaned = stripExerciseHeader(line);
       if (cleaned.length > 0 && cleaned.length < 80 && !/^\d{1,2}\s+[a-zA-Z]+\s+\d{4}$/i.test(cleaned) && !/^[a-zA-Z]+\s+\d{1,2}[,\s]+\d{4}$/i.test(cleaned)) {
         flushEntry();
         currentExercise = cleaned;

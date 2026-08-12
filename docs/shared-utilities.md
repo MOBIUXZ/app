@@ -39,6 +39,9 @@ Normalizes any exercise string to a canonical name:
 | `deadlift`, `deadlifts`, `dl` | Deadlift |
 | `barbell rows`, `bb row`, `row` | Barbell Row |
 | `pushpress`, `push press` | Push Press |
+| `bw pushups`, `bw pullups`, `bw dips` | Push-up, Pull-up, Dip |
+| `wtd pushups`, `wtd pullups` | Weighted Push-up, Weighted Pull-up |
+| `rear delt machine lfyes` | Rear Delt Machine Fly (typo-tolerant) |
 | `single arm latpulldown` | Single Arm Lat Pulldown |
 
 ### `formatExerciseName(exercise)`
@@ -104,15 +107,39 @@ Parses free-form workout notes into structured entries.
 80KG - 4 OR 5REPS
 60KG - ( RIGHT - 7REPS , LEFT - 5REPS ) 8:28
 45KG - 12REPS.8:54
+55KG - 6:34                    (time-only → 1 rep with timestamp)
+20KG - 10 + REPS               (plus notation)
+50KG - racked, but failed      (0 reps)
+{ 60KG - 7REPS 50KG - 2REPS } DROPSET
 ```
+
+#### Bodyweight & Weighted Calisthenics
+```
+BW = 68KG ==BW PUSHUPS== - 34REPS
+==BW PUSHUPS==
+BW = 68KG - 37REPS
+BW = 68KG WEIGHTED = 5.35KG ==WTD PUSHUPS== - 27REPS
+BW = 68 WEIGHTED 10KG ==WTD PULLUPS== - 4 PARTIAL REPS
+BW = 68KG ==BW ELBOW PLANK HOLD== - 60 SECONDS
+BW = 65-68KG                     (stores bodyweight context only)
+```
+
+- `BW = XKG` sets bodyweight context for subsequent sets under an exercise header
+- Inline `==EXERCISE==` on a BW line starts a new exercise entry
+- Weighted lines add vest/plate weight to bodyweight for total load
+- `SECONDS` / hold durations are stored as reps with a `hold` note
 
 #### Set Parsing Features
 - Weight in kg (with or without `KG` suffix)
-- Rep counts including fractional (`6 1/2`) and range (`4 OR 5`)
-- Failed sets (`failed`, `couldn't`)
-- Per-set timestamps (`7:52`, `12REPS.8:54`)
+- Rep counts including fractional (`6 1/2`), range (`4 OR 5`), plus (`10 + REPS`), and partial (`4 PARTIAL REPS`)
+- Time holds (`60 SECONDS`, `10SECONDS`) → reps = seconds, note = hold
+- Failed / partial attempts without rep counts → **0 reps** (not 1)
+- Soft failures: `racked but failed`, `partial`, `just racked`, `could not rack`
+- Per-set timestamps (`7:52`, `12REPS.8:54`, time-only lines)
 - Left/right side detection → separate sets with `side: "left"` or `"right"`
 - Sets without side info → `side: "both"`
+- Dropsets: brace-wrapped multi-set lines tagged with `dropset` note
+- Multi-line continuation notes (e.g. partial lockout on next line) appended to prior set
 - Set notes extracted from remaining text
 
 #### Output Structure
