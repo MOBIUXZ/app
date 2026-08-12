@@ -2,6 +2,47 @@ import { useState } from "react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExerciseName, isNoSplitLift, isCompoundLift, COMPOUND_LIFTS } from "./shared";
 
+function isSplitImbalanced(payload, metric) {
+  if (!payload) return false;
+  var left = payload[metric + "_left"];
+  var right = payload[metric + "_right"];
+  return left != null && right != null && left !== right;
+}
+
+function SplitDot(props) {
+  var cx = props.cx;
+  var cy = props.cy;
+  var payload = props.payload;
+  var fill = props.fill;
+  var metric = props.metric;
+  if (cx == null || cy == null) return null;
+  if (isSplitImbalanced(payload, metric)) {
+    return (
+      <g>
+        <circle cx={cx} cy={cy} r={9} fill="rgba(251, 191, 36, 0.18)" stroke="#fbbf24" strokeWidth={2} />
+        <circle cx={cx} cy={cy} r={5} fill={fill} stroke="#fef3c7" strokeWidth={1.5} />
+      </g>
+    );
+  }
+  return <circle cx={cx} cy={cy} r={4} fill={fill} />;
+}
+
+function SplitTooltip({ active, payload, label, metric, metricLabel }) {
+  if (!active || !payload || !payload.length) return null;
+  var point = payload[0].payload;
+  var left = point[metric + "_left"];
+  var right = point[metric + "_right"];
+  var imbalanced = isSplitImbalanced(point, metric);
+  return (
+    <div style={{ background: "#23232f", border: imbalanced ? "1px solid #fbbf24" : "1px solid #3d3d4a", borderRadius: 8, fontSize: 12, padding: "8px 10px" }}>
+      <div style={{ color: "#e2e8f0", fontWeight: 700, marginBottom: 6 }}>{label}</div>
+      <div style={{ color: BLUE, marginBottom: 2 }}>Left: {left != null ? left : "—"}</div>
+      <div style={{ color: PINK, marginBottom: imbalanced ? 6 : 0 }}>Right: {right != null ? right : "—"}</div>
+      {imbalanced && <div style={{ color: "#fbbf24", fontSize: 11, fontWeight: 700 }}>⚠ Imbalance ({metricLabel})</div>}
+    </div>
+  );
+}
+
 function ExerciseChart({ ex, data, compoundIdx, onPointSelect, formatChartDate, getChartDateKey }) {
   var [metric, setMetric] = useState("weight");
   var isC = isCompoundLift(ex);
@@ -50,6 +91,8 @@ function ExerciseChart({ ex, data, compoundIdx, onPointSelect, formatChartDate, 
   var pr = cd.length ? Math.max.apply(null, cd.map(function (d) { return d.weight; })) : 0;
   var latest = cd.length ? cd[cd.length - 1] : null;
   var trend = cd.length >= 2 ? cd[cd.length - 1].weight - cd[cd.length - 2].weight : null;
+  var metricLabel = metric === "weight" ? "Max Weight" : metric === "volume" ? "Volume" : "Max Reps";
+  var hasImbalance = showSplit && viewMode === "split" && chartData.some(function (p) { return isSplitImbalanced(p, metric); });
 
   return (
     <div style={{ background: "#2a2a38", border: "1px solid #3a3a4a", borderRadius: 14, padding: 18, marginBottom: 14 }}>
@@ -86,7 +129,8 @@ function ExerciseChart({ ex, data, compoundIdx, onPointSelect, formatChartDate, 
               <Line type="monotone" dataKey={metric} stroke={exColor} strokeWidth={2} dot={{ fill: exColor, r: 4 }} connectNulls={true} />
             </LineChart>
           </ResponsiveContainer>
-        </div> : <div style={{ display: 'flex', gap: 8 }}>
+        </div> : <div>
+          <div style={{ display: 'flex', gap: 8 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 11, color: '#9ca3af', margin: '0 8px 6px' }}>Left</div>
             <div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}>
@@ -95,8 +139,8 @@ function ExerciseChart({ ex, data, compoundIdx, onPointSelect, formatChartDate, 
                   <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
                   <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
                   <YAxis tick={cs} width={35} />
-                  <Tooltip contentStyle={tt} />
-                  <Line type="monotone" dataKey={metric + '_left'} stroke={BLUE} strokeWidth={2} dot={{ fill: BLUE, r: 4 }} connectNulls={true} />
+                  <Tooltip content={<SplitTooltip metric={metric} metricLabel={metricLabel} />} />
+                  <Line type="monotone" dataKey={metric + '_left'} stroke={BLUE} strokeWidth={2} dot={function (props) { return <SplitDot cx={props.cx} cy={props.cy} payload={props.payload} fill={BLUE} metric={metric} />; }} activeDot={{ r: 6, fill: BLUE, stroke: "#fef3c7", strokeWidth: 2 }} connectNulls={true} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -109,12 +153,17 @@ function ExerciseChart({ ex, data, compoundIdx, onPointSelect, formatChartDate, 
                   <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
                   <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
                   <YAxis tick={cs} width={35} />
-                  <Tooltip contentStyle={tt} />
-                  <Line type="monotone" dataKey={metric + '_right'} stroke={PINK} strokeWidth={2} dot={{ fill: PINK, r: 4 }} connectNulls={true} />
+                  <Tooltip content={<SplitTooltip metric={metric} metricLabel={metricLabel} />} />
+                  <Line type="monotone" dataKey={metric + '_right'} stroke={PINK} strokeWidth={2} dot={function (props) { return <SplitDot cx={props.cx} cy={props.cy} payload={props.payload} fill={PINK} metric={metric} />; }} activeDot={{ r: 6, fill: PINK, stroke: "#fef3c7", strokeWidth: 2 }} connectNulls={true} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
           </div>
+          </div>
+          {hasImbalance && <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 8, fontSize: 11, color: "#fbbf24" }}>
+            <span style={{ width: 10, height: 10, borderRadius: "50%", border: "2px solid #fbbf24", background: "rgba(251, 191, 36, 0.18)", display: "inline-block" }} />
+            Amber ring highlights left/right imbalance for {metricLabel.toLowerCase()}
+          </div>}
         </div>}
         {cd.length === 1 && <div style={{ color: "#6b7280", fontSize: 11, textAlign: "center", marginTop: 8 }}>Log another session to see trends</div>}
       </div>}

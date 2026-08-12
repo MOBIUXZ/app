@@ -54,6 +54,28 @@ Side data comes from Smart Parser entries like:
 
 Sets without side info are marked `both` and count toward combined totals.
 
+### Left/Right Imbalance Highlighting (Split View)
+
+When **Split** view is active, the app compares left and right values for the currently selected metric (Max Weight, Volume, or Max Reps) at each session. If the two sides differ, that data point is visually flagged so you can spot muscular imbalances at a glance.
+
+**What was added:**
+
+| Feature | Description |
+|---------|-------------|
+| **Amber ring on dots** | Imbalanced points on both Left and Right charts get a larger dot with an amber (`#fbbf24`) outer ring instead of the standard small dot |
+| **Imbalance tooltip** | Hovering an imbalanced point shows Left and Right values together, with a `⚠ Imbalance` warning and an amber tooltip border |
+| **Legend** | When any imbalanced sessions exist for the current metric, a legend appears below the split charts: *"Amber ring highlights left/right imbalance for [metric]"* |
+
+**How imbalance is detected:**
+
+For each session and metric, the app compares the left-side value (`weight_left`, `volume_left`, or `reps_left`) against the right-side value (`weight_right`, `volume_right`, or `reps_right`). If both values exist and are not equal, the point is marked imbalanced.
+
+**Example:** A Single Arm Lat Pulldown session logged as `RIGHT - 10REPS, LEFT - 7REPS` will highlight on the **Max Reps** split chart because 10 ≠ 7. The same session will not highlight on **Max Weight** if both sides used the same load (e.g. 60 kg).
+
+Sessions where left and right match, or where sets are logged without side info (`both`), show normal dots with no amber ring.
+
+**Implementation:** Custom Recharts dot renderer (`SplitDot`) and tooltip component (`SplitTooltip`) in `ProgressPage.jsx`, driven by `isSplitImbalanced()` helper logic.
+
 ### Chart Behavior
 - Charts render from **1 session** onward (single data point shown)
 - Hint shown when only 1 session: *"Log another session to see trends"*
