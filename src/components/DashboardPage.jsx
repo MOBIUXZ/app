@@ -1,5 +1,5 @@
 import React , {useState} from "react";
-import { resolveExercise, Card, StatBox, Collapse } from "./shared";
+import { resolveExercise, formatExerciseName, Card, StatBox, Collapse } from "./shared";
 
 const ACCENT = "#a78bfa";
 const GREEN = "#34d399";
@@ -25,12 +25,12 @@ function DashboardPage({data,setTab}){
       <Card>
         <div style={{fontWeight:700,marginBottom:10}}>🏆 Personal Records</div>
         {Object.keys(prs).length===0?<div style={{color:"#6b7280",fontSize:13,padding:"16px 0",textAlign:"center"}}><div style={{fontSize:32,marginBottom:8}}>🏋️</div><div>No workouts yet.</div><div style={{marginTop:8}}><span style={{color:ACCENT,cursor:"pointer",fontWeight:600}} onClick={function(){setTab("Workout");}}>Log your first workout!</span></div></div>:
-          Object.entries(prs).map(function(kv){return <div key={kv[0]} style={{display:"flex",justifyContent:"space-between",padding:"8px 0",borderBottom:"1px solid #2d2d3a",fontSize:14}}><span>{kv[0]}</span><span style={{color:ACCENT,fontWeight:700}}>{kv[1]} kg</span></div>;})}
+          Object.entries(prs).map(function(kv){return <div key={kv[0]} style={{display:"flex",justifyContent:"space-between",padding:"8px 0",borderBottom:"1px solid #2d2d3a",fontSize:14}}><span>{formatExerciseName(kv[0])}</span><span style={{color:ACCENT,fontWeight:700}}>{kv[1]} kg</span></div>;})}
       </Card>
       <Collapse emoji="📋" label="Recent Workouts" defaultOpen={false}>
         <Card>
           {data.workouts.length===0?<div style={{color:"#6b7280",fontSize:13,padding:"16px 0",textAlign:"center"}}><div style={{fontSize:32,marginBottom:8}}>📝</div><div>Nothing logged yet!</div></div>:
-            data.workouts.slice().reverse().slice(0,3).map(function(w,i){return <div key={i} style={{padding:"8px 0",borderBottom:"1px solid #2d2d3a",fontSize:13}}><span style={{color:ACCENT,fontWeight:700}}>{resolveExercise(w.exercise)}</span><span style={{color:"#6b7280",marginLeft:8,fontSize:12}}>{w.date}{w.time?" · "+w.time:""}</span><div style={{color:"#9ca3af",fontSize:12}}>{w.sets.map(function(s){return s.weight+"kg×"+s.reps;}).join(" • ")}</div></div>;})}
+            data.workouts.slice().reverse().slice(0,3).map(function(w,i){return <div key={i} style={{padding:"8px 0",borderBottom:"1px solid #2d2d3a",fontSize:13}}><span style={{color:ACCENT,fontWeight:700}}>{formatExerciseName(w.exercise)}</span><span style={{color:"#6b7280",marginLeft:8,fontSize:12}}>{w.date}{w.time?" · "+w.time:""}</span><div style={{color:"#9ca3af",fontSize:12}}>{w.sets.map(function(s){return s.weight+"kg×"+s.reps;}).join(" • ")}</div></div>;})}
         </Card>
       </Collapse>
     </div>

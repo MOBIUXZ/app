@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, isCompoundLift, btnPrimary, btnSecondary, btnDanger, inp, Card, formatDate } from "./shared";
+import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, formatExerciseName, btnPrimary, btnSecondary, btnDanger, inp, Card, formatDate } from "./shared";
 
 function OneRMCalc({ data }) {
   var [weight, setWeight] = useState(""); var [reps, setReps] = useState(""); var [formula, setFormula] = useState("Epley"); var [autoEx, setAutoEx] = useState("");
@@ -39,8 +39,6 @@ function OneRMCalc({ data }) {
   );
 }
 
-
-function formatExerciseName(exercise) { return isCompoundLift(exercise) ? resolveExercise(exercise).toUpperCase() : resolveExercise(exercise); }
 
 export default function WorkoutPage({ data, save }) {
   var [cat, setCat] = useState("Powerlifting");
@@ -625,7 +623,7 @@ Bench Press
                         <span>📅</span>
                         <span>{entry.date || parsePreview.date || "Unknown date"}</span>
                       </div>
-                      <div style={{ fontWeight: 700, color: ACCENT, marginBottom: 4 }}>{entry.exercise}</div>
+                      <div style={{ fontWeight: 700, color: ACCENT, marginBottom: 4 }}>{formatExerciseName(entry.exercise)}</div>
                       {entry.sets.map(function (s, sIdx) {
                         return (
                           <div key={sIdx} style={{ fontSize: 13, color: "#9ca3af", marginBottom: 3 }}>

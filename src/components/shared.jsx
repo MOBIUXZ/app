@@ -45,12 +45,14 @@ var EXERCISE_ALIASES = {
   ohp: "Overhead Press",
   "overhead press": "Overhead Press",
   squat: "Squat",
+  squats: "Squat",
   sq: "Squat",
   "back squat": "Squat",
   bench: "Bench Press",
   "bench press": "Bench Press",
   bp: "Bench Press",
   deadlift: "Deadlift",
+  deadlifts: "Deadlift",
   dl: "Deadlift",
   rdl: "Romanian Deadlift",
   "romanian deadlift": "Romanian Deadlift",
@@ -123,6 +125,22 @@ export function isNoSplitLift(exercise) {
 
 export function isCompoundLift(exercise) {
   return COMPOUND_LIFTS.indexOf(resolveExercise(exercise)) !== -1;
+}
+
+var COMPOUND_DISPLAY_NAMES = {
+  "Overhead Press": "OVERHEAD PRESS",
+  "Push Press": "PUSHPRESS",
+  "Barbell Row": "BARBELL ROWS",
+  "Squat": "SQUATS",
+  "Deadlift": "DEADLIFTS",
+  "Bench Press": "BENCH PRESS",
+};
+
+export function formatExerciseName(exercise) {
+  var resolved = resolveExercise(exercise);
+  if (!isCompoundLift(resolved)) return resolved;
+  if (COMPOUND_DISPLAY_NAMES[resolved]) return COMPOUND_DISPLAY_NAMES[resolved];
+  return resolved.toUpperCase();
 }
 
 export function formatDate(date) {
