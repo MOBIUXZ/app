@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
-import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExerciseName, isNoSplitLift, isCompoundLift, COMPOUND_LIFTS, getExerciseChartColor, useKeyboardListNav, useKeyboardLayer, isTypingTarget } from "./shared";
+import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExerciseName, isNoSplitLift, isCompoundLift, COMPOUND_LIFTS, getExerciseChartColor, useKeyboardListNav, useKeyboardLayer, isTypingTarget, ui, cx } from "./shared";
+import s from "./ProgressPage.module.css";
 
 function isSplitImbalanced(payload, metric) {
   if (!payload) return false;
@@ -34,8 +35,8 @@ function SplitTooltip({ active, payload, label, metric, metricLabel }) {
   var right = point[metric + "_right"];
   var imbalanced = isSplitImbalanced(point, metric);
   return (
-    <div style={{ background: "#23232f", border: imbalanced ? "1px solid #fbbf24" : "1px solid #3d3d4a", borderRadius: 8, fontSize: 12, padding: "8px 10px" }}>
-      <div style={{ color: "#e2e8f0", fontWeight: 700, marginBottom: 6 }}>{label}</div>
+    <div className={s.tooltip} style={{ border: imbalanced ? "1px solid #fbbf24" : "1px solid var(--ft-border-input)" }}>
+      <div className={s.tooltipTitle}>{label}</div>
       <div style={{ color: BLUE, marginBottom: 2 }}>Left: {left != null ? left : "—"}</div>
       <div style={{ color: PINK, marginBottom: imbalanced ? 6 : 0 }}>Right: {right != null ? right : "—"}</div>
       {imbalanced && <div style={{ color: "#fbbf24", fontSize: 11, fontWeight: 700 }}>⚠ Imbalance ({metricLabel})</div>}
@@ -72,7 +73,6 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
         rightWeights.push(wt);
         rightReps.push(rp);
       } else {
-        // both / unspecified -> count for both sides
         leftVol += wt * rp; rightVol += wt * rp;
         leftWeights.push(wt); rightWeights.push(wt);
         leftReps.push(rp); rightReps.push(rp);
@@ -94,32 +94,36 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
   var metricLabel = metric === "weight" ? "Max Weight" : metric === "volume" ? "Volume" : "Max Reps";
   var hasImbalance = showSplit && viewMode === "split" && chartData.some(function (p) { return isSplitImbalanced(p, metric); });
 
+  function chartToggleClass(active) {
+    return active ? ui.chartToggleBtnActive : ui.chartToggleBtn;
+  }
+
   return (
-    <div style={{ background: "#2a2a38", border: "1px solid #3a3a4a", borderRadius: 14, padding: 18, marginBottom: 14 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+    <div className={s.exerciseCard}>
+      <div className={s.exerciseHeader}>
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontWeight: 800, fontSize: 15, color: "#e2e8f0" }}>{formatExerciseName(ex)}</span>
-            {isC && <span style={{ background: exColor + "33", color: exColor, border: "1px solid " + exColor + "55", borderRadius: 20, padding: "1px 8px", fontSize: 10, fontWeight: 700 }}>Compound</span>}
+          <div className={s.exerciseTitleRow}>
+            <span className={s.exerciseTitle}>{formatExerciseName(ex)}</span>
+            {isC && <span className={s.compoundBadge} style={{ background: exColor + "33", color: exColor, border: "1px solid " + exColor + "55" }}>Compound</span>}
           </div>
-          <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{sessions.length} session{sessions.length !== 1 ? "s" : ""}</div>
+          <div className={s.sessionCount}>{sessions.length} session{sessions.length !== 1 ? "s" : ""}</div>
         </div>
-        <div style={{ textAlign: "right" }}>
-          <div style={{ fontSize: 11, color: "#6b7280" }}>PR</div>
-          <div style={{ fontWeight: 900, color: exColor, fontSize: 18 }}>{pr}<span style={{ fontSize: 11, color: "#9ca3af" }}> kg</span></div>
-          {trend !== null && <div style={{ fontSize: 11, color: trend > 0 ? GREEN : trend < 0 ? "#f87171" : "#6b7280" }}>{trend > 0 ? "▲ +" : trend < 0 ? "▼ " : "–"}{trend !== 0 ? Math.abs(trend) + " kg" : "no change"}</div>}
+        <div className={s.prBlock}>
+          <div className={s.prLabel}>PR</div>
+          <div className={s.prValue} style={{ color: exColor }}>{pr}<span className={s.prUnit}> kg</span></div>
+          {trend !== null && <div className={s.trend} style={{ color: trend > 0 ? GREEN : trend < 0 ? "#f87171" : "var(--ft-text-dim)" }}>{trend > 0 ? "▲ +" : trend < 0 ? "▼ " : "–"}{trend !== 0 ? Math.abs(trend) + " kg" : "no change"}</div>}
         </div>
       </div>
-      {latest && <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>{[{ label: "Last Weight", val: latest.weight + " kg", color: exColor }, { label: "Last Volume", val: latest.volume + " kg", color: ORANGE }, { label: "Max Reps", val: latest.reps, color: GREEN }].map(function (s) { return <div key={s.label} style={{ flex: 1, background: "#1e1e2e", borderRadius: 8, padding: "7px 8px", textAlign: "center" }}><div style={{ fontSize: 9, color: "#6b7280", marginBottom: 2 }}>{s.label}</div><div style={{ fontWeight: 800, color: s.color, fontSize: 13 }}>{s.val}</div></div>; })}</div>}
-      {cd.length < 1 ? <div style={{ color: "#6b7280", fontSize: 12, textAlign: "center", padding: "10px 0" }}>No sessions logged yet</div> : <div>
-        <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
-          {["weight", "volume", "reps"].map(function (m) { return <button key={m} onClick={function () { setMetric(m); }} style={{ padding: "4px 11px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 600, background: metric === m ? exColor : "#2d2d3a", color: metric === m ? "#fff" : "#a0aec0" }}>{m === "weight" ? "Max Weight" : m === "volume" ? "Volume" : "Max Reps"}</button>; })}
-          {showSplit && <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
-            <button onClick={function () { setViewMode('combined'); }} style={{ padding: "4px 11px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 700, background: viewMode === 'combined' ? exColor : "#2d2d3a", color: viewMode === 'combined' ? "#fff" : "#a0aec0" }}>Combined</button>
-            <button onClick={function () { setViewMode('split'); }} style={{ padding: "4px 11px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 700, background: viewMode === 'split' ? exColor : "#2d2d3a", color: viewMode === 'split' ? "#fff" : "#a0aec0" }}>Split</button>
+      {latest && <div className={s.statStrip}>{[{ label: "Last Weight", val: latest.weight + " kg", color: exColor }, { label: "Last Volume", val: latest.volume + " kg", color: ORANGE }, { label: "Max Reps", val: latest.reps, color: GREEN }].map(function (st) { return <div key={st.label} className={s.miniStat}><div className={s.miniStatLabel}>{st.label}</div><div className={s.miniStatValue} style={{ color: st.color }}>{st.val}</div></div>; })}</div>}
+      {cd.length < 1 ? <div className={s.noSessions}>No sessions logged yet</div> : <div>
+        <div className={ui.chartToggleRow}>
+          {["weight", "volume", "reps"].map(function (m) { return <button key={m} type="button" onClick={function () { setMetric(m); }} className={chartToggleClass(metric === m)} style={metric === m ? { background: exColor, color: "#fff" } : undefined}>{m === "weight" ? "Max Weight" : m === "volume" ? "Volume" : "Max Reps"}</button>; })}
+          {showSplit && <div className={s.splitToggleGroup}>
+            <button type="button" onClick={function () { setViewMode('combined'); }} className={chartToggleClass(viewMode === 'combined')} style={viewMode === 'combined' ? { background: exColor, color: "#fff" } : undefined}>Combined</button>
+            <button type="button" onClick={function () { setViewMode('split'); }} className={chartToggleClass(viewMode === 'split')} style={viewMode === 'split' ? { background: exColor, color: "#fff" } : undefined}>Split</button>
           </div>}
         </div>
-        {(!showSplit || viewMode === 'combined') ? <div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}>
+        {(!showSplit || viewMode === 'combined') ? <div className={ui.chartContainer}>
           <ResponsiveContainer width="100%" height={140}>
             <LineChart data={chartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0] && onPointSelect) { onPointSelect(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
@@ -130,10 +134,10 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
             </LineChart>
           </ResponsiveContainer>
         </div> : <div>
-          <div style={{ display: 'flex', gap: 8 }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 11, color: '#9ca3af', margin: '0 8px 6px' }}>Left</div>
-            <div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}>
+          <div className={s.splitRow}>
+          <div className={s.splitCol}>
+            <div className={s.splitLabel}>Left</div>
+            <div className={ui.chartContainer}>
               <ResponsiveContainer width="100%" height={140}>
                 <LineChart data={chartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0] && onPointSelect) { onPointSelect(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
@@ -145,9 +149,9 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
               </ResponsiveContainer>
             </div>
           </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 11, color: '#9ca3af', margin: '0 8px 6px' }}>Right</div>
-            <div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}>
+          <div className={s.splitCol}>
+            <div className={s.splitLabel}>Right</div>
+            <div className={ui.chartContainer}>
               <ResponsiveContainer width="100%" height={140}>
                 <LineChart data={chartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0] && onPointSelect) { onPointSelect(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
@@ -160,12 +164,12 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
             </div>
           </div>
           </div>
-          {hasImbalance && <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 8, fontSize: 11, color: "#fbbf24" }}>
-            <span style={{ width: 10, height: 10, borderRadius: "50%", border: "2px solid #fbbf24", background: "rgba(251, 191, 36, 0.18)", display: "inline-block" }} />
+          {hasImbalance && <div className={s.imbalanceHint}>
+            <span className={s.imbalanceDot} />
             Amber ring highlights left/right imbalance for {metricLabel.toLowerCase()}
           </div>}
         </div>}
-        {cd.length === 1 && <div style={{ color: "#6b7280", fontSize: 11, textAlign: "center", marginTop: 8 }}>Log another session to see trends</div>}
+        {cd.length === 1 && <div className={s.singleSessionHint}>Log another session to see trends</div>}
       </div>}
     </div>
   );
@@ -261,9 +265,9 @@ export default function ProgressPage({ data }) {
 
   return (
     <div>
-      <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 20, letterSpacing: "-0.02em" }}>📈 Progress</div>
-      {allEx.length === 0 ? <Card><div style={{ color: "#6b7280", fontSize: 13, textAlign: "center", padding: "20px 0" }}>No workouts logged yet.</div></Card> : <div>
-        {compounds.length > 0 && <div style={{ fontSize: 12, color: ACCENT, fontWeight: 700, marginBottom: 10, letterSpacing: 1 }}>🏋️ COMPOUND LIFTS</div>}
+      <div className={ui.pageTitle}>📈 Progress</div>
+      {allEx.length === 0 ? <Card><div className={s.emptyChart}>No workouts logged yet.</div></Card> : <div>
+        {compounds.length > 0 && <div className={s.sectionLabel}>🏋️ COMPOUND LIFTS</div>}
         {compounds.map(function (ex, i) { return <ExerciseChart key={ex} ex={ex} data={normalizedData} colorFallbackIdx={i} onPointSelect={setSelectedDate} formatChartDate={formatChartDate} getChartDateKey={getChartDateKey} />; })}
         {compounds.length > 1 && (function () {
           var allDates = Array.from(new Set(normalizedWorkouts.map(function (w) { return getChartDateKey(w.date); }))).filter(function (date) { return !!date; });
@@ -298,34 +302,58 @@ export default function ProgressPage({ data }) {
             });
             return point;
           });
-          return <Card style={{ marginBottom: 14, background: "#2a2a38" }}><div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4 }}>📊 Combined Compound Lifts</div><div style={{ display: "flex", gap: 6, marginBottom: 8 }}>{["weight", "volume", "reps"].map(function (m) { return <button key={m} onClick={function () { setCompoundMetric(m); }} style={{ padding: "4px 11px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 600, background: compoundMetric === m ? ACCENT : "#2d2d3a", color: compoundMetric === m ? "#fff" : "#a0aec0" }}>{m === "weight" ? "Max Weight" : m === "volume" ? "Volume" : "Max Reps"}</button>; })}</div><div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}><ResponsiveContainer width="100%" height={180}><LineChart data={chartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0]) { setSelectedDate(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} />{compounds.map(function (ex) { var lineColor = getExerciseChartColor(ex); return <Line key={ex} type="monotone" dataKey={ex} stroke={lineColor} strokeWidth={2} dot={{ fill: lineColor, r: 2 }} connectNulls={true} />; })}</LineChart></ResponsiveContainer></div></Card>;
+          return (
+            <Card className={ui.cardChartMb}>
+              <div className={ui.sectionTitleLg}>📊 Combined Compound Lifts</div>
+              <div className={ui.chartToggleRow}>
+                {["weight", "volume", "reps"].map(function (m) {
+                  return (
+                    <button key={m} type="button" onClick={function () { setCompoundMetric(m); }} className={compoundMetric === m ? ui.chartToggleBtnActive : ui.chartToggleBtn} style={compoundMetric === m ? { background: ACCENT, color: "#fff" } : undefined}>
+                      {m === "weight" ? "Max Weight" : m === "volume" ? "Volume" : "Max Reps"}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className={ui.chartContainer}>
+                <ResponsiveContainer width="100%" height={180}>
+                  <LineChart data={chartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0]) { setSelectedDate(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
+                    <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
+                    <YAxis tick={cs} width={35} />
+                    <Tooltip contentStyle={tt} />
+                    {compounds.map(function (ex) { var lineColor = getExerciseChartColor(ex); return <Line key={ex} type="monotone" dataKey={ex} stroke={lineColor} strokeWidth={2} dot={{ fill: lineColor, r: 2 }} connectNulls={true} />; })}
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+          );
         })()}
         {selectedDate && (
-          <div className="ft-kb-modal-backdrop" style={{ position: "fixed", inset: 0, background: "rgba(2, 6, 23, 0.76)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, zIndex: detailLayer.zIndex }} onClick={function () { setSelectedDate(null); }}>
-            <div style={{ width: "100%", maxWidth: 460, background: "#18181f", border: "1px solid #3a3a4a", borderRadius: 18, boxShadow: "0 0 0 1px rgba(167,139,250,0.15), 0 24px 48px rgba(0,0,0,0.5)", overflow: "hidden" }} onClick={function (ev) { ev.stopPropagation(); }} tabIndex={-1}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 18px", borderBottom: "1px solid #2d2d3a" }}>
-                <div><div style={{ fontSize: 12, color: ACCENT, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Workout Details</div><div style={{ fontSize: 17, fontWeight: 800, color: "#e2e8f0", marginTop: 2 }}>{formatChartDate(selectedDate)}</div></div>
-                <button onClick={function () { setSelectedDate(null); }} style={{ background: "transparent", border: "none", color: "#9ca3af", fontSize: 20, cursor: "pointer" }}>✕</button>
+          <div className={cx("ft-kb-modal-backdrop", s.detailBackdrop)} style={{ zIndex: detailLayer.zIndex }} onClick={function () { setSelectedDate(null); }}>
+            <div className={s.detailPanel} onClick={function (ev) { ev.stopPropagation(); }} tabIndex={-1}>
+              <div className={s.detailHeader}>
+                <div><div className={s.detailEyebrow}>Workout Details</div><div className={s.detailDate}>{formatChartDate(selectedDate)}</div></div>
+                <button type="button" onClick={function () { setSelectedDate(null); }} className={ui.modalClose}>✕</button>
               </div>
-              <div ref={detailKb.listRef} style={{ padding: 18, maxHeight: "60vh", overflowY: "auto", outline: "none" }}>
+              <div ref={detailKb.listRef} className={s.detailBody}>
                 {selectedWorkouts.length > 0 ? selectedWorkouts.map(function (w, idx) {
                   return (
-                    <div key={idx} data-kb-index={idx} className={detailKb.kbClass(idx)} onMouseEnter={function () { detailKb.setFocusIdx(idx); }} style={{ background: "#23232f", border: "1px solid #3a3a4a", borderRadius: 12, padding: 12, marginBottom: idx === selectedWorkouts.length - 1 ? 0 : 10 }}>
-                      <div style={{ fontWeight: 800, color: "#e2e8f0", marginBottom: 6 }}>{formatExerciseName(w.exercise)}</div>
-                      <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 8 }}>{w.time ? w.time + " · " : ""}{w.date}</div>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>{(w.sets || []).map(function (s, i) { return <span key={i} style={{ background: "#2d2d3a", color: "#cbd5e1", borderRadius: 999, padding: "4px 8px", fontSize: 11, fontWeight: 700 }}>{s.weight || 0}kg × {s.reps || 0}{s.side === "left" ? " L" : s.side === "right" ? " R" : ""}</span>; })}</div>
+                    <div key={idx} data-kb-index={idx} className={cx(detailKb.kbClass(idx), idx === selectedWorkouts.length - 1 ? s.workoutCard : s.workoutCardSpaced)} onMouseEnter={function () { detailKb.setFocusIdx(idx); }}>
+                      <div className={s.workoutName}>{formatExerciseName(w.exercise)}</div>
+                      <div className={s.workoutMeta}>{w.time ? w.time + " · " : ""}{w.date}</div>
+                      <div className={s.setChipRow}>{(w.sets || []).map(function (st, i) { return <span key={i} className={s.setChip}>{st.weight || 0}kg × {st.reps || 0}{st.side === "left" ? " L" : st.side === "right" ? " R" : ""}</span>; })}</div>
                     </div>
                   );
-                }) : <div style={{ color: "#6b7280", fontSize: 13, textAlign: "center", padding: "16px 0" }}>No workouts logged for this date.</div>}
+                }) : <div className={s.emptyChart}>No workouts logged for this date.</div>}
               </div>
             </div>
           </div>
         )}
-        {(isolations.length > 0) && <div style={{ fontSize: 12, color: ACCENT, fontWeight: 700, margin: "16px 0 10px", letterSpacing: 1 }}>💪 ISOLATION LIFTS</div>}
+        {(isolations.length > 0) && <div className={s.sectionLabelSpaced}>💪 ISOLATION LIFTS</div>}
         {isolations.map(function (ex, i) { return <ExerciseChart key={ex} ex={ex} data={normalizedData} colorFallbackIdx={i} onPointSelect={setSelectedDate} formatChartDate={formatChartDate} getChartDateKey={getChartDateKey} />; })}
-        <Card style={{ background: "#2a2a38" }}>
-          <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 8 }}>📉 Body Weight & Body Fat</div>
-          <div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}>
+        <Card className={ui.cardChart}>
+          <div className={ui.sectionTitleLg}>📉 Body Weight & Body Fat</div>
+          <div className={ui.chartContainer}>
             <ResponsiveContainer width="100%" height={160}>
               <LineChart data={bwChart.length ? bwChart : []}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
@@ -336,11 +364,11 @@ export default function ProgressPage({ data }) {
               </LineChart>
             </ResponsiveContainer>
           </div>
-          {bfChart.length > 0 && <div style={{ marginTop: 12 }}><div style={{ fontSize: 12, color: PINK, fontWeight: 700, marginBottom: 6 }}>Body Fat %</div><div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}><ResponsiveContainer width="100%" height={140}><LineChart data={bfChart}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} /><Line type="monotone" dataKey="bf" stroke={PINK} strokeWidth={2} dot={{ fill: PINK, r: 3 }} /></LineChart></ResponsiveContainer></div></div>}
+          {bfChart.length > 0 && <div className={s.bfSection}><div className={s.bfLabel} style={{ color: PINK }}>Body Fat %</div><div className={ui.chartContainer}><ResponsiveContainer width="100%" height={140}><LineChart data={bfChart}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} /><Line type="monotone" dataKey="bf" stroke={PINK} strokeWidth={2} dot={{ fill: PINK, r: 3 }} /></LineChart></ResponsiveContainer></div></div>}
         </Card>
-        <Card style={{ background: "#2a2a38" }}>
-          <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 8 }}>🔥 Calorie Intake Trend</div>
-          <div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}>
+        <Card className={ui.cardChart}>
+          <div className={ui.sectionTitleLg}>🔥 Calorie Intake Trend</div>
+          <div className={ui.chartContainer}>
             <ResponsiveContainer width="100%" height={160}>
               <LineChart data={calChart}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />

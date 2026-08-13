@@ -1,0 +1,1136 @@
+/* Shared UI — buttons, inputs, cards, typography, layout utilities */
+
+.btnPrimary,
+.btnSecondary,
+.btnDanger {
+  border: none;
+  border-radius: var(--ft-radius-lg);
+  cursor: pointer;
+  font-weight: 700;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btnPrimary {
+  background: var(--ft-accent);
+  color: var(--ft-text-dark);
+  padding: 12px 16px;
+  font-weight: 800;
+  font-size: 14px;
+  min-height: 44px;
+}
+
+.btnPrimary:hover {
+  background: var(--ft-accent-hover);
+}
+
+.btnSecondary {
+  background: var(--ft-bg-btn);
+  color: var(--ft-accent);
+  border: 1px solid rgba(167, 139, 250, 0.27);
+  padding: 10px 14px;
+  font-size: 13px;
+  min-height: 40px;
+}
+
+.btnSecondary:hover {
+  background: var(--ft-bg-btn-hover);
+}
+
+.btnDanger {
+  background: var(--ft-bg-danger);
+  color: var(--ft-red);
+  border: 1px solid var(--ft-red);
+  padding: 10px 14px;
+  font-size: 13px;
+  min-height: 40px;
+}
+
+.btnDanger:hover {
+  background: var(--ft-bg-danger-hover);
+}
+
+.btnXsPill {
+  padding: 5px 10px !important;
+  border-radius: var(--ft-radius-pill) !important;
+  font-size: 11px !important;
+  min-height: auto !important;
+}
+
+.btnSm {
+  padding: 6px 12px !important;
+  font-size: 13px !important;
+  min-height: auto !important;
+}
+
+.btnCompact {
+  padding: 9px !important;
+  font-size: 12px !important;
+  min-height: auto !important;
+}
+
+.btnMd {
+  font-size: 13px !important;
+}
+
+.btnModal {
+  padding: 10px 16px !important;
+}
+
+.btnEditInline {
+  padding: 7px 14px !important;
+  font-size: 12px !important;
+  min-height: auto !important;
+}
+
+.btnCancelHistory {
+  padding: 8px 14px !important;
+  font-size: 13px !important;
+  min-height: 36px !important;
+}
+
+.input {
+  background: var(--ft-bg-card);
+  border: 1px solid var(--ft-border-input);
+  border-radius: var(--ft-radius-md);
+  color: var(--ft-text);
+  padding: 10px 12px;
+  outline: none;
+  box-sizing: border-box;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.textarea {
+  composes: input;
+  resize: vertical;
+  min-height: 70px;
+}
+
+.textareaMono {
+  composes: textarea;
+  font-family: monospace;
+}
+
+.card {
+  background: var(--ft-bg-panel);
+  border: 1px solid var(--ft-border);
+  border-radius: var(--ft-radius-2xl);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.cardChart {
+  composes: card;
+  background: var(--ft-bg-chart);
+}
+
+.statBox {
+  background: var(--ft-bg-card);
+  border-radius: var(--ft-radius-xl);
+  padding: 12px 14px;
+  flex: 1;
+  min-width: 80px;
+}
+
+.statLabel {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+  margin-bottom: 3px;
+}
+
+.statValue {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ft-accent);
+}
+
+.statUnit {
+  font-size: 11px;
+  color: var(--ft-text-muted);
+  margin-left: 2px;
+}
+
+.collapse {
+  background: linear-gradient(135deg, var(--ft-bg-panel) 0%, var(--ft-bg-panel-alt) 100%);
+  border: 1px solid var(--ft-border);
+  border-radius: var(--ft-radius-3xl);
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: var(--ft-shadow-card);
+}
+
+.collapseToggle {
+  width: 100%;
+  padding: 14px 18px;
+  background: transparent;
+  border: none;
+  color: var(--ft-text);
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: inherit;
+}
+
+.collapseToggleOpen {
+  composes: collapseToggle;
+  background: rgba(167, 139, 250, 0.08);
+}
+
+.collapseChevron {
+  font-size: 18px;
+  display: inline-block;
+  transition: transform 0.2s;
+  color: var(--ft-accent);
+}
+
+.collapseChevronOpen {
+  composes: collapseChevron;
+  transform: rotate(90deg);
+}
+
+.collapseBody {
+  padding: 0 18px 18px;
+}
+
+.pageTitle {
+  font-size: 24px;
+  font-weight: 900;
+  margin-bottom: 20px;
+  letter-spacing: -0.02em;
+}
+
+.statRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.sectionTitle {
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.sectionTitleLg {
+  font-weight: 800;
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+
+.muted {
+  color: var(--ft-text-dim);
+}
+
+.mutedSm {
+  color: var(--ft-text-dim);
+  font-size: 13px;
+}
+
+.mutedXs {
+  color: var(--ft-text-dim);
+  font-size: 11px;
+}
+
+.textMuted {
+  color: var(--ft-text-muted);
+}
+
+.textMutedSm {
+  color: var(--ft-text-muted);
+  font-size: 12px;
+}
+
+.textAccent {
+  color: var(--ft-accent);
+}
+
+.textAccentBold {
+  color: var(--ft-accent);
+  font-weight: 700;
+}
+
+.textGreen {
+  color: var(--ft-green);
+}
+
+.textRed {
+  color: var(--ft-red);
+}
+
+.textCenter {
+  text-align: center;
+}
+
+.linkAccent {
+  color: var(--ft-accent);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.emptyState {
+  color: var(--ft-text-dim);
+  font-size: 13px;
+  padding: 16px 0;
+  text-align: center;
+}
+
+.emptyStateLg {
+  composes: emptyState;
+  padding: 24px 0;
+}
+
+.emptyIcon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.emptyIconLg {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.listOutline {
+  outline: none;
+}
+
+.listRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ft-border);
+  font-size: 14px;
+}
+
+.listRowSimple {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ft-border);
+  font-size: 13px;
+}
+
+.flexRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.flexRowWrap {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.flexBetween {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flexEnd {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.fieldLabel {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+  margin-bottom: 4px;
+}
+
+.fieldLabelSection {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+  margin-bottom: 6px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.fieldBlock {
+  margin-bottom: 16px;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.flex1 {
+  flex: 1;
+}
+
+.inputSm {
+  composes: input;
+  font-size: 12px;
+}
+
+.inputGoal {
+  composes: input;
+  width: 75px;
+  text-align: center;
+}
+
+.inputW62 {
+  composes: input;
+  width: 62px;
+}
+
+.inputW70 {
+  composes: input;
+  width: 70px;
+}
+
+.inputMinW60 {
+  composes: input;
+  flex: 1;
+  min-width: 60px;
+}
+
+.inputMinW70 {
+  composes: input;
+  flex: 1;
+  min-width: 70px;
+}
+
+.inputMinW80 {
+  composes: input;
+  flex: 1;
+  min-width: 80px;
+}
+
+.inputMinW130 {
+  composes: input;
+  flex: 1;
+  min-width: 130px;
+}
+
+.inputMinW140 {
+  composes: input;
+  flex: 1;
+  min-width: 140px;
+}
+
+.select {
+  composes: input;
+}
+
+.textareaMb10 {
+  composes: textarea;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.textareaMb8 {
+  composes: textarea;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.textareaMonoMd {
+  composes: textareaMono;
+  width: 100%;
+  min-height: 140px;
+  margin-bottom: 10px;
+}
+
+.textareaMonoLg {
+  composes: textareaMono;
+  width: 100%;
+  min-height: 160px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.cardFlush {
+  composes: card;
+  padding: 0;
+  overflow: hidden;
+}
+
+.cardChartMb {
+  composes: cardChart;
+  margin-bottom: 14px;
+}
+
+.btnSave {
+  background: var(--ft-green);
+  color: var(--ft-text-dark);
+  border: none;
+  border-radius: var(--ft-radius-md);
+  padding: 8px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 13px;
+  min-height: 36px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btnIconEdit {
+  background: var(--ft-bg-btn);
+  color: var(--ft-accent);
+  border: none;
+  border-radius: var(--ft-radius-sm);
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.iconBtnDelete {
+  background: var(--ft-bg-danger);
+  color: var(--ft-red);
+  border: none;
+  border-radius: var(--ft-radius-sm);
+  padding: 4px 9px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btnIconDeleteSm {
+  composes: iconBtnDelete;
+}
+
+.sexToggleRow {
+  display: flex;
+  gap: 6px;
+}
+
+.sexToggleBtn {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--ft-radius-md);
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: capitalize;
+  min-height: 40px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.sexToggleBtnActive {
+  composes: sexToggleBtn;
+  background: var(--ft-accent);
+  color: var(--ft-text-dark);
+}
+
+.sexToggleBtnInactive {
+  composes: sexToggleBtn;
+  background: var(--ft-bg-btn);
+  color: var(--ft-text-nav);
+}
+
+.groupLabel {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+  margin-bottom: 5px;
+  margin-top: 12px;
+}
+
+.metricsHint {
+  font-size: 12px;
+  color: var(--ft-text-dim);
+  margin: 12px 0 8px;
+}
+
+.relationSection {
+  margin-top: 14px;
+}
+
+.relationDivider {
+  border-top: 1px solid var(--ft-border);
+  padding-top: 12px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  color: var(--ft-text-dim);
+}
+
+.relationBox {
+  background: var(--ft-bg-card-alt);
+  border: 1px solid var(--ft-border);
+  border-radius: var(--ft-radius-lg);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.relationBoxLast {
+  composes: relationBox;
+  margin-bottom: 0;
+}
+
+.relationFormula {
+  color: var(--ft-text-dim);
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+
+.relationRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.relationOp {
+  color: var(--ft-text-faint);
+}
+
+.relationNote {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--ft-text-dim);
+}
+
+.historyEntry {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--ft-border);
+}
+
+.historyEntryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.historyEntryDate {
+  font-size: 12px;
+  color: var(--ft-text-dim);
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chipValueDynamic {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.metricBoxLg {
+  flex: 1;
+  background: var(--ft-bg-card);
+  border-radius: var(--ft-radius-lg);
+  padding: 12px;
+  text-align: center;
+}
+
+.metricBoxLgLabel {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+  margin-bottom: 2px;
+}
+
+.metricBoxLgValue {
+  font-weight: 900;
+  font-size: 22px;
+}
+
+.metricBoxLgUnit {
+  font-size: 12px;
+  color: var(--ft-text-muted);
+  margin-left: 2px;
+}
+
+.metricBoxLgSub {
+  font-size: 10px;
+  color: var(--ft-text-dim);
+  margin-top: 2px;
+}
+
+.activityBtn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: var(--ft-radius-md);
+  border: 1px solid var(--ft-border);
+  background: var(--ft-bg-card-alt);
+  cursor: pointer;
+  color: var(--ft-text);
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+}
+
+.activityBtnActive {
+  composes: activityBtn;
+  border-color: var(--ft-accent);
+  background: #2d2040;
+}
+
+.activityBtnLabel {
+  font-size: 13px;
+}
+
+.activityBtnLabelActive {
+  composes: activityBtnLabel;
+  font-weight: 700;
+  color: var(--ft-accent);
+}
+
+.activityBtnDesc {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+}
+
+.goalChip {
+  flex: 1;
+  background: var(--ft-bg-card);
+  border-radius: var(--ft-radius-md);
+  padding: 8px;
+  text-align: center;
+}
+
+.goalChipLabel {
+  font-size: 10px;
+  color: var(--ft-text-dim);
+}
+
+.goalChipValue {
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.progressBarTrack {
+  background: var(--ft-bg-btn);
+  border-radius: 99px;
+  height: 12px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.progressBarFill {
+  height: 100%;
+  border-radius: 99px;
+}
+
+.macroBox {
+  flex: 1;
+  background: var(--ft-bg-card);
+  border-radius: var(--ft-radius-lg);
+  padding: 10px;
+  text-align: center;
+}
+
+.macroBoxLabel {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+}
+
+.macroBoxValue {
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.macroBoxUnit {
+  font-size: 11px;
+  color: var(--ft-text-muted);
+}
+
+.calPickerToggle {
+  width: 100%;
+  padding: 14px 18px;
+  background: transparent;
+  border: none;
+  color: var(--ft-text);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: inherit;
+}
+
+.calPickerChevron {
+  font-size: 18px;
+  transition: transform 0.2s;
+}
+
+.calPickerChevronOpen {
+  composes: calPickerChevron;
+  transform: rotate(90deg);
+}
+
+.calPickerBody {
+  padding: 0 14px 14px;
+}
+
+.calNavRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.calNavBtn {
+  background: var(--ft-bg-btn);
+  border: none;
+  color: var(--ft-text);
+  border-radius: var(--ft-radius-md);
+  padding: 4px 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+.calMonthLabel {
+  font-weight: 700;
+  color: var(--ft-accent);
+}
+
+.calGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  text-align: center;
+}
+
+.calDayHeader {
+  font-size: 10px;
+  color: var(--ft-text-dim);
+  padding: 3px 0;
+}
+
+.calDayBtn {
+  border: none;
+  border-radius: var(--ft-radius-sm);
+  padding: 5px 2px;
+  cursor: pointer;
+  font-size: 12px;
+  position: relative;
+  font-family: inherit;
+}
+
+.calDayDot {
+  width: 4px;
+  height: 4px;
+  background: var(--ft-orange);
+  border-radius: 50%;
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.calLegend {
+  margin-top: 8px;
+  font-size: 10px;
+  color: var(--ft-text-dim);
+  text-align: center;
+}
+
+.foodGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  gap: 6px;
+}
+
+.foodGridEdit {
+  composes: foodGrid;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.entryRow {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ft-border);
+}
+
+.entryFood {
+  font-size: 13px;
+  color: var(--ft-text);
+}
+
+.entryMacros {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+}
+
+.entryActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.entryCal {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.recentExName {
+  color: var(--ft-accent);
+  font-weight: 700;
+}
+
+.recentMeta {
+  color: var(--ft-text-dim);
+  margin-left: 8px;
+  font-size: 12px;
+}
+
+.recentSets {
+  color: var(--ft-text-muted);
+  font-size: 12px;
+}
+
+.prValue {
+  color: var(--ft-accent);
+  font-weight: 700;
+}
+
+.emptyLink {
+  margin-top: 8px;
+}
+
+.emptySub {
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.margin0 {
+  margin: 0 !important;
+}
+
+.marginTop8 {
+  margin-top: 8px;
+}
+
+.marginTop10 {
+  margin-top: 10px;
+}
+
+.marginTop14 {
+  margin-top: 14px;
+}
+
+.marginBottom8 {
+  margin-bottom: 8px;
+}
+
+.marginBottom10 {
+  margin-bottom: 10px;
+}
+
+.marginBottom12 {
+  margin-bottom: 12px;
+}
+
+.gap6 {
+  gap: 6px;
+}
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalPanel {
+  background: var(--ft-bg-panel);
+  border: 1px solid var(--ft-border);
+  border-radius: var(--ft-radius-3xl);
+  padding: 20px;
+  max-width: 600px;
+  width: 90%;
+  outline: none;
+  box-shadow: var(--ft-shadow-modal);
+}
+
+.modalPanelScroll {
+  composes: modalPanel;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalPanelConfirm {
+  background: var(--ft-bg-card);
+  border: 1px solid var(--ft-border-input);
+  border-radius: var(--ft-radius-3xl);
+  padding: 20px;
+  max-width: 400px;
+  width: 90%;
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(167, 139, 250, 0.2), 0 24px 48px rgba(0, 0, 0, 0.5);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.modalTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ft-text);
+}
+
+.modalClose {
+  background: transparent;
+  border: none;
+  color: var(--ft-text-muted);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-family: inherit;
+}
+
+.iconBtnRemove {
+  background: var(--ft-bg-btn);
+  color: var(--ft-red);
+  border: none;
+  border-radius: var(--ft-radius-sm);
+  padding: 7px 9px;
+  cursor: pointer;
+}
+
+.successMsg {
+  color: var(--ft-green);
+  font-size: 13px;
+  text-align: center;
+}
+
+.errorMsg {
+  color: var(--ft-red);
+  font-size: 13px;
+}
+
+.chip {
+  background: var(--ft-bg-card);
+  border-radius: var(--ft-radius-md);
+  padding: 5px 9px;
+}
+
+.chipLabel {
+  font-size: 10px;
+  color: var(--ft-text-dim);
+}
+
+.chipValue {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.chipUnit {
+  font-size: 10px;
+  color: var(--ft-text-muted);
+  margin-left: 1px;
+}
+
+.metricBox {
+  flex: 1;
+  background: var(--ft-bg-inset);
+  border-radius: var(--ft-radius-md);
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.metricBoxLabel {
+  font-size: 10px;
+  color: var(--ft-text-dim);
+  margin-bottom: 2px;
+}
+
+.metricBoxValue {
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.pillToggleTrack {
+  display: flex;
+  gap: 6px;
+  background: var(--ft-bg-card);
+  border: 1px solid var(--ft-border-input);
+  border-radius: var(--ft-radius-pill);
+  padding: 4px;
+}
+
+.pillToggleBtn {
+  padding: 5px 10px;
+  border-radius: var(--ft-radius-pill);
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  background: transparent;
+  color: var(--ft-text-nav);
+  font-family: inherit;
+}
+
+.pillToggleBtnActive {
+  composes: pillToggleBtn;
+  background: var(--ft-accent);
+  color: var(--ft-text-dark);
+}
+
+.historyToolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.historyToolbarSticky {
+  position: sticky;
+  top: 0;
+  background: var(--ft-bg-sticky);
+  z-index: 10;
+  padding-bottom: 12px;
+  padding-top: 4px;
+}
+
+.chartContainer {
+  background: var(--ft-bg-inset);
+  border-radius: var(--ft-radius-lg);
+  padding: 10px 4px;
+}
+
+.chartToggleRow {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.chartToggleBtn {
+  padding: 4px 11px;
+  border-radius: var(--ft-radius-pill);
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--ft-bg-btn);
+  color: var(--ft-text-nav);
+  font-family: inherit;
+}
+
+.chartToggleBtnActive {
+  composes: chartToggleBtn;
+  color: #fff;
+}

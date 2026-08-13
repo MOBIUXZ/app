@@ -1,0 +1,271 @@
+/* Progress page — charts, exercise cards, detail modal */
+
+.exerciseCard {
+  background: var(--ft-bg-chart);
+  border: 1px solid var(--ft-border-card);
+  border-radius: var(--ft-radius-2xl);
+  padding: 18px;
+  margin-bottom: 14px;
+}
+
+.exerciseHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.exerciseTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.exerciseTitle {
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--ft-text);
+}
+
+.compoundBadge {
+  border-radius: var(--ft-radius-pill);
+  padding: 1px 8px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.sessionCount {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+  margin-top: 2px;
+}
+
+.prBlock {
+  text-align: right;
+}
+
+.prLabel {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+}
+
+.prValue {
+  font-weight: 900;
+  font-size: 18px;
+}
+
+.prUnit {
+  font-size: 11px;
+  color: var(--ft-text-muted);
+}
+
+.trend {
+  font-size: 11px;
+}
+
+.statStrip {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.miniStat {
+  flex: 1;
+  background: var(--ft-bg-inset);
+  border-radius: var(--ft-radius-md);
+  padding: 7px 8px;
+  text-align: center;
+}
+
+.miniStatLabel {
+  font-size: 9px;
+  color: var(--ft-text-dim);
+  margin-bottom: 2px;
+}
+
+.miniStatValue {
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.noSessions {
+  color: var(--ft-text-dim);
+  font-size: 12px;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.splitRow {
+  display: flex;
+  gap: 8px;
+}
+
+.splitCol {
+  flex: 1;
+}
+
+.splitLabel {
+  font-size: 11px;
+  color: var(--ft-text-muted);
+  margin: 0 8px 6px;
+}
+
+.imbalanceHint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--ft-yellow);
+}
+
+.imbalanceDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--ft-yellow);
+  background: rgba(251, 191, 36, 0.18);
+  display: inline-block;
+}
+
+.singleSessionHint {
+  color: var(--ft-text-dim);
+  font-size: 11px;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.sectionLabel {
+  font-size: 12px;
+  color: var(--ft-accent);
+  font-weight: 700;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.sectionLabelSpaced {
+  composes: sectionLabel;
+  margin: 16px 0 10px;
+}
+
+.splitToggleGroup {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+
+.tooltip {
+  background: var(--ft-bg-card);
+  border-radius: var(--ft-radius-md);
+  font-size: 12px;
+  padding: 8px 10px;
+}
+
+.tooltipTitle {
+  color: var(--ft-text);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.detailBackdrop {
+  composes: modalBackdrop from "../styles/ui.module.css";
+  background: rgba(2, 6, 23, 0.76);
+  padding: 20px;
+}
+
+.detailPanel {
+  width: 100%;
+  max-width: 460px;
+  background: var(--ft-bg-panel);
+  border: 1px solid var(--ft-border-card);
+  border-radius: 18px;
+  box-shadow: var(--ft-shadow-modal);
+  overflow: hidden;
+}
+
+.detailHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--ft-border);
+}
+
+.detailEyebrow {
+  font-size: 12px;
+  color: var(--ft-accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.detailDate {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--ft-text);
+  margin-top: 2px;
+}
+
+.detailBody {
+  padding: 18px;
+  max-height: 60vh;
+  overflow-y: auto;
+  outline: none;
+}
+
+.workoutCard {
+  background: var(--ft-bg-card);
+  border: 1px solid var(--ft-border-card);
+  border-radius: var(--ft-radius-xl);
+  padding: 12px;
+}
+
+.workoutCardSpaced {
+  composes: workoutCard;
+  margin-bottom: 10px;
+}
+
+.workoutName {
+  font-weight: 800;
+  color: var(--ft-text);
+  margin-bottom: 6px;
+}
+
+.workoutMeta {
+  font-size: 12px;
+  color: var(--ft-text-muted);
+  margin-bottom: 8px;
+}
+
+.setChipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.setChip {
+  background: var(--ft-bg-btn);
+  color: var(--ft-text-chip);
+  border-radius: var(--ft-radius-pill);
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.bfSection {
+  margin-top: 12px;
+}
+
+.bfLabel {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.emptyChart {
+  color: var(--ft-text-dim);
+  font-size: 13px;
+  text-align: center;
+  padding: 20px 0;
+}

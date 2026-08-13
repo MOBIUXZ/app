@@ -1,4 +1,9 @@
 import { useState, useEffect, useRef, createContext, useContext, useMemo } from "react";
+import ui from "../styles/ui.module.css";
+import { cx, btnPrimaryClass, btnSecondaryClass, btnDangerClass, inputClass, selectClass, textareaClass } from "../styles/styleHelpers.js";
+
+export { ui, cx, btnPrimaryClass, btnSecondaryClass, btnDangerClass, inputClass, selectClass, textareaClass };
+export { btnPrimaryClass as btnPrimary, btnSecondaryClass as btnSecondary, btnDangerClass as btnDanger, inputClass as inp };
 
 export const ACCENT = "#a78bfa";
 export const GREEN = "#34d399";
@@ -771,73 +776,31 @@ export function useConfirmDialogKeyboard(open, onConfirm, onCancel, layerId, lab
   };
 }
 
-export function Card({ children, style }) {
-  return <div style={Object.assign({ background: "#18181f", border: "1px solid #2d2d3a", borderRadius: 14, padding: 20, marginBottom: 16 }, style || {})}>{children}</div>;
+export function Card({ children, className }) {
+  return <div className={cx(ui.card, className)}>{children}</div>;
 }
 
 export function StatBox({ label, value, unit, color }) {
-  return <div style={{ background: "#23232f", borderRadius: 12, padding: "12px 14px", flex: 1, minWidth: 80 }}><div style={{ fontSize: 11, color: "#6b7280", marginBottom: 3 }}>{label}</div><div style={{ fontSize: 20, fontWeight: 800, color: color || ACCENT }}>{value != null ? value : "—"}<span style={{ fontSize: 11, color: "#9ca3af", marginLeft: 2 }}>{unit}</span></div></div>;
+  return (
+    <div className={ui.statBox}>
+      <div className={ui.statLabel}>{label}</div>
+      <div className={ui.statValue} style={color ? { color: color } : undefined}>
+        {value != null ? value : "—"}
+        <span className={ui.statUnit}>{unit}</span>
+      </div>
+    </div>
+  );
 }
 
 export function Collapse({ emoji, label, defaultOpen, children }) {
   var [open, setOpen] = useState(defaultOpen || false);
-  return <div style={{ background: "linear-gradient(135deg, #18181f 0%, #1f1f2a 100%)", border: "1px solid #2d2d3a", borderRadius: 16, marginBottom: 12, overflow: "hidden", boxShadow: "0 10px 24px rgba(0,0,0,0.16)" }}>
-    <button onClick={function () { setOpen(!open); }} style={{ width: "100%", padding: "14px 18px", background: open ? "rgba(167, 139, 250, 0.08)" : "transparent", border: "none", color: "#e2e8f0", fontWeight: 700, fontSize: 15, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-      <span>{emoji}  {label}</span>
-      <span style={{ fontSize: 18, display: "inline-block", transform: open ? "rotate(90deg)" : "rotate(0deg)", transition: "transform .2s", color: "#a78bfa" }}>›</span>
-    </button>
-    {open && <div style={{ padding: "0 18px 18px" }}>{children}</div>}
-  </div>;
-}
-
-export function inp(ex) {
-  return Object.assign({ background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 8, color: "#e2e8f0", padding: "10px 12px", outline: "none", boxSizing: "border-box", fontSize: 14, transition: "border-color 0.2s ease, box-shadow 0.2s ease" }, ex || {});
-}
-
-export function btnPrimary(ex) {
-  return Object.assign({ background: ACCENT, color: "#0f0f13", border: "none", borderRadius: 10, padding: "12px 16px", fontWeight: 800, cursor: "pointer", fontSize: 14, transition: "all 0.2s ease", minHeight: 44, outline: "none" }, ex || {});
-}
-
-export function btnSecondary(ex) {
-  return Object.assign({ background: "#2d2d3a", color: ACCENT, border: "1px solid " + ACCENT + "44", borderRadius: 10, padding: "10px 14px", fontWeight: 700, cursor: "pointer", fontSize: 13, transition: "all 0.2s ease", minHeight: 40, outline: "none" }, ex || {});
-}
-
-export function btnDanger(ex) {
-  return Object.assign({ background: "#3d1c1c", color: "#f87171", border: "1px solid #f87171", borderRadius: 10, padding: "10px 14px", fontWeight: 700, cursor: "pointer", fontSize: 13, transition: "all 0.2s ease", minHeight: 40, outline: "none" }, ex || {});
-}
-
-export function btnPrimaryHover() {
-  return {
-    "&:hover": {
-      background: "#b794f6",
-      transform: "translateY(-1px)"
-    }
-  };
-}
-
-export function btnSecondaryHover() {
-  return {
-    "&:hover": {
-      background: "#3d3d4a",
-      transform: "translateY(-1px)"
-    }
-  };
-}
-
-export function btnDangerHover() {
-  return {
-    "&:hover": {
-      background: "#4d2c2c",
-      transform: "translateY(-1px)"
-    }
-  };
-}
-
-export function focusStyles() {
-  return {
-    "&:focus-visible": {
-      outline: "2px solid " + ACCENT,
-      outlineOffset: "2px"
-    }
-  };
+  return (
+    <div className={ui.collapse}>
+      <button type="button" onClick={function () { setOpen(!open); }} className={open ? ui.collapseToggleOpen : ui.collapseToggle}>
+        <span>{emoji}  {label}</span>
+        <span className={open ? ui.collapseChevronOpen : ui.collapseChevron}>›</span>
+      </button>
+      {open && <div className={ui.collapseBody}>{children}</div>}
+    </div>
+  );
 }

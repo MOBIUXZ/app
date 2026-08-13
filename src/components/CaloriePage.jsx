@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ACCENT, BLUE, GREEN, ORANGE, PINK, ACTIVITY, Card, Collapse, btnPrimary, btnSecondary, inp, useKeyboardListNav } from "./shared";
+import { ACCENT, GREEN, ORANGE, PINK, ACTIVITY, Card, Collapse, btnPrimary, btnSecondary, inputClass, useKeyboardListNav, ui, cx } from "./shared";
 
 export default function CaloriePage({ data, save }) {
   var [food, setFood] = useState(""), [cal, setCal] = useState(""), [protein, setProtein] = useState(""), [carbs, setCarbs] = useState(""), [fat, setFat] = useState("");
@@ -23,7 +23,6 @@ export default function CaloriePage({ data, save }) {
   var lastBC = data.bodyComp.length ? data.bodyComp[data.bodyComp.length - 1] : null;
   var bmr = lastBC ? (lastBC.BMR_Mifflin || lastBC.BMR_Katch || null) : null;
   var tdee = bmr ? Math.round(bmr * ACTIVITY[actIdx].mult) : null;
-  var cell = inp({});
   var actKb = useKeyboardListNav(ACTIVITY.length, function (i) { setActIdx(i); }, !!bmr);
   var entryKb = useKeyboardListNav(selEntries.length, function (i) { startEdit(data.calories.indexOf(selEntries[i]), selEntries[i]); }, selEntries.length > 0);
 
@@ -34,66 +33,73 @@ export default function CaloriePage({ data, save }) {
 
   return (
     <div>
-      <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 20, letterSpacing: "-0.02em" }}>🍽️ Calories</div>
+      <div className={ui.pageTitle}>🍽️ Calories</div>
       <Card>
-        <div style={{ fontWeight: 700, marginBottom: 10 }}>🔥 BMR & TDEE</div>
-        {!bmr ? <div style={{ color: "#6b7280", fontSize: 13 }}>Log a Body Comp entry with weight, height, age and sex to calculate BMR.</div> : <div>
-          <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-            <div style={{ flex: 1, background: "#23232f", borderRadius: 10, padding: "12px", textAlign: "center" }}><div style={{ fontSize: 11, color: "#6b7280", marginBottom: 2 }}>BMR</div><div style={{ fontWeight: 900, color: ORANGE, fontSize: 22 }}>{Math.round(bmr)}<span style={{ fontSize: 12, color: "#9ca3af", marginLeft: 2 }}>kcal/d</span></div><div style={{ fontSize: 10, color: "#6b7280", marginTop: 2 }}>{lastBC.BMR_Mifflin ? "Mifflin-St Jeor" : "Katch-McArdle"}</div></div>
-            <div style={{ flex: 1, background: "#23232f", borderRadius: 10, padding: "12px", textAlign: "center" }}><div style={{ fontSize: 11, color: "#6b7280", marginBottom: 2 }}>TDEE</div><div style={{ fontWeight: 900, color: ACCENT, fontSize: 22 }}>{tdee}<span style={{ fontSize: 12, color: "#9ca3af", marginLeft: 2 }}>kcal/d</span></div><div style={{ fontSize: 10, color: "#6b7280", marginTop: 2 }}>{ACTIVITY[actIdx].label}</div></div>
+        <div className={ui.sectionTitle}>🔥 BMR & TDEE</div>
+        {!bmr ? <div className={ui.mutedSm}>Log a Body Comp entry with weight, height, age and sex to calculate BMR.</div> : <div>
+          <div className={cx(ui.flexRow, ui.marginBottom12)}>
+            <div className={ui.metricBoxLg}><div className={ui.metricBoxLgLabel}>BMR</div><div className={ui.metricBoxLgValue} style={{ color: ORANGE }}>{Math.round(bmr)}<span className={ui.metricBoxLgUnit}>kcal/d</span></div><div className={ui.metricBoxLgSub}>{lastBC.BMR_Mifflin ? "Mifflin-St Jeor" : "Katch-McArdle"}</div></div>
+            <div className={ui.metricBoxLg}><div className={ui.metricBoxLgLabel}>TDEE</div><div className={ui.metricBoxLgValue} style={{ color: ACCENT }}>{tdee}<span className={ui.metricBoxLgUnit}>kcal/d</span></div><div className={ui.metricBoxLgSub}>{ACTIVITY[actIdx].label}</div></div>
           </div>
-          <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 6 }}>Activity Level</div>
-          <div ref={actKb.listRef} tabIndex={0} onKeyDown={actKb.handleKeyDown} style={{ display: "flex", flexDirection: "column", gap: 5, outline: "none" }}>{ACTIVITY.map(function (a, i) { return <button key={i} data-kb-index={i} className={actKb.kbClass(i)} onMouseEnter={function () { actKb.setFocusIdx(i); }} onClick={function () { setActIdx(i); }} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", borderRadius: 8, border: "1px solid " + (i === actIdx ? ACCENT : "#2d2d3a"), background: i === actIdx ? "#2d2040" : "#1a1a24", cursor: "pointer", color: "#e2e8f0" }}><span style={{ fontWeight: i === actIdx ? 700 : 400, color: i === actIdx ? ACCENT : "#e2e8f0", fontSize: 13 }}>{a.label}</span><span style={{ fontSize: 11, color: "#6b7280" }}>{a.desc} · x{a.mult}</span></button>; })}</div>
-          <div style={{ marginTop: 12, display: "flex", gap: 8 }}>{[{ label: "Cut (-500)", color: "#f87171", val: tdee - 500 }, { label: "Maintain", color: GREEN, val: tdee }, { label: "Bulk (+300)", color: ACCENT, val: tdee + 300 }].map(function (g) { return <div key={g.label} style={{ flex: 1, background: "#23232f", borderRadius: 8, padding: "8px", textAlign: "center" }}><div style={{ fontSize: 10, color: "#6b7280" }}>{g.label}</div><div style={{ fontWeight: 800, color: g.color, fontSize: 14 }}>{g.val} kcal</div></div>; })}</div>
+          <div className={cx(ui.mutedSm, ui.marginBottom8)}>Activity Level</div>
+          <div ref={actKb.listRef} tabIndex={0} onKeyDown={actKb.handleKeyDown} className={ui.listOutline} style={{ display: "flex", flexDirection: "column", gap: 5 }}>{ACTIVITY.map(function (a, i) { return <button key={i} type="button" data-kb-index={i} className={cx(actKb.kbClass(i), i === actIdx ? ui.activityBtnActive : ui.activityBtn)} onMouseEnter={function () { actKb.setFocusIdx(i); }} onClick={function () { setActIdx(i); }}><span className={i === actIdx ? ui.activityBtnLabelActive : ui.activityBtnLabel}>{a.label}</span><span className={ui.activityBtnDesc}>{a.desc} · x{a.mult}</span></button>; })}</div>
+          <div className={cx(ui.flexRow, ui.marginTop12)}>{[{ label: "Cut (-500)", color: "#f87171", val: tdee - 500 }, { label: "Maintain", color: GREEN, val: tdee }, { label: "Bulk (+300)", color: ACCENT, val: tdee + 300 }].map(function (g) { return <div key={g.label} className={ui.goalChip}><div className={ui.goalChipLabel}>{g.label}</div><div className={ui.goalChipValue} style={{ color: g.color }}>{g.val} kcal</div></div>; })}</div>
         </div>}
       </Card>
-      <Card style={{ padding: 0, overflow: "hidden" }}>
-        <button onClick={function () { setShowCal(!showCal); }} style={{ width: "100%", padding: "14px 18px", background: "transparent", border: "none", color: "#e2e8f0", fontWeight: 700, fontSize: 14, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <Card className={ui.cardFlush}>
+        <button type="button" onClick={function () { setShowCal(!showCal); }} className={ui.calPickerToggle}>
           <span>📅 {displayDate(selDate)}</span>
-          <span style={{ fontSize: 18, transform: showCal ? "rotate(90deg)" : "rotate(0deg)", transition: "transform .2s" }}>›</span>
+          <span className={showCal ? ui.calPickerChevronOpen : ui.calPickerChevron}>›</span>
         </button>
-        {showCal && <div style={{ padding: "0 14px 14px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-            <button onClick={function () { setSelDate(new Date(calYear, calMonth - 1, 1)); }} style={{ background: "#2d2d3a", border: "none", color: "#e2e8f0", borderRadius: 8, padding: "4px 12px", cursor: "pointer", fontWeight: 700 }}>‹</button>
-            <span style={{ fontWeight: 700, color: ACCENT }}>{monthNames[calMonth]} {calYear}</span>
-            <button onClick={function () { setSelDate(new Date(calYear, calMonth + 1, 1)); }} style={{ background: "#2d2d3a", border: "none", color: "#e2e8f0", borderRadius: 8, padding: "4px 12px", cursor: "pointer", fontWeight: 700 }}>›</button>
+        {showCal && <div className={ui.calPickerBody}>
+          <div className={ui.calNavRow}>
+            <button type="button" onClick={function () { setSelDate(new Date(calYear, calMonth - 1, 1)); }} className={ui.calNavBtn}>‹</button>
+            <span className={ui.calMonthLabel}>{monthNames[calMonth]} {calYear}</span>
+            <button type="button" onClick={function () { setSelDate(new Date(calYear, calMonth + 1, 1)); }} className={ui.calNavBtn}>›</button>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 3, textAlign: "center" }}>
-            {dayNames.map(function (d) { return <div key={d} style={{ fontSize: 10, color: "#6b7280", padding: "3px 0" }}>{d}</div>; })}
+          <div className={ui.calGrid}>
+            {dayNames.map(function (d) { return <div key={d} className={ui.calDayHeader}>{d}</div>; })}
             {Array.from({ length: fD(calYear, calMonth) }).map(function (_, i) { return <div key={"e" + i} />; })}
-            {Array.from({ length: dIM(calYear, calMonth) }).map(function (_, i) { var day = i + 1, isSelected = selDate.getDate() === day && selDate.getMonth() === calMonth && selDate.getFullYear() === calYear, isToday = new Date().getDate() === day && new Date().getMonth() === calMonth && new Date().getFullYear() === calYear, has = hasE(day); return <button key={day} onClick={function () { pickDay(day); }} style={{ background: isSelected ? ACCENT : isToday ? "#2d2040" : "transparent", color: isSelected ? "#0f0f13" : isToday ? ACCENT : "#e2e8f0", border: "none", borderRadius: 6, padding: "5px 2px", cursor: "pointer", fontWeight: isSelected || isToday ? 700 : 400, fontSize: 12, position: "relative" }}>{day}{has && !isSelected && <div style={{ width: 4, height: 4, background: ORANGE, borderRadius: "50%", position: "absolute", bottom: 1, left: "50%", transform: "translateX(-50%)" }} />}</button>; })}
+            {Array.from({ length: dIM(calYear, calMonth) }).map(function (_, i) {
+              var day = i + 1, isSelected = selDate.getDate() === day && selDate.getMonth() === calMonth && selDate.getFullYear() === calYear, isToday = new Date().getDate() === day && new Date().getMonth() === calMonth && new Date().getFullYear() === calYear, has = hasE(day);
+              return (
+                <button key={day} type="button" onClick={function () { pickDay(day); }} className={ui.calDayBtn} style={{ background: isSelected ? ACCENT : isToday ? "#2d2040" : "transparent", color: isSelected ? "#0f0f13" : isToday ? ACCENT : "#e2e8f0", fontWeight: isSelected || isToday ? 700 : 400 }}>
+                  {day}{has && !isSelected && <div className={ui.calDayDot} />}
+                </button>
+              );
+            })}
           </div>
-          <div style={{ marginTop: 8, fontSize: 10, color: "#6b7280", textAlign: "center" }}>🟠 = entries logged</div>
+          <div className={ui.calLegend}>🟠 = entries logged</div>
         </div>}
       </Card>
       <Card>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-          <span style={{ fontWeight: 700 }}>Daily Goal</span>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}><input type="number" value={goal} onChange={function (e) { setGoal(e.target.value); }} style={Object.assign({}, cell, { width: 75, textAlign: "center" })} /><span style={{ fontSize: 12, color: "#6b7280" }}>kcal</span></div>
+        <div className={ui.flexBetween} style={{ marginBottom: 10 }}>
+          <span className={ui.sectionTitle} style={{ marginBottom: 0 }}>Daily Goal</span>
+          <div className={ui.flexRow}><input type="number" value={goal} onChange={function (e) { setGoal(e.target.value); }} className={inputClass({ goal: true })} /><span className={ui.mutedSm}>kcal</span></div>
         </div>
-        <div style={{ background: "#2d2d3a", borderRadius: 99, height: 12, overflow: "hidden", marginBottom: 6 }}><div style={{ width: pct + "%", background: barColor, height: "100%", borderRadius: 99 }} /></div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 12 }}><span style={{ color: barColor, fontWeight: 700 }}>{totals.cal} kcal</span><span style={{ color: "#6b7280" }}>{Math.max(0, goal - totals.cal)} remaining</span></div>
-        <div style={{ display: "flex", gap: 8 }}>{[["Protein", totals.p, ACCENT], ["Carbs", totals.c, ORANGE], ["Fat", totals.f, PINK]].map(function (r) { return <div key={r[0]} style={{ flex: 1, background: "#23232f", borderRadius: 10, padding: "10px", textAlign: "center" }}><div style={{ fontSize: 11, color: "#6b7280" }}>{r[0]}</div><div style={{ fontWeight: 800, color: r[2], fontSize: 18 }}>{Math.round(r[1])}<span style={{ fontSize: 11, color: "#9ca3af" }}>g</span></div></div>; })}</div>
+        <div className={ui.progressBarTrack}><div className={ui.progressBarFill} style={{ width: pct + "%", background: barColor }} /></div>
+        <div className={cx(ui.flexBetween, ui.mutedSm)} style={{ marginBottom: 12 }}><span style={{ color: barColor, fontWeight: 700 }}>{totals.cal} kcal</span><span className={ui.muted}>{Math.max(0, goal - totals.cal)} remaining</span></div>
+        <div className={ui.flexRow}>{[["Protein", totals.p, ACCENT], ["Carbs", totals.c, ORANGE], ["Fat", totals.f, PINK]].map(function (r) { return <div key={r[0]} className={ui.macroBox}><div className={ui.macroBoxLabel}>{r[0]}</div><div className={ui.macroBoxValue} style={{ color: r[2] }}>{Math.round(r[1])}<span className={ui.macroBoxUnit}>g</span></div></div>; })}</div>
       </Card>
       <Collapse emoji="✏️" label="Custom Entry" defaultOpen={false}>
-        <div style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 6, letterSpacing: "0.05em", textTransform: "uppercase" }}>Food Details</div>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: 6 }}>
-            <input placeholder="Food" value={food} onChange={function (e) { setFood(e.target.value); }} style={Object.assign({}, cell, {})} />
-            <input type="number" placeholder="kcal" value={cal} onChange={function (e) { setCal(e.target.value); }} style={Object.assign({}, cell, {})} />
-            <input type="number" placeholder="P(g)" value={protein} onChange={function (e) { setProtein(e.target.value); }} style={Object.assign({}, cell, {})} />
-            <input type="number" placeholder="C(g)" value={carbs} onChange={function (e) { setCarbs(e.target.value); }} style={Object.assign({}, cell, {})} />
-            <input type="number" placeholder="F(g)" value={fat} onChange={function (e) { setFat(e.target.value); }} style={Object.assign({}, cell, {})} />
+        <div className={ui.marginBottom12}>
+          <div className={ui.fieldLabelSection}>Food Details</div>
+          <div className={ui.foodGrid}>
+            <input placeholder="Food" value={food} onChange={function (e) { setFood(e.target.value); }} className={inputClass()} />
+            <input type="number" placeholder="kcal" value={cal} onChange={function (e) { setCal(e.target.value); }} className={inputClass()} />
+            <input type="number" placeholder="P(g)" value={protein} onChange={function (e) { setProtein(e.target.value); }} className={inputClass()} />
+            <input type="number" placeholder="C(g)" value={carbs} onChange={function (e) { setCarbs(e.target.value); }} className={inputClass()} />
+            <input type="number" placeholder="F(g)" value={fat} onChange={function (e) { setFat(e.target.value); }} className={inputClass()} />
           </div>
         </div>
-        <button onClick={function () { if (food && cal) addEntry(food, cal, protein, carbs, fat); else setMsg("Enter food and calories."); }} style={Object.assign({}, btnPrimary({}), { width: "100%" })}>Add Entry</button>
-        {msg && <div style={{ marginTop: 8, color: GREEN, fontSize: 13, textAlign: "center" }}>{msg}</div>}
+        <button type="button" onClick={function () { if (food && cal) addEntry(food, cal, protein, carbs, fat); else setMsg("Enter food and calories."); }} className={btnPrimary({ fullWidth: true })}>Add Entry</button>
+        {msg && <div className={cx(ui.successMsg, ui.marginTop8)}>{msg}</div>}
       </Collapse>
       <Collapse emoji="📋" label={"Log for " + displayDate(selDate)} defaultOpen={true}>
-        {selEntries.length === 0 ? <div style={{color:"#6b7280",fontSize:13,padding:"24px 0",textAlign:"center"}}><div style={{fontSize:40,marginBottom:12}}>🍽️</div><div>Nothing logged for this date.</div><div style={{marginTop:8,fontSize:12}}>Add your meals to track calories!</div></div> : (
-        <div ref={entryKb.listRef} tabIndex={0} onKeyDown={entryKb.handleKeyDown} style={{ outline: "none" }}>
-        {selEntries.map(function (e, i) { var gi = data.calories.indexOf(e); return <div key={i} data-kb-index={i} className={entryKb.kbClass(i)} onMouseEnter={function () { entryKb.setFocusIdx(i); }} style={{padding:"8px 0",borderBottom:"1px solid #2d2d3a"}}>
-          {editIdx === gi ? <div><div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: 5, marginBottom: 8 }}><input value={editForm.food} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { food: ev.target.value })); }} style={Object.assign({}, cell, { fontSize: 12 })} /><input type="number" placeholder="kcal" value={editForm.calories} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { calories: ev.target.value })); }} style={Object.assign({}, cell, { fontSize: 12 })} /><input type="number" placeholder="P" value={editForm.protein} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { protein: ev.target.value })); }} style={Object.assign({}, cell, { fontSize: 12 })} /><input type="number" placeholder="C" value={editForm.carbs} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { carbs: ev.target.value })); }} style={Object.assign({}, cell, { fontSize: 12 })} /><input type="number" placeholder="F" value={editForm.fat} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { fat: ev.target.value })); }} style={Object.assign({}, cell, { fontSize: 12 })} /></div><div style={{ display: "flex", gap: 6 }}><button onClick={saveEdit} style={{ background: GREEN, color: "#0f0f13", border: "none", borderRadius: 8, padding: "8px 14px", fontWeight: 700, cursor: "pointer", fontSize: 13, minHeight: 36, transition: "all 0.2s ease" }}>Save</button><button onClick={function () { setEditIdx(null); }} style={btnSecondary({ padding: "8px 14px", fontSize: 13, minHeight: 36 })}>Cancel</button></div></div> : <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><div><div style={{ fontSize: 13, color: "#e2e8f0" }}>{e.food}</div><div style={{ fontSize: 11, color: "#6b7280" }}>P:{e.protein || 0}g C:{e.carbs || 0}g F:{e.fat || 0}g</div></div><div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ color: ORANGE, fontWeight: 700, fontSize: 13 }}>{e.calories} kcal</span><button onClick={function () { startEdit(gi, e); }} style={{ background: "#2d2d3a", color: ACCENT, border: "none", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 11 }}>✏️</button><button onClick={function () { delEntry(gi); }} style={{ background: "#3d1c1c", color: "#f87171", border: "none", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 11 }}>🗑</button></div></div>}</div>; })}
+        {selEntries.length === 0 ? <div className={ui.emptyStateLg}><div className={ui.emptyIconLg}>🍽️</div><div>Nothing logged for this date.</div><div className={ui.emptySub}>Add your meals to track calories!</div></div> : (
+        <div ref={entryKb.listRef} tabIndex={0} onKeyDown={entryKb.handleKeyDown} className={ui.listOutline}>
+        {selEntries.map(function (e, i) { var gi = data.calories.indexOf(e); return <div key={i} data-kb-index={i} className={entryKb.kbClass(i) + " " + ui.entryRow} onMouseEnter={function () { entryKb.setFocusIdx(i); }}>
+          {editIdx === gi ? <div><div className={ui.foodGridEdit}><input value={editForm.food} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { food: ev.target.value })); }} className={inputClass({ sm: true })} /><input type="number" placeholder="kcal" value={editForm.calories} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { calories: ev.target.value })); }} className={inputClass({ sm: true })} /><input type="number" placeholder="P" value={editForm.protein} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { protein: ev.target.value })); }} className={inputClass({ sm: true })} /><input type="number" placeholder="C" value={editForm.carbs} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { carbs: ev.target.value })); }} className={inputClass({ sm: true })} /><input type="number" placeholder="F" value={editForm.fat} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { fat: ev.target.value })); }} className={inputClass({ sm: true })} /></div><div className={ui.flexRow}><button type="button" onClick={saveEdit} className={ui.btnSave}>Save</button><button type="button" onClick={function () { setEditIdx(null); }} className={btnSecondary({ cancelHistory: true })}>Cancel</button></div></div> : <div className={ui.flexBetween}><div><div className={ui.entryFood}>{e.food}</div><div className={ui.entryMacros}>P:{e.protein || 0}g C:{e.carbs || 0}g F:{e.fat || 0}g</div></div><div className={ui.entryActions}><span className={ui.entryCal} style={{ color: ORANGE }}>{e.calories} kcal</span><button type="button" onClick={function () { startEdit(gi, e); }} className={ui.btnIconEdit}>✏️</button><button type="button" onClick={function () { delEntry(gi); }} className={ui.btnIconDeleteSm}>🗑</button></div></div>}</div>; })}
         </div>
         )}
       </Collapse>

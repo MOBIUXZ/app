@@ -1,0 +1,851 @@
+/* Workout page — hero, calendar, history, 1RM calculator */
+
+.heroCard {
+  background: linear-gradient(135deg, var(--ft-bg-panel-alt) 0%, var(--ft-bg-card) 100%);
+  border: 1px solid var(--ft-border-input);
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--ft-shadow-hero);
+}
+
+.sectionLabelUpper {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+  margin-bottom: 4px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.dashboardChip {
+  background: var(--ft-bg-btn);
+  color: var(--ft-text-chip);
+  border: 1px solid var(--ft-border-input);
+  border-radius: var(--ft-radius-pill);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.actionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.fieldBlockSm {
+  margin-bottom: 12px;
+}
+
+.fieldBlockMd {
+  margin-bottom: 14px;
+}
+
+.labelSm {
+  font-size: 12px;
+  color: var(--ft-text-dim);
+  margin-bottom: 6px;
+}
+
+.labelXs {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+  margin-bottom: 4px;
+}
+
+.labelXsMb6 {
+  composes: labelXs;
+  margin-bottom: 6px;
+}
+
+.flex2 {
+  flex: 2;
+}
+
+.mb12 {
+  margin-bottom: 12px;
+}
+
+.mb8 {
+  margin-bottom: 8px;
+}
+
+.mt8 {
+  margin-top: 8px;
+}
+
+.mt16 {
+  margin-top: 16px;
+}
+
+.mt18 {
+  margin-top: 18px;
+}
+
+/* 1RM Calculator */
+.loadedSetBanner {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--ft-green);
+  background: var(--ft-green-bg);
+  border: 1px solid rgba(57, 211, 83, 0.27);
+  border-radius: var(--ft-radius-md);
+  padding: 8px 10px;
+}
+
+.oneRmResultBox {
+  background: var(--ft-bg-card);
+  border-radius: var(--ft-radius-xl);
+  padding: 16px;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.oneRmResultLabel {
+  font-size: 12px;
+  color: var(--ft-text-dim);
+  margin-bottom: 4px;
+}
+
+.oneRmResultValue {
+  font-size: 40px;
+  font-weight: 900;
+}
+
+.oneRmResultUnit {
+  font-size: 18px;
+  color: var(--ft-text-muted);
+}
+
+.pctGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.pctRow {
+  background: var(--ft-bg-card);
+  border-radius: var(--ft-radius-md);
+  padding: 9px 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.pctLabel {
+  color: var(--ft-text-muted);
+  font-size: 13px;
+}
+
+.pctValue {
+  font-weight: 700;
+}
+
+.formulaGuideRow {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--ft-border);
+}
+
+.formulaGuideHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.formulaGuideName {
+  font-weight: 800;
+  color: var(--ft-text);
+}
+
+.formulaGuideWhen {
+  font-size: 12px;
+  color: #d1d5db;
+  margin-bottom: 3px;
+}
+
+.formulaGuideUse {
+  font-size: 12px;
+  color: var(--ft-text-muted);
+  margin-bottom: 6px;
+}
+
+.sportTag {
+  background: var(--ft-bg-btn);
+  color: var(--ft-text-nav);
+  border-radius: var(--ft-radius-pill);
+  padding: 2px 8px;
+  font-size: 11px;
+}
+
+.sportTagRow {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.setPickerList {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.setPickerItem {
+  width: 100%;
+  text-align: left;
+  background: var(--ft-bg-card);
+  border: 1px solid var(--ft-border-muted);
+  border-radius: var(--ft-radius-lg);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  color: var(--ft-text);
+  font-family: inherit;
+}
+
+.setPickerItemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.setPickerItemTitle {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.setPickerItemMeta {
+  font-size: 12px;
+  color: var(--ft-text-muted);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Calendar modal */
+.calModalPanel {
+  composes: modalPanel from "../styles/ui.module.css";
+  width: 95%;
+  max-height: 92vh;
+  overflow-y: auto;
+}
+
+.calModalPanelMonth {
+  composes: calModalPanel;
+  max-width: 420px;
+}
+
+.calModalPanelYear {
+  composes: calModalPanel;
+  max-width: 680px;
+}
+
+.calModalHeader {
+  composes: modalHeader from "../styles/ui.module.css";
+  margin-bottom: 14px;
+}
+
+.calViewToggleWrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.calNavRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.calMonthTitle {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ft-text);
+}
+
+.calYearTitle {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--ft-text);
+  letter-spacing: 0.04em;
+}
+
+.calDayHeaderRow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--ft-text-dim);
+  font-size: 11px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.calDayGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.calDayPadding {
+  aspect-ratio: 1;
+}
+
+.calDayCell {
+  aspect-ratio: 1;
+  border-radius: var(--ft-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s ease, background-color 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.calLegendRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  font-size: 11px;
+  color: var(--ft-text-dim);
+}
+
+.calLegendRowSm {
+  composes: calLegendRow;
+  margin-top: 14px;
+}
+
+.calLegendSwatches {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.calLegendSwatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+.calLegendSwatchSm {
+  composes: calLegendSwatch;
+  width: 12px;
+  height: 12px;
+}
+
+.calLegendArrow {
+  font-size: 10px;
+}
+
+.yearStatsRow {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.yearStatBox {
+  background: var(--ft-bg-card);
+  border: 1px solid var(--ft-border-input);
+  border-radius: var(--ft-radius-lg);
+  padding: 8px 14px;
+  flex: 1;
+  text-align: center;
+}
+
+.yearStatValue {
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.yearStatLabel {
+  font-size: 10px;
+  color: var(--ft-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.miniMonthGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.miniMonthCard {
+  background: var(--ft-bg-mini);
+  border: 1px solid var(--ft-border);
+  border-radius: var(--ft-radius-xl);
+  padding: 10px 8px;
+}
+
+.miniMonthTitle {
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.miniDayHeaderRow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 3px;
+}
+
+.miniDayHeader {
+  font-size: 7px;
+  color: var(--ft-text-faint);
+  text-align: center;
+  font-weight: 700;
+}
+
+.miniDayGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.miniDayPadding {
+  aspect-ratio: 1;
+}
+
+.miniDayCell {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7px;
+  font-weight: 700;
+  transition: transform 0.1s, background 0.15s;
+}
+
+/* Day detail panel */
+.dayPanel {
+  margin-top: 16px;
+  background: var(--ft-bg-deep);
+  border: 1px solid var(--ft-border-input);
+  border-radius: var(--ft-radius-2xl);
+  padding: 16px;
+}
+
+.dayPanelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.dayPanelTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dayPanelDate {
+  font-weight: 800;
+  color: var(--ft-text);
+  font-size: 14px;
+}
+
+.dayPanelBadgeLogged {
+  background: var(--ft-green-bg);
+  color: var(--ft-green-border);
+  border: 1px solid rgba(57, 211, 83, 0.27);
+  border-radius: var(--ft-radius-pill);
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.dayPanelBadgeEmpty {
+  background: var(--ft-bg-btn);
+  color: var(--ft-text-dim);
+  border-radius: var(--ft-radius-pill);
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.dayPanelClose {
+  background: transparent;
+  border: none;
+  color: var(--ft-text-dim);
+  font-size: 18px;
+  cursor: pointer;
+  line-height: 1;
+  font-family: inherit;
+}
+
+.editCard {
+  background: var(--ft-bg-entry);
+  border: 1px solid var(--ft-border-input);
+  border-radius: var(--ft-radius-lg);
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.workoutCard {
+  background: var(--ft-bg-entry);
+  border: 1px solid var(--ft-border);
+  border-radius: var(--ft-radius-lg);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.workoutCardBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.workoutCardName {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 3px;
+}
+
+.workoutCardSets {
+  color: var(--ft-text-muted);
+  font-size: 12px;
+}
+
+.workoutCardNote {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+  margin-top: 3px;
+}
+
+.workoutCardActions {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.btnIconEditCal {
+  background: var(--ft-bg-btn);
+  border: none;
+  border-radius: var(--ft-radius-sm);
+  padding: 4px 9px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.btnIconDeleteCal {
+  background: var(--ft-bg-danger);
+  color: var(--ft-red);
+  border: none;
+  border-radius: var(--ft-radius-sm);
+  padding: 4px 9px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.emptyDayState {
+  text-align: center;
+  padding: 14px 0 10px;
+  color: var(--ft-text-dim);
+  font-size: 13px;
+}
+
+.emptyDayIcon {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.emptyDaySub {
+  font-size: 11px;
+}
+
+.dayActionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.setLabel {
+  color: var(--ft-text-dim);
+  font-size: 12px;
+  min-width: 28px;
+}
+
+.setRow {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+  align-items: center;
+}
+
+.setRowLg {
+  composes: setRow;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.timeCheckboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--ft-text-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.parseHint {
+  color: var(--ft-text-muted);
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.parseHintSm {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+  margin-bottom: 8px;
+}
+
+.parseMsg {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* Smart parser modal */
+.parserModalPanel {
+  composes: modalPanelScroll from "../styles/ui.module.css";
+  max-width: 600px;
+  width: 90%;
+}
+
+.parserHeaderRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.parserIcon {
+  font-size: 18px;
+}
+
+.parsePreviewBox {
+  background: var(--ft-bg-card-alt);
+  border: 1px solid var(--ft-border);
+  border-radius: var(--ft-radius-xl);
+  padding: 12px;
+  margin-top: 8px;
+}
+
+.parsePreviewEntry {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+}
+
+.parsePreviewEntryLast {
+  composes: parsePreviewEntry;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.dateChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--ft-bg-card);
+  border: 1px solid var(--ft-border-input);
+  border-radius: var(--ft-radius-pill);
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ft-yellow);
+  margin-bottom: 6px;
+}
+
+.parseSetLine {
+  font-size: 13px;
+  color: var(--ft-text-muted);
+  margin-bottom: 3px;
+}
+
+/* Manual log section */
+.manualLogHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.manualLogTitle {
+  font-weight: 700;
+}
+
+/* History */
+.expandAllBtn {
+  padding: 5px 10px;
+  border-radius: var(--ft-radius-pill);
+  border: 1px solid var(--ft-border-input);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--ft-bg-card);
+  color: var(--ft-text-nav);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: inherit;
+}
+
+.historyMetaRow {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.historyCount {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+}
+
+.historyDaysLogged {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.historyToggleRow {
+  display: flex;
+  gap: 6px;
+}
+
+.groupHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  border-radius: var(--ft-radius-md);
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.groupHeaderExpanded {
+  composes: groupHeader;
+  background: var(--ft-bg-card);
+  border-color: var(--ft-border-input);
+}
+
+.groupHeaderHover {
+  composes: groupHeader;
+  background: var(--ft-bg-card-alt);
+  border-color: var(--ft-border-input);
+}
+
+.groupHeaderDefault {
+  composes: groupHeader;
+}
+
+.groupHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.groupHeaderLabel {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.groupEntryCount {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+  background: #1f2937;
+  padding: 2px 8px;
+  border-radius: var(--ft-radius-pill);
+}
+
+.groupChevron {
+  font-size: 12px;
+  color: var(--ft-text-muted);
+}
+
+.historyItemCard {
+  background: var(--ft-bg-entry);
+  border: 1px solid var(--ft-border);
+  border-radius: var(--ft-radius-xl);
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.historyItemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.historyItemMeta {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.historyItemDate {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+}
+
+.historyItemSets {
+  color: var(--ft-text-muted);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.historyItemNote {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+  margin-top: 2px;
+}
+
+.historyGroup {
+  margin-bottom: 12px;
+}
+
+.confirmTitle {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--ft-text);
+}
+
+.confirmBody {
+  font-size: 13px;
+  color: var(--ft-text-muted);
+  margin-bottom: 16px;
+}
+
+.setPickerModalPanel {
+  composes: modalPanelScroll from "../styles/ui.module.css";
+  max-width: 560px;
+  width: 92%;
+}
