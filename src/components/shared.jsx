@@ -654,11 +654,11 @@ export function insertTextareaNewline(e, value, setValue) {
 }
 
 export function handleParserTextareaKeyDown(e, onSubmit, value, setValue) {
-  if (e.key === "Enter" && e.ctrlKey && e.shiftKey) {
+  if (e.key === "Enter" && e.ctrlKey && !e.shiftKey) {
     insertTextareaNewline(e, value, setValue);
     return;
   }
-  if (e.key === "Enter" && !e.ctrlKey && !e.metaKey && !e.altKey) {
+  if (e.key === "Enter") {
     e.preventDefault();
     onSubmit();
   }

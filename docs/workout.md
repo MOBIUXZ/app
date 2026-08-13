@@ -49,7 +49,7 @@ See [shared-utilities.md](./shared-utilities.md#smart-parser) for supported form
 
 **Keyboard shortcuts (modal):**
 - `Enter` — Parse & save
-- `Ctrl+Shift+Enter` — Insert newline in textarea
+- `Ctrl+Enter` — Insert newline in textarea
 - `Esc` — Close modal
 
 Same shortcuts apply to the calendar day panel's Smart Parser import.

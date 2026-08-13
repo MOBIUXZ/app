@@ -721,7 +721,7 @@ Bench Press
 80kg - 8 reps`}
                       style={Object.assign({}, cell, { width: "100%", minHeight: 140, marginBottom: 10, resize: "vertical", fontFamily: "monospace", fontSize: 12 })}
                     />
-                    <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 8 }}>Enter parse & save · Ctrl+Shift+Enter new line</div>
+                    <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 8 }}>Enter parse & save · Ctrl+Enter new line</div>
                     {calParseMsg && (
                       <div style={{ color: calParseMsg.includes("✅") ? GREEN : "#f87171", fontSize: 13, fontWeight: 600, marginBottom: 10 }}>{calParseMsg}</div>
                     )}
@@ -765,7 +765,7 @@ Bench Press
 80kg - 8 reps`}
               style={Object.assign({}, cell, { width: "100%", minHeight: 160, marginBottom: 8, resize: "vertical", fontFamily: "monospace" })}
             />
-            <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 12 }}>Enter parse & save · Ctrl+Shift+Enter new line · Esc close</div>
+            <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 12 }}>Enter parse & save · Ctrl+Enter new line · Esc close</div>
             
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
               <button onClick={doParse} style={Object.assign({}, btnPrimary({}), { flex: 1 })}>Parse & Save</button>
