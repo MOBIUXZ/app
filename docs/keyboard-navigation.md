@@ -11,8 +11,6 @@ Keyboard input is handled in **layers** (topmost popup first):
 3. When the popup **closes** → the layer is removed; control returns to the layer below (or global shortcuts if the stack is empty).
 4. Multiple popups stack with increasing `z-index` (e.g. calendar open, then clear-history confirm on top).
 
-The hint bar below the nav shows **"Popup active — local shortcuts only"** when any layer is open.
-
 ## Global Shortcuts
 
 These work only when **no popup is open** and focus is **not** inside an input, textarea, or select:

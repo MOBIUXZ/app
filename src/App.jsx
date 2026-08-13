@@ -43,13 +43,6 @@ export default function App() {
           return <button key={n} onClick={function () { setTab(n); }} className={navKb.navClass(i)} style={{ padding: "10px 16px", borderRadius: 24, border: "none", cursor: "pointer", fontWeight: 700, fontSize: 13, background: tab === n ? ACCENT : "#2d2d3a", color: tab === n ? "#0f0f13" : "#a0aec0", transition: "all 0.2s ease", minHeight: 44, outline: "none" }}>{n}</button>;
         })}
       </div>
-      <div style={{ padding: "6px 16px", background: "#14141a", borderBottom: "1px solid #2d2d3a", fontSize: 11, color: "#6b7280", textAlign: "center" }}>
-        {navKb.blocked ? (
-          <span>⌨ <span style={{ color: "#c4b5fd" }}>Popup active</span> — local shortcuts only · <span style={{ color: "#9ca3af" }}>Esc</span> close · global keys paused</span>
-        ) : (
-          <span>⌨ <span style={{ color: "#9ca3af" }}>1–5</span> switch page · <span style={{ color: "#9ca3af" }}>← →</span> navigate tabs · <span style={{ color: "#9ca3af" }}>↑ ↓</span> move in lists · <span style={{ color: "#9ca3af" }}>Enter</span> select</span>
-        )}
-      </div>
       <div style={{ padding: "18px 14px", maxWidth: 680, margin: "0 auto" }}>
         {tab === "Dashboard" && <DashboardPage data={data} setTab={setTab} />}
         {tab === "Workout" && <WorkoutPage data={data} save={save} />}
