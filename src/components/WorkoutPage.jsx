@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, formatExerciseName, btnPrimary, btnSecondary, btnDanger, inp, Card, formatDate, useKeyboardListNav, useConfirmDialogKeyboard, handleParserTextareaKeyDown, useKeyboardLayer, isTypingTarget } from "./shared";
+import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, formatExerciseName, btnPrimary, btnSecondary, btnDanger, inp, Card, formatDate, useKeyboardListNav, useConfirmDialogKeyboard, handleParserTextareaKeyDown, useParserTextareaKeyboard, useKeyboardLayer, isTypingTarget } from "./shared";
 
 function OneRMCalc({ data }) {
   var [weight, setWeight] = useState(""); var [reps, setReps] = useState(""); var [formula, setFormula] = useState("Epley"); var [autoEx, setAutoEx] = useState("");
@@ -311,6 +311,22 @@ export default function WorkoutPage({ data, save }) {
     }, 1500);
   }
 
+  var doParseRef = useRef(doParse);
+  doParseRef.current = doParse;
+  var calDoParseRef = useRef(calDoParse);
+  calDoParseRef.current = calDoParse;
+  var smartParserTextareaRef = useRef(null);
+  var calParseTextareaRef = useRef(null);
+  useParserTextareaKeyboard(smartParserTextareaRef, function () { doParseRef.current(); }, showSmartParserModal);
+  useParserTextareaKeyboard(calParseTextareaRef, function () { calDoParseRef.current(); }, showCalendarModal && calPanel === "parse");
+
+  function handleParserLayerKey(e, onSubmit) {
+    if (e.key !== "Enter") return;
+    if (e.target && e.target.tagName === "TEXTAREA") return;
+    e.preventDefault();
+    onSubmit();
+  }
+
   function saveEdit() { var updated = data.workouts.map(function (w, i) { return i === editIdx ? Object.assign({}, w, { exercise: resolveExercise(editForm.exercise), note: editForm.note || "", sets: editForm.sets.map(function (s) { return { weight: parseFloat(s.weight), reps: parseInt(s.reps), time: s.time || "", note: s.note || "" }; }) }) : w; }); save({ workouts: updated, bodyLogs: data.bodyLogs, bodyComp: data.bodyComp, calories: data.calories }); setEditIdx(null); setEditForm(null); }
   function delW(i) { save({ workouts: data.workouts.filter(function (_, idx) { return idx !== i; }), bodyLogs: data.bodyLogs, bodyComp: data.bodyComp, calories: data.calories }); }
   function startEdit(i) { var w = data.workouts[i]; setEditIdx(i); setEditForm({ exercise: w.exercise, note: w.note || "", sets: w.sets.map(function (s) { return { weight: s.weight, reps: s.reps, time: s.time || "", note: s.note || "" }; }) }); }
@@ -327,18 +343,16 @@ export default function WorkoutPage({ data, save }) {
       setParsePreview(null);
       return;
     }
-    if (e.target && e.target.tagName === "TEXTAREA") return;
-    if (e.key === "Enter") {
-      e.preventDefault();
-      doParse();
-    }
+    handleParserLayerKey(e, function () { doParseRef.current(); });
   });
 
   var calendarLayer = useKeyboardLayer("calendar-modal", showCalendarModal, function (e) {
     if (e.key === "Escape") {
       e.preventDefault();
       closeCalModal();
+      return;
     }
+    handleParserLayerKey(e, function () { calDoParseRef.current(); });
   });
 
   // Calendar helper functions
@@ -709,9 +723,11 @@ export default function WorkoutPage({ data, save }) {
                       Paste your workout text below. All exercises will be saved to <strong style={{ color: ACCENT }}>{calSelectedDate}</strong> regardless of any dates in the text.
                     </div>
                     <textarea
+                      ref={calParseTextareaRef}
+                      data-parser-textarea="true"
                       value={calParseText}
                       onChange={function (e) { setCalParseText(e.target.value); }}
-                      onKeyDown={function (e) { handleParserTextareaKeyDown(e, calDoParse, calParseText, setCalParseText); }}
+                      onKeyDown={function (e) { handleParserTextareaKeyDown(e, function () { calDoParseRef.current(); }); }}
                       placeholder={`Example:
 Squat
 100kg - 5 reps
@@ -721,7 +737,7 @@ Bench Press
 80kg - 8 reps`}
                       style={Object.assign({}, cell, { width: "100%", minHeight: 140, marginBottom: 10, resize: "vertical", fontFamily: "monospace", fontSize: 12 })}
                     />
-                    <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 8 }}>Enter parse & save · Ctrl+Enter new line</div>
+                    <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 8 }}>Enter parse & save · Shift+Enter new line</div>
                     {calParseMsg && (
                       <div style={{ color: calParseMsg.includes("✅") ? GREEN : "#f87171", fontSize: 13, fontWeight: 600, marginBottom: 10 }}>{calParseMsg}</div>
                     )}
@@ -752,9 +768,11 @@ Bench Press
             <div style={{ color: "#9ca3af", fontSize: 12, marginBottom: 10 }}>Paste a workout log and import it in one click. Supports dates, exercises, and set details.</div>
             
             <textarea
+              ref={smartParserTextareaRef}
+              data-parser-textarea="true"
               value={pasteText}
               onChange={function (e) { setPasteText(e.target.value); }}
-              onKeyDown={function (e) { handleParserTextareaKeyDown(e, doParse, pasteText, setPasteText); }}
+              onKeyDown={function (e) { handleParserTextareaKeyDown(e, function () { doParseRef.current(); }); }}
               placeholder={`Paste workout text... Example:
 24 July 2026
 Squat
@@ -765,7 +783,7 @@ Bench Press
 80kg - 8 reps`}
               style={Object.assign({}, cell, { width: "100%", minHeight: 160, marginBottom: 8, resize: "vertical", fontFamily: "monospace" })}
             />
-            <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 12 }}>Enter parse & save · Ctrl+Enter new line · Esc close</div>
+            <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 12 }}>Enter parse & save · Shift+Enter new line · Esc close</div>
             
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
               <button onClick={doParse} style={Object.assign({}, btnPrimary({}), { flex: 1 })}>Parse & Save</button>

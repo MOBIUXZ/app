@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, createContext, useContext } from "react";
+import { useState, useEffect, useRef, createContext, useContext, useMemo } from "react";
 
 export const ACCENT = "#a78bfa";
 export const GREEN = "#34d399";
@@ -485,13 +485,15 @@ export function KeyboardLayerProvider({ children }) {
     return function () { window.removeEventListener("keydown", onKeyDown, true); };
   }, []);
 
-  var ctx = {
-    pushLayer: pushLayer,
-    popLayer: popLayer,
-    layerCount: layerCount,
-    getLayerZIndex: getLayerZIndex,
-    stackRef: stackRef,
-  };
+  var ctx = useMemo(function () {
+    return {
+      pushLayer: pushLayer,
+      popLayer: popLayer,
+      layerCount: layerCount,
+      getLayerZIndex: getLayerZIndex,
+      stackRef: stackRef,
+    };
+  }, [layerCount]);
 
   return <KeyboardLayerContext.Provider value={ctx}>{children}</KeyboardLayerContext.Provider>;
 }
@@ -639,29 +641,47 @@ export function useAppNavKeyboard(tabs, currentTab, setTab) {
   return { focusIdx: focusIdx, activatedIdx: activatedIdx, blocked: blocked, navClass: function (i) { return (i === focusIdx ? "ft-kb-nav-focus " : "") + (i === activatedIdx ? "ft-kb-nav-activate" : ""); } };
 }
 
-export function insertTextareaNewline(e, value, setValue) {
-  e.preventDefault();
-  var ta = e.target;
-  var start = ta.selectionStart;
-  var end = ta.selectionEnd;
-  var next = value.slice(0, start) + "\n" + value.slice(end);
-  setValue(next);
-  var pos = start + 1;
-  requestAnimationFrame(function () {
-    ta.selectionStart = pos;
-    ta.selectionEnd = pos;
-  });
+export function handleParserTextareaKeyDown(e, onSubmit) {
+  if (e.key !== "Enter" || e.shiftKey) return false;
+  var ne = e.nativeEvent || e;
+  ne.preventDefault();
+  ne.stopPropagation();
+  if (ne.stopImmediatePropagation) ne.stopImmediatePropagation();
+  onSubmit();
+  return true;
 }
 
-export function handleParserTextareaKeyDown(e, onSubmit, value, setValue) {
-  if (e.key === "Enter" && e.ctrlKey && !e.shiftKey) {
-    insertTextareaNewline(e, value, setValue);
-    return;
-  }
-  if (e.key === "Enter") {
-    e.preventDefault();
-    onSubmit();
-  }
+export function useParserTextareaKeyboard(textareaRef, onSubmit, active) {
+  var onSubmitRef = useRef(onSubmit);
+  onSubmitRef.current = onSubmit;
+
+  useEffect(function () {
+    if (!active) return;
+    var el = textareaRef.current;
+    var cleanup = null;
+    function bind() {
+      el = textareaRef.current;
+      if (!el) return;
+      function onKeyDown(e) {
+        if (e.key !== "Enter" || e.shiftKey) return;
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        onSubmitRef.current();
+      }
+      el.addEventListener("keydown", onKeyDown, true);
+      cleanup = function () { el.removeEventListener("keydown", onKeyDown, true); };
+    }
+    bind();
+    if (!cleanup) {
+      var raf = requestAnimationFrame(function () { bind(); });
+      return function () {
+        cancelAnimationFrame(raf);
+        if (cleanup) cleanup();
+      };
+    }
+    return cleanup;
+  }, [active, textareaRef]);
 }
 
 export function useConfirmDialogKeyboard(open, onConfirm, onCancel, layerId, labels) {

@@ -50,7 +50,7 @@ Hovering an item with the mouse also updates keyboard focus.
 | Popup | Keys | Notes |
 |-------|------|-------|
 | **Clear workout history** | `←` `→` / Tab switch buttons · Enter select focused · Esc cancel | Shows which button is focused |
-| **Smart Parser** | Enter parse · Ctrl+Enter newline · Esc close | Textarea keeps local Enter handling |
+| **Smart Parser** | Enter parse · Shift+Enter newline · Esc close | Textarea keeps local Enter handling |
 | **Calendar → Smart Parser** | Same as Smart Parser | |
 | **1RM set picker** | ↑↓ sets · Enter load · Esc close | Search input ignores arrows |
 | **Calendar modal** | Esc close | |

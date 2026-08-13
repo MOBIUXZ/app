@@ -193,7 +193,8 @@ See [keyboard-navigation.md](./keyboard-navigation.md) for full details.
 | `useAppNavKeyboard()` | Global page shortcuts (`1`–`5`, `←` `→`, Enter) |
 | `useKeyboardListNav()` | Arrow/Enter navigation inside lists |
 | `useConfirmDialogKeyboard()` | Confirm dialog with button focus + Enter/Esc |
-| `handleParserTextareaKeyDown()` | Enter submits parser; Ctrl+Enter newline |
+| `handleParserTextareaKeyDown()` | Enter submits parser; Shift+Enter newline |
+| `useParserTextareaKeyboard()` | Native capture listener for parser textarea Enter handling |
 | `isTypingTarget()` | Detects when user is typing in a form field |
 | `kbItemClass()` | CSS classes for focus and activate highlights |
 
