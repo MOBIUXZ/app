@@ -6,6 +6,10 @@ The Body Comp page tracks body measurements and automatically calculates derived
 
 Collapsible form for logging a new body composition entry.
 
+### Date
+- Select or type the entry date (`DD-MM-YYYY` format, same as workouts)
+- Defaults to today — change it to backfill metrics for a previous day
+
 ### Required Fields
 - **Body Weight** (kg)
 - **Body Fat %**
@@ -67,5 +71,6 @@ BW, BMI, FM, FMI, PBF, FFM, FFMI, SMM, SMI
 
 ## Integration
 
+- Entry date is stored as `DD-MM-YYYY` and shown in History and on the Progress page charts.
 - Body weight entries are also appended to `bodyLogs` for use on the Progress page body weight chart.
 - BMR values feed into the **Calories** page TDEE calculation.

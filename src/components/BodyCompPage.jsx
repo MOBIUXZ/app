@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { ACCENT, BLUE, GREEN, ORANGE, PINK, Collapse, btnPrimary, inp } from "./shared";
+import { ACCENT, BLUE, GREEN, ORANGE, PINK, Collapse, btnPrimary, inp, formatDate } from "./shared";
 
 export default function BodyCompPage({ data, save }) {
+  var [logDate, setLogDate] = useState(formatDate(new Date()));
   var [w, setW] = useState(""), [h, setH] = useState(""), [bf, setBf] = useState(""), [smm, setSmm] = useState(""), [waist, setWaist] = useState(""), [age, setAge] = useState(""), [sex, setSex] = useState("male"), [msg, setMsg] = useState("");
   var wN = parseFloat(w) || 0, hM = (parseFloat(h) || 0) / 100, bfN = parseFloat(bf) || 0, smmN = parseFloat(smm) || 0, ageN = parseFloat(age) || 0;
   var hasBase = wN > 0 && bfN > 0, fm = hasBase ? wN * (bfN / 100) : null, ffm = hasBase ? wN - fm : null;
@@ -12,11 +13,15 @@ export default function BodyCompPage({ data, save }) {
   function MBox(p) { return <div style={{ background: "#23232f", borderRadius: 10, padding: "10px 8px", flex: 1 }}><div style={{ fontSize: 10, color: "#6b7280", marginBottom: 2 }}>{p.label}</div><div style={{ fontWeight: 800, color: p.val != null ? p.color : "#4b5563", fontSize: 14 }}>{p.val != null ? p.val.toFixed(2) : "—"}<span style={{ fontSize: 10, color: "#9ca3af", marginLeft: 2 }}>{p.unit}</span></div></div>; }
   function GL(p) { return <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 5, marginTop: 12 }}>{p.children}</div>; }
   var cell = inp({});
-  function submit() { if (!w || !bf) { setMsg("Weight and Body Fat % are required."); return; } var entry = { weight: wN, height: parseFloat(h) || null, bf: bfN, smm: smmN || null, waist: parseFloat(waist) || null, age: ageN || null, sex: sex, BW: wN, PBF: bfN, FM: fm, FFM: ffm, BMI: bmi, FFMI: ffmi, FMI: fmi, SMM: smmN || null, SMI: smi, BMR_Mifflin: bmrMifflin, BMR_Katch: bmrKatch, date: new Date().toLocaleDateString() }; save({ workouts: data.workouts, calories: data.calories, bodyComp: [...data.bodyComp, entry], bodyLogs: [...data.bodyLogs, { weight: wN, date: entry.date }] }); setW(""); setH(""); setBf(""); setSmm(""); setWaist(""); setAge(""); setMsg("Logged!"); setTimeout(function () { setMsg(""); }, 2000); }
+  function submit() { if (!w || !bf) { setMsg("Weight and Body Fat % are required."); return; } if (!logDate.trim()) { setMsg("Date is required."); return; } var entry = { weight: wN, height: parseFloat(h) || null, bf: bfN, smm: smmN || null, waist: parseFloat(waist) || null, age: ageN || null, sex: sex, BW: wN, PBF: bfN, FM: fm, FFM: ffm, BMI: bmi, FFMI: ffmi, FMI: fmi, SMM: smmN || null, SMI: smi, BMR_Mifflin: bmrMifflin, BMR_Katch: bmrKatch, date: logDate }; save({ workouts: data.workouts, calories: data.calories, bodyComp: [...data.bodyComp, entry], bodyLogs: [...data.bodyLogs, { weight: wN, date: logDate }] }); setW(""); setH(""); setBf(""); setSmm(""); setWaist(""); setAge(""); setLogDate(formatDate(new Date())); setMsg("Logged!"); setTimeout(function () { setMsg(""); }, 2000); }
   return (
     <div>
       <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 20, letterSpacing: "-0.02em" }}>📏 Body Composition</div>
       <Collapse emoji="➕" label="Log Entry" defaultOpen={false}>
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 4 }}>Date</div>
+          <input value={logDate} onChange={function (e) { setLogDate(e.target.value); }} placeholder="DD-MM-YYYY" style={Object.assign({}, cell, { width: "100%" })} />
+        </div>
         <div style={{ marginBottom: 16 }}>
           <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 6, letterSpacing: "0.05em", textTransform: "uppercase" }}>Body Measurements</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
