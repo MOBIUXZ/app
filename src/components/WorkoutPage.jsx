@@ -3,11 +3,60 @@ import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parse
 
 function OneRMCalc({ data }) {
   var [weight, setWeight] = useState(""); var [reps, setReps] = useState(""); var [formula, setFormula] = useState("Epley"); var [autoEx, setAutoEx] = useState("");
+  var [setSearch, setSetSearch] = useState(""); var [showSetPicker, setShowSetPicker] = useState(false); var [loadedSet, setLoadedSet] = useState(null);
   var allEx = Array.from(new Set(data.workouts.map(function (w) { return resolveExercise(w.exercise); })));
   var formulas = { Epley: function (w, r) { return w * (1 + r / 30); }, Brzycki: function (w, r) { return w * (36 / (37 - r)); }, Lander: function (w, r) { return (100 * w) / (101.3 - 2.67123 * r); }, Lombardi: function (w, r) { return w * Math.pow(r, 0.1); }, OConnor: function (w, r) { return w * (1 + r / 40); } };
   var wN = parseFloat(weight), rN = parseInt(reps), oneRM = (wN > 0 && rN >= 1) ? formulas[formula](wN, rN) : null;
   var pcts = [100, 95, 90, 85, 80, 75, 70, 65, 60];
-  function autoFill() { var ex = autoEx || allEx[0]; if (!ex) return; var best = null; data.workouts.filter(function (w) { return resolveExercise(w.exercise) === ex; }).forEach(function (w) { w.sets.forEach(function (s) { if (!best || s.weight > best.weight) best = s; }); }); if (best) { setWeight(best.weight); setReps(best.reps); } }
+
+  function parseSetDate(s) {
+    if (!s) return 0;
+    var dmy = s.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+    if (dmy) return new Date(parseInt(dmy[3], 10), parseInt(dmy[2], 10) - 1, parseInt(dmy[1], 10)).getTime();
+    var ymd = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (ymd) return new Date(parseInt(ymd[1], 10), parseInt(ymd[2], 10) - 1, parseInt(ymd[3], 10)).getTime();
+    var parsed = new Date(s);
+    return isNaN(parsed.getTime()) ? 0 : parsed.getTime();
+  }
+
+  var loggedSets = [];
+  data.workouts.forEach(function (w, wi) {
+    w.sets.forEach(function (s, si) {
+      if (!s.weight || s.reps == null || s.reps < 1) return;
+      loggedSets.push({
+        id: wi + "-" + si,
+        exercise: resolveExercise(w.exercise),
+        displayEx: formatExerciseName(w.exercise),
+        date: w.date || "",
+        weight: s.weight,
+        reps: s.reps,
+        side: s.side || "",
+        note: s.note || "",
+        time: s.time || "",
+      });
+    });
+  });
+  loggedSets.sort(function (a, b) { return parseSetDate(b.date) - parseSetDate(a.date); });
+
+  var filteredSets = loggedSets.filter(function (item) {
+    if (!setSearch.trim()) return true;
+    var q = setSearch.toLowerCase();
+    return item.displayEx.toLowerCase().includes(q)
+      || item.exercise.toLowerCase().includes(q)
+      || item.date.toLowerCase().includes(q)
+      || String(item.weight).includes(q)
+      || String(item.reps).includes(q)
+      || item.note.toLowerCase().includes(q)
+      || item.side.toLowerCase().includes(q);
+  });
+
+  function autoFill() { var ex = autoEx || allEx[0]; if (!ex) return; var best = null; data.workouts.filter(function (w) { return resolveExercise(w.exercise) === ex; }).forEach(function (w) { w.sets.forEach(function (s) { if (!best || s.weight > best.weight) best = s; }); }); if (best) { setWeight(best.weight); setReps(best.reps); setLoadedSet(null); } }
+  function selectLoggedSet(item) {
+    setWeight(String(item.weight));
+    setReps(String(item.reps));
+    setLoadedSet(item);
+    setShowSetPicker(false);
+  }
   var cell = inp({});
   var fInfo = [
     { name: "Epley", badge: "Most Popular", bc: ACCENT, when: "Best for moderate rep ranges (3-10 reps).", use: "Widely used in powerlifting and gym training.", sports: ["Powerlifting", "Weightlifting", "General"] },
@@ -19,6 +68,24 @@ function OneRMCalc({ data }) {
   return (
     <div>
       <div style={{ marginBottom: 12 }}>
+        <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 6 }}>Search logged sets</div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <input
+            value={setSearch}
+            onChange={function (e) { setSetSearch(e.target.value); }}
+            onKeyDown={function (e) { if (e.key === "Enter") setShowSetPicker(true); }}
+            placeholder="Exercise, date, weight, reps..."
+            style={Object.assign({}, cell, { flex: 1 })}
+          />
+          <button onClick={function () { setShowSetPicker(true); }} style={btnSecondary({})}>Browse</button>
+        </div>
+        {loadedSet && (
+          <div style={{ marginTop: 8, fontSize: 12, color: GREEN, background: "#2ea44f18", border: "1px solid #39d35344", borderRadius: 8, padding: "8px 10px" }}>
+            Loaded: {loadedSet.displayEx} — {loadedSet.weight} kg × {loadedSet.reps} reps{loadedSet.date ? " · " + loadedSet.date : ""}{loadedSet.side && loadedSet.side !== "both" ? " · " + loadedSet.side : ""}
+          </div>
+        )}
+      </div>
+      <div style={{ marginBottom: 12 }}>
         <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 6 }}>Auto-fill from logged exercise</div>
         <div style={{ display: "flex", gap: 8 }}>
           <select value={autoEx} onChange={function (e) { setAutoEx(e.target.value); }} style={Object.assign({}, cell, { flex: 1 })}>
@@ -28,13 +95,57 @@ function OneRMCalc({ data }) {
         </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 }}>
-        <div><div style={{ fontSize: 11, color: "#6b7280", marginBottom: 4 }}>Weight (kg)</div><input type="number" value={weight} onChange={function (e) { setWeight(e.target.value); }} placeholder="100" style={Object.assign({}, cell, { width: "100%" })} /></div>
-        <div><div style={{ fontSize: 11, color: "#6b7280", marginBottom: 4 }}>Reps</div><input type="number" value={reps} onChange={function (e) { setReps(e.target.value); }} placeholder="5" style={Object.assign({}, cell, { width: "100%" })} /></div>
+        <div><div style={{ fontSize: 11, color: "#6b7280", marginBottom: 4 }}>Weight (kg)</div><input type="number" value={weight} onChange={function (e) { setWeight(e.target.value); setLoadedSet(null); }} placeholder="100" style={Object.assign({}, cell, { width: "100%" })} /></div>
+        <div><div style={{ fontSize: 11, color: "#6b7280", marginBottom: 4 }}>Reps</div><input type="number" value={reps} onChange={function (e) { setReps(e.target.value); setLoadedSet(null); }} placeholder="5" style={Object.assign({}, cell, { width: "100%" })} /></div>
       </div>
       <div style={{ marginBottom: 14 }}><div style={{ fontSize: 11, color: "#6b7280", marginBottom: 6 }}>Formula</div><select value={formula} onChange={function (e) { setFormula(e.target.value); }} style={Object.assign({}, cell, { width: "100%" })}>{Object.keys(formulas).map(function (f) { return <option key={f} value={f}>{f}</option>; })}</select></div>
       {oneRM ? (<div><div style={{ background: "#23232f", borderRadius: 12, padding: 16, textAlign: "center", marginBottom: 14 }}><div style={{ fontSize: 12, color: "#6b7280", marginBottom: 4 }}>Estimated 1RM ({formula})</div><div style={{ fontSize: 40, fontWeight: 900, color: ACCENT }}>{oneRM.toFixed(1)}<span style={{ fontSize: 18, color: "#9ca3af" }}> kg</span></div></div><div style={{ fontWeight: 700, marginBottom: 10, fontSize: 14 }}>📊 Training Percentages</div><div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>{pcts.map(function (p) { return <div key={p} style={{ background: "#23232f", borderRadius: 8, padding: "9px 12px", display: "flex", justifyContent: "space-between" }}><span style={{ color: "#9ca3af", fontSize: 13 }}>{p}%</span><span style={{ fontWeight: 700, color: ACCENT }}>{(oneRM * p / 100).toFixed(1)} kg</span></div>; })}</div></div>) : <div style={{ color: "#6b7280", fontSize: 13, textAlign: "center", padding: "16px 0" }}>Enter weight and reps to calculate your 1RM.</div>}
       <div style={{ fontWeight: 700, margin: "18px 0 10px", fontSize: 14 }}>📖 Formula Guide</div>
       {fInfo.map(function (f) { return <div key={f.name} style={{ padding: "12px 0", borderBottom: "1px solid #2d2d3a" }}><div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}><span style={{ fontWeight: 800, color: "#e2e8f0" }}>{f.name}</span><span style={{ background: f.bc + "33", color: f.bc, border: "1px solid " + f.bc + "44", borderRadius: 20, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{f.badge}</span></div><div style={{ fontSize: 12, color: "#d1d5db", marginBottom: 3 }}>📌 {f.when}</div><div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 6 }}>💡 {f.use}</div><div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>{f.sports.map(function (s) { return <span key={s} style={{ background: "#2d2d3a", color: "#a0aec0", borderRadius: 20, padding: "2px 8px", fontSize: 11 }}>{s}</span>; })}</div></div>; })}
+
+      {showSetPicker && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
+          <div style={{ background: "#18181f", border: "1px solid #2d2d3a", borderRadius: 16, padding: 20, maxWidth: 560, width: "92%", maxHeight: "80vh", display: "flex", flexDirection: "column" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <div style={{ fontWeight: 800, fontSize: 16, color: "#e2e8f0" }}>Select a logged set</div>
+              <button onClick={function () { setShowSetPicker(false); }} style={{ background: "transparent", border: "none", color: "#9ca3af", fontSize: 20, cursor: "pointer", padding: "4px 8px" }}>✕</button>
+            </div>
+            <input
+              value={setSearch}
+              onChange={function (e) { setSetSearch(e.target.value); }}
+              placeholder="Search exercise, date, weight, reps..."
+              style={Object.assign({}, cell, { width: "100%", marginBottom: 12 })}
+              autoFocus
+            />
+            <div style={{ overflowY: "auto", flex: 1 }}>
+              {loggedSets.length === 0 ? (
+                <div style={{ color: "#6b7280", fontSize: 13, textAlign: "center", padding: "24px 0" }}>No logged sets yet. Log a workout first.</div>
+              ) : filteredSets.length === 0 ? (
+                <div style={{ color: "#6b7280", fontSize: 13, textAlign: "center", padding: "24px 0" }}>No sets match your search.</div>
+              ) : filteredSets.map(function (item) {
+                return (
+                  <button
+                    key={item.id}
+                    onClick={function () { selectLoggedSet(item); }}
+                    style={{ width: "100%", textAlign: "left", background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 10, padding: "12px 14px", marginBottom: 8, cursor: "pointer", color: "#e2e8f0" }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontWeight: 700, fontSize: 14 }}>{item.displayEx}</span>
+                      <span style={{ fontWeight: 800, color: ACCENT, fontSize: 14 }}>{item.weight} kg × {item.reps}</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: "#9ca3af", display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      {item.date && <span>{item.date}</span>}
+                      {item.side && item.side !== "both" && <span>{item.side}</span>}
+                      {item.time && <span>{item.time}</span>}
+                      {item.note && <span>{item.note}</span>}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

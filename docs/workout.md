@@ -96,6 +96,7 @@ Estimates one-rep max from submaximal sets using five formulas:
 | O'Connor | Conservative estimate |
 
 **Features:**
+- Search logged sets by exercise, date, weight, reps, or notes — select any set to load into the calculator
 - Auto-fill from best logged set for any exercise
 - Training percentages at 100%, 95%, 90%, 85%, 80%, 75%, 70%, 65%, 60%
 - Formula guide with sport recommendations
