@@ -47,6 +47,13 @@ See [shared-utilities.md](./shared-utilities.md#smart-parser) for supported form
 - Multiple exercises in one paste
 - Import preview with L/R side labels
 
+**Keyboard shortcuts (modal):**
+- `Enter` — Parse & save
+- `Ctrl+Shift+Enter` — Insert newline in textarea
+- `Esc` — Close modal
+
+Same shortcuts apply to the calendar day panel's Smart Parser import.
+
 ## Log Workout (Manual Entry)
 
 Collapsible manual logging form:
@@ -82,6 +89,7 @@ Full history browser with:
 
 ### Bulk Actions
 - **Clear History** — delete all workouts (with confirmation)
+  - `Enter` confirms delete · `Esc` cancels
 
 ## 1RM Calculator
 

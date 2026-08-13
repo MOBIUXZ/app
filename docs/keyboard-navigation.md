@@ -44,6 +44,19 @@ Hovering an item with the mouse also updates keyboard focus.
 | **Body comp history** | Highlight entry |
 | **Progress chart detail modal** | Highlight workout card |
 
+## Popups & Dialogs
+
+| Popup | Enter | Escape | Other |
+|-------|-------|--------|-------|
+| **Clear workout history** | Confirm delete (green flash on button) | Cancel | |
+| **Smart Parser** | Parse & save | Close modal | In textarea: **Ctrl+Shift+Enter** inserts newline |
+| **Calendar → Smart Parser** | Parse & save for selected date | — | Same textarea shortcuts |
+| **1RM set picker** | Select focused set | Close modal | ↑↓ browse sets |
+| **Calendar modal** | — | Close calendar | |
+| **Progress workout detail** | — | Close modal | ↑↓ browse workouts |
+
+Confirm dialogs auto-focus when opened so Enter works immediately without clicking.
+
 ## Implementation
 
 Shared hooks in `src/components/shared.jsx`:

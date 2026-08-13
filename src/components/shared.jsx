@@ -562,6 +562,73 @@ export function useAppNavKeyboard(tabs, currentTab, setTab) {
   return { focusIdx: focusIdx, activatedIdx: activatedIdx, navClass: function (i) { return (i === focusIdx ? "ft-kb-nav-focus " : "") + (i === activatedIdx ? "ft-kb-nav-activate" : ""); } };
 }
 
+export function insertTextareaNewline(e, value, setValue) {
+  e.preventDefault();
+  var ta = e.target;
+  var start = ta.selectionStart;
+  var end = ta.selectionEnd;
+  var next = value.slice(0, start) + "\n" + value.slice(end);
+  setValue(next);
+  var pos = start + 1;
+  requestAnimationFrame(function () {
+    ta.selectionStart = pos;
+    ta.selectionEnd = pos;
+  });
+}
+
+export function handleParserTextareaKeyDown(e, onSubmit, value, setValue) {
+  if (e.key === "Enter" && e.ctrlKey && e.shiftKey) {
+    insertTextareaNewline(e, value, setValue);
+    return;
+  }
+  if (e.key === "Enter" && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    e.preventDefault();
+    onSubmit();
+  }
+}
+
+export function useConfirmDialogKeyboard(open, onConfirm, onCancel) {
+  var [confirmFlash, setConfirmFlash] = useState(false);
+  var dialogRef = useRef(null);
+  var flashTimer = useRef(null);
+
+  useEffect(function () {
+    return function () { if (flashTimer.current) clearTimeout(flashTimer.current); };
+  }, []);
+
+  useEffect(function () {
+    if (open && dialogRef.current) dialogRef.current.focus();
+  }, [open]);
+
+  function handleKeyDown(e) {
+    if (!open) return;
+    if (e.key === "Enter") {
+      e.preventDefault();
+      setConfirmFlash(true);
+      if (flashTimer.current) clearTimeout(flashTimer.current);
+      flashTimer.current = setTimeout(function () { setConfirmFlash(false); }, 450);
+      onConfirm();
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      onCancel();
+    }
+  }
+
+  return { dialogRef: dialogRef, handleKeyDown: handleKeyDown, confirmFlashClass: confirmFlash ? "ft-kb-activate" : "" };
+}
+
+export function handleModalKeyDown(e, onEnter, onEscape) {
+  if (e.key === "Escape" && onEscape) {
+    e.preventDefault();
+    onEscape();
+    return;
+  }
+  if (e.key === "Enter" && onEnter && e.target.tagName !== "TEXTAREA") {
+    e.preventDefault();
+    onEnter();
+  }
+}
+
 export function Card({ children, style }) {
   return <div style={Object.assign({ background: "#18181f", border: "1px solid #2d2d3a", borderRadius: 14, padding: 20, marginBottom: 16 }, style || {})}>{children}</div>;
 }

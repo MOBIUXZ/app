@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, formatExerciseName, btnPrimary, btnSecondary, btnDanger, inp, Card, formatDate, useKeyboardListNav } from "./shared";
+import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, formatExerciseName, btnPrimary, btnSecondary, btnDanger, inp, Card, formatDate, useKeyboardListNav, useConfirmDialogKeyboard, handleParserTextareaKeyDown, handleModalKeyDown } from "./shared";
 
 function OneRMCalc({ data }) {
   var [weight, setWeight] = useState(""); var [reps, setReps] = useState(""); var [formula, setFormula] = useState("Epley"); var [autoEx, setAutoEx] = useState("");
@@ -114,7 +114,7 @@ function OneRMCalc({ data }) {
       {fInfo.map(function (f) { return <div key={f.name} style={{ padding: "12px 0", borderBottom: "1px solid #2d2d3a" }}><div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}><span style={{ fontWeight: 800, color: "#e2e8f0" }}>{f.name}</span><span style={{ background: f.bc + "33", color: f.bc, border: "1px solid " + f.bc + "44", borderRadius: 20, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{f.badge}</span></div><div style={{ fontSize: 12, color: "#d1d5db", marginBottom: 3 }}>📌 {f.when}</div><div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 6 }}>💡 {f.use}</div><div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>{f.sports.map(function (s) { return <span key={s} style={{ background: "#2d2d3a", color: "#a0aec0", borderRadius: 20, padding: "2px 8px", fontSize: 11 }}>{s}</span>; })}</div></div>; })}
 
       {showSetPicker && (
-        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }} onKeyDown={function (e) { handleModalKeyDown(e, null, function () { setShowSetPicker(false); }); }}>
           <div ref={pickerModalRef} tabIndex={-1} onKeyDown={setPickerKb.handleKeyDown} style={{ background: "#18181f", border: "1px solid #2d2d3a", borderRadius: 16, padding: 20, maxWidth: 560, width: "92%", maxHeight: "80vh", display: "flex", flexDirection: "column", outline: "none" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
               <div style={{ fontWeight: 800, fontSize: 16, color: "#e2e8f0" }}>Select a logged set</div>
@@ -306,6 +306,7 @@ export default function WorkoutPage({ data, save }) {
   function toggleGroup(groupKey) { setExpandedGroups(function (prev) { var next = Object.assign({}, prev); next[groupKey] = !next[groupKey]; return next; }); }
   function toggleAllGroups(expand) { var next = {}; groupedHistory.forEach(function (group) { next[group.groupKey] = expand; }); setExpandedGroups(next); setAllExpanded(expand); }
   function clearHistory() { save({ workouts: [], bodyLogs: data.bodyLogs, bodyComp: data.bodyComp, calories: data.calories }); setShowClearConfirm(false); }
+  var clearConfirmKb = useConfirmDialogKeyboard(showClearConfirm, clearHistory, function () { setShowClearConfirm(false); });
 
   // Calendar helper functions
   function hasWorkoutOnDate(dateStr) { return data.workouts.some(function (w) { return w.date === dateStr; }); }
@@ -379,8 +380,8 @@ export default function WorkoutPage({ data, save }) {
       </div>
 
       {showCalendarModal && (
-        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
-          <div style={{ background: "#18181f", border: "1px solid #2d2d3a", borderRadius: 16, padding: 20, maxWidth: calendarView === "year" ? 680 : 420, width: "95%", maxHeight: "92vh", overflowY: "auto" }}>
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }} onKeyDown={function (e) { handleModalKeyDown(e, null, closeCalModal); }}>
+          <div style={{ background: "#18181f", border: "1px solid #2d2d3a", borderRadius: 16, padding: 20, maxWidth: calendarView === "year" ? 680 : 420, width: "95%", maxHeight: "92vh", overflowY: "auto" }} tabIndex={-1}>
 
             {/* Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
@@ -677,6 +678,7 @@ export default function WorkoutPage({ data, save }) {
                     <textarea
                       value={calParseText}
                       onChange={function (e) { setCalParseText(e.target.value); }}
+                      onKeyDown={function (e) { handleParserTextareaKeyDown(e, calDoParse, calParseText, setCalParseText); }}
                       placeholder={`Example:
 Squat
 100kg - 5 reps
@@ -686,6 +688,7 @@ Bench Press
 80kg - 8 reps`}
                       style={Object.assign({}, cell, { width: "100%", minHeight: 140, marginBottom: 10, resize: "vertical", fontFamily: "monospace", fontSize: 12 })}
                     />
+                    <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 8 }}>Enter parse & save · Ctrl+Shift+Enter new line</div>
                     {calParseMsg && (
                       <div style={{ color: calParseMsg.includes("✅") ? GREEN : "#f87171", fontSize: 13, fontWeight: 600, marginBottom: 10 }}>{calParseMsg}</div>
                     )}
@@ -703,8 +706,8 @@ Bench Press
       )}
 
       {showSmartParserModal && (
-        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
-          <div style={{ background: "#18181f", border: "1px solid #2d2d3a", borderRadius: 16, padding: 20, maxWidth: 600, width: "90%", maxHeight: "80vh", overflowY: "auto" }}>
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }} onKeyDown={function (e) { handleModalKeyDown(e, doParse, function () { setShowSmartParserModal(false); setParseMsg(""); setParsePreview(null); }); }}>
+          <div style={{ background: "#18181f", border: "1px solid #2d2d3a", borderRadius: 16, padding: 20, maxWidth: 600, width: "90%", maxHeight: "80vh", overflowY: "auto" }} tabIndex={-1}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ fontSize: 18 }}>🧠</span>
@@ -718,6 +721,7 @@ Bench Press
             <textarea
               value={pasteText}
               onChange={function (e) { setPasteText(e.target.value); }}
+              onKeyDown={function (e) { handleParserTextareaKeyDown(e, doParse, pasteText, setPasteText); }}
               placeholder={`Paste workout text... Example:
 24 July 2026
 Squat
@@ -726,8 +730,9 @@ Squat
 
 Bench Press
 80kg - 8 reps`}
-              style={Object.assign({}, cell, { width: "100%", minHeight: 160, marginBottom: 12, resize: "vertical", fontFamily: "monospace" })}
+              style={Object.assign({}, cell, { width: "100%", minHeight: 160, marginBottom: 8, resize: "vertical", fontFamily: "monospace" })}
             />
+            <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 12 }}>Enter parse & save · Ctrl+Shift+Enter new line · Esc close</div>
             
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
               <button onClick={doParse} style={Object.assign({}, btnPrimary({}), { flex: 1 })}>Parse & Save</button>
@@ -915,13 +920,14 @@ Bench Press
         )}
 
         {showClearConfirm && (
-          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
-            <div style={{ background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 16, padding: 20, maxWidth: 400, width: "90%" }}>
+          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }} onKeyDown={clearConfirmKb.handleKeyDown}>
+            <div ref={clearConfirmKb.dialogRef} tabIndex={-1} style={{ background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 16, padding: 20, maxWidth: 400, width: "90%", outline: "none" }}>
               <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 12, color: "#e2e8f0" }}>Clear Workout History?</div>
               <div style={{ fontSize: 13, color: "#9ca3af", marginBottom: 16 }}>This will permanently delete all {data.workouts.length} logged workouts. Do you want to continue?</div>
+              <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 12 }}>Enter confirm · Esc cancel</div>
               <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
                 <button onClick={function () { setShowClearConfirm(false); }} style={btnSecondary({ padding: "10px 16px" })}>Cancel</button>
-                <button onClick={clearHistory} style={btnDanger({ padding: "10px 16px" })}>Clear History</button>
+                <button onClick={clearHistory} className={clearConfirmKb.confirmFlashClass} style={btnDanger({ padding: "10px 16px" })}>Clear History</button>
               </div>
             </div>
           </div>
