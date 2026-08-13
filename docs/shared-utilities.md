@@ -181,6 +181,17 @@ Shared React components used across pages:
 | `btnSecondary()` | Secondary button styles |
 | `btnDanger()` | Destructive button styles |
 
+## Keyboard Navigation
+
+See [keyboard-navigation.md](./keyboard-navigation.md) for full details.
+
+| Hook / Helper | Purpose |
+|---------------|---------|
+| `useAppNavKeyboard()` | Global page shortcuts (`1`–`5`, `←` `→`, Enter) |
+| `useKeyboardListNav()` | Arrow/Enter navigation inside lists |
+| `isTypingTarget()` | Detects when user is typing in a form field |
+| `kbItemClass()` | CSS classes for focus and activate highlights |
+
 ## Activity Levels
 
 Used by the Calories page for TDEE calculation:

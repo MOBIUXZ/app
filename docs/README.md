@@ -12,6 +12,7 @@ FitTrack is a client-side fitness tracking web app built with **React** and **Vi
 | Calories | [calories.md](./calories.md) | Food logging, macros, BMR/TDEE, daily goals |
 | Progress | [progress.md](./progress.md) | Exercise charts, compound/isolation tracking, trends |
 | Shared Utilities | [shared-utilities.md](./shared-utilities.md) | Smart parser, exercise resolution, compound lifts, data helpers |
+| Keyboard Navigation | [keyboard-navigation.md](./keyboard-navigation.md) | Arrow keys, Enter, page shortcuts, focus highlights |
 
 ## App Structure
 

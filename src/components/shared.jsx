@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export const ACCENT = "#a78bfa";
 export const GREEN = "#34d399";
@@ -437,6 +437,129 @@ export function restStr(t1, t2) {
   if (diff <= 0) return null;
   var mm = Math.floor(diff / 60), ss = diff % 60;
   return mm > 0 && ss > 0 ? mm + " min " + ss + " s" : mm > 0 ? mm + " min" : ss + " s";
+}
+
+export function isTypingTarget(el) {
+  if (!el) return false;
+  var tag = el.tagName;
+  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el.isContentEditable;
+}
+
+export function kbItemClass(index, focusIdx, activatedIdx) {
+  var classes = [];
+  if (index === focusIdx) classes.push("ft-kb-focus");
+  if (index === activatedIdx) classes.push("ft-kb-activate");
+  return classes.join(" ");
+}
+
+export function useKeyboardListNav(count, onSelect, enabled) {
+  var [focusIdx, setFocusIdx] = useState(-1);
+  var [activatedIdx, setActivatedIdx] = useState(-1);
+  var activateTimer = useRef(null);
+  var listRef = useRef(null);
+
+  useEffect(function () {
+    return function () { if (activateTimer.current) clearTimeout(activateTimer.current); };
+  }, []);
+
+  useEffect(function () {
+    if (focusIdx >= count) setFocusIdx(count > 0 ? count - 1 : -1);
+  }, [count, focusIdx]);
+
+  useEffect(function () {
+    if (focusIdx < 0 || !listRef.current) return;
+    var el = listRef.current.querySelector('[data-kb-index="' + focusIdx + '"]');
+    if (el && el.scrollIntoView) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [focusIdx]);
+
+  function flashActivate(index) {
+    setActivatedIdx(index);
+    if (activateTimer.current) clearTimeout(activateTimer.current);
+    activateTimer.current = setTimeout(function () { setActivatedIdx(-1); }, 450);
+  }
+
+  function handleKeyDown(e) {
+    if (enabled === false || count === 0) return;
+    if (isTypingTarget(e.target) && e.currentTarget.contains(e.target) && e.target !== e.currentTarget) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setFocusIdx(function (i) { return i < 0 ? 0 : Math.min(i + 1, count - 1); });
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setFocusIdx(function (i) { return i < 0 ? 0 : Math.max(i - 1, 0); });
+    } else if (e.key === "Enter" && focusIdx >= 0) {
+      e.preventDefault();
+      flashActivate(focusIdx);
+      if (onSelect) onSelect(focusIdx);
+    } else if (e.key === "Escape") {
+      setFocusIdx(-1);
+    }
+  }
+
+  return { focusIdx: focusIdx, setFocusIdx: setFocusIdx, activatedIdx: activatedIdx, handleKeyDown: handleKeyDown, listRef: listRef, reset: function () { setFocusIdx(-1); }, kbClass: function (i) { return kbItemClass(i, focusIdx, activatedIdx); } };
+}
+
+export function useAppNavKeyboard(tabs, currentTab, setTab) {
+  var [focusIdx, setFocusIdx] = useState(-1);
+  var [activatedIdx, setActivatedIdx] = useState(-1);
+  var activateTimer = useRef(null);
+
+  useEffect(function () {
+    setFocusIdx(tabs.indexOf(currentTab));
+  }, [currentTab, tabs]);
+
+  useEffect(function () {
+    return function () { if (activateTimer.current) clearTimeout(activateTimer.current); };
+  }, []);
+
+  function flashActivate(index) {
+    setActivatedIdx(index);
+    if (activateTimer.current) clearTimeout(activateTimer.current);
+    activateTimer.current = setTimeout(function () { setActivatedIdx(-1); }, 450);
+  }
+
+  useEffect(function () {
+    function onKeyDown(e) {
+      if (isTypingTarget(document.activeElement)) return;
+      var idx = tabs.indexOf(currentTab);
+
+      if (e.key >= "1" && e.key <= "9" && !e.ctrlKey && !e.metaKey && !e.altKey && parseInt(e.key, 10) <= tabs.length) {
+        var pick = parseInt(e.key, 10) - 1;
+        setFocusIdx(pick);
+        setTab(tabs[pick]);
+        flashActivate(pick);
+        e.preventDefault();
+        return;
+      }
+
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        var next = (idx + 1) % tabs.length;
+        setFocusIdx(next);
+        setTab(tabs[next]);
+        flashActivate(next);
+        return;
+      }
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        var prev = (idx - 1 + tabs.length) % tabs.length;
+        setFocusIdx(prev);
+        setTab(tabs[prev]);
+        flashActivate(prev);
+        return;
+      }
+      if (e.key === "Enter" && focusIdx >= 0) {
+        e.preventDefault();
+        setTab(tabs[focusIdx]);
+        flashActivate(focusIdx);
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return function () { window.removeEventListener("keydown", onKeyDown); };
+  }, [tabs, currentTab, setTab, focusIdx]);
+
+  return { focusIdx: focusIdx, activatedIdx: activatedIdx, navClass: function (i) { return (i === focusIdx ? "ft-kb-nav-focus " : "") + (i === activatedIdx ? "ft-kb-nav-activate" : ""); } };
 }
 
 export function Card({ children, style }) {

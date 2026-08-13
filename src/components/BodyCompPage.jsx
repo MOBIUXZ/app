@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ACCENT, BLUE, GREEN, ORANGE, PINK, Collapse, btnPrimary, inp, formatDate } from "./shared";
+import { ACCENT, BLUE, GREEN, ORANGE, PINK, Collapse, btnPrimary, inp, formatDate, useKeyboardListNav } from "./shared";
 
 export default function BodyCompPage({ data, save }) {
   var [logDate, setLogDate] = useState(formatDate(new Date()));
@@ -13,6 +13,8 @@ export default function BodyCompPage({ data, save }) {
   function MBox(p) { return <div style={{ background: "#23232f", borderRadius: 10, padding: "10px 8px", flex: 1 }}><div style={{ fontSize: 10, color: "#6b7280", marginBottom: 2 }}>{p.label}</div><div style={{ fontWeight: 800, color: p.val != null ? p.color : "#4b5563", fontSize: 14 }}>{p.val != null ? p.val.toFixed(2) : "—"}<span style={{ fontSize: 10, color: "#9ca3af", marginLeft: 2 }}>{p.unit}</span></div></div>; }
   function GL(p) { return <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 5, marginTop: 12 }}>{p.children}</div>; }
   var cell = inp({});
+  var historyEntries = data.bodyComp.slice().reverse().slice(0, 10);
+  var historyKb = useKeyboardListNav(historyEntries.length, function () {}, historyEntries.length > 0);
   function submit() { if (!w || !bf) { setMsg("Weight and Body Fat % are required."); return; } if (!logDate.trim()) { setMsg("Date is required."); return; } var entry = { weight: wN, height: parseFloat(h) || null, bf: bfN, smm: smmN || null, waist: parseFloat(waist) || null, age: ageN || null, sex: sex, BW: wN, PBF: bfN, FM: fm, FFM: ffm, BMI: bmi, FFMI: ffmi, FMI: fmi, SMM: smmN || null, SMI: smi, BMR_Mifflin: bmrMifflin, BMR_Katch: bmrKatch, date: logDate }; save({ workouts: data.workouts, calories: data.calories, bodyComp: [...data.bodyComp, entry], bodyLogs: [...data.bodyLogs, { weight: wN, date: logDate }] }); setW(""); setH(""); setBf(""); setSmm(""); setWaist(""); setAge(""); setLogDate(formatDate(new Date())); setMsg("Logged!"); setTimeout(function () { setMsg(""); }, 2000); }
   return (
     <div>
@@ -44,7 +46,11 @@ export default function BodyCompPage({ data, save }) {
         {msg && <div style={{ marginTop: 10, color: GREEN, fontSize: 13, textAlign: "center" }}>✅ {msg}</div>}
       </Collapse>
       <Collapse emoji="📋" label="History" defaultOpen={false}>
-        {data.bodyComp.length === 0 ? <div style={{color:"#6b7280",fontSize:13,padding:"24px 0",textAlign:"center"}}><div style={{fontSize:40,marginBottom:12}}>📏</div><div>No entries yet.</div><div style={{marginTop:8,fontSize:12}}>Track your body composition over time!</div></div> : data.bodyComp.slice().reverse().slice(0, 10).map(function (e, i) { return <div key={i} style={{padding:"10px 0",borderBottom:"1px solid #2d2d3a"}}><div style={{fontSize:12,color:"#6b7280",marginBottom:6}}>{e.date}</div><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{[["BW","kg",ACCENT],["BMI","kg/m²",BLUE],["FM","kg",PINK],["FMI","kg/m²",PINK],["PBF","%",PINK],["FFM","kg",GREEN],["FFMI","kg/m²",ACCENT],["SMM","kg",GREEN],["SMI","kg/m²",ORANGE]].map(function (r) { return e[r[0]] != null ? <div key={r[0]} style={{background:"#23232f",borderRadius:8,padding:"5px 9px"}}><div style={{fontSize:10,color:"#6b7280"}}>{r[0]}</div><div style={{fontWeight:700,color:r[2],fontSize:13}}>{Number(e[r[0]]).toFixed(2)}<span style={{fontSize:10,color:"#9ca3af",marginLeft:1}}>{r[1]}</span></div></div> : null; })}</div></div>; })}
+        {historyEntries.length === 0 ? <div style={{color:"#6b7280",fontSize:13,padding:"24px 0",textAlign:"center"}}><div style={{fontSize:40,marginBottom:12}}>📏</div><div>No entries yet.</div><div style={{marginTop:8,fontSize:12}}>Track your body composition over time!</div></div> : (
+        <div ref={historyKb.listRef} tabIndex={0} onKeyDown={historyKb.handleKeyDown} style={{ outline: "none" }}>
+        {historyEntries.map(function (e, i) { return <div key={i} data-kb-index={i} className={historyKb.kbClass(i)} onMouseEnter={function () { historyKb.setFocusIdx(i); }} style={{padding:"10px 0",borderBottom:"1px solid #2d2d3a"}}><div style={{fontSize:12,color:"#6b7280",marginBottom:6}}>{e.date}</div><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{[["BW","kg",ACCENT],["BMI","kg/m²",BLUE],["FM","kg",PINK],["FMI","kg/m²",PINK],["PBF","%",PINK],["FFM","kg",GREEN],["FFMI","kg/m²",ACCENT],["SMM","kg",GREEN],["SMI","kg/m²",ORANGE]].map(function (r) { return e[r[0]] != null ? <div key={r[0]} style={{background:"#23232f",borderRadius:8,padding:"5px 9px"}}><div style={{fontSize:10,color:"#6b7280"}}>{r[0]}</div><div style={{fontWeight:700,color:r[2],fontSize:13}}>{Number(e[r[0]]).toFixed(2)}<span style={{fontSize:10,color:"#9ca3af",marginLeft:1}}>{r[1]}</span></div></div> : null; })}</div></div>; })}
+        </div>
+        )}
       </Collapse>
     </div>
   );

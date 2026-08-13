@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, formatExerciseName, btnPrimary, btnSecondary, btnDanger, inp, Card, formatDate } from "./shared";
+import { useState, useEffect, useRef } from "react";
+import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, formatExerciseName, btnPrimary, btnSecondary, btnDanger, inp, Card, formatDate, useKeyboardListNav } from "./shared";
 
 function OneRMCalc({ data }) {
   var [weight, setWeight] = useState(""); var [reps, setReps] = useState(""); var [formula, setFormula] = useState("Epley"); var [autoEx, setAutoEx] = useState("");
@@ -57,6 +57,16 @@ function OneRMCalc({ data }) {
     setLoadedSet(item);
     setShowSetPicker(false);
   }
+  var setPickerKb = useKeyboardListNav(filteredSets.length, function (i) { selectLoggedSet(filteredSets[i]); }, showSetPicker);
+  var pickerModalRef = useRef(null);
+  useEffect(function () {
+    if (showSetPicker) {
+      setPickerKb.reset();
+      setTimeout(function () {
+        if (pickerModalRef.current) pickerModalRef.current.focus();
+      }, 0);
+    }
+  }, [showSetPicker, filteredSets.length]);
   var cell = inp({});
   var fInfo = [
     { name: "Epley", badge: "Most Popular", bc: ACCENT, when: "Best for moderate rep ranges (3-10 reps).", use: "Widely used in powerlifting and gym training.", sports: ["Powerlifting", "Weightlifting", "General"] },
@@ -105,28 +115,31 @@ function OneRMCalc({ data }) {
 
       {showSetPicker && (
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
-          <div style={{ background: "#18181f", border: "1px solid #2d2d3a", borderRadius: 16, padding: 20, maxWidth: 560, width: "92%", maxHeight: "80vh", display: "flex", flexDirection: "column" }}>
+          <div ref={pickerModalRef} tabIndex={-1} onKeyDown={setPickerKb.handleKeyDown} style={{ background: "#18181f", border: "1px solid #2d2d3a", borderRadius: 16, padding: 20, maxWidth: 560, width: "92%", maxHeight: "80vh", display: "flex", flexDirection: "column", outline: "none" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
               <div style={{ fontWeight: 800, fontSize: 16, color: "#e2e8f0" }}>Select a logged set</div>
               <button onClick={function () { setShowSetPicker(false); }} style={{ background: "transparent", border: "none", color: "#9ca3af", fontSize: 20, cursor: "pointer", padding: "4px 8px" }}>✕</button>
             </div>
             <input
               value={setSearch}
-              onChange={function (e) { setSetSearch(e.target.value); }}
+              onChange={function (e) { setSetSearch(e.target.value); setPickerKb.reset(); }}
               placeholder="Search exercise, date, weight, reps..."
               style={Object.assign({}, cell, { width: "100%", marginBottom: 12 })}
               autoFocus
             />
-            <div style={{ overflowY: "auto", flex: 1 }}>
+            <div ref={setPickerKb.listRef} style={{ overflowY: "auto", flex: 1 }}>
               {loggedSets.length === 0 ? (
                 <div style={{ color: "#6b7280", fontSize: 13, textAlign: "center", padding: "24px 0" }}>No logged sets yet. Log a workout first.</div>
               ) : filteredSets.length === 0 ? (
                 <div style={{ color: "#6b7280", fontSize: 13, textAlign: "center", padding: "24px 0" }}>No sets match your search.</div>
-              ) : filteredSets.map(function (item) {
+              ) : filteredSets.map(function (item, idx) {
                 return (
                   <button
                     key={item.id}
-                    onClick={function () { selectLoggedSet(item); }}
+                    data-kb-index={idx}
+                    className={setPickerKb.kbClass(idx)}
+                    onClick={function () { setPickerKb.setFocusIdx(idx); selectLoggedSet(item); }}
+                    onMouseEnter={function () { setPickerKb.setFocusIdx(idx); }}
                     style={{ width: "100%", textAlign: "left", background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 10, padding: "12px 14px", marginBottom: 8, cursor: "pointer", color: "#e2e8f0" }}
                   >
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, marginBottom: 4 }}>
@@ -327,6 +340,8 @@ export default function WorkoutPage({ data, save }) {
       groupedHistory.push({ groupKey: groupKey, date: w.date, exercise: w.exercise, items: [w] });
     }
   });
+  var historyKb = useKeyboardListNav(historyItems.length, function (i) { startEdit(historyItems[i]._idx); }, historyItems.length > 0);
+  var historyFlatIdx = 0;
   var heroCard = { background: "linear-gradient(135deg, #1a1a24 0%, #23232f 100%)", border: "1px solid #3d3d4a", borderRadius: 18, padding: 20, marginBottom: 16, boxShadow: "0 10px 24px rgba(0,0,0,0.16)" };
   var chip = { background: "#2d2d3a", color: "#cbd5e1", border: "1px solid #3d3d4a", borderRadius: 999, padding: "6px 10px", fontSize: 12, fontWeight: 700 };
   var sectionLabel = { fontSize: 11, color: "#6b7280", marginBottom: 4, letterSpacing: "0.08em", textTransform: "uppercase" };
@@ -829,7 +844,9 @@ Bench Press
 
         {filteredWorkouts.length === 0 ? (
           <div style={{color:"#6b7280",fontSize:13,padding:"24px 0",textAlign:"center"}}><div style={{fontSize:40,marginBottom:12}}>🏋️</div><div>{data.workouts.length === 0 ? "No workouts logged yet." : "No workouts match your search."}</div><div style={{marginTop:8,fontSize:12}}>{data.workouts.length === 0 ? "Start tracking your progress!" : "Try a different search term."}</div></div>
-        ) : groupedHistory.map(function (group, groupIdx) {
+        ) : (
+        <div ref={historyKb.listRef} tabIndex={0} onKeyDown={historyKb.handleKeyDown} style={{ outline: "none" }}>
+        {groupedHistory.map(function (group, groupIdx) {
           return (
             <div key={group.groupKey + groupIdx} style={{ marginBottom: 12 }}>
               <div onClick={function () { toggleGroup(group.groupKey); }} onMouseEnter={function () { setHoveredGroup(group.groupKey); }} onMouseLeave={function () { setHoveredGroup(null); }} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer", marginBottom: 8, padding: "6px 8px", borderRadius: 8, background: expandedGroups[group.groupKey] ? "#23232f" : (hoveredGroup === group.groupKey ? "#1a1a24" : "transparent"), border: expandedGroups[group.groupKey] ? "1px solid #3d3d4a" : (hoveredGroup === group.groupKey ? "1px solid #3d3d4a" : "1px solid transparent"), transition: "all 0.2s ease" }}>
@@ -843,8 +860,9 @@ Bench Press
               {expandedGroups[group.groupKey] !== false && (
                 <div>
                   {group.items.map(function (w) {
+                    var kbIdx = historyFlatIdx++;
                     return (
-                      <div key={w._idx} style={{ background: "#1b1b24", border: "1px solid #2d2d3a", borderRadius: 12, padding: 12, marginBottom: 8 }}>
+                      <div key={w._idx} data-kb-index={kbIdx} className={historyKb.kbClass(kbIdx)} onMouseEnter={function () { historyKb.setFocusIdx(kbIdx); }} style={{ background: "#1b1b24", border: "1px solid #2d2d3a", borderRadius: 12, padding: 12, marginBottom: 8 }}>
                         {editIdx === w._idx ? (
                           <div>
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 }}>
@@ -893,6 +911,8 @@ Bench Press
             </div>
           );
         })}
+        </div>
+        )}
 
         {showClearConfirm && (
           <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>

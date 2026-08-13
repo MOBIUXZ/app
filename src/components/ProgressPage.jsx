@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
-import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExerciseName, isNoSplitLift, isCompoundLift, COMPOUND_LIFTS } from "./shared";
+import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExerciseName, isNoSplitLift, isCompoundLift, COMPOUND_LIFTS, useKeyboardListNav } from "./shared";
 
 function isSplitImbalanced(payload, metric) {
   if (!payload) return false;
@@ -246,6 +246,7 @@ export default function ProgressPage({ data }) {
   }
 
   var selectedWorkouts = selectedDate ? normalizedWorkouts.filter(function (w) { return getChartDateKey(w.date) === String(selectedDate); }) : [];
+  var detailKb = useKeyboardListNav(selectedWorkouts.length, function () {}, selectedDate && selectedWorkouts.length > 0);
 
   return (
     <div>
@@ -289,7 +290,27 @@ export default function ProgressPage({ data }) {
           var COLORS = ["#3b82f6", "#fb923c", "#8b5a2b", "#ef4444", "#22c55e", "#a78bfa", "#f472b6", "#f59e0b", "#818cf8"];
           return <Card style={{ marginBottom: 14, background: "#2a2a38" }}><div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4 }}>📊 Combined Compound Lifts</div><div style={{ display: "flex", gap: 6, marginBottom: 8 }}>{["weight", "volume", "reps"].map(function (m) { return <button key={m} onClick={function () { setCompoundMetric(m); }} style={{ padding: "4px 11px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 600, background: compoundMetric === m ? "#8b5a2b" : "#2d2d3a", color: compoundMetric === m ? "#fff" : "#a0aec0" }}>{m === "weight" ? "Max Weight" : m === "volume" ? "Volume" : "Max Reps"}</button>; })}</div><div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}><ResponsiveContainer width="100%" height={180}><LineChart data={chartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0]) { setSelectedDate(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} />{compounds.map(function (ex, idx) { return <Line key={ex} type="monotone" dataKey={ex} stroke={ex === "Deadlift" ? "#8b5a2b" : COLORS[idx % COLORS.length]} strokeWidth={2} dot={{ r: 2 }} connectNulls={true} />; })}</LineChart></ResponsiveContainer></div></Card>;
         })()}
-        {selectedDate && <div style={{ position: "fixed", inset: 0, background: "rgba(2, 6, 23, 0.76)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, zIndex: 1000 }} onClick={function () { setSelectedDate(null); }}><div style={{ width: "100%", maxWidth: 460, background: "#18181f", border: "1px solid #3a3a4a", borderRadius: 18, boxShadow: "0 18px 48px rgba(0,0,0,0.35)", overflow: "hidden" }} onClick={function (ev) { ev.stopPropagation(); }}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 18px", borderBottom: "1px solid #2d2d3a" }}><div><div style={{ fontSize: 12, color: ACCENT, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Workout Details</div><div style={{ fontSize: 17, fontWeight: 800, color: "#e2e8f0", marginTop: 2 }}>{formatChartDate(selectedDate)}</div></div><button onClick={function () { setSelectedDate(null); }} style={{ background: "transparent", border: "none", color: "#9ca3af", fontSize: 20, cursor: "pointer" }}>✕</button></div><div style={{ padding: 18, maxHeight: "60vh", overflowY: "auto" }}>{selectedWorkouts.length > 0 ? selectedWorkouts.map(function (w, idx) { return <div key={idx} style={{ background: "#23232f", border: "1px solid #3a3a4a", borderRadius: 12, padding: 12, marginBottom: idx === selectedWorkouts.length - 1 ? 0 : 10 }}><div style={{ fontWeight: 800, color: "#e2e8f0", marginBottom: 6 }}>{formatExerciseName(w.exercise)}</div><div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 8 }}>{w.time ? w.time + " · " : ""}{w.date}</div><div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>{(w.sets || []).map(function (s, i) { return <span key={i} style={{ background: "#2d2d3a", color: "#cbd5e1", borderRadius: 999, padding: "4px 8px", fontSize: 11, fontWeight: 700 }}>{s.weight || 0}kg × {s.reps || 0}{s.side === "left" ? " L" : s.side === "right" ? " R" : ""}</span>; })}</div></div>; }) : <div style={{ color: "#6b7280", fontSize: 13, textAlign: "center", padding: "16px 0" }}>No workouts logged for this date.</div>}</div></div></div>}
+        {selectedDate && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(2, 6, 23, 0.76)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, zIndex: 1000 }} onClick={function () { setSelectedDate(null); }}>
+            <div style={{ width: "100%", maxWidth: 460, background: "#18181f", border: "1px solid #3a3a4a", borderRadius: 18, boxShadow: "0 18px 48px rgba(0,0,0,0.35)", overflow: "hidden" }} onClick={function (ev) { ev.stopPropagation(); }} tabIndex={-1} onKeyDown={detailKb.handleKeyDown}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 18px", borderBottom: "1px solid #2d2d3a" }}>
+                <div><div style={{ fontSize: 12, color: ACCENT, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Workout Details</div><div style={{ fontSize: 17, fontWeight: 800, color: "#e2e8f0", marginTop: 2 }}>{formatChartDate(selectedDate)}</div></div>
+                <button onClick={function () { setSelectedDate(null); }} style={{ background: "transparent", border: "none", color: "#9ca3af", fontSize: 20, cursor: "pointer" }}>✕</button>
+              </div>
+              <div ref={detailKb.listRef} style={{ padding: 18, maxHeight: "60vh", overflowY: "auto", outline: "none" }}>
+                {selectedWorkouts.length > 0 ? selectedWorkouts.map(function (w, idx) {
+                  return (
+                    <div key={idx} data-kb-index={idx} className={detailKb.kbClass(idx)} onMouseEnter={function () { detailKb.setFocusIdx(idx); }} style={{ background: "#23232f", border: "1px solid #3a3a4a", borderRadius: 12, padding: 12, marginBottom: idx === selectedWorkouts.length - 1 ? 0 : 10 }}>
+                      <div style={{ fontWeight: 800, color: "#e2e8f0", marginBottom: 6 }}>{formatExerciseName(w.exercise)}</div>
+                      <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 8 }}>{w.time ? w.time + " · " : ""}{w.date}</div>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>{(w.sets || []).map(function (s, i) { return <span key={i} style={{ background: "#2d2d3a", color: "#cbd5e1", borderRadius: 999, padding: "4px 8px", fontSize: 11, fontWeight: 700 }}>{s.weight || 0}kg × {s.reps || 0}{s.side === "left" ? " L" : s.side === "right" ? " R" : ""}</span>; })}</div>
+                    </div>
+                  );
+                }) : <div style={{ color: "#6b7280", fontSize: 13, textAlign: "center", padding: "16px 0" }}>No workouts logged for this date.</div>}
+              </div>
+            </div>
+          </div>
+        )}
         {(isolations.length > 0) && <div style={{ fontSize: 12, color: ACCENT, fontWeight: 700, margin: "16px 0 10px", letterSpacing: 1 }}>💪 ISOLATION LIFTS</div>}
         {isolations.map(function (ex, i) { return <ExerciseChart key={ex} ex={ex} data={normalizedData} compoundIdx={i} onPointSelect={setSelectedDate} formatChartDate={formatChartDate} getChartDateKey={getChartDateKey} />; })}
         <Card style={{ background: "#2a2a38" }}>
