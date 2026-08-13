@@ -62,6 +62,22 @@ Display formatter for the UI:
 | Other compounds | UPPERCASE |
 | Isolation | Title Case |
 
+### `getExerciseChartColor(exercise, fallbackIdx?)`
+
+Returns a consistent hex color for Progress chart lines, badges, and PR stats. Uses `resolveExercise()` first.
+
+| Exercise | Color |
+|----------|-------|
+| Overhead Press | Red (`#ef4444`) |
+| Barbell Row | Green (`#22c55e`) |
+| Push Press | Yellow (`#eab308`) |
+| Bench Press | Orange (`#fb923c`) |
+| Squat | Blue (`#3b82f6`) |
+| Deadlift (incl. Sumo/Romanian) | Purple (`#a78bfa`) |
+| Other lifts | Rotating fallback palette, or accent |
+
+Used by individual exercise charts and the combined compound lifts overlay so colors stay in sync.
+
 ### `isCompoundLift(exercise)`
 
 Returns `true` if the exercise is in the `COMPOUND_LIFTS` list.

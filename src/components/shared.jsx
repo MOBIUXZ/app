@@ -154,6 +154,27 @@ export function formatExerciseName(exercise) {
   return resolved.toUpperCase();
 }
 
+export var EXERCISE_CHART_COLORS = {
+  "Overhead Press": "#ef4444",
+  "Barbell Row": "#22c55e",
+  "Push Press": "#eab308",
+  "Bench Press": "#fb923c",
+  "Squat": "#3b82f6",
+  "Deadlift": "#a78bfa",
+};
+
+var EXERCISE_CHART_FALLBACK = ["#60a5fa", "#f472b6", "#f59e0b", "#e879f9", "#34d399", "#818cf8", "#fb7185", "#6b7280"];
+
+export function getExerciseChartColor(exercise, fallbackIdx) {
+  var ex = resolveExercise(exercise);
+  if (EXERCISE_CHART_COLORS[ex]) return EXERCISE_CHART_COLORS[ex];
+  if (ex.indexOf("Deadlift") !== -1) return EXERCISE_CHART_COLORS["Deadlift"];
+  if (typeof fallbackIdx === "number") {
+    return EXERCISE_CHART_FALLBACK[fallbackIdx % EXERCISE_CHART_FALLBACK.length];
+  }
+  return ACCENT;
+}
+
 export function formatDate(date) {
   if (!date) return "";
   if (typeof date === "string" && /^\d{2}-\d{2}-\d{4}$/.test(date)) {

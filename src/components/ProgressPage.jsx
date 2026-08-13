@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
-import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExerciseName, isNoSplitLift, isCompoundLift, COMPOUND_LIFTS, useKeyboardListNav, useKeyboardLayer, isTypingTarget } from "./shared";
+import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExerciseName, isNoSplitLift, isCompoundLift, COMPOUND_LIFTS, getExerciseChartColor, useKeyboardListNav, useKeyboardLayer, isTypingTarget } from "./shared";
 
 function isSplitImbalanced(payload, metric) {
   if (!payload) return false;
@@ -43,10 +43,10 @@ function SplitTooltip({ active, payload, label, metric, metricLabel }) {
   );
 }
 
-function ExerciseChart({ ex, data, compoundIdx, onPointSelect, formatChartDate, getChartDateKey }) {
+function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartDate, getChartDateKey }) {
   var [metric, setMetric] = useState("weight");
   var isC = isCompoundLift(ex);
-  var exColor = (function () { var EX_COLORS = { "Overhead Press": "#ef4444", "Barbell Row": "#22c55e", Squat: "#3b82f6", Deadlift: "#8b5a2b", "Bench Press": "#fb923c", "Sumo Deadlift": "#6b7280", "Romanian Deadlift": "#9ca3af" }; var EX_FALLBACK = ["#a78bfa", "#f472b6", "#60a5fa", "#f59e0b", "#e879f9", "#34d399", "#818cf8", "#fb7185"]; return EX_COLORS[ex] || EX_FALLBACK[compoundIdx % EX_FALLBACK.length]; })();
+  var exColor = getExerciseChartColor(ex, colorFallbackIdx);
   var cs = { color: "#e2e8f0", fontSize: 10 };
   var tt = { background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 8, fontSize: 12 };
   var sessions = data.workouts.filter(function (w) { return w.exercise === ex; });
@@ -264,7 +264,7 @@ export default function ProgressPage({ data }) {
       <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 20, letterSpacing: "-0.02em" }}>📈 Progress</div>
       {allEx.length === 0 ? <Card><div style={{ color: "#6b7280", fontSize: 13, textAlign: "center", padding: "20px 0" }}>No workouts logged yet.</div></Card> : <div>
         {compounds.length > 0 && <div style={{ fontSize: 12, color: ACCENT, fontWeight: 700, marginBottom: 10, letterSpacing: 1 }}>🏋️ COMPOUND LIFTS</div>}
-        {compounds.map(function (ex, i) { return <ExerciseChart key={ex} ex={ex} data={normalizedData} compoundIdx={i} onPointSelect={setSelectedDate} formatChartDate={formatChartDate} getChartDateKey={getChartDateKey} />; })}
+        {compounds.map(function (ex, i) { return <ExerciseChart key={ex} ex={ex} data={normalizedData} colorFallbackIdx={i} onPointSelect={setSelectedDate} formatChartDate={formatChartDate} getChartDateKey={getChartDateKey} />; })}
         {compounds.length > 1 && (function () {
           var allDates = Array.from(new Set(normalizedWorkouts.map(function (w) { return getChartDateKey(w.date); }))).filter(function (date) { return !!date; });
           allDates.sort(function (a, b) {
@@ -298,8 +298,7 @@ export default function ProgressPage({ data }) {
             });
             return point;
           });
-          var COLORS = ["#3b82f6", "#fb923c", "#8b5a2b", "#ef4444", "#22c55e", "#a78bfa", "#f472b6", "#f59e0b", "#818cf8"];
-          return <Card style={{ marginBottom: 14, background: "#2a2a38" }}><div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4 }}>📊 Combined Compound Lifts</div><div style={{ display: "flex", gap: 6, marginBottom: 8 }}>{["weight", "volume", "reps"].map(function (m) { return <button key={m} onClick={function () { setCompoundMetric(m); }} style={{ padding: "4px 11px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 600, background: compoundMetric === m ? "#8b5a2b" : "#2d2d3a", color: compoundMetric === m ? "#fff" : "#a0aec0" }}>{m === "weight" ? "Max Weight" : m === "volume" ? "Volume" : "Max Reps"}</button>; })}</div><div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}><ResponsiveContainer width="100%" height={180}><LineChart data={chartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0]) { setSelectedDate(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} />{compounds.map(function (ex, idx) { return <Line key={ex} type="monotone" dataKey={ex} stroke={ex === "Deadlift" ? "#8b5a2b" : COLORS[idx % COLORS.length]} strokeWidth={2} dot={{ r: 2 }} connectNulls={true} />; })}</LineChart></ResponsiveContainer></div></Card>;
+          return <Card style={{ marginBottom: 14, background: "#2a2a38" }}><div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4 }}>📊 Combined Compound Lifts</div><div style={{ display: "flex", gap: 6, marginBottom: 8 }}>{["weight", "volume", "reps"].map(function (m) { return <button key={m} onClick={function () { setCompoundMetric(m); }} style={{ padding: "4px 11px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 600, background: compoundMetric === m ? ACCENT : "#2d2d3a", color: compoundMetric === m ? "#fff" : "#a0aec0" }}>{m === "weight" ? "Max Weight" : m === "volume" ? "Volume" : "Max Reps"}</button>; })}</div><div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}><ResponsiveContainer width="100%" height={180}><LineChart data={chartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0]) { setSelectedDate(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} />{compounds.map(function (ex) { var lineColor = getExerciseChartColor(ex); return <Line key={ex} type="monotone" dataKey={ex} stroke={lineColor} strokeWidth={2} dot={{ fill: lineColor, r: 2 }} connectNulls={true} />; })}</LineChart></ResponsiveContainer></div></Card>;
         })()}
         {selectedDate && (
           <div className="ft-kb-modal-backdrop" style={{ position: "fixed", inset: 0, background: "rgba(2, 6, 23, 0.76)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, zIndex: detailLayer.zIndex }} onClick={function () { setSelectedDate(null); }}>
@@ -323,7 +322,7 @@ export default function ProgressPage({ data }) {
           </div>
         )}
         {(isolations.length > 0) && <div style={{ fontSize: 12, color: ACCENT, fontWeight: 700, margin: "16px 0 10px", letterSpacing: 1 }}>💪 ISOLATION LIFTS</div>}
-        {isolations.map(function (ex, i) { return <ExerciseChart key={ex} ex={ex} data={normalizedData} compoundIdx={i} onPointSelect={setSelectedDate} formatChartDate={formatChartDate} getChartDateKey={getChartDateKey} />; })}
+        {isolations.map(function (ex, i) { return <ExerciseChart key={ex} ex={ex} data={normalizedData} colorFallbackIdx={i} onPointSelect={setSelectedDate} formatChartDate={formatChartDate} getChartDateKey={getChartDateKey} />; })}
         <Card style={{ background: "#2a2a38" }}>
           <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 8 }}>📉 Body Weight & Body Fat</div>
           <div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}>

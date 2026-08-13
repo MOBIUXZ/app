@@ -23,6 +23,7 @@ All other exercises appear under **ISOLATION LIFTS** (e.g. Single Arm Lat Pulldo
 Each chart includes:
 
 ### Header Stats
+- Exercise color is consistent across individual charts, combined overlay, PR value, metric toggles, and compound badge (see **Chart Colors** below).
 | Stat | Description |
 |------|-------------|
 | PR | All-time max weight for that exercise |
@@ -81,13 +82,27 @@ Sessions where left and right match, or where sets are logged without side info 
 - Hint shown when only 1 session: *"Log another session to see trends"*
 - Click a chart point to open the **Workout Details** modal
 
+## Chart Colors
+
+Primary compound lifts use fixed colors via `getExerciseChartColor()` in `shared.jsx`:
+
+| Lift | Color |
+|------|-------|
+| OVERHEAD PRESS | Red |
+| BARBELL ROWS | Green |
+| PUSHPRESS | Yellow |
+| BENCH PRESS | Orange |
+| SQUATS | Blue |
+| DEADLIFTS | Purple |
+
+Same colors apply on **individual** exercise charts and the **Combined Compound Lifts** overlay.
+
 ## Combined Compound Lifts Chart
 
 When 2+ compound lifts are logged, an overlay chart compares all compounds on one graph.
 
 - Toggle metric: Max Weight / Volume / Max Reps
-- Each compound is a separate colored line
-- Deadlift uses a dedicated brown color
+- Each compound line uses the same color as its individual chart
 
 ## Workout Details Modal
 
