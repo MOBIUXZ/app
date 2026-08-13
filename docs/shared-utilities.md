@@ -66,17 +66,28 @@ Display formatter for the UI:
 
 Returns a consistent hex color for Progress chart lines, badges, and PR stats. Uses `resolveExercise()` first.
 
-| Exercise | Color |
-|----------|-------|
-| Overhead Press | Red (`#ef4444`) |
-| Barbell Row | Green (`#22c55e`) |
-| Push Press | Yellow (`#eab308`) |
-| Bench Press | Orange (`#fb923c`) |
-| Squat | Blue (`#3b82f6`) |
-| Deadlift (incl. Sumo/Romanian) | Purple (`#a78bfa`) |
-| Other lifts | Rotating fallback palette, or accent |
+**Source of truth:** `EXERCISE_CHART_COLORS` in `shared.jsx`.
+
+| Exercise | Color | Hex |
+|----------|-------|-----|
+| Overhead Press | Red | `#ef4444` |
+| Barbell Row | Green | `#22c55e` |
+| Push Press | Yellow | `#eab308` |
+| Bench Press | Orange | `#fb923c` |
+| Squat | Blue | `#3b82f6` |
+| Deadlift (incl. Sumo/Romanian via `"Deadlift"` in name) | Purple | `#a78bfa` |
+| Other lifts | Rotating fallback palette, or `ACCENT` | — |
 
 Used by individual exercise charts and the combined compound lifts overlay so colors stay in sync.
+
+#### Do not change colors
+
+- **Do not modify** the six fixed hex values in `EXERCISE_CHART_COLORS` without an explicit product decision — these are user-facing conventions (squats = blue, deadlifts = purple, etc.).
+- **Do not hardcode** lift line colors in components. Always call `getExerciseChartColor(exercise)`.
+- **Do not use index-based color arrays** (e.g. `COLORS[idx]`) for compound lifts — list order must not affect color.
+- To give a new lift a permanent color, add **one row** to `EXERCISE_CHART_COLORS` — never a second map in another file.
+
+Full chart-color policy: [progress.md](./progress.md) → Chart Colors.
 
 ### `isCompoundLift(exercise)`
 

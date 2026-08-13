@@ -84,18 +84,38 @@ Sessions where left and right match, or where sets are logged without side info 
 
 ## Chart Colors
 
-Primary compound lifts use fixed colors via `getExerciseChartColor()` in `shared.jsx`:
+Primary compound lifts use **fixed, canonical colors** via `getExerciseChartColor()` in `shared.jsx` (`EXERCISE_CHART_COLORS`).
 
-| Lift | Color |
-|------|-------|
-| OVERHEAD PRESS | Red |
-| BARBELL ROWS | Green |
-| PUSHPRESS | Yellow |
-| BENCH PRESS | Orange |
-| SQUATS | Blue |
-| DEADLIFTS | Purple |
+| Lift (display) | Canonical exercise | Hex |
+|----------------|-------------------|-----|
+| OVERHEAD PRESS | Overhead Press | `#ef4444` (red) |
+| BARBELL ROWS | Barbell Row | `#22c55e` (green) |
+| PUSHPRESS | Push Press | `#eab308` (yellow) |
+| BENCH PRESS | Bench Press | `#fb923c` (orange) |
+| SQUATS | Squat | `#3b82f6` (blue) |
+| DEADLIFTS | Deadlift | `#a78bfa` (purple) |
 
-Same colors apply on **individual** exercise charts and the **Combined Compound Lifts** overlay.
+Sumo Deadlift, Romanian Deadlift, and other names containing `"Deadlift"` inherit **purple** from Deadlift.
+
+### Sync rules
+
+- **Individual** exercise charts and the **Combined Compound Lifts** overlay both call `getExerciseChartColor(ex)` — colors are keyed by **exercise name**, not chart order.
+- Line stroke, dots, PR value, compound badge, and metric toggle buttons on a chart all use the same `exColor` from that function.
+
+### Do not change colors (maintainers)
+
+> **Do not reassign, swap, or hardcode chart colors in `ProgressPage.jsx` or elsewhere.**
+
+1. **Never hardcode** `stroke`, `fill`, or badge colors for compound lift lines in page components. Always use `getExerciseChartColor(exercise)`.
+2. **Do not edit** the six fixed hex values above unless the product owner explicitly requests a palette change — users rely on consistent colors across sessions and charts (e.g. squats always blue, deadlifts always purple).
+3. **Adding a new chart** that plots lift data? Import and call `getExerciseChartColor()` from `shared.jsx`. Do not duplicate color maps or index-based `COLORS[]` arrays.
+4. **Adding a new compound** with a dedicated color? Add one entry to `EXERCISE_CHART_COLORS` in `shared.jsx` only — not inline in JSX.
+5. **Split L/R charts** intentionally use global blue (left) and pink (right) for side comparison — that is separate from per-lift colors and should stay that way.
+6. **Body weight, body fat, and calorie** charts use app theme colors (`ACCENT`, `PINK`, `ORANGE`) — they are not lift colors.
+
+Other compounds (Snatch, Clean & Jerk, etc.) use the fallback palette until added to `EXERCISE_CHART_COLORS`. When adding a fixed color for them, add to the map in `shared.jsx` so individual and combined charts stay in sync.
+
+See also: [shared-utilities.md](./shared-utilities.md) → `getExerciseChartColor()`.
 
 ## Combined Compound Lifts Chart
 
