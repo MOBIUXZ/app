@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, createContext, useContext } from "react";
 
 export const ACCENT = "#a78bfa";
 export const GREEN = "#34d399";
@@ -445,6 +445,81 @@ export function isTypingTarget(el) {
   return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el.isContentEditable;
 }
 
+var KeyboardLayerContext = createContext(null);
+
+export function KeyboardLayerProvider({ children }) {
+  var stackRef = useRef([]);
+  var [layerCount, setLayerCount] = useState(0);
+
+  function syncCount() {
+    setLayerCount(stackRef.current.length);
+  }
+
+  function pushLayer(id, handler) {
+    stackRef.current = stackRef.current.filter(function (l) { return l.id !== id; });
+    stackRef.current.push({ id: id, handler: handler });
+    syncCount();
+  }
+
+  function popLayer(id) {
+    stackRef.current = stackRef.current.filter(function (l) { return l.id !== id; });
+    syncCount();
+  }
+
+  function getLayerZIndex(id) {
+    var idx = -1;
+    for (var i = 0; i < stackRef.current.length; i++) {
+      if (stackRef.current[i].id === id) idx = i;
+    }
+    return 1000 + (idx >= 0 ? idx : stackRef.current.length) * 10;
+  }
+
+  useEffect(function () {
+    function onKeyDown(e) {
+      var stack = stackRef.current;
+      if (!stack.length) return;
+      var top = stack[stack.length - 1];
+      if (top && top.handler) top.handler(e);
+    }
+    window.addEventListener("keydown", onKeyDown, true);
+    return function () { window.removeEventListener("keydown", onKeyDown, true); };
+  }, []);
+
+  var ctx = {
+    pushLayer: pushLayer,
+    popLayer: popLayer,
+    layerCount: layerCount,
+    getLayerZIndex: getLayerZIndex,
+    stackRef: stackRef,
+  };
+
+  return <KeyboardLayerContext.Provider value={ctx}>{children}</KeyboardLayerContext.Provider>;
+}
+
+export function useKeyboardLayer(id, open, handler) {
+  var ctx = useContext(KeyboardLayerContext);
+  var handlerRef = useRef(handler);
+  handlerRef.current = handler;
+
+  useEffect(function () {
+    if (!open || !ctx) return;
+    function wrapped(e) { handlerRef.current(e); }
+    ctx.pushLayer(id, wrapped);
+    return function () { ctx.popLayer(id); };
+  }, [open, id, ctx]);
+
+  return {
+    zIndex: ctx && open ? ctx.getLayerZIndex(id) : 1000,
+    layerCount: ctx ? ctx.layerCount : 0,
+    isBlocked: ctx ? ctx.layerCount > 0 : false,
+  };
+}
+
+export function useKeyboardLayersBlocked() {
+  var ctx = useContext(KeyboardLayerContext);
+  return ctx ? ctx.layerCount > 0 : false;
+}
+
 export function kbItemClass(index, focusIdx, activatedIdx) {
   var classes = [];
   if (index === focusIdx) classes.push("ft-kb-focus");
@@ -480,7 +555,7 @@ export function useKeyboardListNav(count, onSelect, enabled) {
 
   function handleKeyDown(e) {
     if (enabled === false || count === 0) return;
-    if (isTypingTarget(e.target) && e.currentTarget.contains(e.target) && e.target !== e.currentTarget) return;
+    if (isTypingTarget(e.target)) return;
 
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -504,6 +579,7 @@ export function useAppNavKeyboard(tabs, currentTab, setTab) {
   var [focusIdx, setFocusIdx] = useState(-1);
   var [activatedIdx, setActivatedIdx] = useState(-1);
   var activateTimer = useRef(null);
+  var blocked = useKeyboardLayersBlocked();
 
   useEffect(function () {
     setFocusIdx(tabs.indexOf(currentTab));
@@ -521,6 +597,7 @@ export function useAppNavKeyboard(tabs, currentTab, setTab) {
 
   useEffect(function () {
     function onKeyDown(e) {
+      if (blocked) return;
       if (isTypingTarget(document.activeElement)) return;
       var idx = tabs.indexOf(currentTab);
 
@@ -557,9 +634,9 @@ export function useAppNavKeyboard(tabs, currentTab, setTab) {
     }
     window.addEventListener("keydown", onKeyDown);
     return function () { window.removeEventListener("keydown", onKeyDown); };
-  }, [tabs, currentTab, setTab, focusIdx]);
+  }, [tabs, currentTab, setTab, focusIdx, blocked]);
 
-  return { focusIdx: focusIdx, activatedIdx: activatedIdx, navClass: function (i) { return (i === focusIdx ? "ft-kb-nav-focus " : "") + (i === activatedIdx ? "ft-kb-nav-activate" : ""); } };
+  return { focusIdx: focusIdx, activatedIdx: activatedIdx, blocked: blocked, navClass: function (i) { return (i === focusIdx ? "ft-kb-nav-focus " : "") + (i === activatedIdx ? "ft-kb-nav-activate" : ""); } };
 }
 
 export function insertTextareaNewline(e, value, setValue) {
@@ -587,46 +664,70 @@ export function handleParserTextareaKeyDown(e, onSubmit, value, setValue) {
   }
 }
 
-export function useConfirmDialogKeyboard(open, onConfirm, onCancel) {
-  var [confirmFlash, setConfirmFlash] = useState(false);
+export function useConfirmDialogKeyboard(open, onConfirm, onCancel, layerId, labels) {
+  var [focusIdx, setFocusIdx] = useState(0);
+  var [activatedIdx, setActivatedIdx] = useState(-1);
   var dialogRef = useRef(null);
   var flashTimer = useRef(null);
+  var cancelLabel = labels && labels.cancel ? labels.cancel : "Cancel";
+  var confirmLabel = labels && labels.confirm ? labels.confirm : "Confirm";
 
   useEffect(function () {
     return function () { if (flashTimer.current) clearTimeout(flashTimer.current); };
   }, []);
 
   useEffect(function () {
-    if (open && dialogRef.current) dialogRef.current.focus();
+    if (open) {
+      setFocusIdx(0);
+      setTimeout(function () { if (dialogRef.current) dialogRef.current.focus(); }, 0);
+    }
   }, [open]);
 
-  function handleKeyDown(e) {
+  function flashActivate(idx) {
+    setActivatedIdx(idx);
+    if (flashTimer.current) clearTimeout(flashTimer.current);
+    flashTimer.current = setTimeout(function () { setActivatedIdx(-1); }, 450);
+  }
+
+  function handleLayerKey(e) {
     if (!open) return;
-    if (e.key === "Enter") {
+    if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
       e.preventDefault();
-      setConfirmFlash(true);
-      if (flashTimer.current) clearTimeout(flashTimer.current);
-      flashTimer.current = setTimeout(function () { setConfirmFlash(false); }, 450);
-      onConfirm();
+      setFocusIdx(0);
+    } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      e.preventDefault();
+      setFocusIdx(1);
+    } else if (e.key === "Tab") {
+      e.preventDefault();
+      setFocusIdx(function (i) { return i === 0 ? 1 : 0; });
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      flashActivate(focusIdx);
+      if (focusIdx === 0) onCancel();
+      else onConfirm();
     } else if (e.key === "Escape") {
       e.preventDefault();
       onCancel();
     }
   }
 
-  return { dialogRef: dialogRef, handleKeyDown: handleKeyDown, confirmFlashClass: confirmFlash ? "ft-kb-activate" : "" };
-}
+  var layer = useKeyboardLayer(layerId || "confirm-dialog", open, handleLayerKey);
 
-export function handleModalKeyDown(e, onEnter, onEscape) {
-  if (e.key === "Escape" && onEscape) {
-    e.preventDefault();
-    onEscape();
-    return;
+  function btnClass(idx) {
+    var classes = [];
+    if (idx === focusIdx) classes.push("ft-kb-btn-focus");
+    if (idx === activatedIdx) classes.push("ft-kb-activate");
+    return classes.join(" ");
   }
-  if (e.key === "Enter" && onEnter && e.target.tagName !== "TEXTAREA") {
-    e.preventDefault();
-    onEnter();
-  }
+
+  return {
+    dialogRef: dialogRef,
+    focusIdx: focusIdx,
+    setFocusIdx: setFocusIdx,
+    btnClass: btnClass,
+    zIndex: layer.zIndex,
+    focusLabel: focusIdx === 0 ? cancelLabel : confirmLabel,
+  };
 }
 
 export function Card({ children, style }) {

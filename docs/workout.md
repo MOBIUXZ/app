@@ -89,7 +89,8 @@ Full history browser with:
 
 ### Bulk Actions
 - **Clear History** — delete all workouts (with confirmation)
-  - `Enter` confirms delete · `Esc` cancels
+  - `←` `→` / Tab switch buttons · Enter selects focused · Esc cancel
+  - Focus indicator shows **Cancel** or **Clear History**
 
 ## 1RM Calculator
 

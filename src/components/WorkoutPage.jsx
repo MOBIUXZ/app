@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, formatExerciseName, btnPrimary, btnSecondary, btnDanger, inp, Card, formatDate, useKeyboardListNav, useConfirmDialogKeyboard, handleParserTextareaKeyDown, handleModalKeyDown } from "./shared";
+import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, formatExerciseName, btnPrimary, btnSecondary, btnDanger, inp, Card, formatDate, useKeyboardListNav, useConfirmDialogKeyboard, handleParserTextareaKeyDown, useKeyboardLayer, isTypingTarget } from "./shared";
 
 function OneRMCalc({ data }) {
   var [weight, setWeight] = useState(""); var [reps, setReps] = useState(""); var [formula, setFormula] = useState("Epley"); var [autoEx, setAutoEx] = useState("");
@@ -58,6 +58,17 @@ function OneRMCalc({ data }) {
     setShowSetPicker(false);
   }
   var setPickerKb = useKeyboardListNav(filteredSets.length, function (i) { selectLoggedSet(filteredSets[i]); }, showSetPicker);
+  var setPickerKbRef = useRef(setPickerKb);
+  setPickerKbRef.current = setPickerKb;
+  var setPickerLayer = useKeyboardLayer("set-picker", showSetPicker, function (e) {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      setShowSetPicker(false);
+      return;
+    }
+    if (isTypingTarget(e.target)) return;
+    setPickerKbRef.current.handleKeyDown(e);
+  });
   var pickerModalRef = useRef(null);
   useEffect(function () {
     if (showSetPicker) {
@@ -114,8 +125,8 @@ function OneRMCalc({ data }) {
       {fInfo.map(function (f) { return <div key={f.name} style={{ padding: "12px 0", borderBottom: "1px solid #2d2d3a" }}><div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}><span style={{ fontWeight: 800, color: "#e2e8f0" }}>{f.name}</span><span style={{ background: f.bc + "33", color: f.bc, border: "1px solid " + f.bc + "44", borderRadius: 20, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{f.badge}</span></div><div style={{ fontSize: 12, color: "#d1d5db", marginBottom: 3 }}>📌 {f.when}</div><div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 6 }}>💡 {f.use}</div><div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>{f.sports.map(function (s) { return <span key={s} style={{ background: "#2d2d3a", color: "#a0aec0", borderRadius: 20, padding: "2px 8px", fontSize: 11 }}>{s}</span>; })}</div></div>; })}
 
       {showSetPicker && (
-        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }} onKeyDown={function (e) { handleModalKeyDown(e, null, function () { setShowSetPicker(false); }); }}>
-          <div ref={pickerModalRef} tabIndex={-1} onKeyDown={setPickerKb.handleKeyDown} style={{ background: "#18181f", border: "1px solid #2d2d3a", borderRadius: 16, padding: 20, maxWidth: 560, width: "92%", maxHeight: "80vh", display: "flex", flexDirection: "column", outline: "none" }}>
+        <div className="ft-kb-modal-backdrop" style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: setPickerLayer.zIndex }}>
+          <div ref={pickerModalRef} tabIndex={-1} style={{ background: "#18181f", border: "1px solid #2d2d3a", borderRadius: 16, padding: 20, maxWidth: 560, width: "92%", maxHeight: "80vh", display: "flex", flexDirection: "column", outline: "none", boxShadow: "0 0 0 1px rgba(167,139,250,0.15), 0 24px 48px rgba(0,0,0,0.45)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
               <div style={{ fontWeight: 800, fontSize: 16, color: "#e2e8f0" }}>Select a logged set</div>
               <button onClick={function () { setShowSetPicker(false); }} style={{ background: "transparent", border: "none", color: "#9ca3af", fontSize: 20, cursor: "pointer", padding: "4px 8px" }}>✕</button>
@@ -306,7 +317,29 @@ export default function WorkoutPage({ data, save }) {
   function toggleGroup(groupKey) { setExpandedGroups(function (prev) { var next = Object.assign({}, prev); next[groupKey] = !next[groupKey]; return next; }); }
   function toggleAllGroups(expand) { var next = {}; groupedHistory.forEach(function (group) { next[group.groupKey] = expand; }); setExpandedGroups(next); setAllExpanded(expand); }
   function clearHistory() { save({ workouts: [], bodyLogs: data.bodyLogs, bodyComp: data.bodyComp, calories: data.calories }); setShowClearConfirm(false); }
-  var clearConfirmKb = useConfirmDialogKeyboard(showClearConfirm, clearHistory, function () { setShowClearConfirm(false); });
+  var clearConfirmKb = useConfirmDialogKeyboard(showClearConfirm, clearHistory, function () { setShowClearConfirm(false); }, "clear-workout-history", { cancel: "Cancel", confirm: "Clear History" });
+
+  var smartParserLayer = useKeyboardLayer("smart-parser", showSmartParserModal, function (e) {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      setShowSmartParserModal(false);
+      setParseMsg("");
+      setParsePreview(null);
+      return;
+    }
+    if (e.target && e.target.tagName === "TEXTAREA") return;
+    if (e.key === "Enter") {
+      e.preventDefault();
+      doParse();
+    }
+  });
+
+  var calendarLayer = useKeyboardLayer("calendar-modal", showCalendarModal, function (e) {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      closeCalModal();
+    }
+  });
 
   // Calendar helper functions
   function hasWorkoutOnDate(dateStr) { return data.workouts.some(function (w) { return w.date === dateStr; }); }
@@ -380,8 +413,8 @@ export default function WorkoutPage({ data, save }) {
       </div>
 
       {showCalendarModal && (
-        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }} onKeyDown={function (e) { handleModalKeyDown(e, null, closeCalModal); }}>
-          <div style={{ background: "#18181f", border: "1px solid #2d2d3a", borderRadius: 16, padding: 20, maxWidth: calendarView === "year" ? 680 : 420, width: "95%", maxHeight: "92vh", overflowY: "auto" }} tabIndex={-1}>
+        <div className="ft-kb-modal-backdrop" style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: calendarLayer.zIndex }}>
+          <div style={{ background: "#18181f", border: "1px solid #2d2d3a", borderRadius: 16, padding: 20, maxWidth: calendarView === "year" ? 680 : 420, width: "95%", maxHeight: "92vh", overflowY: "auto", boxShadow: "0 0 0 1px rgba(167,139,250,0.15), 0 24px 48px rgba(0,0,0,0.45)" }} tabIndex={-1}>
 
             {/* Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
@@ -706,8 +739,8 @@ Bench Press
       )}
 
       {showSmartParserModal && (
-        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }} onKeyDown={function (e) { handleModalKeyDown(e, doParse, function () { setShowSmartParserModal(false); setParseMsg(""); setParsePreview(null); }); }}>
-          <div style={{ background: "#18181f", border: "1px solid #2d2d3a", borderRadius: 16, padding: 20, maxWidth: 600, width: "90%", maxHeight: "80vh", overflowY: "auto" }} tabIndex={-1}>
+        <div className="ft-kb-modal-backdrop" style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: smartParserLayer.zIndex }}>
+          <div style={{ background: "#18181f", border: "1px solid #2d2d3a", borderRadius: 16, padding: 20, maxWidth: 600, width: "90%", maxHeight: "80vh", overflowY: "auto", boxShadow: "0 0 0 1px rgba(167,139,250,0.15), 0 24px 48px rgba(0,0,0,0.45)" }} tabIndex={-1}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ fontSize: 18 }}>🧠</span>
@@ -920,14 +953,15 @@ Bench Press
         )}
 
         {showClearConfirm && (
-          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }} onKeyDown={clearConfirmKb.handleKeyDown}>
-            <div ref={clearConfirmKb.dialogRef} tabIndex={-1} style={{ background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 16, padding: 20, maxWidth: 400, width: "90%", outline: "none" }}>
+          <div className="ft-kb-modal-backdrop" style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: clearConfirmKb.zIndex }}>
+            <div ref={clearConfirmKb.dialogRef} tabIndex={-1} style={{ background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 16, padding: 20, maxWidth: 400, width: "90%", outline: "none", boxShadow: "0 0 0 1px rgba(167,139,250,0.2), 0 24px 48px rgba(0,0,0,0.5)" }}>
               <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 12, color: "#e2e8f0" }}>Clear Workout History?</div>
               <div style={{ fontSize: 13, color: "#9ca3af", marginBottom: 16 }}>This will permanently delete all {data.workouts.length} logged workouts. Do you want to continue?</div>
-              <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 12 }}>Enter confirm · Esc cancel</div>
+              <div className="ft-kb-focus-indicator">Focused: <strong>{clearConfirmKb.focusLabel}</strong></div>
+              <div className="ft-kb-hint">← → or Tab switch · Enter select · Esc cancel</div>
               <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-                <button onClick={function () { setShowClearConfirm(false); }} style={btnSecondary({ padding: "10px 16px" })}>Cancel</button>
-                <button onClick={clearHistory} className={clearConfirmKb.confirmFlashClass} style={btnDanger({ padding: "10px 16px" })}>Clear History</button>
+                <button onClick={function () { setShowClearConfirm(false); }} onMouseEnter={function () { clearConfirmKb.setFocusIdx(0); }} className={clearConfirmKb.btnClass(0)} style={btnSecondary({ padding: "10px 16px" })}>Cancel</button>
+                <button onClick={clearHistory} onMouseEnter={function () { clearConfirmKb.setFocusIdx(1); }} className={clearConfirmKb.btnClass(1)} style={btnDanger({ padding: "10px 16px" })}>Clear History</button>
               </div>
             </div>
           </div>

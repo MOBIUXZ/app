@@ -185,13 +185,15 @@ Shared React components used across pages:
 
 See [keyboard-navigation.md](./keyboard-navigation.md) for full details.
 
-| Hook / Helper | Purpose |
-|---------------|---------|
+| Hook / Component | Purpose |
+|------------------|---------|
+| `KeyboardLayerProvider` | App wrapper; layered popup keyboard routing |
+| `useKeyboardLayer()` | Register a popup as top keyboard layer |
+| `useKeyboardLayersBlocked()` | True when any popup is blocking global keys |
 | `useAppNavKeyboard()` | Global page shortcuts (`1`–`5`, `←` `→`, Enter) |
 | `useKeyboardListNav()` | Arrow/Enter navigation inside lists |
-| `useConfirmDialogKeyboard()` | Enter to confirm, Escape to cancel in dialogs |
+| `useConfirmDialogKeyboard()` | Confirm dialog with button focus + Enter/Esc |
 | `handleParserTextareaKeyDown()` | Enter submits parser; Ctrl+Shift+Enter newline |
-| `handleModalKeyDown()` | Enter/Escape handlers for modal overlays |
 | `isTypingTarget()` | Detects when user is typing in a form field |
 | `kbItemClass()` | CSS classes for focus and activate highlights |
 

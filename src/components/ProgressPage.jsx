@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
-import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExerciseName, isNoSplitLift, isCompoundLift, COMPOUND_LIFTS, useKeyboardListNav, handleModalKeyDown } from "./shared";
+import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExerciseName, isNoSplitLift, isCompoundLift, COMPOUND_LIFTS, useKeyboardListNav, useKeyboardLayer, isTypingTarget } from "./shared";
 
 function isSplitImbalanced(payload, metric) {
   if (!payload) return false;
@@ -247,6 +247,17 @@ export default function ProgressPage({ data }) {
 
   var selectedWorkouts = selectedDate ? normalizedWorkouts.filter(function (w) { return getChartDateKey(w.date) === String(selectedDate); }) : [];
   var detailKb = useKeyboardListNav(selectedWorkouts.length, function () {}, selectedDate && selectedWorkouts.length > 0);
+  var detailKbRef = useRef(detailKb);
+  detailKbRef.current = detailKb;
+  var detailLayer = useKeyboardLayer("progress-detail", !!selectedDate, function (e) {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      setSelectedDate(null);
+      return;
+    }
+    if (isTypingTarget(e.target)) return;
+    detailKbRef.current.handleKeyDown(e);
+  });
 
   return (
     <div>
@@ -291,8 +302,8 @@ export default function ProgressPage({ data }) {
           return <Card style={{ marginBottom: 14, background: "#2a2a38" }}><div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4 }}>📊 Combined Compound Lifts</div><div style={{ display: "flex", gap: 6, marginBottom: 8 }}>{["weight", "volume", "reps"].map(function (m) { return <button key={m} onClick={function () { setCompoundMetric(m); }} style={{ padding: "4px 11px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 600, background: compoundMetric === m ? "#8b5a2b" : "#2d2d3a", color: compoundMetric === m ? "#fff" : "#a0aec0" }}>{m === "weight" ? "Max Weight" : m === "volume" ? "Volume" : "Max Reps"}</button>; })}</div><div style={{ background: "#1e1e2e", borderRadius: 10, padding: "10px 4px" }}><ResponsiveContainer width="100%" height={180}><LineChart data={chartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0]) { setSelectedDate(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} />{compounds.map(function (ex, idx) { return <Line key={ex} type="monotone" dataKey={ex} stroke={ex === "Deadlift" ? "#8b5a2b" : COLORS[idx % COLORS.length]} strokeWidth={2} dot={{ r: 2 }} connectNulls={true} />; })}</LineChart></ResponsiveContainer></div></Card>;
         })()}
         {selectedDate && (
-          <div style={{ position: "fixed", inset: 0, background: "rgba(2, 6, 23, 0.76)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, zIndex: 1000 }} onClick={function () { setSelectedDate(null); }} onKeyDown={function (e) { handleModalKeyDown(e, null, function () { setSelectedDate(null); }); }}>
-            <div style={{ width: "100%", maxWidth: 460, background: "#18181f", border: "1px solid #3a3a4a", borderRadius: 18, boxShadow: "0 18px 48px rgba(0,0,0,0.35)", overflow: "hidden" }} onClick={function (ev) { ev.stopPropagation(); }} tabIndex={-1} onKeyDown={detailKb.handleKeyDown}>
+          <div className="ft-kb-modal-backdrop" style={{ position: "fixed", inset: 0, background: "rgba(2, 6, 23, 0.76)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, zIndex: detailLayer.zIndex }} onClick={function () { setSelectedDate(null); }}>
+            <div style={{ width: "100%", maxWidth: 460, background: "#18181f", border: "1px solid #3a3a4a", borderRadius: 18, boxShadow: "0 0 0 1px rgba(167,139,250,0.15), 0 24px 48px rgba(0,0,0,0.5)", overflow: "hidden" }} onClick={function (ev) { ev.stopPropagation(); }} tabIndex={-1}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 18px", borderBottom: "1px solid #2d2d3a" }}>
                 <div><div style={{ fontSize: 12, color: ACCENT, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Workout Details</div><div style={{ fontSize: 17, fontWeight: 800, color: "#e2e8f0", marginTop: 2 }}>{formatChartDate(selectedDate)}</div></div>
                 <button onClick={function () { setSelectedDate(null); }} style={{ background: "transparent", border: "none", color: "#9ca3af", fontSize: 20, cursor: "pointer" }}>✕</button>

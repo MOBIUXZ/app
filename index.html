@@ -50,6 +50,52 @@
       .ft-kb-nav-activate {
         animation: ft-kb-activate 0.45s ease-out;
       }
+
+      @keyframes ft-kb-btn-pulse {
+        0%, 100% { box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.35); }
+        50% { box-shadow: 0 0 0 5px rgba(167, 139, 250, 0.55); }
+      }
+
+      .ft-kb-btn-focus {
+        outline: 2px solid #a78bfa !important;
+        outline-offset: 2px !important;
+        animation: ft-kb-btn-pulse 1.6s ease-in-out infinite;
+        position: relative;
+        z-index: 1;
+      }
+
+      .ft-kb-focus-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(167, 139, 250, 0.12);
+        border: 1px solid rgba(167, 139, 250, 0.45);
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 11px;
+        color: #c4b5fd;
+        margin-bottom: 10px;
+      }
+
+      .ft-kb-focus-indicator strong {
+        color: #e9d5ff;
+        font-weight: 800;
+      }
+
+      .ft-kb-hint {
+        font-size: 11px;
+        color: #6b7280;
+        margin-bottom: 8px;
+      }
+
+      .ft-kb-modal-backdrop {
+        animation: ft-kb-backdrop-in 0.2s ease-out;
+      }
+
+      @keyframes ft-kb-backdrop-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
     </style>
   </head>
   <body>
