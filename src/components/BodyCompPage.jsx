@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { ACCENT, BLUE, GREEN, ORANGE, PINK, Collapse, btnPrimary, inp, formatDate, useKeyboardListNav } from "./shared";
+import { ACCENT, BLUE, GREEN, ORANGE, PINK, Collapse, btnPrimary, btnSecondary, btnDanger, inp, formatDate, useConfirmDialogKeyboard } from "./shared";
 
 export default function BodyCompPage({ data, save }) {
   var [logDate, setLogDate] = useState(formatDate(new Date()));
   var [w, setW] = useState(""), [h, setH] = useState(""), [bf, setBf] = useState(""), [smm, setSmm] = useState(""), [waist, setWaist] = useState(""), [age, setAge] = useState(""), [sex, setSex] = useState("male"), [msg, setMsg] = useState("");
+  var [showClearConfirm, setShowClearConfirm] = useState(false);
   var wN = parseFloat(w) || 0, hM = (parseFloat(h) || 0) / 100, bfN = parseFloat(bf) || 0, smmN = parseFloat(smm) || 0, ageN = parseFloat(age) || 0;
   var hasBase = wN > 0 && bfN > 0, fm = hasBase ? wN * (bfN / 100) : null, ffm = hasBase ? wN - fm : null;
   var bmi = (wN > 0 && hM > 0) ? wN / (hM * hM) : null, ffmi = (ffm != null && hM > 0) ? ffm / (hM * hM) : null, fmi = (fm != null && hM > 0) ? fm / (hM * hM) : null, smi = (smmN > 0 && hM > 0) ? smmN / (hM * hM) : null;
@@ -14,7 +15,31 @@ export default function BodyCompPage({ data, save }) {
   function GL(p) { return <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 5, marginTop: 12 }}>{p.children}</div>; }
   var cell = inp({});
   var historyEntries = data.bodyComp.slice().reverse().slice(0, 10);
-  var historyKb = useKeyboardListNav(historyEntries.length, function () {}, historyEntries.length > 0);
+  function deleteEntry(displayIdx) {
+    var compIdx = data.bodyComp.length - 1 - displayIdx;
+    var entry = data.bodyComp[compIdx];
+    if (!entry) return;
+    var w = entry.weight != null ? entry.weight : entry.BW;
+    var removedLog = false;
+    var newBodyLogs = data.bodyLogs.filter(function (log) {
+      if (!removedLog && log.date === entry.date && log.weight === w) {
+        removedLog = true;
+        return false;
+      }
+      return true;
+    });
+    save({
+      workouts: data.workouts,
+      calories: data.calories,
+      bodyComp: data.bodyComp.filter(function (_, i) { return i !== compIdx; }),
+      bodyLogs: newBodyLogs,
+    });
+  }
+  function clearHistory() {
+    save({ workouts: data.workouts, calories: data.calories, bodyComp: [], bodyLogs: [] });
+    setShowClearConfirm(false);
+  }
+  var clearConfirmKb = useConfirmDialogKeyboard(showClearConfirm, clearHistory, function () { setShowClearConfirm(false); }, "clear-body-comp-history", { cancel: "Cancel", confirm: "Clear History" });
   function submit() { if (!w || !bf) { setMsg("Weight and Body Fat % are required."); return; } if (!logDate.trim()) { setMsg("Date is required."); return; } var entry = { weight: wN, height: parseFloat(h) || null, bf: bfN, smm: smmN || null, waist: parseFloat(waist) || null, age: ageN || null, sex: sex, BW: wN, PBF: bfN, FM: fm, FFM: ffm, BMI: bmi, FFMI: ffmi, FMI: fmi, SMM: smmN || null, SMI: smi, BMR_Mifflin: bmrMifflin, BMR_Katch: bmrKatch, date: logDate }; save({ workouts: data.workouts, calories: data.calories, bodyComp: [...data.bodyComp, entry], bodyLogs: [...data.bodyLogs, { weight: wN, date: logDate }] }); setW(""); setH(""); setBf(""); setSmm(""); setWaist(""); setAge(""); setLogDate(formatDate(new Date())); setMsg("Logged!"); setTimeout(function () { setMsg(""); }, 2000); }
   return (
     <div>
@@ -46,10 +71,49 @@ export default function BodyCompPage({ data, save }) {
         {msg && <div style={{ marginTop: 10, color: GREEN, fontSize: 13, textAlign: "center" }}>✅ {msg}</div>}
       </Collapse>
       <Collapse emoji="📋" label="History" defaultOpen={false}>
+        {historyEntries.length > 0 && (
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+            <span style={{ fontSize: 11, color: "#6b7280" }}>{data.bodyComp.length} {data.bodyComp.length === 1 ? "entry" : "entries"}</span>
+            <button onClick={function () { setShowClearConfirm(true); }} style={btnDanger({ padding: "5px 10px", borderRadius: 999, fontSize: 11 })}>Clear History</button>
+          </div>
+        )}
         {historyEntries.length === 0 ? <div style={{color:"#6b7280",fontSize:13,padding:"24px 0",textAlign:"center"}}><div style={{fontSize:40,marginBottom:12}}>📏</div><div>No entries yet.</div><div style={{marginTop:8,fontSize:12}}>Track your body composition over time!</div></div> : (
-        <div ref={historyKb.listRef} tabIndex={0} onKeyDown={historyKb.handleKeyDown} style={{ outline: "none" }}>
-        {historyEntries.map(function (e, i) { return <div key={i} data-kb-index={i} className={historyKb.kbClass(i)} onMouseEnter={function () { historyKb.setFocusIdx(i); }} style={{padding:"10px 0",borderBottom:"1px solid #2d2d3a"}}><div style={{fontSize:12,color:"#6b7280",marginBottom:6}}>{e.date}</div><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{[["BW","kg",ACCENT],["BMI","kg/m²",BLUE],["FM","kg",PINK],["FMI","kg/m²",PINK],["PBF","%",PINK],["FFM","kg",GREEN],["FFMI","kg/m²",ACCENT],["SMM","kg",GREEN],["SMI","kg/m²",ORANGE]].map(function (r) { return e[r[0]] != null ? <div key={r[0]} style={{background:"#23232f",borderRadius:8,padding:"5px 9px"}}><div style={{fontSize:10,color:"#6b7280"}}>{r[0]}</div><div style={{fontWeight:700,color:r[2],fontSize:13}}>{Number(e[r[0]]).toFixed(2)}<span style={{fontSize:10,color:"#9ca3af",marginLeft:1}}>{r[1]}</span></div></div> : null; })}</div></div>; })}
+        <div>
+        {historyEntries.map(function (e, i) {
+          return (
+            <div key={i} style={{ padding: "10px 0", borderBottom: "1px solid #2d2d3a" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <div style={{ fontSize: 12, color: "#6b7280" }}>{e.date}</div>
+                <button onClick={function () { deleteEntry(i); }} title="Delete entry" style={{ background: "#3d1c1c", color: "#f87171", border: "none", borderRadius: 6, padding: "4px 9px", cursor: "pointer", fontSize: 12 }}>🗑</button>
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {[["BW", "kg", ACCENT], ["BMI", "kg/m²", BLUE], ["FM", "kg", PINK], ["FMI", "kg/m²", PINK], ["PBF", "%", PINK], ["FFM", "kg", GREEN], ["FFMI", "kg/m²", ACCENT], ["SMM", "kg", GREEN], ["SMI", "kg/m²", ORANGE]].map(function (r) {
+                  return e[r[0]] != null ? (
+                    <div key={r[0]} style={{ background: "#23232f", borderRadius: 8, padding: "5px 9px" }}>
+                      <div style={{ fontSize: 10, color: "#6b7280" }}>{r[0]}</div>
+                      <div style={{ fontWeight: 700, color: r[2], fontSize: 13 }}>{Number(e[r[0]]).toFixed(2)}<span style={{ fontSize: 10, color: "#9ca3af", marginLeft: 1 }}>{r[1]}</span></div>
+                    </div>
+                  ) : null;
+                })}
+              </div>
+            </div>
+          );
+        })}
         </div>
+        )}
+        {showClearConfirm && (
+          <div className="ft-kb-modal-backdrop" style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: clearConfirmKb.zIndex }}>
+            <div ref={clearConfirmKb.dialogRef} tabIndex={-1} style={{ background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 16, padding: 20, maxWidth: 400, width: "90%", outline: "none", boxShadow: "0 0 0 1px rgba(167,139,250,0.2), 0 24px 48px rgba(0,0,0,0.5)" }}>
+              <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 12, color: "#e2e8f0" }}>Clear Body Comp History?</div>
+              <div style={{ fontSize: 13, color: "#9ca3af", marginBottom: 16 }}>This will permanently delete all {data.bodyComp.length} body composition entries and body weight chart data. Do you want to continue?</div>
+              <div className="ft-kb-focus-indicator">Focused: <strong>{clearConfirmKb.focusLabel}</strong></div>
+              <div className="ft-kb-hint">← → or Tab switch · Enter select · Esc cancel</div>
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                <button onClick={function () { setShowClearConfirm(false); }} onMouseEnter={function () { clearConfirmKb.setFocusIdx(0); }} className={clearConfirmKb.btnClass(0)} style={btnSecondary({ padding: "10px 16px" })}>Cancel</button>
+                <button onClick={clearHistory} onMouseEnter={function () { clearConfirmKb.setFocusIdx(1); }} className={clearConfirmKb.btnClass(1)} style={btnDanger({ padding: "10px 16px" })}>Clear History</button>
+              </div>
+            </div>
+          </div>
         )}
       </Collapse>
     </div>

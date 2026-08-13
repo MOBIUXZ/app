@@ -69,6 +69,21 @@ Shows the **10 most recent** entries with all stored metrics displayed as chips:
 
 BW, BMI, FM, FMI, PBF, FFM, FFMI, SMM, SMI
 
+### Clear History
+- **Clear History** button (when entries exist) deletes all `bodyComp` and `bodyLogs` data
+- Confirmation dialog with keyboard support (`Enter` confirm · `Esc` cancel)
+- Clears Dashboard body weight/body fat stats and Progress body weight chart data
+
+### Delete Entry
+- **🗑** on each history row deletes that entry only
+- Removes the matching `bodyComp` record and its paired `bodyLogs` point (same date + weight)
+
+## Workout `BW=` Notes vs Body Comp
+
+Smart Parser lines like `BW = 60kg` in calisthenics workout logs are **only** used to calculate set loads (e.g. weighted pull-ups). They do **not** create body composition entries or update the Dashboard body weight stat.
+
+Body comp data only comes from the **Log Entry** form on this page.
+
 ## Integration
 
 - Entry date is stored as `DD-MM-YYYY` and shown in History and on the Progress page charts.
