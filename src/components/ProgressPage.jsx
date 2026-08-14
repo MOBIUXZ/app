@@ -156,15 +156,39 @@ function buildSetChartData(sets) {
     var sideSuffix = st.side === "left" ? " L" : st.side === "right" ? " R" : "";
     var vol = wt * rp;
     var e1 = roundE1RM(estimate1RM(wt, rp));
+    var time = st.time && String(st.time).trim() ? String(st.time).trim() : "";
     return {
       set: "S" + (i + 1),
       label: "S" + (i + 1) + sideSuffix,
+      time: time,
       weight: wt > 0 ? wt : null,
       volume: vol > 0 ? Math.round(vol) : null,
       e1rm: e1,
       reps: rp,
     };
   });
+}
+
+function createSessionSetAxisTick(data) {
+  return function SessionSetAxisTick(tickProps) {
+    var x = tickProps.x;
+    var y = tickProps.y;
+    var idx = tickProps.index;
+    var point = data[idx];
+    if (x == null || y == null || !point) return null;
+    return (
+      <g transform={"translate(" + x + "," + y + ")"}>
+        <text y={0} dy={12} textAnchor="middle" fill="#e2e8f0" fontSize={10}>{point.label}</text>
+        {point.time ? <text y={0} dy={24} textAnchor="middle" fill="#9ca3af" fontSize={9}>{point.time}</text> : null}
+      </g>
+    );
+  };
+}
+
+function sessionChartXAxisHeight(data) {
+  var hasTimes = data.some(function (p) { return !!p.time; });
+  if (data.length > 6) return hasTimes ? 62 : 48;
+  return hasTimes ? 44 : 30;
 }
 
 function SessionSetTooltip({ active, payload, metricLabel }) {
@@ -175,6 +199,7 @@ function SessionSetTooltip({ active, payload, metricLabel }) {
       <div className={s.tooltipTitle}>{point.label}</div>
       <div style={{ color: ACCENT }}>{metricLabel}: {payload[0].value != null ? payload[0].value : "—"}</div>
       {point.reps != null && <div style={{ color: "var(--ft-text-muted)", fontSize: 11, marginTop: 4 }}>{point.weight || 0}kg × {point.reps}</div>}
+      {point.time && <div style={{ color: "var(--ft-text-dim)", fontSize: 11, marginTop: 2 }}>{point.time}</div>}
     </div>
   );
 }
@@ -197,12 +222,16 @@ function WorkoutSessionGraph({ workout, colorFallbackIdx, onClose, formatChartDa
 
   function renderMetricChart(data, strokeColor, height) {
     if (!data.length) return <div className={s.sessionGraphEmpty}>No sets for this side</div>;
+    var hasTimes = data.some(function (p) { return !!p.time; });
+    var angled = data.length > 6 && !hasTimes;
+    var xHeight = sessionChartXAxisHeight(data);
+    var chartHeight = (height || 140) + (xHeight > 30 ? xHeight - 30 : 0);
     return (
       <div className={ui.chartContainer}>
-        <ResponsiveContainer width="100%" height={height || 140}>
-          <LineChart data={data}>
+        <ResponsiveContainer width="100%" height={chartHeight}>
+          <LineChart data={data} margin={{ bottom: xHeight > 30 ? 4 : 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
-            <XAxis dataKey="label" tick={cs} interval={0} angle={data.length > 6 ? -25 : 0} textAnchor={data.length > 6 ? "end" : "middle"} height={data.length > 6 ? 48 : 30} />
+            <XAxis dataKey="label" tick={createSessionSetAxisTick(data)} interval={0} angle={angled ? -25 : 0} textAnchor={angled ? "end" : "middle"} height={xHeight} />
             <YAxis tick={cs} width={35} />
             <Tooltip content={<SessionSetTooltip metricLabel={metricLabel} />} />
             <Line type="monotone" dataKey={metric} stroke={strokeColor} strokeWidth={2} dot={{ fill: strokeColor, r: 4 }} connectNulls={true} />
