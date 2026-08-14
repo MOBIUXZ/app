@@ -244,6 +244,32 @@
   margin-bottom: 10px;
 }
 
+.workoutCardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.showGraphBtn {
+  flex-shrink: 0;
+  border: 1px solid var(--ft-border-input);
+  background: var(--ft-bg-btn);
+  color: var(--ft-text-chip);
+  border-radius: var(--ft-radius-pill);
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.showGraphBtn:hover {
+  background: var(--ft-bg-btn-hover);
+  color: var(--ft-text);
+}
+
 .workoutName {
   font-weight: 800;
   color: var(--ft-text);
@@ -317,6 +343,75 @@
   padding: 8px 10px;
   background: var(--ft-bg-btn);
   border-radius: var(--ft-radius-md);
+}
+
+.sessionGraphOverlay {
+  composes: modalBackdrop from "../styles/ui.module.css";
+  align-items: center;
+  padding: 16px;
+}
+
+.sessionGraphPanel {
+  width: min(520px, 100%);
+  background: var(--ft-bg-panel);
+  border: 1px solid var(--ft-border);
+  border-radius: 18px;
+  box-shadow: var(--ft-shadow-modal);
+  overflow: hidden;
+}
+
+.sessionGraphHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--ft-border);
+}
+
+.sessionGraphEyebrow {
+  font-size: 11px;
+  color: var(--ft-accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.sessionGraphTitle {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ft-text);
+  margin-top: 2px;
+}
+
+.sessionGraphMeta {
+  font-size: 12px;
+  color: var(--ft-text-muted);
+  margin-top: 2px;
+}
+
+.sessionStatStrip {
+  composes: statStrip;
+  padding: 12px 18px 0;
+  margin-bottom: 0;
+}
+
+.sessionGraphChartBody {
+  padding: 8px 12px 0;
+}
+
+.sessionGraphHint {
+  color: var(--ft-text-dim);
+  font-size: 11px;
+  text-align: center;
+  padding: 0 18px 14px;
+}
+
+.sessionGraphEmpty {
+  color: var(--ft-text-dim);
+  font-size: 13px;
+  text-align: center;
+  padding: 24px 18px;
 }
 
 .bfSection {

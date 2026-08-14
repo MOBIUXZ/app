@@ -22,8 +22,9 @@ function roundE1RM(value) {
   return value != null && value > 0 ? Math.round(value * 10) / 10 : null;
 }
 
-function metricLabelFor(metric) {
-  return metric === "weight" ? "Max Weight" : metric === "volume" ? "Volume" : "Best e1RM";
+function metricLabelFor(metric, session) {
+  if (metric === "weight") return session ? "Weight" : "Max Weight";
+  return metric === "volume" ? "Volume" : "Best e1RM";
 }
 
 function computeSessionMetrics(sets) {
@@ -145,6 +146,127 @@ function renderWorkoutSetPanel(sets, exercise) {
 
   var bestE1Value = getBestE1RM(sets) || null;
   return <div className={s.setList}>{renderDetailSetRows(sets, bestE1Value, "set")}</div>;
+}
+
+function buildSetChartData(sets) {
+  return (sets || []).map(function (st, i) {
+    var wt = typeof st.weight === "number" && !isNaN(st.weight) ? st.weight : parseFloat(st.weight) || 0;
+    var rp = typeof st.reps === "number" && !isNaN(st.reps) ? st.reps : parseFloat(st.reps) || 0;
+    var sideSuffix = st.side === "left" ? " L" : st.side === "right" ? " R" : "";
+    var vol = wt * rp;
+    var e1 = roundE1RM(estimate1RM(wt, rp));
+    return {
+      set: "S" + (i + 1),
+      label: "S" + (i + 1) + sideSuffix,
+      weight: wt > 0 ? wt : null,
+      volume: vol > 0 ? Math.round(vol) : null,
+      e1rm: e1,
+      reps: rp,
+    };
+  });
+}
+
+function SessionSetTooltip({ active, payload, metricLabel }) {
+  if (!active || !payload || !payload.length) return null;
+  var point = payload[0].payload;
+  return (
+    <div className={s.tooltip} style={{ border: "1px solid var(--ft-border-input)" }}>
+      <div className={s.tooltipTitle}>{point.label}</div>
+      <div style={{ color: ACCENT }}>{metricLabel}: {payload[0].value != null ? payload[0].value : "—"}</div>
+      {point.reps != null && <div style={{ color: "var(--ft-text-muted)", fontSize: 11, marginTop: 4 }}>{point.weight || 0}kg × {point.reps}</div>}
+    </div>
+  );
+}
+
+function WorkoutSessionGraph({ workout, colorFallbackIdx, onClose, formatChartDate, selectedDateKey }) {
+  var [metric, setMetric] = useState("weight");
+  var sets = workout.sets || [];
+  var exColor = getExerciseChartColor(workout.exercise, colorFallbackIdx);
+  var chartData = buildSetChartData(sets);
+  var sessionMetrics = computeSessionMetrics(sets);
+  var metricLabel = metricLabelFor(metric, true);
+  var cs = { color: "#e2e8f0", fontSize: 10 };
+  var showSplit = !isCompoundLift(workout.exercise) && workoutUsesSplitPanel(sets);
+  var leftData = buildSetChartData(sets.filter(function (st) { return st.side === "left"; }).concat(sets.filter(function (st) { return st.side !== "left" && st.side !== "right"; })));
+  var rightData = buildSetChartData(sets.filter(function (st) { return st.side === "right"; }).concat(sets.filter(function (st) { return st.side !== "left" && st.side !== "right"; })));
+
+  function chartToggleClass(active) {
+    return active ? ui.chartToggleBtnActive : ui.chartToggleBtn;
+  }
+
+  function renderMetricChart(data, strokeColor, height) {
+    if (!data.length) return <div className={s.sessionGraphEmpty}>No sets for this side</div>;
+    return (
+      <div className={ui.chartContainer}>
+        <ResponsiveContainer width="100%" height={height || 140}>
+          <LineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
+            <XAxis dataKey="label" tick={cs} interval={0} angle={data.length > 6 ? -25 : 0} textAnchor={data.length > 6 ? "end" : "middle"} height={data.length > 6 ? 48 : 30} />
+            <YAxis tick={cs} width={35} />
+            <Tooltip content={<SessionSetTooltip metricLabel={metricLabel} />} />
+            <Line type="monotone" dataKey={metric} stroke={strokeColor} strokeWidth={2} dot={{ fill: strokeColor, r: 4 }} connectNulls={true} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  }
+
+  return (
+    <div className={s.sessionGraphPanel} onClick={function (ev) { ev.stopPropagation(); }} tabIndex={-1}>
+      <div className={s.sessionGraphHeader}>
+        <div>
+          <div className={s.sessionGraphEyebrow}>Session Performance</div>
+          <div className={s.sessionGraphTitle}>{formatExerciseName(workout.exercise)}</div>
+          <div className={s.sessionGraphMeta}>{workout.time ? workout.time + " · " : ""}{formatChartDate(selectedDateKey || workout.date)}</div>
+        </div>
+        <button type="button" onClick={onClose} className={ui.modalClose} title="Close graph">✕</button>
+      </div>
+      <div className={s.sessionStatStrip}>
+        {[
+          { label: "Weight", val: sessionMetrics.weight ? sessionMetrics.weight + " kg" : "—", color: exColor },
+          { label: "Volume", val: sessionMetrics.volume ? sessionMetrics.volume + " kg" : "—", color: ORANGE },
+          { label: "Best e1RM", val: sessionMetrics.e1rm != null ? sessionMetrics.e1rm + " kg" : "—", color: GREEN },
+        ].map(function (st) {
+          return (
+            <div key={st.label} className={s.miniStat}>
+              <div className={s.miniStatLabel}>{st.label}</div>
+              <div className={s.miniStatValue} style={{ color: st.color }}>{st.val}</div>
+            </div>
+          );
+        })}
+      </div>
+      {sets.length < 1 ? (
+        <div className={s.sessionGraphEmpty}>No sets logged for this workout.</div>
+      ) : (
+        <div>
+          <div className={ui.chartToggleRow}>
+            {["weight", "volume", "e1rm"].map(function (m) {
+              return (
+                <button key={m} type="button" onClick={function () { setMetric(m); }} className={chartToggleClass(metric === m)} style={metric === m ? { background: exColor, color: "#fff" } : undefined}>
+                  {metricLabelFor(m, true)}
+                </button>
+              );
+            })}
+          </div>
+          <div className={s.sessionGraphChartBody}>
+          {showSplit ? (
+            <div className={s.detailSplitRow}>
+              <div className={s.detailSplitCol}>
+                <div className={s.detailSplitLabel} style={{ color: BLUE }}>Left</div>
+                {renderMetricChart(leftData, BLUE, 120)}
+              </div>
+              <div className={s.detailSplitCol}>
+                <div className={s.detailSplitLabel} style={{ color: PINK }}>Right</div>
+                {renderMetricChart(rightData, PINK, 120)}
+              </div>
+            </div>
+          ) : renderMetricChart(chartData, exColor, 160)}
+          </div>
+          <div className={s.sessionGraphHint}>Per-set trend for this session · {sets.length} set{sets.length !== 1 ? "s" : ""}</div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function SplitDot(props) {
@@ -286,6 +408,7 @@ export default function ProgressPage({ data }) {
   var [compoundMetric, setCompoundMetric] = useState("weight");
   var [hiddenCompoundLifts, setHiddenCompoundLifts] = useState({});
   var [selectedDate, setSelectedDate] = useState(null);
+  var [sessionGraphIdx, setSessionGraphIdx] = useState(null);
   var normalizedWorkouts = data.workouts.map(function (w) { return Object.assign({}, w, { exercise: resolveExercise(w.exercise) }); });
   var normalizedData = Object.assign({}, data, { workouts: normalizedWorkouts });
   var allEx = Array.from(new Set(normalizedWorkouts.map(function (w) { return w.exercise; })));
@@ -346,13 +469,39 @@ export default function ProgressPage({ data }) {
   }
 
   var selectedWorkouts = selectedDate ? normalizedWorkouts.filter(function (w) { return getChartDateKey(w.date) === String(selectedDate); }) : [];
-  var detailKb = useKeyboardListNav(selectedWorkouts.length, function () {}, selectedDate && selectedWorkouts.length > 0);
+  var sessionGraphWorkout = sessionGraphIdx != null && selectedWorkouts[sessionGraphIdx] ? selectedWorkouts[sessionGraphIdx] : null;
+  var sessionGraphOpen = !!sessionGraphWorkout;
+
+  function closeDetailPanel() {
+    setSessionGraphIdx(null);
+    setSelectedDate(null);
+  }
+
+  function closeSessionGraph() {
+    setSessionGraphIdx(null);
+  }
+
+  function getWorkoutColorIdx(exercise) {
+    var idx = compounds.indexOf(exercise);
+    if (idx !== -1) return idx;
+    idx = isolations.indexOf(exercise);
+    return idx !== -1 ? idx : 0;
+  }
+
+  var detailKb = useKeyboardListNav(selectedWorkouts.length, function () {}, selectedDate && selectedWorkouts.length > 0 && !sessionGraphOpen);
   var detailKbRef = useRef(detailKb);
   detailKbRef.current = detailKb;
-  var detailLayer = useKeyboardLayer("progress-detail", !!selectedDate, function (e) {
+  var sessionGraphLayer = useKeyboardLayer("progress-session-graph", sessionGraphOpen, function (e) {
     if (e.key === "Escape") {
       e.preventDefault();
-      setSelectedDate(null);
+      closeSessionGraph();
+      return;
+    }
+  });
+  var detailLayer = useKeyboardLayer("progress-detail", !!selectedDate && !sessionGraphOpen, function (e) {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      closeDetailPanel();
       return;
     }
     if (isTypingTarget(e.target)) return;
@@ -443,24 +592,40 @@ export default function ProgressPage({ data }) {
           );
         })()}
         {selectedDate && (
-          <div className={cx("ft-kb-modal-backdrop", s.detailBackdrop)} style={{ zIndex: detailLayer.zIndex }} onClick={function () { setSelectedDate(null); }}>
+          <div className={cx("ft-kb-modal-backdrop", s.detailBackdrop)} style={{ zIndex: detailLayer.zIndex }} onClick={closeDetailPanel}>
             <div className={s.detailPanel} onClick={function (ev) { ev.stopPropagation(); }} tabIndex={-1}>
               <div className={s.detailHeader}>
                 <div><div className={s.detailEyebrow}>Workout Details</div><div className={s.detailDate}>{formatChartDate(selectedDate)}</div></div>
-                <button type="button" onClick={function () { setSelectedDate(null); }} className={ui.modalClose}>✕</button>
+                <button type="button" onClick={closeDetailPanel} className={ui.modalClose}>✕</button>
               </div>
               <div ref={detailKb.listRef} className={s.detailBody}>
                 {selectedWorkouts.length > 0 ? selectedWorkouts.map(function (w, idx) {
                   return (
                     <div key={idx} data-kb-index={idx} className={cx(detailKb.kbClass(idx), idx === selectedWorkouts.length - 1 ? s.workoutCard : s.workoutCardSpaced)} onMouseEnter={function () { detailKb.setFocusIdx(idx); }}>
-                      <div className={s.workoutName}>{formatExerciseName(w.exercise)}</div>
-                      <div className={s.workoutMeta}>{w.time ? w.time + " · " : ""}{w.date}</div>
+                      <div className={s.workoutCardTop}>
+                        <div>
+                          <div className={s.workoutName}>{formatExerciseName(w.exercise)}</div>
+                          <div className={s.workoutMeta}>{w.time ? w.time + " · " : ""}{w.date}</div>
+                        </div>
+                        <button type="button" onClick={function () { setSessionGraphIdx(idx); }} className={s.showGraphBtn}>📈 Show Graph</button>
+                      </div>
                       {renderWorkoutSetPanel(w.sets || [], w.exercise)}
                     </div>
                   );
                 }) : <div className={s.emptyChart}>No workouts logged for this date.</div>}
               </div>
             </div>
+            {sessionGraphOpen && (
+              <div className={cx("ft-kb-modal-backdrop", s.sessionGraphOverlay)} style={{ zIndex: sessionGraphLayer.zIndex }} onClick={closeSessionGraph}>
+                <WorkoutSessionGraph
+                  workout={sessionGraphWorkout}
+                  colorFallbackIdx={getWorkoutColorIdx(sessionGraphWorkout.exercise)}
+                  onClose={closeSessionGraph}
+                  formatChartDate={formatChartDate}
+                  selectedDateKey={selectedDate}
+                />
+              </div>
+            )}
           </div>
         )}
         {(isolations.length > 0) && <div className={s.sectionLabelSpaced}>💪 ISOLATION LIFTS</div>}

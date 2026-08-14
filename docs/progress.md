@@ -157,7 +157,21 @@ Click any chart data point to open a modal showing all workouts on that date:
 - Date and time
 - All sets listed one per row: weight × reps on the left, per-set **e1RM** on the right (Epley estimate; `—` when weight/reps are invalid). The **best e1RM** row(s) for each workout are highlighted with a green border and ★
 - **Left/right workouts (isolation only)** — side-by-side **Left** (blue) and **Right** (pink) columns, each with its own set list and best-e1RM highlight. Sets logged without a side (`both`) appear in **both** columns. **Compound lifts** always use a single-column list
-- Left/Right labels (`L` / `R`) when side data exists
+- **📈 Show Graph** on each workout — opens a **Session Performance** overlay (layered on top of the day modal)
+
+### Session Performance Graph
+
+Per-workout popup chart for that single logged session:
+
+| Feature | Description |
+|---------|-------------|
+| **Session stats** | Weight, Volume, Best e1RM for the whole workout |
+| **Metric toggles** | Weight / Volume / Best e1RM |
+| **X-axis** | Set number (`S1`, `S2`, …) with `L` / `R` when side data exists |
+| **Y-axis** | Selected metric per set (weight, set volume, or set e1RM) |
+| **Split view** | Isolation workouts with left/right data show side-by-side Left (blue) and Right (pink) mini charts; compound lifts use one chart |
+| **Keyboard** | `Esc` closes the graph first, then the day modal |
+
 
 ## Body Weight & Body Fat Chart
 
