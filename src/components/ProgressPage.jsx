@@ -335,7 +335,7 @@ function WorkoutSessionGraph({ workout, colorFallbackIdx, onClose, formatChartDa
         <div className={s.sessionGraphEmpty}>No sets logged for this workout.</div>
       ) : (
         <div>
-          <div className={ui.chartToggleRow}>
+          <div className={s.sessionGraphToggles}>
             {["weight", "volume", "e1rm"].map(function (m) {
               return (
                 <button key={m} type="button" onClick={function () { setMetric(m); }} className={chartToggleClass(metric === m)} style={metric === m ? { background: exColor, color: "#fff" } : undefined}>
