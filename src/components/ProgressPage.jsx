@@ -391,7 +391,25 @@ export default function ProgressPage({ data }) {
                     <div key={idx} data-kb-index={idx} className={cx(detailKb.kbClass(idx), idx === selectedWorkouts.length - 1 ? s.workoutCard : s.workoutCardSpaced)} onMouseEnter={function () { detailKb.setFocusIdx(idx); }}>
                       <div className={s.workoutName}>{formatExerciseName(w.exercise)}</div>
                       <div className={s.workoutMeta}>{w.time ? w.time + " · " : ""}{w.date}</div>
-                      <div className={s.setChipRow}>{(w.sets || []).map(function (st, i) { return <span key={i} className={s.setChip}>{st.weight || 0}kg × {st.reps || 0}{st.side === "left" ? " L" : st.side === "right" ? " R" : ""}</span>; })}</div>
+                      <div className={s.setChipRow}>{(() => {
+                        var sets = w.sets || [];
+                        var bestE1 = sets.reduce(function (max, st) {
+                          var e1 = roundE1RM(estimate1RM(st.weight, st.reps));
+                          return e1 != null && e1 > max ? e1 : max;
+                        }, 0);
+                        var bestE1Value = bestE1 > 0 ? bestE1 : null;
+                        return sets.map(function (st, i) {
+                          var sideSuffix = st.side === "left" ? " L" : st.side === "right" ? " R" : "";
+                          var setE1 = roundE1RM(estimate1RM(st.weight, st.reps));
+                          var isBest = setE1 != null && bestE1Value != null && setE1 === bestE1Value;
+                          return (
+                            <span key={i} className={cx(s.setChip, isBest && s.setChipBest)}>
+                              {st.weight || 0}kg × {st.reps || 0}{sideSuffix}
+                              {setE1 != null && <span className={s.setChipE1rm}> · e1RM {setE1}{isBest ? " ★" : ""}</span>}
+                            </span>
+                          );
+                        });
+                      })()}</div>
                     </div>
                   );
                 }) : <div className={s.emptyChart}>No workouts logged for this date.</div>}

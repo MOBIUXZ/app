@@ -271,6 +271,21 @@
   font-weight: 700;
 }
 
+.setChipE1rm {
+  color: var(--ft-green);
+  font-weight: 600;
+}
+
+.setChipBest {
+  background: var(--ft-green-bg);
+  border: 1px solid var(--ft-green-border);
+  color: var(--ft-text);
+}
+
+.setChipBest .setChipE1rm {
+  font-weight: 800;
+}
+
 .bfSection {
   margin-top: 12px;
 }
