@@ -177,6 +177,7 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
 
 export default function ProgressPage({ data }) {
   var [compoundMetric, setCompoundMetric] = useState("weight");
+  var [hiddenCompoundLifts, setHiddenCompoundLifts] = useState({});
   var [selectedDate, setSelectedDate] = useState(null);
   var normalizedWorkouts = data.workouts.map(function (w) { return Object.assign({}, w, { exercise: resolveExercise(w.exercise) }); });
   var normalizedData = Object.assign({}, data, { workouts: normalizedWorkouts });
@@ -231,6 +232,15 @@ export default function ProgressPage({ data }) {
       return isNaN(parsed) ? null : parsed;
     }).filter(function (value) { return value != null && !isNaN(value); });
     return weights.length ? Math.max.apply(null, weights) : null;
+  }
+
+  function toggleCompoundLift(ex) {
+    setHiddenCompoundLifts(function (prev) {
+      var next = Object.assign({}, prev);
+      if (next[ex]) delete next[ex];
+      else next[ex] = true;
+      return next;
+    });
   }
 
   function getWorkoutMetrics(workout) {
@@ -321,9 +331,27 @@ export default function ProgressPage({ data }) {
                     <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
                     <YAxis tick={cs} width={35} />
                     <Tooltip contentStyle={tt} />
-                    {compounds.map(function (ex) { var lineColor = getExerciseChartColor(ex); return <Line key={ex} type="monotone" dataKey={ex} stroke={lineColor} strokeWidth={2} dot={{ fill: lineColor, r: 2 }} connectNulls={true} />; })}
+                    {compounds.filter(function (ex) { return !hiddenCompoundLifts[ex]; }).map(function (ex) { var lineColor = getExerciseChartColor(ex); return <Line key={ex} type="monotone" dataKey={ex} stroke={lineColor} strokeWidth={2} dot={{ fill: lineColor, r: 2 }} connectNulls={true} />; })}
                   </LineChart>
                 </ResponsiveContainer>
+              </div>
+              <div className={cx(ui.chartToggleRow, s.compoundLegendRow)}>
+                {compounds.map(function (ex) {
+                  var lineColor = getExerciseChartColor(ex);
+                  var visible = !hiddenCompoundLifts[ex];
+                  return (
+                    <button
+                      key={ex}
+                      type="button"
+                      onClick={function () { toggleCompoundLift(ex); }}
+                      className={visible ? ui.chartToggleBtnActive : ui.chartToggleBtn}
+                      style={visible ? { background: lineColor, color: "#fff" } : { border: "1px solid " + lineColor + "66", color: lineColor, opacity: 0.72 }}
+                      title={visible ? "Hide " + formatExerciseName(ex) : "Show " + formatExerciseName(ex)}
+                    >
+                      {formatExerciseName(ex)}
+                    </button>
+                  );
+                })}
               </div>
             </Card>
           );

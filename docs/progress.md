@@ -121,8 +121,28 @@ See also: [shared-utilities.md](./shared-utilities.md) → `getExerciseChartColo
 
 When 2+ compound lifts are logged, an overlay chart compares all compounds on one graph.
 
-- Toggle metric: Max Weight / Volume / Max Reps
-- Each compound line uses the same color as its individual chart
+### Metric toggles (above chart)
+
+- **Max Weight** / **Volume** / **Max Reps** — same metrics as individual exercise charts
+- Active toggle uses the accent color; chart Y-axis values update to match the selected metric
+
+### Lift legend (below chart)
+
+- One pill button per logged compound lift, placed **below the graph** (not under the metric row)
+- Click a lift to show or hide its line on the combined chart
+- **Visible:** filled with that lift’s chart color (from `getExerciseChartColor()`)
+- **Hidden:** dimmed outline in the lift color; line removed from chart and tooltip
+- All lifts start visible; visibility resets when leaving the page (not persisted)
+
+### Colors
+
+- Each compound line uses the same color as its individual chart above
+
+### Implementation
+
+- `ProgressPage.jsx` — `compoundMetric`, `hiddenCompoundLifts`, `toggleCompoundLift()`
+- `ProgressPage.module.css` — `.compoundLegendRow` (spacing below chart)
+- Recharts `<Line>` components render only for lifts not in `hiddenCompoundLifts`
 
 ## Workout Details Modal
 

@@ -162,6 +162,11 @@
   gap: 6px;
 }
 
+.compoundLegendRow {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
 .tooltip {
   background: var(--ft-bg-card);
   border-radius: var(--ft-radius-md);
