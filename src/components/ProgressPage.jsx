@@ -23,7 +23,7 @@ function roundE1RM(value) {
 }
 
 function metricLabelFor(metric) {
-  return metric === "weight" ? "Max Weight" : metric === "volume" ? "Volume" : "Est. 1RM";
+  return metric === "weight" ? "Max Weight" : metric === "volume" ? "Volume" : "Best e1RM";
 }
 
 function computeSessionMetrics(sets) {
@@ -157,7 +157,7 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
           {trend !== null && <div className={s.trend} style={{ color: trend > 0 ? GREEN : trend < 0 ? "#f87171" : "var(--ft-text-dim)" }}>{trend > 0 ? "▲ +" : trend < 0 ? "▼ " : "–"}{trend !== 0 ? Math.abs(trend) + " kg" : "no change"}</div>}
         </div>
       </div>
-      {latest && <div className={s.statStrip}>{[{ label: "Last Weight", val: latest.weight + " kg", color: exColor }, { label: "Last Volume", val: latest.volume + " kg", color: ORANGE }, { label: "Est. 1RM", val: latest.e1rm != null ? latest.e1rm + " kg" : "—", color: GREEN }].map(function (st) { return <div key={st.label} className={s.miniStat}><div className={s.miniStatLabel}>{st.label}</div><div className={s.miniStatValue} style={{ color: st.color }}>{st.val}</div></div>; })}</div>}
+      {latest && <div className={s.statStrip}>{[{ label: "Last Weight", val: latest.weight + " kg", color: exColor }, { label: "Last Volume", val: latest.volume + " kg", color: ORANGE }, { label: "Best e1RM", val: latest.e1rm != null ? latest.e1rm + " kg" : "—", color: GREEN }].map(function (st) { return <div key={st.label} className={s.miniStat}><div className={s.miniStatLabel}>{st.label}</div><div className={s.miniStatValue} style={{ color: st.color }}>{st.val}</div></div>; })}</div>}
       {cd.length < 1 ? <div className={s.noSessions}>No sessions logged yet</div> : <div>
         <div className={ui.chartToggleRow}>
           {["weight", "volume", "e1rm"].map(function (m) { return <button key={m} type="button" onClick={function () { setMetric(m); }} className={chartToggleClass(metric === m)} style={metric === m ? { background: exColor, color: "#fff" } : undefined}>{metricLabelFor(m)}</button>; })}

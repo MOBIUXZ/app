@@ -33,7 +33,7 @@ Each chart includes:
 ### Session Summary (latest day)
 - Last Weight (kg)
 - Last Volume (kg — sum of weight × reps that day)
-- Est. 1RM (kg — best set that day, Epley formula)
+- Best e1RM (kg — highest Epley estimate across all sets that day)
 
 ### Metric Toggle
 Switch between three chart metrics. Each chart point is **one calendar date**; if you log the same exercise multiple times on one day, those entries are merged:
@@ -42,7 +42,7 @@ Switch between three chart metrics. Each chart point is **one calendar date**; i
 |--------|----------------|
 | **Max Weight** | Heaviest set across all entries that day |
 | **Volume** | Sum of weight × reps across all sets that day |
-| **Est. 1RM** | Highest estimated one-rep max across all sets that day (Epley: `weight × (1 + reps / 30)`; 1-rep sets use the logged weight) |
+| **Best e1RM** | Highest estimated one-rep max across all sets that day (Epley: `weight × (1 + reps / 30)`; 1-rep sets use the logged weight) |
 
 This matches the **Combined Compound Lifts** overlay chart.
 
@@ -62,7 +62,7 @@ Sets without side info are marked `both` and count toward combined totals.
 
 ### Left/Right Imbalance Highlighting (Split View)
 
-When **Split** view is active, the app compares left and right values for the currently selected metric (Max Weight, Volume, or Est. 1RM) at each **date**. If the two sides differ, that data point is visually flagged so you can spot muscular imbalances at a glance.
+When **Split** view is active, the app compares left and right values for the currently selected metric (Max Weight, Volume, or Best e1RM) at each **date**. If the two sides differ, that data point is visually flagged so you can spot muscular imbalances at a glance.
 
 **What was added:**
 
@@ -76,7 +76,7 @@ When **Split** view is active, the app compares left and right values for the cu
 
 For each date and metric, the app compares the left-side value (`weight_left`, `volume_left`, or `e1rm_left`) against the right-side value (`weight_right`, `volume_right`, or `e1rm_right`). If both values exist and are not equal, the point is marked imbalanced. Multiple logs on the same day are merged: all sets from that day are pooled before left/right metrics are computed.
 
-**Example:** A Single Arm Lat Pulldown session logged as `RIGHT - 60kg × 10`, `LEFT - 60kg × 7` will highlight on the **Est. 1RM** split chart because the estimated max differs per side. The same session will not highlight on **Max Weight** if both sides used the same load (60 kg).
+**Example:** A Single Arm Lat Pulldown session logged as `RIGHT - 60kg × 10`, `LEFT - 60kg × 7` will highlight on the **Best e1RM** split chart because the estimated max differs per side. The same session will not highlight on **Max Weight** if both sides used the same load (60 kg).
 
 Sessions where left and right match, or where sets are logged without side info (`both`), show normal dots with no amber ring.
 
@@ -128,7 +128,7 @@ When 2+ compound lifts are logged, an overlay chart compares all compounds on on
 
 ### Metric toggles (above chart)
 
-- **Max Weight** / **Volume** / **Est. 1RM** — same metrics as individual exercise charts
+- **Max Weight** / **Volume** / **Best e1RM** — same metrics as individual exercise charts
 - Active toggle uses cyan (`#06b6d4`) so it stays distinct from lift legend colors (e.g. Deadlift purple)
 
 ### Lift legend (below chart)
