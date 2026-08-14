@@ -330,6 +330,7 @@ export default function WorkoutPage({ data, save }) {
   }
 
   function saveEdit() { var updated = data.workouts.map(function (w, i) { return i === editIdx ? Object.assign({}, w, { exercise: resolveExercise(editForm.exercise), note: editForm.note || "", sets: editForm.sets.map(function (s) { return { weight: parseFloat(s.weight), reps: parseInt(s.reps), time: s.time || "", note: s.note || "" }; }) }) : w; }); save({ workouts: updated, bodyLogs: data.bodyLogs, bodyComp: data.bodyComp, calories: data.calories }); setEditIdx(null); setEditForm(null); }
+  function cancelEdit() { setEditIdx(null); setEditForm(null); }
   function delW(i) { save({ workouts: data.workouts.filter(function (_, idx) { return idx !== i; }), bodyLogs: data.bodyLogs, bodyComp: data.bodyComp, calories: data.calories }); }
   function startEdit(i) { var w = data.workouts[i]; setEditIdx(i); setEditForm({ exercise: w.exercise, note: w.note || "", sets: w.sets.map(function (s) { return { weight: s.weight, reps: s.reps, time: s.time || "", note: s.note || "" }; }) }); }
   function toggleGroup(groupKey) { setExpandedGroups(function (prev) { var next = Object.assign({}, prev); next[groupKey] = !next[groupKey]; return next; }); }
@@ -349,6 +350,7 @@ export default function WorkoutPage({ data, save }) {
   });
 
   function closeCalDayPanel() {
+    cancelEdit();
     setCalSelectedDate(null);
     closeCalLogPanel();
   }
@@ -371,6 +373,10 @@ export default function WorkoutPage({ data, save }) {
   var calDayLayer = useKeyboardLayer("calendar-day-panel", calDayOpen, function (e) {
     if (e.key === "Escape") {
       e.preventDefault();
+      if (editIdx != null && editForm && data.workouts[editIdx] && data.workouts[editIdx].date === calSelectedDate) {
+        cancelEdit();
+        return;
+      }
       closeCalDayPanel();
       return;
     }
@@ -661,30 +667,40 @@ export default function WorkoutPage({ data, save }) {
 
                 {(() => {
                   var dayWo = data.workouts.map(function (w, i) { return Object.assign({}, w, { _idx: i }); }).filter(function (w) { return w.date === calSelectedDate; });
+                  var editingDayWorkout = editIdx != null && editForm && dayWo.some(function (w) { return w._idx === editIdx; });
+
+                  if (editingDayWorkout) {
+                    return (
+                      <div className={s.editCard}>
+                        <div className={s.editCardToolbar}>
+                          <div className={s.calLogPanelTitle}>✏️ Edit Workout</div>
+                          <button type="button" onClick={cancelEdit} className={btnSecondary({ md: true })}>← Back</button>
+                        </div>
+                        <div className={cx(ui.grid2, ui.marginBottom8)}>
+                          <div><div className={ui.fieldLabel}>Exercise</div><input value={editForm.exercise} onChange={function (e) { setEditForm(Object.assign({}, editForm, { exercise: e.target.value })); }} className={inputClass({ fullWidth: true })} /></div>
+                          <div><div className={ui.fieldLabel}>Notes</div><input value={editForm.note || ""} onChange={function (e) { setEditForm(Object.assign({}, editForm, { note: e.target.value })); }} className={inputClass({ fullWidth: true })} /></div>
+                        </div>
+                        {editForm.sets.map(function (setItem, si) {
+                          return (
+                            <div key={si} className={s.setRow}>
+                              <span className={s.setLabel}>S{si + 1}</span>
+                              <input type="number" value={setItem.weight} placeholder="kg" onChange={function (e) { var ss = editForm.sets.map(function (x, j) { return j === si ? Object.assign({}, x, { weight: parseFloat(e.target.value) }) : x; }); setEditForm(Object.assign({}, editForm, { sets: ss })); }} className={inputClass({ w62: true })} />
+                              <input type="number" value={setItem.reps} placeholder="reps" onChange={function (e) { var ss = editForm.sets.map(function (x, j) { return j === si ? Object.assign({}, x, { reps: parseInt(e.target.value) }) : x; }); setEditForm(Object.assign({}, editForm, { sets: ss })); }} className={inputClass({ w62: true })} />
+                            </div>
+                          );
+                        })}
+                        <div className={cx(ui.flexRow, s.mt8)}>
+                          <button type="button" onClick={saveEdit} className={btnPrimary({ flex1: true, md: true })}>Save</button>
+                          <button type="button" onClick={cancelEdit} className={btnSecondary({ md: true })}>Cancel</button>
+                        </div>
+                      </div>
+                    );
+                  }
+
                   return (
                     <div>
                       {dayWo.length > 0 ? dayWo.map(function (w) {
-                        return editIdx === w._idx ? (
-                          <div key={w._idx} className={s.editCard}>
-                            <div className={cx(ui.grid2, ui.marginBottom8)}>
-                              <div><div className={ui.fieldLabel}>Exercise</div><input value={editForm.exercise} onChange={function (e) { setEditForm(Object.assign({}, editForm, { exercise: e.target.value })); }} className={inputClass({ fullWidth: true })} /></div>
-                              <div><div className={ui.fieldLabel}>Notes</div><input value={editForm.note || ""} onChange={function (e) { setEditForm(Object.assign({}, editForm, { note: e.target.value })); }} className={inputClass({ fullWidth: true })} /></div>
-                            </div>
-                            {editForm.sets.map(function (setItem, si) {
-                              return (
-                                <div key={si} className={s.setRow}>
-                                  <span className={s.setLabel}>S{si + 1}</span>
-                                  <input type="number" value={setItem.weight} placeholder="kg" onChange={function (e) { var ss = editForm.sets.map(function (x, j) { return j === si ? Object.assign({}, x, { weight: parseFloat(e.target.value) }) : x; }); setEditForm(Object.assign({}, editForm, { sets: ss })); }} className={inputClass({ w62: true })} />
-                                  <input type="number" value={setItem.reps} placeholder="reps" onChange={function (e) { var ss = editForm.sets.map(function (x, j) { return j === si ? Object.assign({}, x, { reps: parseInt(e.target.value) }) : x; }); setEditForm(Object.assign({}, editForm, { sets: ss })); }} className={inputClass({ w62: true })} />
-                                </div>
-                              );
-                            })}
-                            <div className={cx(ui.flexRow, s.mt8)}>
-                              <button type="button" onClick={saveEdit} className={s.btnSave}>Save</button>
-                              <button type="button" onClick={function () { setEditIdx(null); setEditForm(null); }} className={btnSecondary({ editInline: true })}>Cancel</button>
-                            </div>
-                          </div>
-                        ) : (
+                        return (
                           <div key={w._idx} className={s.workoutCard}>
                             <div className={s.workoutCardBody}>
                               <div className={s.workoutCardName} style={{ color: ACCENT }}>{formatExerciseName(w.exercise)}</div>
