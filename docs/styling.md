@@ -8,10 +8,16 @@ FitTrack uses **CSS Modules** with a shared theme. Static layout and typography 
 |------|---------|
 | `src/styles/theme.css` | CSS custom properties (`--ft-accent`, `--ft-bg-*`, radii, shadows) |
 | `src/styles/global.css` | Base reset + keyboard navigation classes (`.ft-kb-*`) |
-| `src/styles/ui.module.css` | Shared UI: buttons, inputs, cards, collapse, modals, utilities |
+| `src/styles/ui.module.css` | Shared UI: buttons, inputs, cards, collapse, modals, flex/grid utilities |
 | `src/styles/styleHelpers.js` | `cx()`, `btnPrimaryClass`, `inputClass`, `selectClass`, `textareaClass` |
 | `src/App.module.css` | App shell: header, nav, main |
-| `src/components/*.module.css` | Page-specific layouts (Progress, Workout) |
+| `src/components/DashboardPage.module.css` | Dashboard: stat row, PR list, recent workouts |
+| `src/components/BodyCompPage.module.css` | Body comp: metrics, relations, history chips |
+| `src/components/CaloriePage.module.css` | Calories: BMR/TDEE, calendar, macros, food log |
+| `src/components/ProgressPage.module.css` | Progress: exercise charts, detail modal |
+| `src/components/WorkoutPage.module.css` | Workout: 1RM, calendar, parser, history |
+
+Every page follows the same pattern: import shared `ui` for buttons/inputs/cards, import local `s` for page layout.
 
 ## Conventions
 
@@ -21,17 +27,21 @@ Use class helpers from `shared.jsx` (re-exported from `styleHelpers.js`):
 
 ```jsx
 import { btnPrimary, btnSecondary, inputClass, ui } from "./shared";
+import s from "./CaloriePage.module.css";
 
 <button className={btnPrimary({ fullWidth: true })}>Save</button>
 <input className={inputClass({ flex1: true })} />
+<div className={s.pageTitle}>🍽️ Calories</div>
 ```
 
 Do **not** pass these helpers to `style=` — they return class name strings.
 
-### Shared components
+### Shared vs page-specific
 
-- `Card`, `StatBox`, `Collapse` — use `className` for overrides (`ui.cardChart`, `ui.cardFlush`).
-- `StatBox` `color` prop — still sets dynamic text color inline.
+- **`ui.module.css`** — anything reused across pages (buttons, forms, cards, modals, empty states, history toolbar)
+- **`PageName.module.css`** — layout and components unique to that tab
+
+Page modules may `composes` from `ui.module.css` (e.g. `cardFlush` composes `card`).
 
 ### Chart colors
 
@@ -52,7 +62,6 @@ Global classes in `global.css` (not modules): `.ft-kb-focus`, `.ft-kb-modal-back
 
 ## Adding new UI
 
-1. Prefer existing classes in `ui.module.css`.
-2. Add page-specific rules to the page’s `.module.css`.
-3. Add theme tokens to `theme.css` instead of hard-coding hex in modules.
-4. Extend `styleHelpers.js` with modifier flags (`fullWidth`, `flex1`, `sm`, …) rather than one-off inline layout.
+1. Check if the class belongs in `ui.module.css` (shared) or the page’s `.module.css`.
+2. Add theme tokens to `theme.css` instead of hard-coding hex in modules.
+3. Extend `styleHelpers.js` with modifier flags (`fullWidth`, `flex1`, `sm`, …) for shared inputs/buttons.

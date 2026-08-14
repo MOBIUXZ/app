@@ -1,5 +1,12 @@
 /* Progress page — charts, exercise cards, detail modal */
 
+.pageTitle {
+  font-size: 24px;
+  font-weight: 900;
+  margin-bottom: 20px;
+  letter-spacing: -0.02em;
+}
+
 .exerciseCard {
   background: var(--ft-bg-chart);
   border: 1px solid var(--ft-border-card);

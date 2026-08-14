@@ -647,7 +647,7 @@ export default function WorkoutPage({ data, save }) {
                               );
                             })}
                             <div className={cx(ui.flexRow, s.mt8)}>
-                              <button type="button" onClick={saveEdit} className={ui.btnSave}>Save</button>
+                              <button type="button" onClick={saveEdit} className={s.btnSave}>Save</button>
                               <button type="button" onClick={function () { setEditIdx(null); setEditForm(null); }} className={btnSecondary({ editInline: true })}>Cancel</button>
                             </div>
                           </div>
@@ -902,7 +902,7 @@ Bench Press
           <div className={ui.emptyStateLg}>
             <div className={ui.emptyIconLg}>🏋️</div>
             <div>{data.workouts.length === 0 ? "No workouts logged yet." : "No workouts match your search."}</div>
-            <div className={ui.emptySub}>{data.workouts.length === 0 ? "Start tracking your progress!" : "Try a different search term."}</div>
+            <div className={s.emptySub}>{data.workouts.length === 0 ? "Start tracking your progress!" : "Try a different search term."}</div>
           </div>
         ) : (
         <div ref={historyKb.listRef} tabIndex={0} onKeyDown={historyKb.handleKeyDown} className={ui.listOutline}>
@@ -945,7 +945,7 @@ Bench Press
                               );
                             })}
                             <div className={cx(ui.flexRow, ui.marginTop10)}>
-                              <button type="button" onClick={saveEdit} className={ui.btnSave}>Save</button>
+                              <button type="button" onClick={saveEdit} className={s.btnSave}>Save</button>
                               <button type="button" onClick={function () { setEditIdx(null); setEditForm(null); }} className={btnSecondary({ cancelHistory: true })}>Cancel</button>
                             </div>
                           </div>
@@ -955,8 +955,8 @@ Bench Press
                               <span className={ui.textAccentBold} style={{ fontSize: 13 }}>{formatExerciseName(w.exercise)}</span>
                               <div className={s.historyItemMeta}>
                                 <span className={s.historyItemDate}>{formatDate(w.date)}{w.time ? " · " + w.time : ""}</span>
-                                <button type="button" onClick={function () { startEdit(w._idx); }} className={ui.btnIconEdit} style={{ color: ACCENT }}>✏️</button>
-                                <button type="button" onClick={function () { delW(w._idx); }} className={ui.btnIconDeleteSm}>🗑</button>
+                                <button type="button" onClick={function () { startEdit(w._idx); }} className={s.btnIconEdit} style={{ color: ACCENT }}>✏️</button>
+                                <button type="button" onClick={function () { delW(w._idx); }} className={s.btnIconDelete}>🗑</button>
                               </div>
                             </div>
                             <div className={s.historyItemSets}>{w.sets.map(function (setItem) { return setItem.weight + "kg×" + setItem.reps + (setItem.time ? " @" + setItem.time : ""); }).join(" • ")}</div>

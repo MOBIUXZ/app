@@ -1,0 +1,193 @@
+/* Body Composition page */
+
+.pageTitle {
+  font-size: 24px;
+  font-weight: 900;
+  margin-bottom: 20px;
+  letter-spacing: -0.02em;
+}
+
+.metricBox {
+  flex: 1;
+  background: var(--ft-bg-inset);
+  border-radius: var(--ft-radius-md);
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.metricBoxLabel {
+  font-size: 10px;
+  color: var(--ft-text-dim);
+  margin-bottom: 2px;
+}
+
+.metricBoxValue {
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.metricUnit {
+  font-size: 10px;
+  color: var(--ft-text-muted);
+  margin-left: 2px;
+}
+
+.groupLabel {
+  font-size: 11px;
+  color: var(--ft-text-dim);
+  margin-bottom: 5px;
+  margin-top: 12px;
+}
+
+.metricsHint {
+  font-size: 12px;
+  color: var(--ft-text-dim);
+  margin: 12px 0 8px;
+}
+
+.metricsHintFaint {
+  color: var(--ft-text-faint);
+}
+
+.bmrHint {
+  color: var(--ft-text-faint);
+  margin-top: 4px;
+}
+
+.sexToggleRow {
+  display: flex;
+  gap: 6px;
+}
+
+.sexToggleBtn {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--ft-radius-md);
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: capitalize;
+  min-height: 40px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.sexToggleBtnActive {
+  composes: sexToggleBtn;
+  background: var(--ft-accent);
+  color: var(--ft-text-dark);
+}
+
+.sexToggleBtnInactive {
+  composes: sexToggleBtn;
+  background: var(--ft-bg-btn);
+  color: var(--ft-text-nav);
+}
+
+.relationSection {
+  margin-top: 14px;
+}
+
+.relationDivider {
+  border-top: 1px solid var(--ft-border);
+  padding-top: 12px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  color: var(--ft-text-dim);
+}
+
+.relationBox {
+  background: var(--ft-bg-card-alt);
+  border: 1px solid var(--ft-border);
+  border-radius: var(--ft-radius-lg);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.relationBoxLast {
+  composes: relationBox;
+  margin-bottom: 0;
+}
+
+.relationFormula {
+  color: var(--ft-text-dim);
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+
+.relationRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.relationOp {
+  color: var(--ft-text-faint);
+}
+
+.relationNote {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--ft-text-dim);
+}
+
+.historyEntry {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--ft-border);
+}
+
+.historyEntryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.historyEntryDate {
+  font-size: 12px;
+  color: var(--ft-text-dim);
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.metricChip {
+  background: var(--ft-bg-card);
+  border-radius: var(--ft-radius-md);
+  padding: 5px 9px;
+}
+
+.metricChipLabel {
+  font-size: 10px;
+  color: var(--ft-text-dim);
+}
+
+.metricChipValue {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.metricChipUnit {
+  font-size: 10px;
+  color: var(--ft-text-muted);
+  margin-left: 1px;
+}
+
+.confirmTitle {
+  margin-bottom: 12px;
+}
+
+.confirmBody {
+  margin-bottom: 16px;
+}
+
+.emptySub {
+  margin-top: 8px;
+  font-size: 12px;
+}

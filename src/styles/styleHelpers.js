@@ -49,7 +49,6 @@ export function inputClass(opts) {
     opts.fullWidth && ui.fullWidth,
     opts.flex1 && ui.flex1,
     opts.sm && ui.inputSm,
-    opts.goal && ui.inputGoal,
     opts.w62 && ui.inputW62,
     opts.w70 && ui.inputW70,
     opts.minW60 && ui.inputMinW60,

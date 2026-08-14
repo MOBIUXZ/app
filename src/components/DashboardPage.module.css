@@ -1,0 +1,54 @@
+/* Dashboard page */
+
+.pageTitle {
+  font-size: 24px;
+  font-weight: 900;
+  margin-bottom: 20px;
+  letter-spacing: -0.02em;
+}
+
+.statRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.prRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ft-border);
+  font-size: 14px;
+}
+
+.prValue {
+  color: var(--ft-accent);
+  font-weight: 700;
+}
+
+.recentRow {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ft-border);
+  font-size: 13px;
+}
+
+.recentExName {
+  color: var(--ft-accent);
+  font-weight: 700;
+}
+
+.recentMeta {
+  color: var(--ft-text-dim);
+  margin-left: 8px;
+  font-size: 12px;
+}
+
+.recentSets {
+  color: var(--ft-text-muted);
+  font-size: 12px;
+}
+
+.emptyLink {
+  margin-top: 8px;
+}

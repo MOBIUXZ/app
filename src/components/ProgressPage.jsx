@@ -265,7 +265,7 @@ export default function ProgressPage({ data }) {
 
   return (
     <div>
-      <div className={ui.pageTitle}>📈 Progress</div>
+      <div className={s.pageTitle}>📈 Progress</div>
       {allEx.length === 0 ? <Card><div className={s.emptyChart}>No workouts logged yet.</div></Card> : <div>
         {compounds.length > 0 && <div className={s.sectionLabel}>🏋️ COMPOUND LIFTS</div>}
         {compounds.map(function (ex, i) { return <ExerciseChart key={ex} ex={ex} data={normalizedData} colorFallbackIdx={i} onPointSelect={setSelectedDate} formatChartDate={formatChartDate} getChartDateKey={getChartDateKey} />; })}

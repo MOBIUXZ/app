@@ -552,14 +552,41 @@
 }
 
 .btnIconDeleteCal {
-  background: var(--ft-bg-danger);
-  color: var(--ft-red);
+  composes: iconBtnDelete from "../styles/ui.module.css";
+}
+
+.btnSave {
+  background: var(--ft-green);
+  color: var(--ft-text-dark);
+  border: none;
+  border-radius: var(--ft-radius-md);
+  padding: 8px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 13px;
+  min-height: 36px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btnIconEdit {
+  background: var(--ft-bg-btn);
+  color: var(--ft-accent);
   border: none;
   border-radius: var(--ft-radius-sm);
-  padding: 4px 9px;
+  padding: 4px 8px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 11px;
   font-family: inherit;
+}
+
+.btnIconDelete {
+  composes: iconBtnDelete from "../styles/ui.module.css";
+}
+
+.emptySub {
+  margin-top: 8px;
+  font-size: 12px;
 }
 
 .emptyDayState {

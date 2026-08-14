@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, Collapse, btnPrimary, btnSecondary, btnDanger, inputClass, formatDate, useConfirmDialogKeyboard, ui, cx } from "./shared";
+import s from "./BodyCompPage.module.css";
 
 export default function BodyCompPage({ data, save }) {
   var [logDate, setLogDate] = useState(formatDate(new Date()));
@@ -13,16 +14,16 @@ export default function BodyCompPage({ data, save }) {
   var bmrKatch = ffm != null ? 370 + 21.6 * ffm : null;
   function MBox(p) {
     return (
-      <div className={ui.metricBox}>
-        <div className={ui.metricBoxLabel}>{p.label}</div>
-        <div className={ui.metricBoxValue} style={{ color: p.val != null ? p.color : "var(--ft-text-faint)" }}>
+      <div className={s.metricBox}>
+        <div className={s.metricBoxLabel}>{p.label}</div>
+        <div className={s.metricBoxValue} style={{ color: p.val != null ? p.color : "var(--ft-text-faint)" }}>
           {p.val != null ? p.val.toFixed(2) : "—"}
-          <span className={ui.chipUnit}>{p.unit}</span>
+          <span className={s.metricUnit}>{p.unit}</span>
         </div>
       </div>
     );
   }
-  function GL(p) { return <div className={ui.groupLabel}>{p.children}</div>; }
+  function GL(p) { return <div className={s.groupLabel}>{p.children}</div>; }
   var historyEntries = data.bodyComp.slice().reverse().slice(0, 10);
   function deleteEntry(displayIdx) {
     var compIdx = data.bodyComp.length - 1 - displayIdx;
@@ -52,7 +53,7 @@ export default function BodyCompPage({ data, save }) {
   function submit() { if (!w || !bf) { setMsg("Weight and Body Fat % are required."); return; } if (!logDate.trim()) { setMsg("Date is required."); return; } var entry = { weight: wN, height: parseFloat(h) || null, bf: bfN, smm: smmN || null, waist: parseFloat(waist) || null, age: ageN || null, sex: sex, BW: wN, PBF: bfN, FM: fm, FFM: ffm, BMI: bmi, FFMI: ffmi, FMI: fmi, SMM: smmN || null, SMI: smi, BMR_Mifflin: bmrMifflin, BMR_Katch: bmrKatch, date: logDate }; save({ workouts: data.workouts, calories: data.calories, bodyComp: [...data.bodyComp, entry], bodyLogs: [...data.bodyLogs, { weight: wN, date: logDate }] }); setW(""); setH(""); setBf(""); setSmm(""); setWaist(""); setAge(""); setLogDate(formatDate(new Date())); setMsg("Logged!"); setTimeout(function () { setMsg(""); }, 2000); }
   return (
     <div>
-      <div className={ui.pageTitle}>📏 Body Composition</div>
+      <div className={s.pageTitle}>📏 Body Composition</div>
       <Collapse emoji="➕" label="Log Entry" defaultOpen={false}>
         <div className={ui.fieldBlock}>
           <div className={ui.fieldLabel}>Date</div>
@@ -66,16 +67,16 @@ export default function BodyCompPage({ data, save }) {
         </div>
         <div className={ui.fieldBlock}>
           <div className={ui.fieldLabelSection}>Sex</div>
-          <div className={ui.sexToggleRow}>{["male", "female"].map(function (s) { return <button key={s} type="button" onClick={function () { setSex(s); }} className={sex === s ? ui.sexToggleBtnActive : ui.sexToggleBtnInactive}>{s}</button>; })}</div>
+          <div className={s.sexToggleRow}>{["male", "female"].map(function (sx) { return <button key={sx} type="button" onClick={function () { setSex(sx); }} className={sex === sx ? s.sexToggleBtnActive : s.sexToggleBtnInactive}>{sx}</button>; })}</div>
         </div>
-        <div className={ui.metricsHint}>📊 Metrics {!hasBase && <span className={ui.muted} style={{ color: "var(--ft-text-faint)" }}>(enter weight + BF% to calculate)</span>}</div>
+        <div className={s.metricsHint}>📊 Metrics {!hasBase && <span className={s.metricsHintFaint}> (enter weight + BF% to calculate)</span>}</div>
         <GL>🏋️ Total Body</GL><div className={ui.flexRow}><MBox label="Body Weight" val={wN > 0 ? wN : null} unit="kg" color={ACCENT} /><MBox label="BMI" val={bmi} unit="kg/m²" color={BLUE} /></div>
         <GL>🔥 Fat Mass</GL><div className={ui.flexRow}><MBox label="Fat Mass" val={fm} unit="kg" color={PINK} /><MBox label="FMI" val={fmi} unit="kg/m²" color={PINK} /><MBox label="Body Fat %" val={bfN > 0 ? bfN : null} unit="%" color={PINK} /></div>
         <GL>💪 Fat-Free Mass</GL><div className={ui.flexRow}><MBox label="Fat-Free Mass" val={ffm} unit="kg" color={GREEN} /><MBox label="FFMI" val={ffmi} unit="kg/m²" color={ACCENT} /></div>
         <GL>🦾 Skeletal Muscle</GL><div className={ui.flexRow}><MBox label="Skel. Muscle" val={smmN > 0 ? smmN : null} unit="kg" color={GREEN} /><MBox label="SMI" val={smi} unit="kg/m²" color={ORANGE} /></div>
         <GL>🔥 BMR</GL><div className={ui.flexRow}><MBox label="BMR Mifflin" val={bmrMifflin} unit="kcal/d" color={ORANGE} /><MBox label="BMR Katch-McArdle" val={bmrKatch} unit="kcal/d" color={ORANGE} /></div>
-        {(!bmrMifflin && !bmrKatch) && <div className={ui.mutedXs} style={{ color: "var(--ft-text-faint)", marginTop: 4 }}>Mifflin: needs weight+height+age. Katch: needs BF% too.</div>}
-        {hasBase && <div className={ui.relationSection}><div className={ui.relationDivider}>🔗 Body Composition Relations</div><div className={ui.relationBox}><div className={ui.relationFormula}>FM + FFM = BW</div><div className={ui.relationRow}><span style={{ color: PINK, fontWeight: 700 }}>{fm.toFixed(2)} kg</span><span className={ui.relationOp}>+</span><span style={{ color: GREEN, fontWeight: 700 }}>{ffm.toFixed(2)} kg</span><span className={ui.relationOp}>=</span><span style={{ color: ACCENT, fontWeight: 800 }}>{wN.toFixed(2)} kg</span><span style={{ marginLeft: 4, color: Math.abs(fm + ffm - wN) < 0.01 ? GREEN : "#f87171", fontSize: 11 }}>{Math.abs(fm + ffm - wN) < 0.01 ? "✓ balanced" : "⚠ check values"}</span></div></div><div className={ui.relationBoxLast}><div className={ui.relationFormula}>FM + SMM + Residual = BW</div><div className={ui.relationRow}><span style={{ color: PINK, fontWeight: 700 }}>{fm.toFixed(2)} kg</span><span className={ui.relationOp}>+</span><span style={{ color: GREEN, fontWeight: 700 }}>{smmN > 0 ? smmN.toFixed(2) : "—"} kg</span><span className={ui.relationOp}>+</span><span style={{ color: ORANGE, fontWeight: 700 }}>{residual != null ? residual.toFixed(2) : "—"} kg</span><span className={ui.relationOp}>=</span><span style={{ color: ACCENT, fontWeight: 800 }}>{wN.toFixed(2)} kg</span></div>{residual != null && <div className={ui.relationNote}>Residual = Bone + Organs + Water + Other tissue</div>}</div></div>}
+        {(!bmrMifflin && !bmrKatch) && <div className={cx(ui.mutedXs, s.bmrHint)}>Mifflin: needs weight+height+age. Katch: needs BF% too.</div>}
+        {hasBase && <div className={s.relationSection}><div className={s.relationDivider}>🔗 Body Composition Relations</div><div className={s.relationBox}><div className={s.relationFormula}>FM + FFM = BW</div><div className={s.relationRow}><span style={{ color: PINK, fontWeight: 700 }}>{fm.toFixed(2)} kg</span><span className={s.relationOp}>+</span><span style={{ color: GREEN, fontWeight: 700 }}>{ffm.toFixed(2)} kg</span><span className={s.relationOp}>=</span><span style={{ color: ACCENT, fontWeight: 800 }}>{wN.toFixed(2)} kg</span><span style={{ marginLeft: 4, color: Math.abs(fm + ffm - wN) < 0.01 ? GREEN : "#f87171", fontSize: 11 }}>{Math.abs(fm + ffm - wN) < 0.01 ? "✓ balanced" : "⚠ check values"}</span></div></div><div className={s.relationBoxLast}><div className={s.relationFormula}>FM + SMM + Residual = BW</div><div className={s.relationRow}><span style={{ color: PINK, fontWeight: 700 }}>{fm.toFixed(2)} kg</span><span className={s.relationOp}>+</span><span style={{ color: GREEN, fontWeight: 700 }}>{smmN > 0 ? smmN.toFixed(2) : "—"} kg</span><span className={s.relationOp}>+</span><span style={{ color: ORANGE, fontWeight: 700 }}>{residual != null ? residual.toFixed(2) : "—"} kg</span><span className={s.relationOp}>=</span><span style={{ color: ACCENT, fontWeight: 800 }}>{wN.toFixed(2)} kg</span></div>{residual != null && <div className={s.relationNote}>Residual = Bone + Organs + Water + Other tissue</div>}</div></div>}
         <button type="button" onClick={submit} className={btnPrimary({ fullWidth: true, marginTop14: true })}>Log Entry</button>
         {msg && <div className={cx(ui.successMsg, ui.marginTop10)}>✅ {msg}</div>}
       </Collapse>
@@ -86,21 +87,21 @@ export default function BodyCompPage({ data, save }) {
             <button type="button" onClick={function () { setShowClearConfirm(true); }} className={btnDanger({ xsPill: true })}>Clear History</button>
           </div>
         )}
-        {historyEntries.length === 0 ? <div className={ui.emptyStateLg}><div className={ui.emptyIconLg}>📏</div><div>No entries yet.</div><div className={ui.emptySub}>Track your body composition over time!</div></div> : (
+        {historyEntries.length === 0 ? <div className={ui.emptyStateLg}><div className={ui.emptyIconLg}>📏</div><div>No entries yet.</div><div className={s.emptySub}>Track your body composition over time!</div></div> : (
         <div>
         {historyEntries.map(function (e, i) {
           return (
-            <div key={i} className={ui.historyEntry}>
-              <div className={ui.historyEntryHeader}>
-                <div className={ui.historyEntryDate}>{e.date}</div>
+            <div key={i} className={s.historyEntry}>
+              <div className={s.historyEntryHeader}>
+                <div className={s.historyEntryDate}>{e.date}</div>
                 <button type="button" onClick={function () { deleteEntry(i); }} title="Delete entry" className={ui.iconBtnDelete}>🗑</button>
               </div>
-              <div className={ui.chipRow}>
+              <div className={s.chipRow}>
                 {[["BW", "kg", ACCENT], ["BMI", "kg/m²", BLUE], ["FM", "kg", PINK], ["FMI", "kg/m²", PINK], ["PBF", "%", PINK], ["FFM", "kg", GREEN], ["FFMI", "kg/m²", ACCENT], ["SMM", "kg", GREEN], ["SMI", "kg/m²", ORANGE]].map(function (r) {
                   return e[r[0]] != null ? (
-                    <div key={r[0]} className={ui.chip}>
-                      <div className={ui.chipLabel}>{r[0]}</div>
-                      <div className={ui.chipValueDynamic} style={{ color: r[2] }}>{Number(e[r[0]]).toFixed(2)}<span className={ui.chipUnit}>{r[1]}</span></div>
+                    <div key={r[0]} className={s.metricChip}>
+                      <div className={s.metricChipLabel}>{r[0]}</div>
+                      <div className={s.metricChipValue} style={{ color: r[2] }}>{Number(e[r[0]]).toFixed(2)}<span className={s.metricChipUnit}>{r[1]}</span></div>
                     </div>
                   ) : null;
                 })}
@@ -113,8 +114,8 @@ export default function BodyCompPage({ data, save }) {
         {showClearConfirm && (
           <div className={cx("ft-kb-modal-backdrop", ui.modalBackdrop)} style={{ zIndex: clearConfirmKb.zIndex }}>
             <div ref={clearConfirmKb.dialogRef} tabIndex={-1} className={ui.modalPanelConfirm}>
-              <div className={ui.modalTitle} style={{ marginBottom: 12 }}>Clear Body Comp History?</div>
-              <div className={ui.textMutedSm} style={{ marginBottom: 16 }}>This will permanently delete all {data.bodyComp.length} body composition entries and body weight chart data. Do you want to continue?</div>
+              <div className={cx(ui.modalTitle, s.confirmTitle)}>Clear Body Comp History?</div>
+              <div className={cx(ui.textMutedSm, s.confirmBody)}>This will permanently delete all {data.bodyComp.length} body composition entries and body weight chart data. Do you want to continue?</div>
               <div className="ft-kb-focus-indicator">Focused: <strong>{clearConfirmKb.focusLabel}</strong></div>
               <div className="ft-kb-hint">← → or Tab switch · Enter select · Esc cancel</div>
               <div className={ui.flexEnd}>
