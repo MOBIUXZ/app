@@ -117,9 +117,14 @@ When a calendar day is selected:
 ### View Panel
 - Lists all workouts logged on that date
 - Edit/delete individual entries
+- **Manual Log** and **Smart Paste** open a layered popup on top of the calendar (no scrolling past the grid)
 
-### Log Panel
-- Quick manual log for the selected date
+### Log Panel (layered popup)
+- Opens centered over the calendar when you choose Manual Log or Smart Paste
+- Click backdrop, ✕, or **← Back** to return to the day view
+- `Esc` closes the log panel first (calendar stays open)
+
+Quick manual log for the selected date:
 - Smart parser import scoped to the selected date
 - Category + exercise picker (same as manual entry)
 

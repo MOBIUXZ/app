@@ -444,6 +444,41 @@
   padding: 16px;
 }
 
+/* Layered log / parse popup over calendar */
+.calLogOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.calLogPanel {
+  composes: modalPanelScroll from "../styles/ui.module.css";
+  width: 95%;
+  max-width: 440px;
+  max-height: 88vh;
+}
+
+.calLogPanelHeader {
+  composes: modalHeader from "../styles/ui.module.css";
+  margin-bottom: 14px;
+}
+
+.calLogPanelTitle {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ft-text);
+}
+
+.calLogPanelDate {
+  font-size: 12px;
+  color: var(--ft-text-dim);
+  margin-top: 2px;
+}
+
 .dayPanelHeader {
   display: flex;
   justify-content: space-between;

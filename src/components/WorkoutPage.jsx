@@ -317,8 +317,9 @@ export default function WorkoutPage({ data, save }) {
   calDoParseRef.current = calDoParse;
   var smartParserTextareaRef = useRef(null);
   var calParseTextareaRef = useRef(null);
+  var calLogOpen = showCalendarModal && !!calSelectedDate && (calPanel === "log" || calPanel === "parse");
   useParserTextareaKeyboard(smartParserTextareaRef, function () { doParseRef.current(); }, showSmartParserModal);
-  useParserTextareaKeyboard(calParseTextareaRef, function () { calDoParseRef.current(); }, showCalendarModal && calPanel === "parse");
+  useParserTextareaKeyboard(calParseTextareaRef, function () { calDoParseRef.current(); }, calLogOpen && calPanel === "parse");
 
   function handleParserLayerKey(e, onSubmit) {
     if (e.key !== "Enter") return;
@@ -346,6 +347,12 @@ export default function WorkoutPage({ data, save }) {
     handleParserLayerKey(e, function () { doParseRef.current(); });
   });
 
+  function closeCalLogPanel() {
+    setCalPanel("view");
+    setCalLogMsg("");
+    setCalParseMsg("");
+  }
+
   var calendarLayer = useKeyboardLayer("calendar-modal", showCalendarModal, function (e) {
     if (e.key === "Escape") {
       e.preventDefault();
@@ -353,6 +360,17 @@ export default function WorkoutPage({ data, save }) {
       return;
     }
     handleParserLayerKey(e, function () { calDoParseRef.current(); });
+  });
+
+  var calLogLayer = useKeyboardLayer("calendar-log-panel", calLogOpen, function (e) {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      closeCalLogPanel();
+      return;
+    }
+    if (calPanel === "parse") {
+      handleParserLayerKey(e, function () { calDoParseRef.current(); });
+    }
   });
 
   // Calendar helper functions
@@ -606,8 +624,8 @@ export default function WorkoutPage({ data, save }) {
               </div>
             )}
 
-            {/* ── DAY DETAIL / LOG PANEL ── */}
-            {calSelectedDate && (
+            {/* ── DAY DETAIL PANEL (view only — log/parse open as layered overlay) ── */}
+            {calSelectedDate && calPanel === "view" && (
               <div className={s.dayPanel}>
                 {/* Panel header */}
                 <div className={s.dayPanelHeader}>
@@ -622,11 +640,10 @@ export default function WorkoutPage({ data, save }) {
                     })()}
                     {calLogMsg && <span style={{ color: calLogMsg.includes("✅") ? GREEN : "#f87171", fontSize: 12, fontWeight: 700 }}>{calLogMsg}</span>}
                   </div>
-                  <button type="button" onClick={function () { setCalSelectedDate(null); setCalPanel("view"); setCalLogMsg(""); }} className={s.dayPanelClose}>✕</button>
+                  <button type="button" onClick={function () { setCalSelectedDate(null); closeCalLogPanel(); }} className={s.dayPanelClose}>✕</button>
                 </div>
 
-                {/* VIEW: workouts list */}
-                {calPanel === "view" && (() => {
+                {(() => {
                   var dayWo = data.workouts.map(function (w, i) { return Object.assign({}, w, { _idx: i }); }).filter(function (w) { return w.date === calSelectedDate; });
                   return (
                     <div>
@@ -678,8 +695,23 @@ export default function WorkoutPage({ data, save }) {
                     </div>
                   );
                 })()}
+              </div>
+            )}
 
-                {/* LOG: quick log form */}
+          </div>
+
+          {/* Layered log / smart-paste panel on top of calendar */}
+          {calLogOpen && (
+            <div className={cx("ft-kb-modal-backdrop", s.calLogOverlay)} style={{ zIndex: calLogLayer.zIndex }} onClick={closeCalLogPanel}>
+              <div className={s.calLogPanel} onClick={function (ev) { ev.stopPropagation(); }} tabIndex={-1}>
+                <div className={s.calLogPanelHeader}>
+                  <div>
+                    <div className={s.calLogPanelTitle}>{calPanel === "log" ? "✍️ Manual Log" : "🧠 Smart Paste"}</div>
+                    <div className={s.calLogPanelDate}>{calSelectedDate}</div>
+                  </div>
+                  <button type="button" onClick={closeCalLogPanel} className={ui.modalClose} title="Back to day view">✕</button>
+                </div>
+
                 {calPanel === "log" && (
                   <div>
                     <div className={s.fieldBlockSm}>
@@ -709,14 +741,16 @@ export default function WorkoutPage({ data, save }) {
                       <button type="button" onClick={function () { setCalLogSets(function (p) { return p.concat([{ weight: "", reps: "", note: "" }]); }); }} className={btnSecondary({ sm: true })}>+ Add Set</button>
                     </div>
                     <textarea value={calLogNote} onChange={function (e) { setCalLogNote(e.target.value); }} placeholder="Notes (optional)" className={textareaClass({ fullWidth: true, mb10: true })} style={{ minHeight: 55 }} />
+                    {calLogMsg && !calLogMsg.includes("✅") && (
+                      <div className={s.parseMsg} style={{ color: "#f87171", marginBottom: 8 }}>{calLogMsg}</div>
+                    )}
                     <div className={ui.flexRow}>
                       <button type="button" onClick={calSubmit} className={btnPrimary({ flex1: true, md: true })}>Log Workout</button>
-                      <button type="button" onClick={function () { setCalPanel("view"); setCalLogMsg(""); }} className={btnSecondary({ md: true })}>← Back</button>
+                      <button type="button" onClick={closeCalLogPanel} className={btnSecondary({ md: true })}>← Back</button>
                     </div>
                   </div>
                 )}
 
-                {/* PARSE: smart paste form */}
                 {calPanel === "parse" && (
                   <div>
                     <div className={s.parseHint}>
@@ -737,20 +771,19 @@ Bench Press
 80kg - 8 reps`}
                       className={textareaClass({ mono: true, fullWidth: true, monoMd: true })}
                     />
-                    <div className={s.parseHintSm}>Enter parse & save · Shift+Enter new line</div>
+                    <div className={s.parseHintSm}>Enter parse & save · Shift+Enter new line · Esc back</div>
                     {calParseMsg && (
                       <div className={s.parseMsg} style={{ color: calParseMsg.includes("✅") ? GREEN : "#f87171" }}>{calParseMsg}</div>
                     )}
                     <div className={ui.flexRow}>
                       <button type="button" onClick={calDoParse} className={btnPrimary({ flex1: true, md: true })}>Parse &amp; Save</button>
-                      <button type="button" onClick={function () { setCalPanel("view"); setCalParseMsg(""); setCalParseText(""); }} className={btnSecondary({ md: true })}>← Back</button>
+                      <button type="button" onClick={closeCalLogPanel} className={btnSecondary({ md: true })}>← Back</button>
                     </div>
                   </div>
                 )}
               </div>
-            )}
-
-          </div>
+            </div>
+          )}
         </div>
       )}
 
