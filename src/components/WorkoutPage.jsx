@@ -318,6 +318,7 @@ export default function WorkoutPage({ data, save }) {
   var smartParserTextareaRef = useRef(null);
   var calParseTextareaRef = useRef(null);
   var calLogOpen = showCalendarModal && !!calSelectedDate && (calPanel === "log" || calPanel === "parse");
+  var calDayOpen = showCalendarModal && !!calSelectedDate && calPanel === "view";
   useParserTextareaKeyboard(smartParserTextareaRef, function () { doParseRef.current(); }, showSmartParserModal);
   useParserTextareaKeyboard(calParseTextareaRef, function () { calDoParseRef.current(); }, calLogOpen && calPanel === "parse");
 
@@ -347,6 +348,11 @@ export default function WorkoutPage({ data, save }) {
     handleParserLayerKey(e, function () { doParseRef.current(); });
   });
 
+  function closeCalDayPanel() {
+    setCalSelectedDate(null);
+    closeCalLogPanel();
+  }
+
   function closeCalLogPanel() {
     setCalPanel("view");
     setCalLogMsg("");
@@ -360,6 +366,14 @@ export default function WorkoutPage({ data, save }) {
       return;
     }
     handleParserLayerKey(e, function () { calDoParseRef.current(); });
+  });
+
+  var calDayLayer = useKeyboardLayer("calendar-day-panel", calDayOpen, function (e) {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      closeCalDayPanel();
+      return;
+    }
   });
 
   var calLogLayer = useKeyboardLayer("calendar-log-panel", calLogOpen, function (e) {
@@ -624,10 +638,12 @@ export default function WorkoutPage({ data, save }) {
               </div>
             )}
 
-            {/* ── DAY DETAIL PANEL (view only — log/parse open as layered overlay) ── */}
-            {calSelectedDate && calPanel === "view" && (
-              <div className={s.dayPanel}>
-                {/* Panel header */}
+          </div>
+
+          {/* Day detail — centered popup over calendar (not inline dropdown) */}
+          {calDayOpen && (
+            <div className={cx("ft-kb-modal-backdrop", s.calDayOverlay)} style={{ zIndex: calDayLayer.zIndex }} onClick={closeCalDayPanel}>
+              <div className={s.calDayPanel} onClick={function (ev) { ev.stopPropagation(); }} tabIndex={-1}>
                 <div className={s.dayPanelHeader}>
                   <div className={s.dayPanelTitleRow}>
                     <span style={{ fontSize: 15 }}>📅</span>
@@ -640,7 +656,7 @@ export default function WorkoutPage({ data, save }) {
                     })()}
                     {calLogMsg && <span style={{ color: calLogMsg.includes("✅") ? GREEN : "#f87171", fontSize: 12, fontWeight: 700 }}>{calLogMsg}</span>}
                   </div>
-                  <button type="button" onClick={function () { setCalSelectedDate(null); closeCalLogPanel(); }} className={s.dayPanelClose}>✕</button>
+                  <button type="button" onClick={closeCalDayPanel} className={ui.modalClose} title="Close day view">✕</button>
                 </div>
 
                 {(() => {
@@ -696,11 +712,10 @@ export default function WorkoutPage({ data, save }) {
                   );
                 })()}
               </div>
-            )}
+            </div>
+          )}
 
-          </div>
-
-          {/* Layered log / smart-paste panel on top of calendar */}
+          {/* Log / smart-paste — second layer on top of day detail */}
           {calLogOpen && (
             <div className={cx("ft-kb-modal-backdrop", s.calLogOverlay)} style={{ zIndex: calLogLayer.zIndex }} onClick={closeCalLogPanel}>
               <div className={s.calLogPanel} onClick={function (ev) { ev.stopPropagation(); }} tabIndex={-1}>

@@ -112,17 +112,17 @@ Estimates one-rep max from submaximal sets using five formulas:
 
 ## Calendar Day Panel
 
-When a calendar day is selected:
+When a calendar day is selected, a **centered popup** opens over the calendar (not an inline panel below the grid):
 
-### View Panel
+### View Panel (popup layer 1)
 - Lists all workouts logged on that date
 - Edit/delete individual entries
-- **Manual Log** and **Smart Paste** open a layered popup on top of the calendar (no scrolling past the grid)
+- **Manual Log** and **Smart Paste** open a second popup layer on top
 
-### Log Panel (layered popup)
-- Opens centered over the calendar when you choose Manual Log or Smart Paste
+### Log Panel (popup layer 2)
+- Centered over the calendar when you choose Manual Log or Smart Paste
 - Click backdrop, ✕, or **← Back** to return to the day view
-- `Esc` closes the log panel first (calendar stays open)
+- `Esc` closes the top layer first (log → day → calendar)
 
 Quick manual log for the selected date:
 - Smart parser import scoped to the selected date

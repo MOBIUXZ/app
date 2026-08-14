@@ -435,17 +435,8 @@
   transition: transform 0.1s, background 0.15s;
 }
 
-/* Day detail panel */
-.dayPanel {
-  margin-top: 16px;
-  background: var(--ft-bg-deep);
-  border: 1px solid var(--ft-border-input);
-  border-radius: var(--ft-radius-2xl);
-  padding: 16px;
-}
-
-/* Layered log / parse popup over calendar */
-.calLogOverlay {
+/* Layered popups over calendar (day detail + log/parse) */
+.calStackOverlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.62);
@@ -455,11 +446,27 @@
   padding: 16px;
 }
 
-.calLogPanel {
+.calStackPanel {
   composes: modalPanelScroll from "../styles/ui.module.css";
   width: 95%;
   max-width: 440px;
   max-height: 88vh;
+}
+
+.calLogOverlay {
+  composes: calStackOverlay;
+}
+
+.calLogPanel {
+  composes: calStackPanel;
+}
+
+.calDayOverlay {
+  composes: calStackOverlay;
+}
+
+.calDayPanel {
+  composes: calStackPanel;
 }
 
 .calLogPanelHeader {
