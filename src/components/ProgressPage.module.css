@@ -256,33 +256,40 @@
   margin-bottom: 8px;
 }
 
-.setChipRow {
+.setList {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.setChip {
+.setRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 10px;
+  border-radius: var(--ft-radius-md);
   background: var(--ft-bg-btn);
-  color: var(--ft-text-chip);
-  border-radius: var(--ft-radius-pill);
-  padding: 4px 8px;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12px;
 }
 
-.setChipE1rm {
+.setRowLoad {
+  font-weight: 700;
+  color: var(--ft-text-chip);
+}
+
+.setRowE1rm {
   color: var(--ft-green);
   font-weight: 600;
+  white-space: nowrap;
 }
 
-.setChipBest {
+.setRowBest {
   background: var(--ft-green-bg);
   border: 1px solid var(--ft-green-border);
-  color: var(--ft-text);
 }
 
-.setChipBest .setChipE1rm {
+.setRowBest .setRowE1rm {
   font-weight: 800;
 }
 
