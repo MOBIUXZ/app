@@ -92,12 +92,18 @@ function getBestE1RM(sets) {
   }, 0);
 }
 
+function isSingleArmWorkout(workout) {
+  return workout && String(workout.exercise || "").toLowerCase().indexOf("single arm") !== -1;
+}
+
 function workoutHasSplitSets(sets) {
   return (sets || []).some(function (st) { return st && (st.side === "left" || st.side === "right"); });
 }
 
-function workoutUsesSplitPanel(sets) {
-  return workoutHasSplitSets(sets) || (sets || []).some(function (st) {
+function workoutUsesSplitPanel(workout) {
+  if (!workout || isCompoundLift(workout.exercise) || !isSingleArmWorkout(workout)) return false;
+  var sets = workout.sets || [];
+  return workoutHasSplitSets(sets) || sets.some(function (st) {
     return st && st.side !== "left" && st.side !== "right";
   });
 }
@@ -115,10 +121,11 @@ function renderDetailSetRows(sets, bestE1Value, keyPrefix) {
   });
 }
 
-function renderWorkoutSetPanel(sets, exercise) {
+function renderWorkoutSetPanel(workout) {
+  var sets = workout.sets || [];
   if (!sets.length) return <div className={s.setEmptySide}>No sets logged</div>;
 
-  if (!isCompoundLift(exercise) && workoutUsesSplitPanel(sets)) {
+  if (workoutUsesSplitPanel(workout)) {
     var leftSets = sets.filter(function (st) { return st.side === "left"; });
     var rightSets = sets.filter(function (st) { return st.side === "right"; });
     var bothSets = sets.filter(function (st) { return st.side !== "left" && st.side !== "right"; });
@@ -180,6 +187,13 @@ function withFailedPlot(data, metric) {
   });
 }
 
+function isSessionSetImbalanced(leftPoint, rightPoint, metric) {
+  if (!leftPoint || !rightPoint) return false;
+  var left = leftPoint[metric];
+  var right = rightPoint[metric];
+  return left != null && right != null && left !== right;
+}
+
 function FailedSetDot(props) {
   var cx = props.cx;
   var cy = props.cy;
@@ -198,8 +212,18 @@ function SessionSetDot(props) {
   var cy = props.cy;
   var fill = props.fill;
   var payload = props.payload;
+  var peerPoint = props.peerPoint;
+  var metric = props.metric;
   if (payload && payload.failed) return null;
   if (cx == null || cy == null) return null;
+  if (peerPoint && metric && isSessionSetImbalanced(payload, peerPoint, metric)) {
+    return (
+      <g>
+        <circle cx={cx} cy={cy} r={9} fill="rgba(251, 191, 36, 0.18)" stroke="#fbbf24" strokeWidth={2} />
+        <circle cx={cx} cy={cy} r={5} fill={fill} stroke="#fef3c7" strokeWidth={1.5} />
+      </g>
+    );
+  }
   return <circle cx={cx} cy={cy} r={4} fill={fill} />;
 }
 
@@ -274,7 +298,7 @@ function WorkoutSessionGraph({ workout, colorFallbackIdx, onClose, formatChartDa
   var sessionMetrics = computeSessionMetrics(sets);
   var metricLabel = metricLabelFor(metric, true);
   var cs = { color: "#e2e8f0", fontSize: 10 };
-  var showSplit = !isCompoundLift(workout.exercise) && workoutUsesSplitPanel(sets);
+  var showSplit = workoutUsesSplitPanel(workout);
   var leftData = buildSetChartData(sets.filter(function (st) { return st.side === "left"; }).concat(sets.filter(function (st) { return st.side !== "left" && st.side !== "right"; })));
   var rightData = buildSetChartData(sets.filter(function (st) { return st.side === "right"; }).concat(sets.filter(function (st) { return st.side !== "left" && st.side !== "right"; })));
 
@@ -282,7 +306,7 @@ function WorkoutSessionGraph({ workout, colorFallbackIdx, onClose, formatChartDa
     return active ? ui.chartToggleBtnActive : ui.chartToggleBtn;
   }
 
-  function renderMetricChart(data, strokeColor, height) {
+  function renderMetricChart(data, strokeColor, height, peerData) {
     if (!data.length) return <div className={s.sessionGraphEmpty}>No sets for this side</div>;
     var plotData = withFailedPlot(data, metric);
     var hasTimes = data.some(function (p) { return !!p.time; });
@@ -298,7 +322,7 @@ function WorkoutSessionGraph({ workout, colorFallbackIdx, onClose, formatChartDa
             <XAxis dataKey="label" tick={createSessionSetAxisTick(data)} interval={0} angle={angled ? -25 : 0} textAnchor={angled ? "end" : "middle"} height={xHeight} />
             <YAxis tick={cs} width={35} domain={sessionChartYDomain(plotData, metric)} allowDataOverflow={false} />
             <Tooltip content={<SessionSetTooltip metricLabel={metricLabel} />} />
-            <Line type="monotone" dataKey={metric} stroke={strokeColor} strokeWidth={2} dot={function (props) { return <SessionSetDot cx={props.cx} cy={props.cy} fill={strokeColor} payload={props.payload} />; }} connectNulls={false} />
+            <Line type="monotone" dataKey={metric} stroke={strokeColor} strokeWidth={2} dot={function (props) { return <SessionSetDot cx={props.cx} cy={props.cy} fill={strokeColor} payload={props.payload} peerPoint={peerData ? peerData[props.index] : null} metric={peerData ? metric : null} />; }} connectNulls={false} />
             {hasFailed && <Line type="monotone" dataKey="failedPlot" stroke="none" connectNulls={false} dot={FailedSetDot} activeDot={{ r: 6, stroke: "#f87171", fill: "#f87171" }} isAnimationActive={false} legendType="none" />}
           </LineChart>
         </ResponsiveContainer>
@@ -306,6 +330,8 @@ function WorkoutSessionGraph({ workout, colorFallbackIdx, onClose, formatChartDa
       </div>
     );
   }
+
+  var sessionHasImbalance = showSplit && leftData.some(function (p, i) { return isSessionSetImbalanced(p, rightData[i], metric); });
 
   return (
     <div className={s.sessionGraphPanel} onClick={function (ev) { ev.stopPropagation(); }} tabIndex={-1}>
@@ -346,16 +372,22 @@ function WorkoutSessionGraph({ workout, colorFallbackIdx, onClose, formatChartDa
           </div>
           <div className={s.sessionGraphChartBody}>
           {showSplit ? (
+            <>
             <div className={s.detailSplitRow}>
               <div className={s.detailSplitCol}>
                 <div className={s.detailSplitLabel} style={{ color: BLUE }}>Left</div>
-                {renderMetricChart(leftData, BLUE, 120)}
+                {renderMetricChart(leftData, BLUE, 120, rightData)}
               </div>
               <div className={s.detailSplitCol}>
                 <div className={s.detailSplitLabel} style={{ color: PINK }}>Right</div>
-                {renderMetricChart(rightData, PINK, 120)}
+                {renderMetricChart(rightData, PINK, 120, leftData)}
               </div>
             </div>
+            {sessionHasImbalance && <div className={s.imbalanceHint}>
+              <span className={s.imbalanceDot} />
+              Amber ring highlights left/right imbalance for {metricLabel.toLowerCase()}
+            </div>}
+            </>
           ) : renderMetricChart(chartData, exColor, 160)}
           </div>
           <div className={s.sessionGraphHint}>Per-set trend for this session · {sets.length} set{sets.length !== 1 ? "s" : ""}</div>
@@ -700,7 +732,7 @@ export default function ProgressPage({ data }) {
                         </div>
                         <button type="button" onClick={function () { setSessionGraphIdx(idx); }} className={s.showGraphBtn}>📈 Show Graph</button>
                       </div>
-                      {renderWorkoutSetPanel(w.sets || [], w.exercise)}
+                      {renderWorkoutSetPanel(w)}
                     </div>
                   );
                 }) : <div className={s.emptyChart}>No workouts logged for this date.</div>}

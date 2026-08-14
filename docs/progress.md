@@ -156,7 +156,7 @@ Click any chart data point to open a modal showing all workouts on that date:
 - Exercise name (compound lifts in caps)
 - Date and time
 - All sets listed one per row: weight × reps on the left, per-set **e1RM** on the right (Epley estimate; `—` when weight/reps are invalid). The **best e1RM** row(s) for each workout are highlighted with a green border and ★
-- **Left/right workouts (isolation only)** — side-by-side **Left** (blue) and **Right** (pink) columns, each with its own set list and best-e1RM highlight. Sets logged without a side (`both`) appear in **both** columns. **Compound lifts** always use a single-column list
+- **Left/right workouts (isolation only)** — side-by-side **Left** (blue) and **Right** (pink) columns when the exercise name contains **single arm** (e.g. Single Arm Lat Pulldown). Sets logged without a side (`both`) appear in **both** columns. **Compound lifts** always use a single-column list
 - **📈 Show Graph** on each workout — opens a **Session Performance** overlay (layered on top of the day modal)
 
 ### Session Performance Graph
@@ -169,7 +169,7 @@ Per-workout popup chart for that single logged session:
 | **Metric toggles** | Weight / Volume / e1RM |
 | **X-axis** | Set number (`S1`, `S2`, …) with `L` / `R` when side data exists; per-set **time** shown below the label when parsed from Smart Parser (`MM:SS` on the set) |
 | **Y-axis** | Selected metric per set (weight, set volume, or set e1RM) |
-| **Split view** | Isolation workouts with left/right data show side-by-side Left (blue) and Right (pink) mini charts; compound lifts use one chart |
+| **Split view** | Isolation workouts whose exercise name includes **single arm**, with left/right set data, show side-by-side Left (blue) and Right (pink) mini charts; compound lifts use one chart. **Amber rings** mark sets where left and right values differ for the selected metric |
 | **Failed sets (0 reps)** | Excluded from the trend line; shown as a red **✕** at the set position (attempted weight on Weight view, bottom on Volume/e1RM). Set label turns red; tooltip shows **Failed attempt** |
 | **Keyboard** | `Esc` closes the graph first, then the day modal |
 
