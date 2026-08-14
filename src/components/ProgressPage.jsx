@@ -226,6 +226,23 @@ function sessionChartXAxisHeight(data) {
   return hasTimes ? 44 : 30;
 }
 
+function sessionChartYDomain(plotData, metric) {
+  var values = [];
+  plotData.forEach(function (p) {
+    if (p[metric] != null && !isNaN(p[metric])) values.push(Number(p[metric]));
+    if (p.failedPlot != null && !isNaN(p.failedPlot)) values.push(Number(p.failedPlot));
+  });
+  if (!values.length) return [0, 1];
+  var max = Math.max.apply(null, values);
+  var min = Math.min.apply(null, values);
+  if (max <= 0) return [0, 1];
+  var pad = Math.max(1, Math.ceil(max * 0.1));
+  var top = Math.ceil(max + pad);
+  if (top === max) top = max + 1;
+  var bottom = min > 0 ? Math.max(0, Math.floor(min - pad)) : 0;
+  return [bottom, top];
+}
+
 function SessionSetTooltip({ active, payload, metricLabel }) {
   if (!active || !payload || !payload.length) return null;
   var point = payload[0].payload;
@@ -276,10 +293,10 @@ function WorkoutSessionGraph({ workout, colorFallbackIdx, onClose, formatChartDa
     return (
       <div className={ui.chartContainer}>
         <ResponsiveContainer width="100%" height={chartHeight}>
-          <LineChart data={plotData} margin={{ bottom: xHeight > 30 ? 4 : 0 }}>
+          <LineChart data={plotData} margin={{ top: 12, right: 8, bottom: xHeight > 30 ? 4 : 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
             <XAxis dataKey="label" tick={createSessionSetAxisTick(data)} interval={0} angle={angled ? -25 : 0} textAnchor={angled ? "end" : "middle"} height={xHeight} />
-            <YAxis tick={cs} width={35} />
+            <YAxis tick={cs} width={35} domain={sessionChartYDomain(plotData, metric)} allowDataOverflow={false} />
             <Tooltip content={<SessionSetTooltip metricLabel={metricLabel} />} />
             <Line type="monotone" dataKey={metric} stroke={strokeColor} strokeWidth={2} dot={function (props) { return <SessionSetDot cx={props.cx} cy={props.cy} fill={strokeColor} payload={props.payload} />; }} connectNulls={false} />
             {hasFailed && <Line type="monotone" dataKey="failedPlot" stroke="none" connectNulls={false} dot={FailedSetDot} activeDot={{ r: 6, stroke: "#f87171", fill: "#f87171" }} isAnimationActive={false} legendType="none" />}
