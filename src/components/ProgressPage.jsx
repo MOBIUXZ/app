@@ -10,6 +10,22 @@ function isSplitImbalanced(payload, metric) {
   return left != null && right != null && left !== right;
 }
 
+function estimate1RM(weight, reps) {
+  var w = typeof weight === "number" && !isNaN(weight) ? weight : parseFloat(weight);
+  var r = typeof reps === "number" && !isNaN(reps) ? reps : parseFloat(reps);
+  if (isNaN(w) || w <= 0 || isNaN(r) || r <= 0) return null;
+  if (r === 1) return w;
+  return w * (1 + r / 30);
+}
+
+function roundE1RM(value) {
+  return value != null && value > 0 ? Math.round(value * 10) / 10 : null;
+}
+
+function metricLabelFor(metric) {
+  return metric === "weight" ? "Max Weight" : metric === "volume" ? "Volume" : "Est. 1RM";
+}
+
 function SplitDot(props) {
   var cx = props.cx;
   var cy = props.cy;
@@ -58,31 +74,44 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
     var all = w.sets || [];
     var totalVol = 0;
     var leftVol = 0, rightVol = 0;
-    var leftWeights = [], rightWeights = [], leftReps = [], rightReps = [];
+    var leftWeights = [], rightWeights = [], leftE1 = [], rightE1 = [];
     all.forEach(function (s) {
       var wt = typeof s.weight === "number" && !isNaN(s.weight) ? s.weight : parseFloat(s.weight) || 0;
       var rp = typeof s.reps === "number" && !isNaN(s.reps) ? s.reps : parseFloat(s.reps) || 0;
       totalVol += wt * rp;
+      var e1 = estimate1RM(wt, rp);
       var side = s.side || 'both';
       if (side === 'left') {
         leftVol += wt * rp;
         leftWeights.push(wt);
-        leftReps.push(rp);
+        if (e1 != null) leftE1.push(e1);
       } else if (side === 'right') {
         rightVol += wt * rp;
         rightWeights.push(wt);
-        rightReps.push(rp);
+        if (e1 != null) rightE1.push(e1);
       } else {
         leftVol += wt * rp; rightVol += wt * rp;
         leftWeights.push(wt); rightWeights.push(wt);
-        leftReps.push(rp); rightReps.push(rp);
+        if (e1 != null) { leftE1.push(e1); rightE1.push(e1); }
       }
     });
     var lw = leftWeights.length ? Math.max.apply(null, leftWeights) : 0;
     var rw = rightWeights.length ? Math.max.apply(null, rightWeights) : 0;
-    var lrep = leftReps.length ? Math.max.apply(null, leftReps) : 0;
-    var rrep = rightReps.length ? Math.max.apply(null, rightReps) : 0;
-    return { date: w.date, weight: Math.max(lw, rw), weight_left: lw, weight_right: rw, volume: Math.round(totalVol), volume_left: Math.round(leftVol), volume_right: Math.round(rightVol), reps: Math.max(lrep, rrep), reps_left: lrep, reps_right: rrep };
+    var le1 = leftE1.length ? Math.max.apply(null, leftE1) : 0;
+    var re1 = rightE1.length ? Math.max.apply(null, rightE1) : 0;
+    var sessionE1 = roundE1RM(Math.max(le1, re1));
+    return {
+      date: w.date,
+      weight: Math.max(lw, rw),
+      weight_left: lw,
+      weight_right: rw,
+      volume: Math.round(totalVol),
+      volume_left: Math.round(leftVol),
+      volume_right: Math.round(rightVol),
+      e1rm: sessionE1,
+      e1rm_left: roundE1RM(le1) || 0,
+      e1rm_right: roundE1RM(re1) || 0,
+    };
   });
   var chartData = cd.map(function (point) {
     var dateKey = getChartDateKey(point.date);
@@ -91,7 +120,7 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
   var pr = cd.length ? Math.max.apply(null, cd.map(function (d) { return d.weight; })) : 0;
   var latest = cd.length ? cd[cd.length - 1] : null;
   var trend = cd.length >= 2 ? cd[cd.length - 1].weight - cd[cd.length - 2].weight : null;
-  var metricLabel = metric === "weight" ? "Max Weight" : metric === "volume" ? "Volume" : "Max Reps";
+  var metricLabel = metricLabelFor(metric);
   var hasImbalance = showSplit && viewMode === "split" && chartData.some(function (p) { return isSplitImbalanced(p, metric); });
 
   function chartToggleClass(active) {
@@ -114,10 +143,10 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
           {trend !== null && <div className={s.trend} style={{ color: trend > 0 ? GREEN : trend < 0 ? "#f87171" : "var(--ft-text-dim)" }}>{trend > 0 ? "▲ +" : trend < 0 ? "▼ " : "–"}{trend !== 0 ? Math.abs(trend) + " kg" : "no change"}</div>}
         </div>
       </div>
-      {latest && <div className={s.statStrip}>{[{ label: "Last Weight", val: latest.weight + " kg", color: exColor }, { label: "Last Volume", val: latest.volume + " kg", color: ORANGE }, { label: "Max Reps", val: latest.reps, color: GREEN }].map(function (st) { return <div key={st.label} className={s.miniStat}><div className={s.miniStatLabel}>{st.label}</div><div className={s.miniStatValue} style={{ color: st.color }}>{st.val}</div></div>; })}</div>}
+      {latest && <div className={s.statStrip}>{[{ label: "Last Weight", val: latest.weight + " kg", color: exColor }, { label: "Last Volume", val: latest.volume + " kg", color: ORANGE }, { label: "Est. 1RM", val: latest.e1rm != null ? latest.e1rm + " kg" : "—", color: GREEN }].map(function (st) { return <div key={st.label} className={s.miniStat}><div className={s.miniStatLabel}>{st.label}</div><div className={s.miniStatValue} style={{ color: st.color }}>{st.val}</div></div>; })}</div>}
       {cd.length < 1 ? <div className={s.noSessions}>No sessions logged yet</div> : <div>
         <div className={ui.chartToggleRow}>
-          {["weight", "volume", "reps"].map(function (m) { return <button key={m} type="button" onClick={function () { setMetric(m); }} className={chartToggleClass(metric === m)} style={metric === m ? { background: exColor, color: "#fff" } : undefined}>{m === "weight" ? "Max Weight" : m === "volume" ? "Volume" : "Max Reps"}</button>; })}
+          {["weight", "volume", "e1rm"].map(function (m) { return <button key={m} type="button" onClick={function () { setMetric(m); }} className={chartToggleClass(metric === m)} style={metric === m ? { background: exColor, color: "#fff" } : undefined}>{metricLabelFor(m)}</button>; })}
           {showSplit && <div className={s.splitToggleGroup}>
             <button type="button" onClick={function () { setViewMode('combined'); }} className={chartToggleClass(viewMode === 'combined')} style={viewMode === 'combined' ? { background: exColor, color: "#fff" } : undefined}>Combined</button>
             <button type="button" onClick={function () { setViewMode('split'); }} className={chartToggleClass(viewMode === 'split')} style={viewMode === 'split' ? { background: exColor, color: "#fff" } : undefined}>Split</button>
@@ -252,11 +281,13 @@ export default function ProgressPage({ data }) {
       if (isNaN(reps)) reps = 0;
       return sum + (weight * reps);
     }, 0);
-    var maxReps = workout.sets.reduce(function (max, set) {
+    var maxE1RM = workout.sets.reduce(function (max, set) {
+      var weight = typeof set.weight === "number" && !isNaN(set.weight) ? set.weight : parseFloat(set.weight);
       var reps = typeof set.reps === "number" && !isNaN(set.reps) ? set.reps : parseFloat(set.reps);
-      return isNaN(reps) ? max : Math.max(max, reps);
+      var e1 = estimate1RM(weight, reps);
+      return e1 != null ? Math.max(max, e1) : max;
     }, 0);
-    return { weight: maxWeight, volume: Math.round(volume), reps: maxReps };
+    return { weight: maxWeight, volume: Math.round(volume), e1rm: roundE1RM(maxE1RM) };
   }
 
   var selectedWorkouts = selectedDate ? normalizedWorkouts.filter(function (w) { return getChartDateKey(w.date) === String(selectedDate); }) : [];
@@ -316,10 +347,10 @@ export default function ProgressPage({ data }) {
             <Card className={ui.cardChartMb}>
               <div className={ui.sectionTitleLg}>📊 Combined Compound Lifts</div>
               <div className={ui.chartToggleRow}>
-                {["weight", "volume", "reps"].map(function (m) {
+                {["weight", "volume", "e1rm"].map(function (m) {
                   return (
                     <button key={m} type="button" onClick={function () { setCompoundMetric(m); }} className={compoundMetric === m ? s.compoundMetricToggleActive : ui.chartToggleBtn}>
-                      {m === "weight" ? "Max Weight" : m === "volume" ? "Volume" : "Max Reps"}
+                      {metricLabelFor(m)}
                     </button>
                   );
                 })}

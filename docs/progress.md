@@ -33,13 +33,13 @@ Each chart includes:
 ### Session Summary (latest)
 - Last Weight (kg)
 - Last Volume (kg — sum of weight × reps)
-- Max Reps
+- Est. 1RM (kg — best set in session, Epley formula)
 
 ### Metric Toggle
 Switch between three chart metrics:
 - **Max Weight** — heaviest set per session
 - **Volume** — total weight × reps per session
-- **Max Reps** — highest rep count per session
+- **Est. 1RM** — highest estimated one-rep max per session (Epley: `weight × (1 + reps / 30)`; 1-rep sets use the logged weight)
 
 ### Combined / Split Toggle
 
@@ -57,7 +57,7 @@ Sets without side info are marked `both` and count toward combined totals.
 
 ### Left/Right Imbalance Highlighting (Split View)
 
-When **Split** view is active, the app compares left and right values for the currently selected metric (Max Weight, Volume, or Max Reps) at each session. If the two sides differ, that data point is visually flagged so you can spot muscular imbalances at a glance.
+When **Split** view is active, the app compares left and right values for the currently selected metric (Max Weight, Volume, or Est. 1RM) at each session. If the two sides differ, that data point is visually flagged so you can spot muscular imbalances at a glance.
 
 **What was added:**
 
@@ -69,9 +69,9 @@ When **Split** view is active, the app compares left and right values for the cu
 
 **How imbalance is detected:**
 
-For each session and metric, the app compares the left-side value (`weight_left`, `volume_left`, or `reps_left`) against the right-side value (`weight_right`, `volume_right`, or `reps_right`). If both values exist and are not equal, the point is marked imbalanced.
+For each session and metric, the app compares the left-side value (`weight_left`, `volume_left`, or `e1rm_left`) against the right-side value (`weight_right`, `volume_right`, or `e1rm_right`). If both values exist and are not equal, the point is marked imbalanced.
 
-**Example:** A Single Arm Lat Pulldown session logged as `RIGHT - 10REPS, LEFT - 7REPS` will highlight on the **Max Reps** split chart because 10 ≠ 7. The same session will not highlight on **Max Weight** if both sides used the same load (e.g. 60 kg).
+**Example:** A Single Arm Lat Pulldown session logged as `RIGHT - 60kg × 10`, `LEFT - 60kg × 7` will highlight on the **Est. 1RM** split chart because the estimated max differs per side. The same session will not highlight on **Max Weight** if both sides used the same load (60 kg).
 
 Sessions where left and right match, or where sets are logged without side info (`both`), show normal dots with no amber ring.
 
@@ -123,7 +123,7 @@ When 2+ compound lifts are logged, an overlay chart compares all compounds on on
 
 ### Metric toggles (above chart)
 
-- **Max Weight** / **Volume** / **Max Reps** — same metrics as individual exercise charts
+- **Max Weight** / **Volume** / **Est. 1RM** — same metrics as individual exercise charts
 - Active toggle uses cyan (`#06b6d4`) so it stays distinct from lift legend colors (e.g. Deadlift purple)
 
 ### Lift legend (below chart)
