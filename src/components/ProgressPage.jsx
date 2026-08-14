@@ -26,6 +26,63 @@ function metricLabelFor(metric) {
   return metric === "weight" ? "Max Weight" : metric === "volume" ? "Volume" : "Est. 1RM";
 }
 
+function computeSessionMetrics(sets) {
+  var all = sets || [];
+  var totalVol = 0;
+  var leftVol = 0, rightVol = 0;
+  var leftWeights = [], rightWeights = [], leftE1 = [], rightE1 = [];
+  all.forEach(function (setItem) {
+    var wt = typeof setItem.weight === "number" && !isNaN(setItem.weight) ? setItem.weight : parseFloat(setItem.weight) || 0;
+    var rp = typeof setItem.reps === "number" && !isNaN(setItem.reps) ? setItem.reps : parseFloat(setItem.reps) || 0;
+    totalVol += wt * rp;
+    var e1 = estimate1RM(wt, rp);
+    var side = setItem.side || "both";
+    if (side === "left") {
+      leftVol += wt * rp;
+      leftWeights.push(wt);
+      if (e1 != null) leftE1.push(e1);
+    } else if (side === "right") {
+      rightVol += wt * rp;
+      rightWeights.push(wt);
+      if (e1 != null) rightE1.push(e1);
+    } else {
+      leftVol += wt * rp;
+      rightVol += wt * rp;
+      leftWeights.push(wt);
+      rightWeights.push(wt);
+      if (e1 != null) { leftE1.push(e1); rightE1.push(e1); }
+    }
+  });
+  var lw = leftWeights.length ? Math.max.apply(null, leftWeights) : 0;
+  var rw = rightWeights.length ? Math.max.apply(null, rightWeights) : 0;
+  var le1 = leftE1.length ? Math.max.apply(null, leftE1) : 0;
+  var re1 = rightE1.length ? Math.max.apply(null, rightE1) : 0;
+  return {
+    weight: Math.max(lw, rw),
+    weight_left: lw,
+    weight_right: rw,
+    volume: Math.round(totalVol),
+    volume_left: Math.round(leftVol),
+    volume_right: Math.round(rightVol),
+    e1rm: roundE1RM(Math.max(le1, re1)),
+    e1rm_left: roundE1RM(le1) || 0,
+    e1rm_right: roundE1RM(re1) || 0,
+  };
+}
+
+function buildExerciseChartPoints(sessions, getChartDateKey) {
+  var byDate = {};
+  sessions.forEach(function (w) {
+    var dateKey = getChartDateKey(w.date);
+    if (!dateKey) return;
+    if (!byDate[dateKey]) byDate[dateKey] = [];
+    (w.sets || []).forEach(function (setItem) { byDate[dateKey].push(setItem); });
+  });
+  return Object.keys(byDate).map(function (dateKey) {
+    return Object.assign({ dateKey: dateKey, rawDate: dateKey }, computeSessionMetrics(byDate[dateKey]));
+  });
+}
+
 function SplitDot(props) {
   var cx = props.cx;
   var cy = props.cy;
@@ -67,55 +124,12 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
   var cs = { color: "#e2e8f0", fontSize: 10 };
   var tt = { background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 8, fontSize: 12 };
   var sessions = data.workouts.filter(function (w) { return w.exercise === ex; });
-  var hasSides = sessions.some(function (w) { return (w.sets || []).some(function (s) { return s && (s.side === 'left' || s.side === 'right'); }); });
+  var hasSides = sessions.some(function (w) { return (w.sets || []).some(function (setItem) { return setItem && (setItem.side === "left" || setItem.side === "right"); }); });
   var showSplit = hasSides && !isNoSplitLift(ex);
-  var [viewMode, setViewMode] = useState(showSplit ? 'split' : 'combined');
-  var cd = sessions.map(function (w) {
-    var all = w.sets || [];
-    var totalVol = 0;
-    var leftVol = 0, rightVol = 0;
-    var leftWeights = [], rightWeights = [], leftE1 = [], rightE1 = [];
-    all.forEach(function (s) {
-      var wt = typeof s.weight === "number" && !isNaN(s.weight) ? s.weight : parseFloat(s.weight) || 0;
-      var rp = typeof s.reps === "number" && !isNaN(s.reps) ? s.reps : parseFloat(s.reps) || 0;
-      totalVol += wt * rp;
-      var e1 = estimate1RM(wt, rp);
-      var side = s.side || 'both';
-      if (side === 'left') {
-        leftVol += wt * rp;
-        leftWeights.push(wt);
-        if (e1 != null) leftE1.push(e1);
-      } else if (side === 'right') {
-        rightVol += wt * rp;
-        rightWeights.push(wt);
-        if (e1 != null) rightE1.push(e1);
-      } else {
-        leftVol += wt * rp; rightVol += wt * rp;
-        leftWeights.push(wt); rightWeights.push(wt);
-        if (e1 != null) { leftE1.push(e1); rightE1.push(e1); }
-      }
-    });
-    var lw = leftWeights.length ? Math.max.apply(null, leftWeights) : 0;
-    var rw = rightWeights.length ? Math.max.apply(null, rightWeights) : 0;
-    var le1 = leftE1.length ? Math.max.apply(null, leftE1) : 0;
-    var re1 = rightE1.length ? Math.max.apply(null, rightE1) : 0;
-    var sessionE1 = roundE1RM(Math.max(le1, re1));
-    return {
-      date: w.date,
-      weight: Math.max(lw, rw),
-      weight_left: lw,
-      weight_right: rw,
-      volume: Math.round(totalVol),
-      volume_left: Math.round(leftVol),
-      volume_right: Math.round(rightVol),
-      e1rm: sessionE1,
-      e1rm_left: roundE1RM(le1) || 0,
-      e1rm_right: roundE1RM(re1) || 0,
-    };
-  });
+  var [viewMode, setViewMode] = useState(showSplit ? "split" : "combined");
+  var cd = buildExerciseChartPoints(sessions, getChartDateKey);
   var chartData = cd.map(function (point) {
-    var dateKey = getChartDateKey(point.date);
-    return Object.assign({}, point, { dateKey: dateKey, rawDate: dateKey, date: formatChartDate(dateKey) });
+    return Object.assign({}, point, { date: formatChartDate(point.dateKey) });
   }).sort(function (a, b) { return String(a.dateKey).localeCompare(String(b.dateKey)); });
   var pr = cd.length ? Math.max.apply(null, cd.map(function (d) { return d.weight; })) : 0;
   var latest = cd.length ? cd[cd.length - 1] : null;
@@ -253,16 +267,6 @@ export default function ProgressPage({ data }) {
     return parsed.toLocaleDateString(undefined, { month: "short", day: "numeric" });
   }
 
-  function getMaxWeight(sets) {
-    if (!sets || !sets.length) return null;
-    var weights = sets.map(function (s) {
-      if (typeof s.weight === "number" && !isNaN(s.weight)) return s.weight;
-      var parsed = parseFloat(s.weight);
-      return isNaN(parsed) ? null : parsed;
-    }).filter(function (value) { return value != null && !isNaN(value); });
-    return weights.length ? Math.max.apply(null, weights) : null;
-  }
-
   function toggleCompoundLift(ex) {
     setHiddenCompoundLifts(function (prev) {
       var next = Object.assign({}, prev);
@@ -273,21 +277,8 @@ export default function ProgressPage({ data }) {
   }
 
   function getWorkoutMetrics(workout) {
-    var maxWeight = getMaxWeight(workout.sets);
-    var volume = workout.sets.reduce(function (sum, set) {
-      var weight = typeof set.weight === "number" && !isNaN(set.weight) ? set.weight : parseFloat(set.weight);
-      var reps = typeof set.reps === "number" && !isNaN(set.reps) ? set.reps : parseFloat(set.reps);
-      if (isNaN(weight)) weight = 0;
-      if (isNaN(reps)) reps = 0;
-      return sum + (weight * reps);
-    }, 0);
-    var maxE1RM = workout.sets.reduce(function (max, set) {
-      var weight = typeof set.weight === "number" && !isNaN(set.weight) ? set.weight : parseFloat(set.weight);
-      var reps = typeof set.reps === "number" && !isNaN(set.reps) ? set.reps : parseFloat(set.reps);
-      var e1 = estimate1RM(weight, reps);
-      return e1 != null ? Math.max(max, e1) : max;
-    }, 0);
-    return { weight: maxWeight, volume: Math.round(volume), e1rm: roundE1RM(maxE1RM) };
+    var m = computeSessionMetrics(workout.sets);
+    return { weight: m.weight || null, volume: m.volume, e1rm: m.e1rm };
   }
 
   var selectedWorkouts = selectedDate ? normalizedWorkouts.filter(function (w) { return getChartDateKey(w.date) === String(selectedDate); }) : [];

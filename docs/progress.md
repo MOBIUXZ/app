@@ -27,19 +27,24 @@ Each chart includes:
 | Stat | Description |
 |------|-------------|
 | PR | All-time max weight for that exercise |
-| Trend | Change vs previous session (▲/▼ kg) |
-| Sessions | Total session count |
+| Trend | Change vs previous logged day (▲/▼ kg) |
+| Sessions | Total session count (chart shows one point per calendar date) |
 
-### Session Summary (latest)
+### Session Summary (latest day)
 - Last Weight (kg)
-- Last Volume (kg — sum of weight × reps)
-- Est. 1RM (kg — best set in session, Epley formula)
+- Last Volume (kg — sum of weight × reps that day)
+- Est. 1RM (kg — best set that day, Epley formula)
 
 ### Metric Toggle
-Switch between three chart metrics:
-- **Max Weight** — heaviest set per session
-- **Volume** — total weight × reps per session
-- **Est. 1RM** — highest estimated one-rep max per session (Epley: `weight × (1 + reps / 30)`; 1-rep sets use the logged weight)
+Switch between three chart metrics. Each chart point is **one calendar date**; if you log the same exercise multiple times on one day, those entries are merged:
+
+| Metric | Per-date rule |
+|--------|----------------|
+| **Max Weight** | Heaviest set across all entries that day |
+| **Volume** | Sum of weight × reps across all sets that day |
+| **Est. 1RM** | Highest estimated one-rep max across all sets that day (Epley: `weight × (1 + reps / 30)`; 1-rep sets use the logged weight) |
+
+This matches the **Combined Compound Lifts** overlay chart.
 
 ### Combined / Split Toggle
 
@@ -57,7 +62,7 @@ Sets without side info are marked `both` and count toward combined totals.
 
 ### Left/Right Imbalance Highlighting (Split View)
 
-When **Split** view is active, the app compares left and right values for the currently selected metric (Max Weight, Volume, or Est. 1RM) at each session. If the two sides differ, that data point is visually flagged so you can spot muscular imbalances at a glance.
+When **Split** view is active, the app compares left and right values for the currently selected metric (Max Weight, Volume, or Est. 1RM) at each **date**. If the two sides differ, that data point is visually flagged so you can spot muscular imbalances at a glance.
 
 **What was added:**
 
@@ -69,7 +74,7 @@ When **Split** view is active, the app compares left and right values for the cu
 
 **How imbalance is detected:**
 
-For each session and metric, the app compares the left-side value (`weight_left`, `volume_left`, or `e1rm_left`) against the right-side value (`weight_right`, `volume_right`, or `e1rm_right`). If both values exist and are not equal, the point is marked imbalanced.
+For each date and metric, the app compares the left-side value (`weight_left`, `volume_left`, or `e1rm_left`) against the right-side value (`weight_right`, `volume_right`, or `e1rm_right`). If both values exist and are not equal, the point is marked imbalanced. Multiple logs on the same day are merged: all sets from that day are pooled before left/right metrics are computed.
 
 **Example:** A Single Arm Lat Pulldown session logged as `RIGHT - 60kg × 10`, `LEFT - 60kg × 7` will highlight on the **Est. 1RM** split chart because the estimated max differs per side. The same session will not highlight on **Max Weight** if both sides used the same load (60 kg).
 
