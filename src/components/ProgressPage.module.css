@@ -167,6 +167,12 @@
   margin-bottom: 0;
 }
 
+.compoundMetricToggleActive {
+  composes: chartToggleBtnActive from "../styles/ui.module.css";
+  background: #06b6d4;
+  color: #fff;
+}
+
 .tooltip {
   background: var(--ft-bg-card);
   border-radius: var(--ft-radius-md);

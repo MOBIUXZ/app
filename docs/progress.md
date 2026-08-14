@@ -124,7 +124,7 @@ When 2+ compound lifts are logged, an overlay chart compares all compounds on on
 ### Metric toggles (above chart)
 
 - **Max Weight** / **Volume** / **Max Reps** — same metrics as individual exercise charts
-- Active toggle uses the accent color; chart Y-axis values update to match the selected metric
+- Active toggle uses cyan (`#06b6d4`) so it stays distinct from lift legend colors (e.g. Deadlift purple)
 
 ### Lift legend (below chart)
 

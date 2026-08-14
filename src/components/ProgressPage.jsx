@@ -318,7 +318,7 @@ export default function ProgressPage({ data }) {
               <div className={ui.chartToggleRow}>
                 {["weight", "volume", "reps"].map(function (m) {
                   return (
-                    <button key={m} type="button" onClick={function () { setCompoundMetric(m); }} className={compoundMetric === m ? ui.chartToggleBtnActive : ui.chartToggleBtn} style={compoundMetric === m ? { background: ACCENT, color: "#fff" } : undefined}>
+                    <button key={m} type="button" onClick={function () { setCompoundMetric(m); }} className={compoundMetric === m ? s.compoundMetricToggleActive : ui.chartToggleBtn}>
                       {m === "weight" ? "Max Weight" : m === "volume" ? "Volume" : "Max Reps"}
                     </button>
                   );
