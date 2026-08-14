@@ -83,6 +83,71 @@ function buildExerciseChartPoints(sessions, getChartDateKey) {
   });
 }
 
+function getBestE1RM(sets) {
+  return (sets || []).reduce(function (max, st) {
+    var e1 = roundE1RM(estimate1RM(st.weight, st.reps));
+    return e1 != null && e1 > max ? e1 : max;
+  }, 0);
+}
+
+function workoutHasSplitSets(sets) {
+  return (sets || []).some(function (st) { return st && (st.side === "left" || st.side === "right"); });
+}
+
+function renderDetailSetRows(sets, bestE1Value, keyPrefix) {
+  return (sets || []).map(function (st, i) {
+    var setE1 = roundE1RM(estimate1RM(st.weight, st.reps));
+    var isBest = setE1 != null && bestE1Value != null && bestE1Value > 0 && setE1 === bestE1Value;
+    return (
+      <div key={keyPrefix + "-" + i} className={cx(s.setRow, isBest && s.setRowBest)}>
+        <span className={s.setRowLoad}>{st.weight || 0}kg × {st.reps || 0}</span>
+        <span className={s.setRowE1rm}>{setE1 != null ? "e1RM " + setE1 + (isBest ? " ★" : "") : "—"}</span>
+      </div>
+    );
+  });
+}
+
+function renderWorkoutSetPanel(sets) {
+  if (!sets.length) return <div className={s.setEmptySide}>No sets logged</div>;
+
+  if (workoutHasSplitSets(sets)) {
+    var leftSets = sets.filter(function (st) { return st.side === "left"; });
+    var rightSets = sets.filter(function (st) { return st.side === "right"; });
+    var bothSets = sets.filter(function (st) { return st.side !== "left" && st.side !== "right"; });
+    var leftBestVal = getBestE1RM(leftSets) || null;
+    var rightBestVal = getBestE1RM(rightSets) || null;
+    var bothBestVal = getBestE1RM(bothSets) || null;
+
+    return (
+      <div>
+        <div className={s.detailSplitRow}>
+          <div className={s.detailSplitCol}>
+            <div className={s.detailSplitLabel} style={{ color: BLUE }}>Left</div>
+            <div className={s.setList}>
+              {leftSets.length ? renderDetailSetRows(leftSets, leftBestVal, "left") : <div className={s.setEmptySide}>No left sets</div>}
+            </div>
+          </div>
+          <div className={s.detailSplitCol}>
+            <div className={s.detailSplitLabel} style={{ color: PINK }}>Right</div>
+            <div className={s.setList}>
+              {rightSets.length ? renderDetailSetRows(rightSets, rightBestVal, "right") : <div className={s.setEmptySide}>No right sets</div>}
+            </div>
+          </div>
+        </div>
+        {bothSets.length > 0 && (
+          <div className={s.setListBoth}>
+            <div className={s.detailSplitLabel}>Both</div>
+            {renderDetailSetRows(bothSets, bothBestVal, "both")}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  var bestE1Value = getBestE1RM(sets) || null;
+  return <div className={s.setList}>{renderDetailSetRows(sets, bestE1Value, "set")}</div>;
+}
+
 function SplitDot(props) {
   var cx = props.cx;
   var cy = props.cy;
@@ -391,25 +456,7 @@ export default function ProgressPage({ data }) {
                     <div key={idx} data-kb-index={idx} className={cx(detailKb.kbClass(idx), idx === selectedWorkouts.length - 1 ? s.workoutCard : s.workoutCardSpaced)} onMouseEnter={function () { detailKb.setFocusIdx(idx); }}>
                       <div className={s.workoutName}>{formatExerciseName(w.exercise)}</div>
                       <div className={s.workoutMeta}>{w.time ? w.time + " · " : ""}{w.date}</div>
-                      <div className={s.setList}>{(() => {
-                        var sets = w.sets || [];
-                        var bestE1 = sets.reduce(function (max, st) {
-                          var e1 = roundE1RM(estimate1RM(st.weight, st.reps));
-                          return e1 != null && e1 > max ? e1 : max;
-                        }, 0);
-                        var bestE1Value = bestE1 > 0 ? bestE1 : null;
-                        return sets.map(function (st, i) {
-                          var sideSuffix = st.side === "left" ? " L" : st.side === "right" ? " R" : "";
-                          var setE1 = roundE1RM(estimate1RM(st.weight, st.reps));
-                          var isBest = setE1 != null && bestE1Value != null && setE1 === bestE1Value;
-                          return (
-                            <div key={i} className={cx(s.setRow, isBest && s.setRowBest)}>
-                              <span className={s.setRowLoad}>{st.weight || 0}kg × {st.reps || 0}{sideSuffix}</span>
-                              <span className={s.setRowE1rm}>{setE1 != null ? "e1RM " + setE1 + (isBest ? " ★" : "") : "—"}</span>
-                            </div>
-                          );
-                        });
-                      })()}</div>
+                      {renderWorkoutSetPanel(w.sets || [])}
                     </div>
                   );
                 }) : <div className={s.emptyChart}>No workouts logged for this date.</div>}

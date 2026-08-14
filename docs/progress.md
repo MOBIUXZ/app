@@ -156,6 +156,7 @@ Click any chart data point to open a modal showing all workouts on that date:
 - Exercise name (compound lifts in caps)
 - Date and time
 - All sets listed one per row: weight × reps on the left, per-set **e1RM** on the right (Epley estimate; `—` when weight/reps are invalid). The **best e1RM** row(s) for each workout are highlighted with a green border and ★
+- **Left/right workouts** — side-by-side **Left** (blue) and **Right** (pink) columns, each with its own set list and best-e1RM highlight. Sets without a side appear under **Both** below the split
 - Left/Right labels (`L` / `R`) when side data exists
 
 ## Body Weight & Body Fat Chart
