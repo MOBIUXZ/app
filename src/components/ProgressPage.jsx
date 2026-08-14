@@ -1,6 +1,6 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
-import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExerciseName, isNoSplitLift, isCompoundLift, COMPOUND_LIFTS, getExerciseChartColor, useKeyboardListNav, useKeyboardLayer, isTypingTarget, ui, cx } from "./shared";
+import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExerciseName, isNoSplitLift, isCompoundLift, COMPOUND_LIFTS, getExerciseChartColor, useKeyboardLayer, ui, cx } from "./shared";
 import s from "./ProgressPage.module.css";
 
 function isSplitImbalanced(payload, metric) {
@@ -24,7 +24,8 @@ function roundE1RM(value) {
 
 function metricLabelFor(metric, session) {
   if (metric === "weight") return session ? "Weight" : "Max Weight";
-  return metric === "volume" ? "Volume" : "Best e1RM";
+  if (metric === "volume") return "Volume";
+  return session ? "e1RM" : "Best e1RM";
 }
 
 function computeSessionMetrics(sets) {
@@ -225,7 +226,7 @@ function WorkoutSessionGraph({ workout, colorFallbackIdx, onClose, formatChartDa
         {[
           { label: "Weight", val: sessionMetrics.weight ? sessionMetrics.weight + " kg" : "—", color: exColor },
           { label: "Volume", val: sessionMetrics.volume ? sessionMetrics.volume + " kg" : "—", color: ORANGE },
-          { label: "Best e1RM", val: sessionMetrics.e1rm != null ? sessionMetrics.e1rm + " kg" : "—", color: GREEN },
+          { label: "e1RM", val: sessionMetrics.e1rm != null ? sessionMetrics.e1rm + " kg" : "—", color: GREEN },
         ].map(function (st) {
           return (
             <div key={st.label} className={s.miniStat}>
@@ -488,9 +489,6 @@ export default function ProgressPage({ data }) {
     return idx !== -1 ? idx : 0;
   }
 
-  var detailKb = useKeyboardListNav(selectedWorkouts.length, function () {}, selectedDate && selectedWorkouts.length > 0 && !sessionGraphOpen);
-  var detailKbRef = useRef(detailKb);
-  detailKbRef.current = detailKb;
   var sessionGraphLayer = useKeyboardLayer("progress-session-graph", sessionGraphOpen, function (e) {
     if (e.key === "Escape") {
       e.preventDefault();
@@ -504,8 +502,6 @@ export default function ProgressPage({ data }) {
       closeDetailPanel();
       return;
     }
-    if (isTypingTarget(e.target)) return;
-    detailKbRef.current.handleKeyDown(e);
   });
 
   return (
@@ -598,10 +594,10 @@ export default function ProgressPage({ data }) {
                 <div><div className={s.detailEyebrow}>Workout Details</div><div className={s.detailDate}>{formatChartDate(selectedDate)}</div></div>
                 <button type="button" onClick={closeDetailPanel} className={ui.modalClose}>✕</button>
               </div>
-              <div ref={detailKb.listRef} className={s.detailBody}>
+              <div className={s.detailBody}>
                 {selectedWorkouts.length > 0 ? selectedWorkouts.map(function (w, idx) {
                   return (
-                    <div key={idx} data-kb-index={idx} className={cx(detailKb.kbClass(idx), idx === selectedWorkouts.length - 1 ? s.workoutCard : s.workoutCardSpaced)} onMouseEnter={function () { detailKb.setFocusIdx(idx); }}>
+                    <div key={idx} className={idx === selectedWorkouts.length - 1 ? s.workoutCard : s.workoutCardSpaced}>
                       <div className={s.workoutCardTop}>
                         <div>
                           <div className={s.workoutName}>{formatExerciseName(w.exercise)}</div>

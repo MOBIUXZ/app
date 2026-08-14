@@ -165,8 +165,8 @@ Per-workout popup chart for that single logged session:
 
 | Feature | Description |
 |---------|-------------|
-| **Session stats** | Weight, Volume, Best e1RM for the whole workout |
-| **Metric toggles** | Weight / Volume / Best e1RM |
+| **Session stats** | Weight, Volume, e1RM for the whole workout |
+| **Metric toggles** | Weight / Volume / e1RM |
 | **X-axis** | Set number (`S1`, `S2`, …) with `L` / `R` when side data exists |
 | **Y-axis** | Selected metric per set (weight, set volume, or set e1RM) |
 | **Split view** | Isolation workouts with left/right data show side-by-side Left (blue) and Right (pink) mini charts; compound lifts use one chart |
