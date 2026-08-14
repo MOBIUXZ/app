@@ -94,6 +94,12 @@ function workoutHasSplitSets(sets) {
   return (sets || []).some(function (st) { return st && (st.side === "left" || st.side === "right"); });
 }
 
+function workoutUsesSplitPanel(sets) {
+  return workoutHasSplitSets(sets) || (sets || []).some(function (st) {
+    return st && st.side !== "left" && st.side !== "right";
+  });
+}
+
 function renderDetailSetRows(sets, bestE1Value, keyPrefix) {
   return (sets || []).map(function (st, i) {
     var setE1 = roundE1RM(estimate1RM(st.weight, st.reps));
@@ -107,39 +113,32 @@ function renderDetailSetRows(sets, bestE1Value, keyPrefix) {
   });
 }
 
-function renderWorkoutSetPanel(sets) {
+function renderWorkoutSetPanel(sets, exercise) {
   if (!sets.length) return <div className={s.setEmptySide}>No sets logged</div>;
 
-  if (workoutHasSplitSets(sets)) {
+  if (!isCompoundLift(exercise) && workoutUsesSplitPanel(sets)) {
     var leftSets = sets.filter(function (st) { return st.side === "left"; });
     var rightSets = sets.filter(function (st) { return st.side === "right"; });
     var bothSets = sets.filter(function (st) { return st.side !== "left" && st.side !== "right"; });
-    var leftBestVal = getBestE1RM(leftSets) || null;
-    var rightBestVal = getBestE1RM(rightSets) || null;
-    var bothBestVal = getBestE1RM(bothSets) || null;
+    var leftDisplaySets = leftSets.concat(bothSets);
+    var rightDisplaySets = rightSets.concat(bothSets);
+    var leftBestVal = getBestE1RM(leftDisplaySets) || null;
+    var rightBestVal = getBestE1RM(rightDisplaySets) || null;
 
     return (
-      <div>
-        <div className={s.detailSplitRow}>
-          <div className={s.detailSplitCol}>
-            <div className={s.detailSplitLabel} style={{ color: BLUE }}>Left</div>
-            <div className={s.setList}>
-              {leftSets.length ? renderDetailSetRows(leftSets, leftBestVal, "left") : <div className={s.setEmptySide}>No left sets</div>}
-            </div>
-          </div>
-          <div className={s.detailSplitCol}>
-            <div className={s.detailSplitLabel} style={{ color: PINK }}>Right</div>
-            <div className={s.setList}>
-              {rightSets.length ? renderDetailSetRows(rightSets, rightBestVal, "right") : <div className={s.setEmptySide}>No right sets</div>}
-            </div>
+      <div className={s.detailSplitRow}>
+        <div className={s.detailSplitCol}>
+          <div className={s.detailSplitLabel} style={{ color: BLUE }}>Left</div>
+          <div className={s.setList}>
+            {leftDisplaySets.length ? renderDetailSetRows(leftDisplaySets, leftBestVal, "left") : <div className={s.setEmptySide}>No left sets</div>}
           </div>
         </div>
-        {bothSets.length > 0 && (
-          <div className={s.setListBoth}>
-            <div className={s.detailSplitLabel}>Both</div>
-            {renderDetailSetRows(bothSets, bothBestVal, "both")}
+        <div className={s.detailSplitCol}>
+          <div className={s.detailSplitLabel} style={{ color: PINK }}>Right</div>
+          <div className={s.setList}>
+            {rightDisplaySets.length ? renderDetailSetRows(rightDisplaySets, rightBestVal, "right") : <div className={s.setEmptySide}>No right sets</div>}
           </div>
-        )}
+        </div>
       </div>
     );
   }
@@ -456,7 +455,7 @@ export default function ProgressPage({ data }) {
                     <div key={idx} data-kb-index={idx} className={cx(detailKb.kbClass(idx), idx === selectedWorkouts.length - 1 ? s.workoutCard : s.workoutCardSpaced)} onMouseEnter={function () { detailKb.setFocusIdx(idx); }}>
                       <div className={s.workoutName}>{formatExerciseName(w.exercise)}</div>
                       <div className={s.workoutMeta}>{w.time ? w.time + " · " : ""}{w.date}</div>
-                      {renderWorkoutSetPanel(w.sets || [])}
+                      {renderWorkoutSetPanel(w.sets || [], w.exercise)}
                     </div>
                   );
                 }) : <div className={s.emptyChart}>No workouts logged for this date.</div>}

@@ -311,10 +311,6 @@
   text-transform: uppercase;
 }
 
-.setListBoth {
-  margin-top: 10px;
-}
-
 .setEmptySide {
   color: var(--ft-text-dim);
   font-size: 11px;
