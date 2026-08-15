@@ -22,6 +22,11 @@ function roundE1RM(value) {
   return value != null && value > 0 ? Math.round(value * 10) / 10 : null;
 }
 
+function formatChartTooltipValue(value, metric) {
+  if (value == null || value === "") return "—";
+  return metric === "volume" ? value : value + " kg";
+}
+
 function averageE1RM(values) {
   if (!values.length) return null;
   var sum = values.reduce(function (acc, v) { return acc + v; }, 0);
@@ -536,7 +541,7 @@ function ExerciseSplitDetail({ point, metric, metricLabel }) {
     <div className={cx(s.sessionSplitDetail, imbalanced && s.sessionSplitDetailImbalanced)}>
       <div className={s.sessionSplitDetailRow}>
         <div className={s.sessionSplitSide}>
-          <div className={s.sessionSplitSideValue} style={{ color: BLUE }}>Left: {left != null ? left : "—"}</div>
+          <div className={s.sessionSplitSideValue} style={{ color: BLUE }}>Left: {formatChartTooltipValue(left, metric)}</div>
         </div>
         <div className={s.sessionSplitCenter}>
           <div className={s.sessionSplitSetTitle}>{dateLabel}</div>
@@ -547,7 +552,7 @@ function ExerciseSplitDetail({ point, metric, metricLabel }) {
           ) : null}
         </div>
         <div className={cx(s.sessionSplitSide, s.sessionSplitSideRight)}>
-          <div className={s.sessionSplitSideValue} style={{ color: PINK }}>Right: {right != null ? right : "—"}</div>
+          <div className={s.sessionSplitSideValue} style={{ color: PINK }}>Right: {formatChartTooltipValue(right, metric)}</div>
         </div>
       </div>
     </div>
@@ -642,7 +647,7 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
               <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
               <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
               <YAxis tick={cs} width={35} />
-              <Tooltip contentStyle={tt} formatter={function (value) { return [value, metricLabel]; }} />
+              <Tooltip contentStyle={tt} formatter={function (value) { return [formatChartTooltipValue(value, metric), metricLabel]; }} />
               <Line type="monotone" dataKey={metric} name={metricLabel} stroke={exColor} strokeWidth={2} dot={{ fill: exColor, r: 4 }} connectNulls={true} />
             </LineChart>
           </ResponsiveContainer>
