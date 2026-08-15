@@ -36,15 +36,56 @@ Each chart includes:
 - Best e1RM (kg — highest Epley estimate across all sets that day)
 
 ### Metric Toggle
-Switch between three chart metrics. Each chart point is **one calendar date**; if you log the same exercise multiple times on one day, those entries are merged:
+Switch between four chart metrics. Each chart point is **one calendar date**; if you log the same exercise multiple times on one day, those entries are merged:
 
 | Metric | Per-date rule |
 |--------|----------------|
 | **Max Weight** | Heaviest set across all entries that day |
 | **Volume** | Sum of weight × reps across all sets that day |
 | **Best e1RM** | Highest estimated one-rep max across all sets that day (Epley: `weight × (1 + reps / 30)`; 1-rep sets use the logged weight) |
+| **Mean e1RM** | Average Epley e1RM across **successful sets only** (reps > 0). Failed sets (0 reps) are excluded — see below |
 
-This matches the **Combined Compound Lifts** overlay chart.
+This matches the **Combined Compound Lifts** overlay chart (Mean e1RM on a day with multiple sessions uses the average of each session’s mean).
+
+### Why Mean e1RM excludes failed sets (0 reps)
+
+Epley’s formula is `e1RM = weight × (1 + reps / 30)`. Plugging in **0 reps** gives `weight × 1 = weight` — so a failed attempt at 50 kg would produce a **50 kg “e1RM”**, as if you had completed a single at that load. The formula was not designed for misses; it applies no failure penalty, only “no rep discount,” which makes 0-rep sets meaningless for strength averaging.
+
+**Including failed sets distorts the mean in either direction**, depending on how heavy the miss was — not on how badly you failed:
+
+#### Example A — failed set pulls the mean down
+
+Session: 45 kg × 5, 47.5 kg × 3, **50 kg × 0 (failed)**, 47.5 kg × 3
+
+| Set | Weight | Reps | e1RM | In mean? |
+|-----|--------|------|------|----------|
+| S1 | 45 kg | 5 | 52.5 kg | Yes |
+| S2 | 47.5 kg | 3 | 52.25 kg | Yes |
+| S3 | 50 kg | 0 | 50 kg ⚠️ | **No** — excluded |
+| S4 | 47.5 kg | 3 | 52.25 kg | Yes |
+
+- Wrong (all 4 sets): (52.5 + 52.25 + 50 + 52.25) / 4 = **51.75 kg**
+- Correct (successful only): (52.5 + 52.25 + 52.25) / 3 = **52.33 kg**
+
+The failed set dilutes the average with a middling 50 kg value — not because failure was penalized, but because the formula treats the miss like a valid single.
+
+#### Example B — failed set inflates the mean
+
+Session: 45 kg × 5, 47.5 kg × 3, **60 kg × 0 (failed)**, 47.5 kg × 3
+
+| Set | Weight | Reps | e1RM | In mean? |
+|-----|--------|------|------|----------|
+| S1 | 45 kg | 5 | 52.5 kg | Yes |
+| S2 | 47.5 kg | 3 | 52.25 kg | Yes |
+| S3 | 60 kg | 0 | 60 kg ⚠️ | **No** — excluded |
+| S4 | 47.5 kg | 3 | 52.25 kg | Yes |
+
+- Wrong (all 4 sets): (52.5 + 52.25 + 60 + 52.25) / 4 = **54.25 kg**
+- Correct (successful only): (52.5 + 52.25 + 52.25) / 3 = **52.33 kg**
+
+Here the miss **adds ~2 kg** to the reported average — a failed heavy attempt makes the session look stronger than the sets you actually completed. Heavier failed weights inflate more; the formula cannot distinguish a near-miss from a total blowout (both become “weight as e1RM”).
+
+**FitTrack rule:** Mean e1RM averages only sets with reps > 0. Failure information belongs elsewhere (e.g. fail rate / red ✕ on session charts), not in e1RM math.
 
 ### Combined / Split Toggle
 
@@ -64,7 +105,7 @@ Sets without side info are marked `both` and count toward combined totals.
 
 ### Left/Right Imbalance Highlighting (Split View)
 
-When **Split** view is active, the app compares left and right values for the currently selected metric (Max Weight, Volume, or Best e1RM) at each **date**. If the two sides differ, that data point is visually flagged so you can spot muscular imbalances at a glance.
+When **Split** view is active, the app compares left and right values for the currently selected metric (Max Weight, Volume, Best e1RM, or Mean e1RM) at each **date**. If the two sides differ, that data point is visually flagged so you can spot muscular imbalances at a glance.
 
 | Feature | Description |
 |---------|-------------|
@@ -128,7 +169,7 @@ When 2+ compound lifts are logged, an overlay chart compares all compounds on on
 
 ### Metric toggles (above chart)
 
-- **Max Weight** / **Volume** / **Best e1RM** — same metrics as individual exercise charts
+- **Max Weight** / **Volume** / **Best e1RM** / **Mean e1RM** — same metrics as individual exercise charts
 - Active toggle uses cyan (`#06b6d4`) so it stays distinct from lift legend colors (e.g. Deadlift purple)
 
 ### Lift legend (below chart)

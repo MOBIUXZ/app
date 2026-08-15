@@ -22,9 +22,16 @@ function roundE1RM(value) {
   return value != null && value > 0 ? Math.round(value * 10) / 10 : null;
 }
 
+function averageE1RM(values) {
+  if (!values.length) return null;
+  var sum = values.reduce(function (acc, v) { return acc + v; }, 0);
+  return roundE1RM(sum / values.length);
+}
+
 function metricLabelFor(metric, session) {
   if (metric === "weight") return session ? "Weight" : "Max Weight";
   if (metric === "volume") return "Volume";
+  if (metric === "mean_e1rm") return "Mean e1RM";
   return session ? "e1RM" : "Best e1RM";
 }
 
@@ -32,12 +39,13 @@ function computeSessionMetrics(sets) {
   var all = sets || [];
   var totalVol = 0;
   var leftVol = 0, rightVol = 0;
-  var leftWeights = [], rightWeights = [], leftE1 = [], rightE1 = [];
+  var leftWeights = [], rightWeights = [], leftE1 = [], rightE1 = [], allE1 = [];
   all.forEach(function (setItem) {
     var wt = typeof setItem.weight === "number" && !isNaN(setItem.weight) ? setItem.weight : parseFloat(setItem.weight) || 0;
     var rp = typeof setItem.reps === "number" && !isNaN(setItem.reps) ? setItem.reps : parseFloat(setItem.reps) || 0;
     totalVol += wt * rp;
     var e1 = estimate1RM(wt, rp);
+    if (e1 != null) allE1.push(e1);
     var side = setItem.side || "both";
     if (side === "left") {
       leftVol += wt * rp;
@@ -69,6 +77,9 @@ function computeSessionMetrics(sets) {
     e1rm: roundE1RM(Math.max(le1, re1)),
     e1rm_left: roundE1RM(le1) || 0,
     e1rm_right: roundE1RM(re1) || 0,
+    mean_e1rm: averageE1RM(allE1),
+    mean_e1rm_left: averageE1RM(leftE1) || 0,
+    mean_e1rm_right: averageE1RM(rightE1) || 0,
   };
 }
 
@@ -619,7 +630,7 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
       {latest && <div className={s.statStrip}>{[{ label: "Last Weight", val: latest.weight + " kg", color: exColor }, { label: "Last Volume", val: latest.volume + " kg", color: ORANGE }, { label: "Best e1RM", val: latest.e1rm != null ? latest.e1rm + " kg" : "—", color: GREEN }].map(function (st) { return <div key={st.label} className={s.miniStat}><div className={s.miniStatLabel}>{st.label}</div><div className={s.miniStatValue} style={{ color: st.color }}>{st.val}</div></div>; })}</div>}
       {cd.length < 1 ? <div className={s.noSessions}>No sessions logged yet</div> : <div>
         <div className={ui.chartToggleRow}>
-          {["weight", "volume", "e1rm"].map(function (m) { return <button key={m} type="button" onClick={function () { setMetric(m); setHoveredPointIdx(null); }} className={chartToggleClass(metric === m)} style={metric === m ? { background: exColor, color: "#fff" } : undefined}>{metricLabelFor(m)}</button>; })}
+          {["weight", "volume", "e1rm", "mean_e1rm"].map(function (m) { return <button key={m} type="button" onClick={function () { setMetric(m); setHoveredPointIdx(null); }} className={chartToggleClass(metric === m)} style={metric === m ? { background: exColor, color: "#fff" } : undefined}>{metricLabelFor(m)}</button>; })}
           {showSplit && <div className={s.splitToggleGroup}>
             <button type="button" onClick={function () { setViewMode('combined'); setHoveredPointIdx(null); }} className={chartToggleClass(viewMode === 'combined')} style={viewMode === 'combined' ? { background: exColor, color: "#fff" } : undefined}>Combined</button>
             <button type="button" onClick={function () { setViewMode('split'); setHoveredPointIdx(null); }} className={chartToggleClass(viewMode === 'split')} style={viewMode === 'split' ? { background: exColor, color: "#fff" } : undefined}>Split</button>
@@ -732,7 +743,7 @@ export default function ProgressPage({ data }) {
 
   function getWorkoutMetrics(workout) {
     var m = computeSessionMetrics(workout.sets);
-    return { weight: m.weight || null, volume: m.volume, e1rm: m.e1rm };
+    return { weight: m.weight || null, volume: m.volume, e1rm: m.e1rm, mean_e1rm: m.mean_e1rm };
   }
 
   var selectedWorkouts = selectedDate ? normalizedWorkouts.filter(function (w) { return getChartDateKey(w.date) === String(selectedDate); }) : [];
@@ -796,6 +807,10 @@ export default function ProgressPage({ data }) {
               if (metricValue != null) {
                 if (compoundMetric === "volume") {
                   seriesMap[ex][dateKey] = (seriesMap[ex][dateKey] || 0) + metricValue;
+                } else if (compoundMetric === "mean_e1rm") {
+                  if (!seriesMap[ex][dateKey]) seriesMap[ex][dateKey] = { total: 0, count: 0 };
+                  seriesMap[ex][dateKey].total += metricValue;
+                  seriesMap[ex][dateKey].count += 1;
                 } else {
                   seriesMap[ex][dateKey] = Math.max(seriesMap[ex][dateKey] || 0, metricValue);
                 }
@@ -805,7 +820,9 @@ export default function ProgressPage({ data }) {
           var chartData = allDates.map(function (dateKey) {
             var point = { date: formatChartDate(dateKey), dateKey: dateKey };
             compounds.forEach(function (ex) {
-              point[ex] = seriesMap[ex][dateKey] != null ? seriesMap[ex][dateKey] : null;
+              var entry = seriesMap[ex][dateKey];
+              if (entry && entry.count) point[ex] = roundE1RM(entry.total / entry.count);
+              else point[ex] = entry != null ? entry : null;
             });
             return point;
           });
@@ -813,7 +830,7 @@ export default function ProgressPage({ data }) {
             <Card className={ui.cardChartMb}>
               <div className={ui.sectionTitleLg}>📊 Combined Compound Lifts</div>
               <div className={ui.chartToggleRow}>
-                {["weight", "volume", "e1rm"].map(function (m) {
+                {["weight", "volume", "e1rm", "mean_e1rm"].map(function (m) {
                   return (
                     <button key={m} type="button" onClick={function () { setCompoundMetric(m); }} className={compoundMetric === m ? s.compoundMetricToggleActive : ui.chartToggleBtn}>
                       {metricLabelFor(m)}
