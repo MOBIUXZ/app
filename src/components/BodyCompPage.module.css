@@ -133,6 +133,35 @@
   color: var(--ft-text-dim);
 }
 
+.historyEntryActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btnIconEdit {
+  background: var(--ft-bg-btn);
+  color: var(--ft-accent);
+  border: none;
+  border-radius: var(--ft-radius-sm);
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.historyEditForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.historyEditActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
 .chipRow {
   display: flex;
   flex-wrap: wrap;

@@ -6,6 +6,8 @@ export default function BodyCompPage({ data, save }) {
   var [logDate, setLogDate] = useState(formatDate(new Date()));
   var [w, setW] = useState(""), [h, setH] = useState(""), [bf, setBf] = useState(""), [smm, setSmm] = useState(""), [waist, setWaist] = useState(""), [age, setAge] = useState(""), [sex, setSex] = useState("male"), [msg, setMsg] = useState("");
   var [showClearConfirm, setShowClearConfirm] = useState(false);
+  var [editIdx, setEditIdx] = useState(null);
+  var [editForm, setEditForm] = useState(null);
   var wN = parseFloat(w) || 0, hM = (parseFloat(h) || 0) / 100, bfN = parseFloat(bf) || 0, smmN = parseFloat(smm) || 0, ageN = parseFloat(age) || 0;
   var hasBase = wN > 0 && bfN > 0, fm = hasBase ? wN * (bfN / 100) : null, ffm = hasBase ? wN - fm : null;
   var bmi = (wN > 0 && hM > 0) ? wN / (hM * hM) : null, ffmi = (ffm != null && hM > 0) ? ffm / (hM * hM) : null, fmi = (fm != null && hM > 0) ? fm / (hM * hM) : null, smi = (smmN > 0 && hM > 0) ? smmN / (hM * hM) : null;
@@ -24,11 +26,70 @@ export default function BodyCompPage({ data, save }) {
     );
   }
   function GL(p) { return <div className={s.groupLabel}>{p.children}</div>; }
+  function computeBodyCompEntry(fields) {
+    var wN = parseFloat(fields.weight) || 0;
+    var hM = (parseFloat(fields.height) || 0) / 100;
+    var bfN = parseFloat(fields.bf) || 0;
+    var smmN = parseFloat(fields.smm) || 0;
+    var ageN = parseFloat(fields.age) || 0;
+    var sexVal = fields.sex || "male";
+    var hasBase = wN > 0 && bfN > 0;
+    var fm = hasBase ? wN * (bfN / 100) : null;
+    var ffm = hasBase ? wN - fm : null;
+    var bmi = (wN > 0 && hM > 0) ? wN / (hM * hM) : null;
+    var ffmi = (ffm != null && hM > 0) ? ffm / (hM * hM) : null;
+    var fmi = (fm != null && hM > 0) ? fm / (hM * hM) : null;
+    var smi = (smmN > 0 && hM > 0) ? smmN / (hM * hM) : null;
+    var bmrMifflin = (wN > 0 && hM > 0 && ageN > 0) ? (sexVal === "male" ? 10 * wN + 6.25 * (hM * 100) - 5 * ageN + 5 : 10 * wN + 6.25 * (hM * 100) - 5 * ageN - 161) : null;
+    var bmrKatch = ffm != null ? 370 + 21.6 * ffm : null;
+    return {
+      weight: wN,
+      height: parseFloat(fields.height) || null,
+      bf: bfN,
+      smm: smmN || null,
+      waist: parseFloat(fields.waist) || null,
+      age: ageN || null,
+      sex: sexVal,
+      BW: wN,
+      PBF: bfN,
+      FM: fm,
+      FFM: ffm,
+      BMI: bmi,
+      FFMI: ffmi,
+      FMI: fmi,
+      SMM: smmN || null,
+      SMI: smi,
+      BMR_Mifflin: bmrMifflin,
+      BMR_Katch: bmrKatch,
+      date: fields.date,
+    };
+  }
+  function compIdxFromDisplay(displayIdx) {
+    return data.bodyComp.length - 1 - displayIdx;
+  }
+  function syncBodyLogsAfterEdit(oldEntry, newEntry) {
+    var oldW = oldEntry.weight != null ? oldEntry.weight : oldEntry.BW;
+    var newW = newEntry.weight != null ? newEntry.weight : newEntry.BW;
+    var removedLog = false;
+    var logs = data.bodyLogs.filter(function (log) {
+      if (!removedLog && log.date === oldEntry.date && log.weight === oldW) {
+        removedLog = true;
+        return false;
+      }
+      return true;
+    });
+    if (newW > 0) logs.push({ weight: newW, date: newEntry.date });
+    return logs;
+  }
   var historyEntries = data.bodyComp.slice().reverse().slice(0, 10);
   function deleteEntry(displayIdx) {
-    var compIdx = data.bodyComp.length - 1 - displayIdx;
+    var compIdx = compIdxFromDisplay(displayIdx);
     var entry = data.bodyComp[compIdx];
     if (!entry) return;
+    if (editIdx === compIdx) {
+      setEditIdx(null);
+      setEditForm(null);
+    }
     var w = entry.weight != null ? entry.weight : entry.BW;
     var removedLog = false;
     var newBodyLogs = data.bodyLogs.filter(function (log) {
@@ -48,9 +109,62 @@ export default function BodyCompPage({ data, save }) {
   function clearHistory() {
     save({ workouts: data.workouts, calories: data.calories, bodyComp: [], bodyLogs: [] });
     setShowClearConfirm(false);
+    setEditIdx(null);
+    setEditForm(null);
+  }
+  function startEdit(displayIdx) {
+    var compIdx = compIdxFromDisplay(displayIdx);
+    var entry = data.bodyComp[compIdx];
+    if (!entry) return;
+    setEditIdx(compIdx);
+    setEditForm({
+      date: entry.date || "",
+      weight: entry.weight != null ? String(entry.weight) : (entry.BW != null ? String(entry.BW) : ""),
+      height: entry.height != null ? String(entry.height) : "",
+      bf: entry.bf != null ? String(entry.bf) : (entry.PBF != null ? String(entry.PBF) : ""),
+      smm: entry.smm != null ? String(entry.smm) : (entry.SMM != null ? String(entry.SMM) : ""),
+      waist: entry.waist != null ? String(entry.waist) : "",
+      age: entry.age != null ? String(entry.age) : "",
+      sex: entry.sex || "male",
+    });
+  }
+  function cancelEdit() {
+    setEditIdx(null);
+    setEditForm(null);
+  }
+  function saveEdit() {
+    if (!editForm || editIdx == null) return;
+    if (!editForm.weight || !editForm.bf) {
+      setMsg("Weight and Body Fat % are required.");
+      setTimeout(function () { setMsg(""); }, 2000);
+      return;
+    }
+    if (!editForm.date.trim()) {
+      setMsg("Date is required.");
+      setTimeout(function () { setMsg(""); }, 2000);
+      return;
+    }
+    var oldEntry = data.bodyComp[editIdx];
+    var updatedEntry = computeBodyCompEntry(editForm);
+    var newBodyComp = data.bodyComp.map(function (entry, i) {
+      return i === editIdx ? updatedEntry : entry;
+    });
+    save({
+      workouts: data.workouts,
+      calories: data.calories,
+      bodyComp: newBodyComp,
+      bodyLogs: syncBodyLogsAfterEdit(oldEntry, updatedEntry),
+    });
+    cancelEdit();
   }
   var clearConfirmKb = useConfirmDialogKeyboard(showClearConfirm, clearHistory, function () { setShowClearConfirm(false); }, "clear-body-comp-history", { cancel: "Cancel", confirm: "Clear History" });
-  function submit() { if (!w || !bf) { setMsg("Weight and Body Fat % are required."); return; } if (!logDate.trim()) { setMsg("Date is required."); return; } var entry = { weight: wN, height: parseFloat(h) || null, bf: bfN, smm: smmN || null, waist: parseFloat(waist) || null, age: ageN || null, sex: sex, BW: wN, PBF: bfN, FM: fm, FFM: ffm, BMI: bmi, FFMI: ffmi, FMI: fmi, SMM: smmN || null, SMI: smi, BMR_Mifflin: bmrMifflin, BMR_Katch: bmrKatch, date: logDate }; save({ workouts: data.workouts, calories: data.calories, bodyComp: [...data.bodyComp, entry], bodyLogs: [...data.bodyLogs, { weight: wN, date: logDate }] }); setW(""); setH(""); setBf(""); setSmm(""); setWaist(""); setAge(""); setLogDate(formatDate(new Date())); setMsg("Logged!"); setTimeout(function () { setMsg(""); }, 2000); }
+  function submit() {
+    if (!w || !bf) { setMsg("Weight and Body Fat % are required."); return; }
+    if (!logDate.trim()) { setMsg("Date is required."); return; }
+    var entry = computeBodyCompEntry({ date: logDate, weight: w, height: h, bf: bf, smm: smm, waist: waist, age: age, sex: sex });
+    save({ workouts: data.workouts, calories: data.calories, bodyComp: [...data.bodyComp, entry], bodyLogs: [...data.bodyLogs, { weight: entry.weight, date: logDate }] });
+    setW(""); setH(""); setBf(""); setSmm(""); setWaist(""); setAge(""); setLogDate(formatDate(new Date())); setMsg("Logged!"); setTimeout(function () { setMsg(""); }, 2000);
+  }
   return (
     <div>
       <div className={s.pageTitle}>📏 Body Composition</div>
@@ -104,22 +218,70 @@ export default function BodyCompPage({ data, save }) {
         {historyEntries.length === 0 ? <div className={ui.emptyStateLg}><div className={ui.emptyIconLg}>📏</div><div>No entries yet.</div><div className={s.emptySub}>Track your body composition over time!</div></div> : (
         <div>
         {historyEntries.map(function (e, i) {
+          var compIdx = compIdxFromDisplay(i);
+          var editing = editIdx === compIdx && editForm;
           return (
             <div key={i} className={s.historyEntry}>
-              <div className={s.historyEntryHeader}>
-                <div className={s.historyEntryDate}>{e.date}</div>
-                <button type="button" onClick={function () { deleteEntry(i); }} title="Delete entry" className={ui.iconBtnDelete}>🗑</button>
-              </div>
-              <div className={s.chipRow}>
-                {[["BW", "kg", ACCENT], ["BMI", "kg/m²", BLUE], ["FM", "kg", PINK], ["FMI", "kg/m²", PINK], ["PBF", "%", PINK], ["FFM", "kg", GREEN], ["FFMI", "kg/m²", ACCENT], ["SMM", "kg", GREEN], ["SMI", "kg/m²", ORANGE]].map(function (r) {
-                  return e[r[0]] != null ? (
-                    <div key={r[0]} className={s.metricChip}>
-                      <div className={s.metricChipLabel}>{r[0]}</div>
-                      <div className={s.metricChipValue} style={{ color: r[2] }}>{Number(e[r[0]]).toFixed(2)}<span className={s.metricChipUnit}>{r[1]}</span></div>
+              {editing ? (
+                <div className={s.historyEditForm}>
+                  <div className={ui.fieldBlock}>
+                    <div className={ui.fieldLabel}>Date</div>
+                    <input value={editForm.date} onChange={function (ev) { setEditForm(Object.assign({}, editForm, { date: ev.target.value })); }} placeholder="DD-MM-YYYY" className={inputClass({ fullWidth: true })} />
+                  </div>
+                  <div className={ui.grid2}>
+                    {[ ["Body Weight (kg)", "weight"], ["Height (cm)", "height"], ["Body Fat %", "bf"], ["Skel. Muscle Mass (kg)", "smm"], ["Waist (cm)", "waist"], ["Age", "age"] ].map(function (row) {
+                      return (
+                        <div key={row[1]}>
+                          <div className={ui.fieldLabel}>{row[0]}</div>
+                          <input type="number" value={editForm[row[1]]} onChange={function (ev) { var next = Object.assign({}, editForm); next[row[1]] = ev.target.value; setEditForm(next); }} placeholder="—" className={inputClass({ fullWidth: true })} />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className={ui.fieldBlock}>
+                    <div className={ui.fieldLabelSection}>Sex</div>
+                    <div className={cx(ui.pillToggleTrack, s.sexToggleTrack)} role="group" aria-label="Sex">
+                      {["male", "female"].map(function (sx) {
+                        return (
+                          <button
+                            key={sx}
+                            type="button"
+                            aria-pressed={editForm.sex === sx}
+                            onClick={function () { setEditForm(Object.assign({}, editForm, { sex: sx })); }}
+                            className={cx(editForm.sex === sx ? ui.pillToggleBtnActive : ui.pillToggleBtn, s.sexToggleBtn)}
+                          >
+                            {sx}
+                          </button>
+                        );
+                      })}
                     </div>
-                  ) : null;
-                })}
-              </div>
+                  </div>
+                  <div className={s.historyEditActions}>
+                    <button type="button" onClick={saveEdit} className={btnPrimary({ flex1: true, md: true })}>Save</button>
+                    <button type="button" onClick={cancelEdit} className={btnSecondary({ md: true })}>Cancel</button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className={s.historyEntryHeader}>
+                    <div className={s.historyEntryDate}>{e.date}</div>
+                    <div className={s.historyEntryActions}>
+                      <button type="button" onClick={function () { startEdit(i); }} title="Edit entry" className={s.btnIconEdit}>✏️</button>
+                      <button type="button" onClick={function () { deleteEntry(i); }} title="Delete entry" className={ui.iconBtnDelete}>🗑</button>
+                    </div>
+                  </div>
+                  <div className={s.chipRow}>
+                    {[["BW", "kg", ACCENT], ["BMI", "kg/m²", BLUE], ["FM", "kg", PINK], ["FMI", "kg/m²", PINK], ["PBF", "%", PINK], ["FFM", "kg", GREEN], ["FFMI", "kg/m²", ACCENT], ["SMM", "kg", GREEN], ["SMI", "kg/m²", ORANGE]].map(function (r) {
+                      return e[r[0]] != null ? (
+                        <div key={r[0]} className={s.metricChip}>
+                          <div className={s.metricChipLabel}>{r[0]}</div>
+                          <div className={s.metricChipValue} style={{ color: r[2] }}>{Number(e[r[0]]).toFixed(2)}<span className={s.metricChipUnit}>{r[1]}</span></div>
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
+                </>
+              )}
             </div>
           );
         })}
