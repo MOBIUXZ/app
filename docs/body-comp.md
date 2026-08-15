@@ -19,7 +19,7 @@ Collapsible form for logging a new body composition entry.
 - Skeletal Muscle Mass (kg)
 - Waist (cm)
 - Age
-- Sex (male / female)
+- **Sex** — Male / Female pill toggle (shared UI pattern with hover, active, and focus states; used for Mifflin-St Jeor BMR)
 
 ## Live Calculated Metrics
 
@@ -69,10 +69,20 @@ Shows the **10 most recent** entries with all stored metrics displayed as chips:
 
 BW, BMI, FM, FMI, PBF, FFM, FFMI, SMM, SMI
 
+The history toolbar (entry count + actions) has top spacing below the collapsible **History** header so it does not sit flush against the toggle.
+
 ### Clear History
 - **Clear History** button (when entries exist) deletes all `bodyComp` and `bodyLogs` data
 - Confirmation dialog with keyboard support (`Enter` confirm · `Esc` cancel)
 - Clears Dashboard body weight/body fat stats and Progress body weight chart data
+
+### Edit Entry
+- **✏️** on each history row opens an **inline edit form** for that entry
+- Editable fields: date, body weight, height, body fat %, skeletal muscle mass, waist, age, sex
+- **Save** recalculates all derived metrics (BMI, FFMI, FMI, SMI, BMR, etc.) using the same logic as **Log Entry**
+- **Cancel** returns to the read-only chip view
+- Only one entry can be edited at a time
+- If date or weight changes, the paired **`bodyLogs`** point is updated (old date+weight removed, new point appended) so the Progress body weight chart stays in sync
 
 ### Delete Entry
 - **🗑** on each history row deletes that entry only
@@ -88,4 +98,5 @@ Body comp data only comes from the **Log Entry** form on this page.
 
 - Entry date is stored as `DD-MM-YYYY` and shown in History and on the Progress page charts.
 - Body weight entries are also appended to `bodyLogs` for use on the Progress page body weight chart.
+- Editing or deleting a history entry keeps `bodyLogs` in sync (matched by date + weight).
 - BMR values feed into the **Calories** page TDEE calculation.

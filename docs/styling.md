@@ -7,7 +7,7 @@ FitTrack uses **CSS Modules** with a shared theme. Static layout and typography 
 | File | Purpose |
 |------|---------|
 | `src/styles/theme.css` | CSS custom properties (`--ft-accent`, `--ft-bg-*`, radii, shadows) |
-| `src/styles/global.css` | Base reset + keyboard navigation classes (`.ft-kb-*`) |
+| `src/styles/global.css` | Base reset, keyboard navigation classes (`.ft-kb-*`), number-input scroll guard |
 | `src/styles/ui.module.css` | Shared UI: buttons, inputs, cards, collapse, modals, flex/grid utilities |
 | `src/styles/styleHelpers.js` | `cx()`, `btnPrimaryClass`, `inputClass`, `selectClass`, `textareaClass` |
 | `src/App.module.css` | App shell: header, nav, main |
@@ -38,10 +38,32 @@ Do **not** pass these helpers to `style=` — they return class name strings.
 
 ### Shared vs page-specific
 
-- **`ui.module.css`** — anything reused across pages (buttons, forms, cards, modals, empty states, history toolbar)
+- **`ui.module.css`** — anything reused across pages (buttons, forms, cards, modals, empty states, history toolbar, pill toggles)
 - **`PageName.module.css`** — layout and components unique to that tab
 
 Page modules may `composes` from `ui.module.css` (e.g. `cardFlush` composes `card`).
+
+### Pill toggles
+
+Segmented controls use the shared pill track pattern:
+
+- **`pillToggleTrack`** — bordered container
+- **`pillToggleBtn`** / **`pillToggleBtnActive`** — inactive (transparent) vs selected (accent fill)
+
+Used on Body Comp (sex), Workout (calendar month/year, history sort/order), and similar binary/multi-choice UI. Active buttons include hover, press (`:active` scale), and `:focus-visible` ring feedback.
+
+### Number inputs
+
+All `type="number"` fields app-wide:
+
+- **Spinner arrows hidden** in `global.css` (avoids accidental clicks)
+- **Mouse wheel blocked** while a number input is focused — `useDisableNumberInputWheel()` in `App.jsx` prevents scroll from changing values when hovering over form fields
+
+Values change only by typing (or keyboard arrows when focused).
+
+### History toolbar
+
+**`.historyToolbar`** — flex row for entry counts and actions (e.g. **Clear History** on Body Comp and Workout). Includes `margin-top: 12px` so the toolbar clears the collapse header.
 
 ### Chart colors
 

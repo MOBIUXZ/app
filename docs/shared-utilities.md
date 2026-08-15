@@ -198,15 +198,13 @@ Calculates rest duration between two `MM:SS` timestamps.
 
 Shared React components used across pages:
 
-| Component | Purpose |
-|-----------|---------|
+| Component / helper | Purpose |
+|--------------------|---------|
 | `Card` | Styled container |
 | `StatBox` | Metric display box |
 | `Collapse` | Expandable section |
-| `inp()` | Input field style factory |
-| `btnPrimary()` | Primary button styles |
-| `btnSecondary()` | Secondary button styles |
-| `btnDanger()` | Destructive button styles |
+| `inputClass()` | Input field class helper |
+| `btnPrimary()` / `btnSecondary()` / `btnDanger()` | Button class helpers |
 
 ## Keyboard Navigation
 
@@ -218,6 +216,7 @@ See [keyboard-navigation.md](./keyboard-navigation.md) for full details.
 | `useKeyboardLayer()` | Register a popup as top keyboard layer |
 | `useKeyboardLayersBlocked()` | True when any popup is blocking global keys |
 | `useAppNavKeyboard()` | Global page shortcuts (`1`–`5`, `←` `→`, Enter) |
+| `useDisableNumberInputWheel()` | Prevents mouse wheel from changing focused number inputs (mounted in `App.jsx`) |
 | `useKeyboardListNav()` | Arrow/Enter navigation inside lists |
 | `useConfirmDialogKeyboard()` | Confirm dialog with button focus + Enter/Esc |
 | `handleParserTextareaKeyDown()` | Enter submits parser; Shift+Enter newline |

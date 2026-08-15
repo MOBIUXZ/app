@@ -43,6 +43,8 @@ Four mini-stat boxes above the metric toggles, all from the **most recent logged
 | **Last Best e1RM** | e.g. `50.7 kg` | kg |
 | **Last Mean e1RM** | e.g. `52.3 kg` | kg (successful sets only; see Mean e1RM section) |
 
+> **Note:** The **Session Performance** popup (per-workout graph) shows **Volume** with a kg suffix for the whole session. The per-exercise **Last Volume** stat above is unitless (raw weight × reps total).
+
 ### Metric Toggle
 Switch between four chart metrics. Each chart point is **one calendar date**; if you log the same exercise multiple times on one day, those entries are merged:
 
@@ -227,7 +229,7 @@ Per-workout popup chart for that single logged session:
 
 | Feature | Description |
 |---------|-------------|
-| **Session stats** | Weight, Volume, e1RM for the whole workout |
+| **Session stats** | **Weight** (max set load, kg), **Volume** (sum of weight × reps for the session, shown with kg suffix), **e1RM** (best set estimate, kg) |
 | **Metric toggles** | Weight / Volume / e1RM — line animates smoothly when switching (600ms ease-in-out), matching the main progress charts |
 | **X-axis** | Set number (`S1`, `S2`, …) with `L` / `R` when side data exists; per-set **time** shown below the label when parsed from Smart Parser (`MM:SS` on the set) |
 | **Y-axis** | Selected metric per set (weight, set volume, or set e1RM) |
