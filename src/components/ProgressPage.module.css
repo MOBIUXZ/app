@@ -114,37 +114,6 @@
 .splitCol {
   flex: 1;
   min-width: 0;
-  display: flex;
-  gap: 6px;
-}
-
-.splitColLeft {
-  flex-direction: row;
-}
-
-.splitColRight {
-  flex-direction: row;
-}
-
-.splitSideLabel {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  width: 32px;
-}
-
-.splitSideLabelRight {
-  justify-content: flex-end;
-  text-align: right;
-}
-
-.splitChartWrap {
-  flex: 1;
-  min-width: 0;
 }
 
 .splitLabel {
@@ -225,7 +194,18 @@
 .splitTooltipValues {
   display: flex;
   justify-content: space-between;
-  gap: 16px;
+  gap: 20px;
+  min-width: 160px;
+}
+
+.splitTooltipLeft {
+  color: inherit;
+  text-align: left;
+}
+
+.splitTooltipRight {
+  color: inherit;
+  text-align: right;
 }
 
 .detailBackdrop {
