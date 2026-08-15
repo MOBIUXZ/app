@@ -131,7 +131,10 @@ function renderDetailSetRows(sets, bestE1Value, keyPrefix) {
     return (
       <div key={keyPrefix + "-" + i} className={cx(s.setRow, isBest && s.setRowBest)}>
         <span className={s.setRowLoad}>{st.weight || 0}kg × {st.reps || 0}</span>
-        <span className={s.setRowE1rm}>{setE1 != null ? "e1RM " + setE1 + (isBest ? " ★" : "") : "—"}</span>
+        <div className={s.setRowE1rmGroup}>
+          <span className={s.setBestSlot}>{isBest && <span className={s.setBestTag}>Best</span>}</span>
+          <span className={cx(s.setRowE1rm, isBest && s.setRowE1rmBest)}>{setE1 != null ? "e1RM " + setE1 : "—"}</span>
+        </div>
       </div>
     );
   });

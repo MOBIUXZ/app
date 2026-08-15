@@ -310,19 +310,47 @@
   color: var(--ft-text-chip);
 }
 
+.setRowE1rmGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.setBestSlot {
+  width: 38px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .setRowE1rm {
-  color: var(--ft-green);
+  min-width: 72px;
+  text-align: right;
+  color: var(--ft-text-muted);
   font-weight: 600;
   white-space: nowrap;
 }
 
-.setRowBest {
-  background: var(--ft-green-bg);
-  border: 1px solid var(--ft-green-border);
+.setRowE1rmBest {
+  color: var(--ft-green);
+  font-weight: 700;
 }
 
-.setRowBest .setRowE1rm {
+.setRowBest {
+  box-shadow: inset 3px 0 0 var(--ft-green);
+}
+
+.setBestTag {
+  font-size: 9px;
   font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ft-green);
+  background: rgba(52, 211, 153, 0.1);
+  border-radius: var(--ft-radius-pill);
+  padding: 2px 6px;
+  line-height: 1;
 }
 
 .detailSplitRow {

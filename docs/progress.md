@@ -219,7 +219,7 @@ Click any chart data point to open a modal showing all workouts on that date:
 
 - Exercise name (compound lifts in caps)
 - Date and time
-- All sets listed one per row: weight × reps on the left, per-set **e1RM** on the right (Epley estimate; `—` when weight/reps are invalid). The **best e1RM** row(s) for each workout are highlighted with a green border and ★
+- All sets listed one per row: weight × reps on the left, per-set **e1RM** on the right (Epley estimate; `—` when weight/reps are invalid). The **best e1RM** row(s) show a green left accent, a **Best** pill to the left of the e1RM value, and green e1RM text — e1RM values stay column-aligned across all sets (ties allowed)
 - **Left/right workouts (isolation only)** — side-by-side **Left** (blue) and **Right** (pink) columns when the exercise **name** contains `single arm` (case-insensitive), e.g. Single Arm Lat Pulldown. Sets logged without a side (`both`) appear in **both** columns, each with its own best-e1RM highlight. **Compound lifts** always use a single-column list
 - **📈 Show Graph** on each workout — opens a **Session Performance** overlay (layered on top of the day modal)
 
