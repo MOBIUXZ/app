@@ -228,7 +228,7 @@ Per-workout popup chart for that single logged session:
 | Feature | Description |
 |---------|-------------|
 | **Session stats** | Weight, Volume, e1RM for the whole workout |
-| **Metric toggles** | Weight / Volume / e1RM |
+| **Metric toggles** | Weight / Volume / e1RM — line animates smoothly when switching (600ms ease-in-out), matching the main progress charts |
 | **X-axis** | Set number (`S1`, `S2`, …) with `L` / `R` when side data exists; per-set **time** shown below the label when parsed from Smart Parser (`MM:SS` on the set) |
 | **Y-axis** | Selected metric per set (weight, set volume, or set e1RM) |
 | **Split view** | Only when the exercise **name** includes `single arm` and left/right set data exists: side-by-side Left (blue) and Right (pink) mini charts in one row, labels above each chart; compound lifts use one chart |

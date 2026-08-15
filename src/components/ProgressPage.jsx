@@ -420,8 +420,8 @@ function WorkoutSessionGraph({ workout, colorFallbackIdx, onClose, formatChartDa
               : <Tooltip content={<SessionSetTooltip metricLabel={metricLabel} />} />}
             <Line type="monotone" dataKey={metric} stroke={strokeColor} strokeWidth={2} activeDot={useDockedDetail ? false : undefined} dot={function (props) {
               return <SessionSetDot cx={props.cx} cy={props.cy} fill={strokeColor} payload={props.payload} peerPoint={peerData ? peerData[props.index] : null} metric={peerData ? metric : null} highlightIdx={highlightIdx} />;
-            }} connectNulls={false} isAnimationActive={false} />
-            {hasFailed && <Line type="monotone" dataKey="failedPlot" stroke="none" connectNulls={false} dot={FailedSetDot} activeDot={{ r: 6, stroke: "#f87171", fill: "#f87171" }} isAnimationActive={false} legendType="none" />}
+            }} connectNulls={false} animationDuration={600} animationEasing="ease-in-out" />
+            {hasFailed && <Line type="monotone" dataKey="failedPlot" stroke="none" connectNulls={false} dot={FailedSetDot} activeDot={{ r: 6, stroke: "#f87171", fill: "#f87171" }} animationDuration={600} animationEasing="ease-in-out" legendType="none" />}
           </LineChart>
         </ResponsiveContainer>
         {hasFailed && <div className={s.sessionFailedHint}>Red ✕ marks failed sets (0 reps)</div>}
