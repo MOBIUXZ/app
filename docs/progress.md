@@ -51,7 +51,7 @@ This matches the **Combined Compound Lifts** overlay chart.
 Available when left/right side data exists **and** the exercise is not a no-split compound:
 
 - **Combined** — single line chart (default for compounds)
-- **Split** — side-by-side Left (blue) and Right (pink) charts
+- **Split** — two charts in a **horizontal row**: Left (blue) on the left, Right (pink) on the right, each with its **Left** / **Right** label above the chart
 
 Side data comes from Smart Parser entries like:
 ```
@@ -60,16 +60,16 @@ Side data comes from Smart Parser entries like:
 
 Sets without side info are marked `both` and count toward combined totals.
 
+> **Note:** The per-exercise **Split** toggle applies to any isolation exercise with left/right set data. The **Workout Details** set list and **Session Performance** split view use a stricter rule: only exercises whose **name** contains `single arm` (case-insensitive), e.g. Single Arm Lat Pulldown. Workout or set notes do not trigger that split.
+
 ### Left/Right Imbalance Highlighting (Split View)
 
 When **Split** view is active, the app compares left and right values for the currently selected metric (Max Weight, Volume, or Best e1RM) at each **date**. If the two sides differ, that data point is visually flagged so you can spot muscular imbalances at a glance.
 
-**What was added:**
-
 | Feature | Description |
 |---------|-------------|
 | **Amber ring on dots** | Imbalanced points on both Left and Right charts get a larger dot with an amber (`#fbbf24`) outer ring instead of the standard small dot |
-| **Imbalance tooltip** | Hovering an imbalanced point shows Left and Right values together, with a `⚠ Imbalance` warning and an amber tooltip border |
+| **Imbalance tooltip** | Hovering an imbalanced point shows **Left** and **Right** on one row — Left value aligned to the left, Right value aligned to the right — plus a `⚠ Imbalance` warning and an amber tooltip border |
 | **Legend** | When any imbalanced sessions exist for the current metric, a legend appears below the split charts: *"Amber ring highlights left/right imbalance for [metric]"* |
 
 **How imbalance is detected:**
@@ -156,7 +156,7 @@ Click any chart data point to open a modal showing all workouts on that date:
 - Exercise name (compound lifts in caps)
 - Date and time
 - All sets listed one per row: weight × reps on the left, per-set **e1RM** on the right (Epley estimate; `—` when weight/reps are invalid). The **best e1RM** row(s) for each workout are highlighted with a green border and ★
-- **Left/right workouts (isolation only)** — side-by-side **Left** (blue) and **Right** (pink) columns when the exercise name contains **single arm** (e.g. Single Arm Lat Pulldown). Sets logged without a side (`both`) appear in **both** columns. **Compound lifts** always use a single-column list
+- **Left/right workouts (isolation only)** — side-by-side **Left** (blue) and **Right** (pink) columns when the exercise **name** contains `single arm` (case-insensitive), e.g. Single Arm Lat Pulldown. Sets logged without a side (`both`) appear in **both** columns, each with its own best-e1RM highlight. **Compound lifts** always use a single-column list
 - **📈 Show Graph** on each workout — opens a **Session Performance** overlay (layered on top of the day modal)
 
 ### Session Performance Graph
@@ -169,7 +169,8 @@ Per-workout popup chart for that single logged session:
 | **Metric toggles** | Weight / Volume / e1RM |
 | **X-axis** | Set number (`S1`, `S2`, …) with `L` / `R` when side data exists; per-set **time** shown below the label when parsed from Smart Parser (`MM:SS` on the set) |
 | **Y-axis** | Selected metric per set (weight, set volume, or set e1RM) |
-| **Split view** | Isolation workouts whose exercise name includes **single arm**, with left/right set data, show side-by-side Left (blue) and Right (pink) mini charts; compound lifts use one chart. **Amber rings** mark sets where left and right values differ for the selected metric |
+| **Split view** | Only when the exercise **name** includes `single arm` and left/right set data exists: side-by-side Left (blue) and Right (pink) mini charts in one row, labels above each chart; compound lifts use one chart |
+| **Split imbalance** | In split session graphs, each set index on Left is compared to the same index on Right for the active metric. Mismatches get **amber rings** on both dots; a legend appears below when any imbalance exists |
 | **Failed sets (0 reps)** | Excluded from the trend line; shown as a red **✕** at the set position (attempted weight on Weight view, bottom on Volume/e1RM). Set label turns red; tooltip shows **Failed attempt** |
 | **Keyboard** | `Esc` closes the graph first, then the day modal |
 
