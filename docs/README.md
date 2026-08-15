@@ -63,6 +63,7 @@ Sets may include an optional `side` field: `"left"`, `"right"`, or `"both"`.
 
 ## Key Conventions
 
+- **Main navigation** — five pages in a segmented pill track; active tab is a gradient purple pill (see [keyboard-navigation.md](./keyboard-navigation.md#main-navigation)).
 - **Compound lifts** (Squat, Bench Press, Deadlift, etc.) display in ALL CAPS in the UI (e.g. `SQUATS`, `PUSHPRESS`, `BARBELL ROWS`).
 - **Exercise names** are normalized via aliases (e.g. `pushpress` → Push Press, `barbell rows` → Barbell Row).
 - **Dates** are stored as `DD-MM-YYYY` for workouts; calorie entries use locale date strings.

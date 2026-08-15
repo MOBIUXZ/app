@@ -215,7 +215,7 @@ See [keyboard-navigation.md](./keyboard-navigation.md) for full details.
 | `KeyboardLayerProvider` | App wrapper; layered popup keyboard routing |
 | `useKeyboardLayer()` | Register a popup as top keyboard layer |
 | `useKeyboardLayersBlocked()` | True when any popup is blocking global keys |
-| `useAppNavKeyboard()` | Global page shortcuts (`1`–`5`, `←` `→`, Enter) |
+| `useAppNavKeyboard()` | Global page shortcuts; returns `selectTab(i)` for nav button clicks |
 | `useDisableNumberInputWheel()` | Prevents mouse wheel from changing focused number inputs (mounted in `App.jsx`) |
 | `useKeyboardListNav()` | Arrow/Enter navigation inside lists |
 | `useConfirmDialogKeyboard()` | Confirm dialog with button focus + Enter/Esc |

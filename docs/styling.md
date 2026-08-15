@@ -10,7 +10,7 @@ FitTrack uses **CSS Modules** with a shared theme. Static layout and typography 
 | `src/styles/global.css` | Base reset, keyboard navigation classes (`.ft-kb-*`), number-input scroll guard |
 | `src/styles/ui.module.css` | Shared UI: buttons, inputs, cards, collapse, modals, flex/grid utilities |
 | `src/styles/styleHelpers.js` | `cx()`, `btnPrimaryClass`, `inputClass`, `selectClass`, `textareaClass` |
-| `src/App.module.css` | App shell: header, nav, main |
+| `src/App.module.css` | App shell: header, segmented main nav (`.navTrack`), main content |
 | `src/components/DashboardPage.module.css` | Dashboard: stat row, PR list, recent workouts |
 | `src/components/BodyCompPage.module.css` | Body comp: metrics, relations, history chips |
 | `src/components/CaloriePage.module.css` | Calories: BMR/TDEE, calendar, macros, food log |
@@ -51,6 +51,26 @@ Segmented controls use the shared pill track pattern:
 - **`pillToggleBtn`** / **`pillToggleBtnActive`** — inactive (transparent) vs selected (accent fill)
 
 Used on Body Comp (sex), Workout (calendar month/year, history sort/order), and similar binary/multi-choice UI. Active buttons include hover, press (`:active` scale), and `:focus-visible` ring feedback.
+
+### Main navigation (app shell)
+
+**`App.module.css`** — top page switcher, separate from small in-page pill toggles:
+
+| Class | Role |
+|-------|------|
+| `.navTrack` | Bordered pill container (max-width 680px, centered) |
+| `.navBtn` | Inactive tab — transparent, hover wash, green `:focus-visible` on inactive tabs only |
+| `.navBtnActive` | Active tab — gradient purple pill, shadow; no focus outline (pill is the indicator) |
+
+Tabs use `role="tab"` / `aria-selected`. Focus sync in `App.jsx` moves DOM focus to the active tab when the page changes via keyboard while focus remains in the nav bar.
+
+### Activity level list (Calories)
+
+**`CaloriePage.module.css`** — BMR/TDEE activity picker (not the shared pill track):
+
+- **Selected row:** green inset left bar (`.activityBtnActive`)
+- **Keyboard focus:** green outline override on `.activityList .ft-kb-focus` (no purple glow)
+- Mouse hover does not sync keyboard focus
 
 ### Number inputs
 

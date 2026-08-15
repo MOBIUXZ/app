@@ -4,11 +4,25 @@ The Calories page tracks daily food intake, macronutrients, and energy expenditu
 
 ## BMR & TDEE
 
-Requires at least one Body Comp entry with weight, height, age, and sex.
+Requires at least one **Body Comp** entry. BMR is read from the **latest** `bodyComp` record (not recalculated on the Calories page).
+
+### BMR source & formulas
+
+| Priority | Field | Formula | Requirements |
+|----------|-------|---------|--------------|
+| 1 | `BMR_Mifflin` | Mifflin-St Jeor | Weight, height, age, sex (from Body Comp **Log Entry**) |
+| 2 | `BMR_Katch` | `370 + 21.6 × FFM` | Body fat % (FFM = fat-free mass in kg) |
+
+**Mifflin-St Jeor** (computed in `BodyCompPage.jsx` when logging):
+
+- **Male:** `10 × weight(kg) + 6.25 × height(cm) − 5 × age + 5`
+- **Female:** `10 × weight(kg) + 6.25 × height(cm) − 5 × age − 161`
+
+The BMR card subtitle shows which formula was used (**Mifflin-St Jeor** or **Katch-McArdle**).
 
 ### BMR Display
-- Uses **Mifflin-St Jeor** when available, otherwise **Katch-McArdle**
-- Shown in kcal/day
+- Value shown rounded to whole kcal/d
+- If no qualifying Body Comp entry exists, shows a prompt to log weight, height, age, and sex
 
 ### Activity Level Selector
 
@@ -20,7 +34,15 @@ Requires at least one Body Comp entry with weight, height, age, and sex.
 | Active | 1.725 | 6–7 days/week |
 | Very Active | 1.9 | Hard daily / 2×/day |
 
-**TDEE** = BMR × activity multiplier
+**TDEE** = `round(BMR × activity multiplier)`
+
+Selected level is shown under the TDEE value. Default selection is **Moderate** (index 2).
+
+**Activity row UI:**
+- **Selected:** green left accent bar, darker inset background, bold label
+- **Unselected:** subtle hover lift; no purple highlight
+- **Keyboard (↑↓ in list):** green outline (not purple); mouse hover does not move list focus
+- **Click / press:** slight scale-down feedback
 
 ### Goal Presets
 Based on calculated TDEE:
@@ -75,5 +97,6 @@ Lists all entries for the selected date with:
 
 ## Integration
 
+- **Body Comp** — latest entry supplies `BMR_Mifflin` / `BMR_Katch`; edit Body Comp to update Calories BMR/TDEE
 - **Dashboard** shows today's total calories
 - **Progress** page includes a 7-day calorie intake trend chart
