@@ -69,7 +69,7 @@ Shows the **10 most recent** entries with all stored metrics displayed as chips:
 
 BW, BMI, FM, FMI, PBF, FFM, FFMI, SMM, SMI
 
-The history toolbar (entry count + actions) has top spacing below the collapsible **History** header so it does not sit flush against the toggle.
+The history toolbar (entry count + actions) sits below the collapsible **History** header with spacing from the shared collapse body padding.
 
 ### Clear History
 - **Clear History** button (when entries exist) deletes all `bodyComp` and `bodyLogs` data

@@ -63,7 +63,7 @@ Values change only by typing (or keyboard arrows when focused).
 
 ### History toolbar
 
-**`.historyToolbar`** — flex row for entry counts and actions (e.g. **Clear History** on Body Comp and Workout). Includes `margin-top: 12px` so the toolbar clears the collapse header.
+**`.historyToolbar`** — flex row for entry counts and actions (e.g. **Clear History** on Body Comp and Workout). Top spacing comes from **`.collapseBody`** padding (`12px`), not a separate toolbar margin.
 
 ### Chart colors
 

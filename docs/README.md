@@ -67,4 +67,4 @@ Sets may include an optional `side` field: `"left"`, `"right"`, or `"both"`.
 - **Exercise names** are normalized via aliases (e.g. `pushpress` → Push Press, `barbell rows` → Barbell Row).
 - **Dates** are stored as `DD-MM-YYYY` for workouts; calorie entries use locale date strings.
 - **Number inputs** do not change on mouse wheel scroll while focused; spinner arrows are hidden (see [styling.md](./styling.md#number-inputs)).
-- **History toolbars** (Body Comp, Workout) use shared spacing below collapse headers (see [styling.md](./styling.md#history-toolbar)).
+- **Collapse panels** use `12px` top padding inside the body so the first field (e.g. Date on Body Comp **Log Entry**) is not flush against the header (see [styling.md](./styling.md#history-toolbar)).

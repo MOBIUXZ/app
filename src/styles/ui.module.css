@@ -195,7 +195,7 @@
 }
 
 .collapseBody {
-  padding: 0 18px 18px;
+  padding: 12px 18px 18px;
 }
 
 .sectionTitle {
@@ -607,7 +607,6 @@
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-  margin-top: 12px;
   margin-bottom: 12px;
 }
 
