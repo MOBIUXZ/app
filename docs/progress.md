@@ -170,7 +170,7 @@ Per-workout popup chart for that single logged session:
 | **X-axis** | Set number (`S1`, `S2`, …) with `L` / `R` when side data exists; per-set **time** shown below the label when parsed from Smart Parser (`MM:SS` on the set) |
 | **Y-axis** | Selected metric per set (weight, set volume, or set e1RM) |
 | **Split view** | Only when the exercise **name** includes `single arm` and left/right set data exists: side-by-side Left (blue) and Right (pink) mini charts in one row, labels above each chart; compound lifts use one chart |
-| **Split imbalance** | In split session graphs, each set index on Left is compared to the same index on Right for the active metric. Mismatches get **amber rings** on both dots; a legend appears below when any imbalance exists. Hovering a set shows a **docked comparison panel** below the charts (not over them) — Left on the left, Right on the right, load under each, plus `⚠ Imbalance · Δ [difference]` when they differ |
+| **Split imbalance** | In split session graphs, each set index on Left is compared to the same index on Right for the active metric. Mismatches get **amber rings** on both dots; a legend appears below when any imbalance exists. Hovering a set shows a **docked comparison panel** below the charts: hand-specific values (Left / Right + load) on the sides; **set number**, **time**, and **imbalance · Δ** centered in the middle |
 | **Failed sets (0 reps)** | Excluded from the trend line; shown as a red **✕** at the set position (attempted weight on Weight view, bottom on Volume/e1RM). Set label turns red; tooltip shows **Failed attempt** |
 | **Keyboard** | `Esc` closes the graph first, then the day modal |
 

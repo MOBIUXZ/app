@@ -294,31 +294,31 @@ function SessionSplitSetDetail({ leftPoint, rightPoint, metric, metricLabel }) {
     delta = leftVal - rightVal;
   }
 
+  var setTime = leftPoint && leftPoint.time && rightPoint && rightPoint.time && leftPoint.time !== rightPoint.time
+    ? leftPoint.time + " / " + rightPoint.time
+    : ((leftPoint && leftPoint.time) || (rightPoint && rightPoint.time) || "");
+
   return (
     <div className={cx(s.sessionSplitDetail, imbalanced && s.sessionSplitDetailImbalanced)}>
-      <div className={s.tooltipTitle}>{setTitle}</div>
-      <div className={s.splitTooltipValues}>
-        <div className={s.splitTooltipLeft} style={{ color: BLUE }}>
-          <div>Left: {leftVal}</div>
+      <div className={s.sessionSplitDetailRow}>
+        <div className={s.sessionSplitSide}>
+          <div className={s.sessionSplitSideValue} style={{ color: BLUE }}>Left: {leftVal}</div>
           <div className={s.sessionSplitLoad}>{formatSessionSetLoad(leftPoint)}</div>
         </div>
-        <div className={s.splitTooltipRight} style={{ color: PINK }}>
-          <div>Right: {rightVal}</div>
+        <div className={s.sessionSplitCenter}>
+          <div className={s.sessionSplitSetTitle}>{setTitle}</div>
+          {setTime ? <div className={s.sessionSplitTime}>{setTime}</div> : null}
+          {imbalanced ? (
+            <div className={s.sessionSplitImbalance}>
+              ⚠ Imbalance ({metricLabel}){delta != null ? " · Δ " + Math.abs(delta) : ""}
+            </div>
+          ) : null}
+        </div>
+        <div className={cx(s.sessionSplitSide, s.sessionSplitSideRight)}>
+          <div className={s.sessionSplitSideValue} style={{ color: PINK }}>Right: {rightVal}</div>
           <div className={s.sessionSplitLoad}>{formatSessionSetLoad(rightPoint)}</div>
         </div>
       </div>
-      {imbalanced && (
-        <div className={s.sessionSplitImbalance}>
-          ⚠ Imbalance ({metricLabel}){delta != null ? " · Δ " + Math.abs(delta) : ""}
-        </div>
-      )}
-      {(leftPoint && leftPoint.time || rightPoint && rightPoint.time) && (
-        <div className={s.sessionSplitTime}>
-          {leftPoint && leftPoint.time && rightPoint && rightPoint.time && leftPoint.time !== rightPoint.time
-            ? leftPoint.time + " / " + rightPoint.time
-            : ((leftPoint && leftPoint.time) || (rightPoint && rightPoint.time))}
-        </div>
-      )}
     </div>
   );
 }
