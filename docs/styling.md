@@ -63,7 +63,25 @@ Values change only by typing (or keyboard arrows when focused).
 
 ### History toolbar
 
-**`.historyToolbar`** — flex row for entry counts and actions (e.g. **Clear History** on Body Comp and Workout). Top spacing comes from **`.collapseBody`** padding (`12px`), not a separate toolbar margin.
+**`.historyToolbar`** — flex row for entry counts and actions (e.g. **Clear History** on Body Comp). Top spacing comes from **`.collapseBody`** padding.
+
+### Collapse panels
+
+**`.collapseBody`** — content area below each collapsible header:
+
+```css
+padding: 12px 18px 18px;
+```
+
+Applies to **Log Entry**, **History**, **Log Workout**, calorie log sections, etc. Prevents the first field or toolbar from sitting flush against the toggle row.
+
+### Workout history controls
+
+**`.historyControls`** in `WorkoutPage.module.css` — stacked layout for search/actions/filter rows:
+
+- `flex-direction: column` with `12px` gap between rows
+- `padding-inline: 10px` for left/right inset on action and sort buttons
+- Used with **`.historyToolbarSticky`** for scroll-pinned header
 
 ### Chart colors
 

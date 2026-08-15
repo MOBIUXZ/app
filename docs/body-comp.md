@@ -4,7 +4,7 @@ The Body Comp page tracks body measurements and automatically calculates derived
 
 ## Log Entry
 
-Collapsible form for logging a new body composition entry.
+Collapsible form for logging a new body composition entry. The first field (**Date**) sits below the collapse header with spacing from shared **`.collapseBody`** padding (`12px` top).
 
 ### Date
 - Select or type the entry date (`DD-MM-YYYY` format, same as workouts)

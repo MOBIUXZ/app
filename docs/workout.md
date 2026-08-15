@@ -74,19 +74,33 @@ Each set supports an optional **Time** toggle for rest tracking.
 Full history browser with:
 
 ### Search & Filter
-- Search by exercise name (stacked below the collapse header with spacing)
-- **Expand all / Clear History** row with workout/day counts on the same line
-- Sort **By Date** / **By Workout** and **Newest** / **Oldest** pill toggles on a separate row below
-- Date/exercise group headers sit below the filter row with clear vertical gap
+
+Stacked control layout inside **Workout History** (sticky header while scrolling):
+
+| Row | Contents |
+|-----|----------|
+| Search | Full-width exercise name filter |
+| Actions | **Expand all / Collapse all** + **Clear History** (left) · workout count + days logged (right) |
+| Sort | **By Date / By Workout** and **Newest / Oldest** pill toggles |
+
+- Controls have **10px horizontal inset** so buttons and stats are not flush with the panel edges
+- Vertical gaps separate search, actions, filters, and the history list
+- Top spacing comes from shared **`.collapseBody`** padding (`12px`)
 
 ### Grouping
-- Expand/collapse individual groups
-- **Expand all / Collapse all** toggle
-- Group headers show date or exercise name (compound lifts in caps)
+
+- Workouts are grouped by **date** or **exercise** (depending on sort mode)
+- Groups **start expanded** on first load
+- Click a group header to expand/collapse that group (chevron **▾ / ▸** matches state)
+- **Expand all / Collapse all** toggles every group in **one click**
+  - Button label is derived from actual group state (`allGroupsExpanded`), not a separate flag — avoids the old double-click bug
+  - When all groups are expanded → **Collapse all ▲**; otherwise → **Expand all ▼**
+- Group headers show date or exercise name (compound lifts in caps) plus entry count badge
 
 ### Per-Entry Actions
 - **Edit** — modify exercise, notes, and all sets inline
 - **Delete** — remove a single workout entry
+- **No purple focus ring on mouse hover** — keyboard list focus (`.ft-kb-focus`) applies only when navigating the list with ↑↓ after focusing the list; hovering an entry does not highlight it
 
 ### Bulk Actions
 - **Clear History** — delete all workouts (with confirmation)

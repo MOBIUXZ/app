@@ -31,7 +31,7 @@ Click a list area (or tab into it), then:
 | `Enter` | Select / activate the focused item |
 | `Escape` | Clear list focus (or close popup if in a modal) |
 
-Hovering an item with the mouse also updates keyboard focus.
+Hovering an item with the mouse updates keyboard focus on most lists (Dashboard PRs, calorie log, activity picker, 1RM set picker). **Workout History entry rows** are an exception — mouse hover does not apply `.ft-kb-focus`; use ↑↓ after tabbing into the list.
 
 ## Visual Feedback
 
@@ -53,6 +53,7 @@ Hovering an item with the mouse also updates keyboard focus.
 | **1RM set picker** | ↑↓ sets · Enter load · Esc close | Search input ignores arrows |
 | **Calendar modal** | Esc close | |
 | **Progress workout detail** | ↑↓ cards · Esc close | |
+| **Workout History list** | ↑↓ entries · Enter edit · Esc clear focus | Mouse hover does not move focus |
 
 ### Clear History Dialog
 
@@ -72,4 +73,4 @@ Hovering an item with the mouse also updates keyboard focus.
 | `useKeyboardListNav()` | Arrow/Enter list control |
 | `useConfirmDialogKeyboard()` | Two-button confirm with focus indicator |
 
-CSS in `index.html`: `.ft-kb-focus`, `.ft-kb-btn-focus`, `.ft-kb-activate`, `.ft-kb-focus-indicator`, `.ft-kb-modal-backdrop`.
+CSS in `src/styles/global.css`: `.ft-kb-focus`, `.ft-kb-btn-focus`, `.ft-kb-activate`, `.ft-kb-focus-indicator`, `.ft-kb-modal-backdrop`.
