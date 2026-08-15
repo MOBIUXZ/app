@@ -424,9 +424,11 @@ function SplitTooltip({ active, payload, label, metric, metricLabel }) {
   return (
     <div className={s.tooltip} style={{ border: imbalanced ? "1px solid #fbbf24" : "1px solid var(--ft-border-input)" }}>
       <div className={s.tooltipTitle}>{label}</div>
-      <div style={{ color: BLUE, marginBottom: 2 }}>Left: {left != null ? left : "—"}</div>
-      <div style={{ color: PINK, marginBottom: imbalanced ? 6 : 0 }}>Right: {right != null ? right : "—"}</div>
-      {imbalanced && <div style={{ color: "#fbbf24", fontSize: 11, fontWeight: 700 }}>⚠ Imbalance ({metricLabel})</div>}
+      <div className={s.splitTooltipValues}>
+        <div style={{ color: BLUE }}>Left: {left != null ? left : "—"}</div>
+        <div style={{ color: PINK }}>Right: {right != null ? right : "—"}</div>
+      </div>
+      {imbalanced && <div style={{ color: "#fbbf24", fontSize: 11, fontWeight: 700, marginTop: 6 }}>⚠ Imbalance ({metricLabel})</div>}
     </div>
   );
 }
@@ -492,9 +494,9 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
           </ResponsiveContainer>
         </div> : <div>
           <div className={s.splitRow}>
-          <div className={s.splitCol}>
-            <div className={s.splitLabel}>Left</div>
-            <div className={ui.chartContainer}>
+          <div className={cx(s.splitCol, s.splitColLeft)}>
+            <div className={s.splitSideLabel} style={{ color: BLUE }}>Left</div>
+            <div className={cx(ui.chartContainer, s.splitChartWrap)}>
               <ResponsiveContainer width="100%" height={140}>
                 <LineChart data={chartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0] && onPointSelect) { onPointSelect(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
@@ -506,9 +508,8 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
               </ResponsiveContainer>
             </div>
           </div>
-          <div className={s.splitCol}>
-            <div className={s.splitLabel}>Right</div>
-            <div className={ui.chartContainer}>
+          <div className={cx(s.splitCol, s.splitColRight)}>
+            <div className={cx(ui.chartContainer, s.splitChartWrap)}>
               <ResponsiveContainer width="100%" height={140}>
                 <LineChart data={chartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0] && onPointSelect) { onPointSelect(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
@@ -519,6 +520,7 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
                 </LineChart>
               </ResponsiveContainer>
             </div>
+            <div className={cx(s.splitSideLabel, s.splitSideLabelRight)} style={{ color: PINK }}>Right</div>
           </div>
           </div>
           {hasImbalance && <div className={s.imbalanceHint}>
