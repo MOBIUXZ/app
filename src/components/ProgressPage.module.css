@@ -310,26 +310,13 @@
   color: var(--ft-text-chip);
 }
 
-.setRowE1rmGroup {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.setBestSlot {
-  width: 38px;
-  flex-shrink: 0;
-  display: flex;
-  justify-content: flex-end;
-}
-
 .setRowE1rm {
-  min-width: 72px;
+  min-width: 92px;
   text-align: right;
   color: var(--ft-text-muted);
   font-weight: 600;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .setRowE1rmBest {
@@ -339,18 +326,6 @@
 
 .setRowBest {
   box-shadow: inset 3px 0 0 var(--ft-green);
-}
-
-.setBestTag {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--ft-green);
-  background: rgba(52, 211, 153, 0.1);
-  border-radius: var(--ft-radius-pill);
-  padding: 2px 6px;
-  line-height: 1;
 }
 
 .detailSplitRow {
