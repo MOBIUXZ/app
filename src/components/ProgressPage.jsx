@@ -168,6 +168,7 @@ function buildSetChartData(sets) {
     return {
       set: "S" + (i + 1),
       label: "S" + (i + 1) + sideSuffix,
+      idx: i,
       time: time,
       failed: failed,
       attemptWeight: wt,
@@ -214,6 +215,7 @@ function SessionSetDot(props) {
   var payload = props.payload;
   var peerPoint = props.peerPoint;
   var metric = props.metric;
+  var highlightIdx = props.highlightIdx;
   if (payload && payload.failed) return null;
   if (cx == null || cy == null) return null;
   if (peerPoint && metric && isSessionSetImbalanced(payload, peerPoint, metric)) {
@@ -224,7 +226,8 @@ function SessionSetDot(props) {
       </g>
     );
   }
-  return <circle cx={cx} cy={cy} r={4} fill={fill} />;
+  var r = highlightIdx != null && payload && payload.idx === highlightIdx ? 6 : 4;
+  return <circle cx={cx} cy={cy} r={r} fill={fill} stroke={highlightIdx != null && payload && payload.idx === highlightIdx ? "#fef3c7" : "none"} strokeWidth={1.5} />;
 }
 
 function createSessionSetAxisTick(data) {
@@ -267,9 +270,63 @@ function sessionChartYDomain(plotData, metric) {
   return [bottom, top];
 }
 
+function formatSessionSetLoad(point) {
+  if (!point) return "—";
+  if (point.failed) return (point.attemptWeight || 0) + "kg × 0";
+  return (point.attemptWeight || point.weight || 0) + "kg × " + (point.reps || 0);
+}
+
+function sessionSideMetricDisplay(point, metric) {
+  if (!point) return "—";
+  if (point.failed) return "Failed";
+  return point[metric] != null ? point[metric] : "—";
+}
+
+function SessionSplitSetDetail({ leftPoint, rightPoint, metric, metricLabel }) {
+  if (!leftPoint && !rightPoint) return null;
+  var leftVal = sessionSideMetricDisplay(leftPoint, metric);
+  var rightVal = sessionSideMetricDisplay(rightPoint, metric);
+  var imbalanced = isSessionSetImbalanced(leftPoint, rightPoint, metric)
+    || (leftPoint && rightPoint && leftPoint.failed !== rightPoint.failed);
+  var setTitle = (leftPoint && leftPoint.set) || (rightPoint && rightPoint.set) || "—";
+  var delta = null;
+  if (typeof leftVal === "number" && typeof rightVal === "number" && leftVal !== rightVal) {
+    delta = leftVal - rightVal;
+  }
+
+  return (
+    <div className={cx(s.sessionSplitDetail, imbalanced && s.sessionSplitDetailImbalanced)}>
+      <div className={s.tooltipTitle}>{setTitle}</div>
+      <div className={s.splitTooltipValues}>
+        <div className={s.splitTooltipLeft} style={{ color: BLUE }}>
+          <div>Left: {leftVal}</div>
+          <div className={s.sessionSplitLoad}>{formatSessionSetLoad(leftPoint)}</div>
+        </div>
+        <div className={s.splitTooltipRight} style={{ color: PINK }}>
+          <div>Right: {rightVal}</div>
+          <div className={s.sessionSplitLoad}>{formatSessionSetLoad(rightPoint)}</div>
+        </div>
+      </div>
+      {imbalanced && (
+        <div className={s.sessionSplitImbalance}>
+          ⚠ Imbalance ({metricLabel}){delta != null ? " · Δ " + Math.abs(delta) : ""}
+        </div>
+      )}
+      {(leftPoint && leftPoint.time || rightPoint && rightPoint.time) && (
+        <div className={s.sessionSplitTime}>
+          {leftPoint && leftPoint.time && rightPoint && rightPoint.time && leftPoint.time !== rightPoint.time
+            ? leftPoint.time + " / " + rightPoint.time
+            : ((leftPoint && leftPoint.time) || (rightPoint && rightPoint.time))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function SessionSetTooltip({ active, payload, metricLabel }) {
   if (!active || !payload || !payload.length) return null;
   var point = payload[0].payload;
+
   if (point.failed) {
     return (
       <div className={s.tooltip} style={{ border: "1px solid #f87171" }}>
@@ -292,6 +349,7 @@ function SessionSetTooltip({ active, payload, metricLabel }) {
 
 function WorkoutSessionGraph({ workout, colorFallbackIdx, onClose, formatChartDate, selectedDateKey }) {
   var [metric, setMetric] = useState("weight");
+  var [hoveredSetIdx, setHoveredSetIdx] = useState(null);
   var sets = workout.sets || [];
   var exColor = getExerciseChartColor(workout.exercise, colorFallbackIdx);
   var chartData = buildSetChartData(sets);
@@ -306,7 +364,23 @@ function WorkoutSessionGraph({ workout, colorFallbackIdx, onClose, formatChartDa
     return active ? ui.chartToggleBtnActive : ui.chartToggleBtn;
   }
 
-  function renderMetricChart(data, strokeColor, height, peerData) {
+  function handleSplitChartHover(state) {
+    if (!state || typeof state.activeTooltipIndex !== "number" || state.activeTooltipIndex < 0) return;
+    setHoveredSetIdx(function (prev) {
+      return prev === state.activeTooltipIndex ? prev : state.activeTooltipIndex;
+    });
+  }
+
+  function clearSplitHover(ev) {
+    var next = ev.relatedTarget;
+    if (!next || !ev.currentTarget.contains(next)) setHoveredSetIdx(null);
+  }
+
+  function renderMetricChart(data, strokeColor, height, chartOpts) {
+    chartOpts = chartOpts || {};
+    var peerData = chartOpts.peerData;
+    var useDockedDetail = chartOpts.useDockedDetail;
+    var highlightIdx = chartOpts.highlightIdx;
     if (!data.length) return <div className={s.sessionGraphEmpty}>No sets for this side</div>;
     var plotData = withFailedPlot(data, metric);
     var hasTimes = data.some(function (p) { return !!p.time; });
@@ -317,12 +391,20 @@ function WorkoutSessionGraph({ workout, colorFallbackIdx, onClose, formatChartDa
     return (
       <div className={ui.chartContainer}>
         <ResponsiveContainer width="100%" height={chartHeight}>
-          <LineChart data={plotData} margin={{ top: 12, right: 8, bottom: xHeight > 30 ? 4 : 0 }}>
+          <LineChart
+            data={plotData}
+            margin={{ top: 12, right: 8, bottom: xHeight > 30 ? 4 : 0 }}
+            onMouseMove={useDockedDetail ? handleSplitChartHover : undefined}
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
             <XAxis dataKey="label" tick={createSessionSetAxisTick(data)} interval={0} angle={angled ? -25 : 0} textAnchor={angled ? "end" : "middle"} height={xHeight} />
             <YAxis tick={cs} width={35} domain={sessionChartYDomain(plotData, metric)} allowDataOverflow={false} />
-            <Tooltip content={<SessionSetTooltip metricLabel={metricLabel} />} />
-            <Line type="monotone" dataKey={metric} stroke={strokeColor} strokeWidth={2} dot={function (props) { return <SessionSetDot cx={props.cx} cy={props.cy} fill={strokeColor} payload={props.payload} peerPoint={peerData ? peerData[props.index] : null} metric={peerData ? metric : null} />; }} connectNulls={false} />
+            {useDockedDetail
+              ? <Tooltip content={function () { return null; }} cursor={{ stroke: "#64748b", strokeWidth: 1, strokeDasharray: "4 4" }} isAnimationActive={false} animationDuration={0} />
+              : <Tooltip content={<SessionSetTooltip metricLabel={metricLabel} />} />}
+            <Line type="monotone" dataKey={metric} stroke={strokeColor} strokeWidth={2} activeDot={useDockedDetail ? false : undefined} dot={function (props) {
+              return <SessionSetDot cx={props.cx} cy={props.cy} fill={strokeColor} payload={props.payload} peerPoint={peerData ? peerData[props.index] : null} metric={peerData ? metric : null} highlightIdx={highlightIdx} />;
+            }} connectNulls={false} isAnimationActive={false} />
             {hasFailed && <Line type="monotone" dataKey="failedPlot" stroke="none" connectNulls={false} dot={FailedSetDot} activeDot={{ r: 6, stroke: "#f87171", fill: "#f87171" }} isAnimationActive={false} legendType="none" />}
           </LineChart>
         </ResponsiveContainer>
@@ -364,7 +446,7 @@ function WorkoutSessionGraph({ workout, colorFallbackIdx, onClose, formatChartDa
           <div className={s.sessionGraphToggles}>
             {["weight", "volume", "e1rm"].map(function (m) {
               return (
-                <button key={m} type="button" onClick={function () { setMetric(m); }} className={chartToggleClass(metric === m)} style={metric === m ? { background: exColor, color: "#fff" } : undefined}>
+                <button key={m} type="button" onClick={function () { setMetric(m); setHoveredSetIdx(null); }} className={chartToggleClass(metric === m)} style={metric === m ? { background: exColor, color: "#fff" } : undefined}>
                   {metricLabelFor(m, true)}
                 </button>
               );
@@ -373,15 +455,26 @@ function WorkoutSessionGraph({ workout, colorFallbackIdx, onClose, formatChartDa
           <div className={s.sessionGraphChartBody}>
           {showSplit ? (
             <>
+            <div className={s.sessionSplitHoverZone} onMouseLeave={clearSplitHover}>
             <div className={s.detailSplitRow}>
               <div className={s.detailSplitCol}>
                 <div className={s.detailSplitLabel} style={{ color: BLUE }}>Left</div>
-                {renderMetricChart(leftData, BLUE, 120, rightData)}
+                {renderMetricChart(leftData, BLUE, 120, { peerData: rightData, useDockedDetail: true, highlightIdx: hoveredSetIdx })}
               </div>
               <div className={s.detailSplitCol}>
                 <div className={s.detailSplitLabel} style={{ color: PINK }}>Right</div>
-                {renderMetricChart(rightData, PINK, 120, leftData)}
+                {renderMetricChart(rightData, PINK, 120, { peerData: leftData, useDockedDetail: true, highlightIdx: hoveredSetIdx })}
               </div>
+            </div>
+            {hoveredSetIdx != null && (
+              <SessionSplitSetDetail
+                key={"split-" + hoveredSetIdx + "-" + metric}
+                leftPoint={leftData[hoveredSetIdx]}
+                rightPoint={rightData[hoveredSetIdx]}
+                metric={metric}
+                metricLabel={metricLabel}
+              />
+            )}
             </div>
             {sessionHasImbalance && <div className={s.imbalanceHint}>
               <span className={s.imbalanceDot} />

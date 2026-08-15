@@ -195,7 +195,7 @@
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  min-width: 160px;
+  min-width: 200px;
 }
 
 .splitTooltipLeft {
@@ -426,6 +426,42 @@
 
 .sessionGraphChartBody {
   padding: 8px 12px 0;
+}
+
+.sessionSplitHoverZone {
+  width: 100%;
+}
+
+.sessionSplitDetail {
+  margin: 10px 6px 0;
+  padding: 10px 12px;
+  background: var(--ft-bg-inset);
+  border: 1px solid var(--ft-border-input);
+  border-radius: var(--ft-radius-md);
+  pointer-events: none;
+}
+
+.sessionSplitDetailImbalanced {
+  border-color: #fbbf24;
+}
+
+.sessionSplitLoad {
+  font-size: 11px;
+  color: var(--ft-text-muted);
+  margin-top: 2px;
+}
+
+.sessionSplitImbalance {
+  color: #fbbf24;
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+.sessionSplitTime {
+  color: var(--ft-text-dim);
+  font-size: 11px;
+  margin-top: 4px;
 }
 
 .sessionGraphHint {
