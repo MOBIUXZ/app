@@ -69,22 +69,44 @@
   font-family: inherit;
   width: 100%;
   text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.activityBtn:hover {
+  background: var(--ft-bg-btn-hover);
+  border-color: var(--ft-border-input);
+}
+
+.activityBtn:active {
+  transform: scale(0.99);
 }
 
 .activityBtnActive {
   composes: activityBtn;
-  border-color: var(--ft-accent);
-  background: #2d2040;
+  border-color: var(--ft-border-input);
+  background: var(--ft-bg-inset);
+  box-shadow: inset 3px 0 0 var(--ft-green);
+}
+
+.activityBtnActive:hover {
+  background: var(--ft-bg-inset);
 }
 
 .activityBtnLabel {
   font-size: 13px;
+  color: var(--ft-text-nav);
 }
 
 .activityBtnLabelActive {
   composes: activityBtnLabel;
   font-weight: 700;
-  color: var(--ft-accent);
+  color: var(--ft-text);
+}
+
+.activityList :global(.ft-kb-focus) {
+  outline: 2px solid var(--ft-green) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
 }
 
 .activityBtnDesc {
