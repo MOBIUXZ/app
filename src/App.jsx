@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import DashboardPage from "./components/DashboardPage.jsx";
 import WorkoutPage from "./components/WorkoutPage.jsx";
 import BodyCompPage from "./components/BodyCompPage.jsx";
 import CaloriePage from "./components/CaloriePage.jsx";
 import ProgressPage from "./components/ProgressPage.jsx";
-import { cx, useAppNavKeyboard, useDisableNumberInputWheel } from "./components/shared.jsx";
+import { useAppNavKeyboard, useDisableNumberInputWheel } from "./components/shared.jsx";
 import styles from "./App.module.css";
 
 const NAV = ["Dashboard", "Workout", "Body Comp", "Calories", "Progress"];
@@ -28,7 +28,19 @@ export default function App() {
   var [data, setData] = useState(loadData);
   var [tab, setTab] = useState("Dashboard");
   var navKb = useAppNavKeyboard(NAV, tab, setTab);
+  var navTrackRef = useRef(null);
   useDisableNumberInputWheel();
+
+  useEffect(function () {
+    var track = navTrackRef.current;
+    if (!track) return;
+    var focused = document.activeElement;
+    if (!focused || !track.contains(focused)) return;
+    var activeBtn = track.querySelector('[role="tab"][aria-selected="true"]');
+    if (activeBtn && focused !== activeBtn) {
+      activeBtn.focus({ preventScroll: true });
+    }
+  }, [tab]);
 
   function save(d) {
     setData(d);
@@ -40,20 +52,25 @@ export default function App() {
       <div className={styles.header}>
         <span className={styles.logo}>⚡ FitTrack</span>
       </div>
-      <div className={styles.nav}>
-        {NAV.map(function (n, i) {
-          return (
-            <button
-              key={n}
-              type="button"
-              onClick={function () { setTab(n); }}
-              className={cx(tab === n ? styles.navBtnActive : styles.navBtn, navKb.navClass(i))}
-            >
-              {n}
-            </button>
-          );
-        })}
-      </div>
+      <nav className={styles.nav} aria-label="Main">
+        <div ref={navTrackRef} className={styles.navTrack} role="tablist">
+          {NAV.map(function (n, i) {
+            var isActive = tab === n;
+            return (
+              <button
+                key={n}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={function () { navKb.selectTab(i); }}
+                className={isActive ? styles.navBtnActive : styles.navBtn}
+              >
+                {n}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
       <div className={styles.main}>
         {tab === "Dashboard" && <DashboardPage data={data} setTab={setTab} />}
         {tab === "Workout" && <WorkoutPage data={data} save={save} />}

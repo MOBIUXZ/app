@@ -680,7 +680,15 @@ export function useAppNavKeyboard(tabs, currentTab, setTab) {
     return function () { window.removeEventListener("keydown", onKeyDown); };
   }, [tabs, currentTab, setTab, focusIdx, blocked]);
 
-  return { focusIdx: focusIdx, activatedIdx: activatedIdx, blocked: blocked, navClass: function (i) { return (i === focusIdx ? "ft-kb-nav-focus " : "") + (i === activatedIdx ? "ft-kb-nav-activate" : ""); } };
+  return {
+    focusIdx: focusIdx,
+    activatedIdx: activatedIdx,
+    blocked: blocked,
+    selectTab: function (i) {
+      setTab(tabs[i]);
+    },
+    navClass: function () { return ""; },
+  };
 }
 
 export function handleParserTextareaKeyDown(e, onSubmit) {
