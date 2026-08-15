@@ -88,6 +88,7 @@
   font-size: 9px;
   color: var(--ft-text-dim);
   margin-bottom: 2px;
+  line-height: 1.2;
 }
 
 .miniStatValue {

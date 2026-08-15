@@ -23,7 +23,9 @@ All other exercises appear under **ISOLATION LIFTS** (e.g. Single Arm Lat Pulldo
 Each chart includes:
 
 ### Header Stats
-- Exercise color is consistent across individual charts, combined overlay, PR value, metric toggles, and compound badge (see **Chart Colors** below).
+
+Exercise color is consistent across individual charts, combined overlay, PR value, metric toggles, and compound badge (see **Chart Colors** below).
+
 | Stat | Description |
 |------|-------------|
 | PR | All-time max weight for that exercise |
@@ -31,9 +33,15 @@ Each chart includes:
 | Sessions | Total session count (chart shows one point per calendar date) |
 
 ### Session Summary (latest day)
-- Last Weight (kg)
-- Last Volume (kg — sum of weight × reps that day)
-- Best e1RM (kg — highest Epley estimate across all sets that day)
+
+Four mini-stat boxes above the metric toggles, all from the **most recent logged date** for that exercise:
+
+| Label | Display | Units |
+|-------|---------|-------|
+| **Last Weight** | e.g. `40 kg` | kg |
+| **Last Volume** | e.g. `1160` | **None** — volume is weight × reps (not bar load) |
+| **Last Best e1RM** | e.g. `50.7 kg` | kg |
+| **Last Mean e1RM** | e.g. `52.3 kg` | kg (successful sets only; see Mean e1RM section) |
 
 ### Metric Toggle
 Switch between four chart metrics. Each chart point is **one calendar date**; if you log the same exercise multiple times on one day, those entries are merged:
@@ -110,12 +118,12 @@ When **Split** view is active, the app compares left and right values for the cu
 | Feature | Description |
 |---------|-------------|
 | **Amber ring on dots** | Imbalanced points on both Left and Right charts get a larger dot with an amber (`#fbbf24`) outer ring instead of the standard small dot |
-| **Imbalance detail** | Hovering a date shows a **docked panel** below the charts (not over them): **date** centered above, **⚠ Imbalance · Δ** centered below when sides differ, Left/Right values on the sides |
+| **Imbalance detail** | Hovering a date shows a **docked panel** below the charts (not over them): **date** centered above, **⚠ Imbalance · Δ** centered below when sides differ, Left/Right values on the sides. Weight and e1RM values include **kg**; **Volume** is unitless |
 | **Legend** | When any imbalanced sessions exist for the current metric, a legend appears below the split charts: *"Amber ring highlights left/right imbalance for [metric]"* |
 
 **How imbalance is detected:**
 
-For each date and metric, the app compares the left-side value (`weight_left`, `volume_left`, or `e1rm_left`) against the right-side value (`weight_right`, `volume_right`, or `e1rm_right`). If both values exist and are not equal, the point is marked imbalanced. Multiple logs on the same day are merged: all sets from that day are pooled before left/right metrics are computed.
+For each date and metric, the app compares the left-side value against the right-side value (`weight_left` / `weight_right`, `volume_left` / `volume_right`, `e1rm_left` / `e1rm_right`, or `mean_e1rm_left` / `mean_e1rm_right`). If both values exist and are not equal, the point is marked imbalanced. Multiple logs on the same day are merged: all sets from that day are pooled before left/right metrics are computed.
 
 **Example:** A Single Arm Lat Pulldown session logged as `RIGHT - 60kg × 10`, `LEFT - 60kg × 7` will highlight on the **Best e1RM** split chart because the estimated max differs per side. The same session will not highlight on **Max Weight** if both sides used the same load (60 kg).
 
@@ -127,6 +135,19 @@ Sessions where left and right match, or where sets are logged without side info 
 - Charts render from **1 session** onward (single data point shown)
 - Hint shown when only 1 session: *"Log another session to see trends"*
 - Click a chart point to open the **Workout Details** modal
+
+### Chart Hover Tooltips (combined view)
+
+On the **single-line combined chart** (not Split view), hovering a point shows a default Recharts tooltip:
+
+| Active metric | Label shown | Value format |
+|---------------|-------------|--------------|
+| **Max Weight** | Max Weight | `{value} kg` |
+| **Volume** | Volume | `{value}` (no unit) |
+| **Best e1RM** | Best e1RM | `{value} kg` |
+| **Mean e1RM** | Mean e1RM | `{value} kg` |
+
+Labels match the toggle names (not internal keys like `weight` or `e1rm`). Split view uses the docked imbalance panel instead of a floating tooltip (see above).
 
 ## Chart Colors
 
@@ -211,7 +232,7 @@ Per-workout popup chart for that single logged session:
 | **X-axis** | Set number (`S1`, `S2`, …) with `L` / `R` when side data exists; per-set **time** shown below the label when parsed from Smart Parser (`MM:SS` on the set) |
 | **Y-axis** | Selected metric per set (weight, set volume, or set e1RM) |
 | **Split view** | Only when the exercise **name** includes `single arm` and left/right set data exists: side-by-side Left (blue) and Right (pink) mini charts in one row, labels above each chart; compound lifts use one chart |
-| **Split imbalance** | In split session graphs, each set index on Left is compared to the same index on Right for the active metric. Mismatches get **amber rings** on both dots; a legend appears below when any imbalance exists. Hovering a set shows a **docked comparison panel** below the charts: hand-specific values (Left / Right + load) on the sides; **set number**, **time**, and **imbalance · Δ** centered in the middle |
+| **Split imbalance** | In split session graphs, each set index on Left is compared to the same index on Right for the active metric. Mismatches get **amber rings** on both dots; a legend appears below when any imbalance exists. Hovering a set shows a **docked comparison panel** below the charts (not over the graph): **set number** centered above, **time** below that, **⚠ Imbalance · Δ** centered at the bottom when sides differ; **Left** / **Right** values and load (`kg × reps`) on the sides. Panel tracks cursor via chart x-position (not tiny dot hit targets) |
 | **Failed sets (0 reps)** | Excluded from the trend line; shown as a red **✕** at the set position (attempted weight on Weight view, bottom on Volume/e1RM). Set label turns red; tooltip shows **Failed attempt** |
 | **Keyboard** | `Esc` closes the graph first, then the day modal |
 
