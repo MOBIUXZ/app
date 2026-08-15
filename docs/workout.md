@@ -74,9 +74,10 @@ Each set supports an optional **Time** toggle for rest tracking.
 Full history browser with:
 
 ### Search & Filter
-- Search by exercise name
-- Sort **By Date** or **By Workout**
-- Order **Newest** or **Oldest**
+- Search by exercise name (stacked below the collapse header with spacing)
+- **Expand all / Clear History** row with workout/day counts on the same line
+- Sort **By Date** / **By Workout** and **Newest** / **Oldest** pill toggles on a separate row below
+- Date/exercise group headers sit below the filter row with clear vertical gap
 
 ### Grouping
 - Expand/collapse individual groups

@@ -197,7 +197,6 @@ export default function WorkoutPage({ data, save }) {
   var [searchQuery, setSearchQuery] = useState("");
   var [expandedGroups, setExpandedGroups] = useState({});
   var [showClearConfirm, setShowClearConfirm] = useState(false);
-  var [allExpanded, setAllExpanded] = useState(false);
   var [hoveredGroup, setHoveredGroup] = useState(null);
   var [showCalendarModal, setShowCalendarModal] = useState(false);
   var [calendarView, setCalendarView] = useState("month");
@@ -333,8 +332,13 @@ export default function WorkoutPage({ data, save }) {
   function cancelEdit() { setEditIdx(null); setEditForm(null); }
   function delW(i) { save({ workouts: data.workouts.filter(function (_, idx) { return idx !== i; }), bodyLogs: data.bodyLogs, bodyComp: data.bodyComp, calories: data.calories }); }
   function startEdit(i) { var w = data.workouts[i]; setEditIdx(i); setEditForm({ exercise: w.exercise, note: w.note || "", sets: w.sets.map(function (s) { return { weight: s.weight, reps: s.reps, time: s.time || "", note: s.note || "" }; }) }); }
-  function toggleGroup(groupKey) { setExpandedGroups(function (prev) { var next = Object.assign({}, prev); next[groupKey] = !next[groupKey]; return next; }); }
-  function toggleAllGroups(expand) { var next = {}; groupedHistory.forEach(function (group) { next[group.groupKey] = expand; }); setExpandedGroups(next); setAllExpanded(expand); }
+  function toggleGroup(groupKey) {
+    setExpandedGroups(function (prev) {
+      var next = Object.assign({}, prev);
+      next[groupKey] = prev[groupKey] !== false ? false : true;
+      return next;
+    });
+  }
   function clearHistory() { save({ workouts: [], bodyLogs: data.bodyLogs, bodyComp: data.bodyComp, calories: data.calories }); setShowClearConfirm(false); }
   var clearConfirmKb = useConfirmDialogKeyboard(showClearConfirm, clearHistory, function () { setShowClearConfirm(false); }, "clear-workout-history", { cancel: "Cancel", confirm: "Clear History" });
 
@@ -425,6 +429,16 @@ export default function WorkoutPage({ data, save }) {
       groupedHistory.push({ groupKey: groupKey, date: w.date, exercise: w.exercise, items: [w] });
     }
   });
+  function isGroupExpanded(groupKey) {
+    return expandedGroups[groupKey] !== false;
+  }
+  var allGroupsExpanded = groupedHistory.length > 0 && groupedHistory.every(function (g) { return isGroupExpanded(g.groupKey); });
+  function toggleAllGroups() {
+    var expand = !allGroupsExpanded;
+    var next = {};
+    groupedHistory.forEach(function (group) { next[group.groupKey] = expand; });
+    setExpandedGroups(next);
+  }
   var historyKb = useKeyboardListNav(historyItems.length, function (i) { startEdit(historyItems[i]._idx); }, historyItems.length > 0);
   var historyFlatIdx = 0;
 
@@ -937,28 +951,30 @@ Bench Press
       <Collapse emoji="📋" label="Workout History" defaultOpen={false}>
         <div className={ui.marginBottom12}>
           <div className={ui.historyToolbarSticky}>
-            <input value={searchQuery} onChange={function (e) { setSearchQuery(e.target.value); }} placeholder="Search by workout name..." className={cx(inputClass({ fullWidth: true }), ui.marginBottom8)} />
-            <div className={ui.historyToolbar}>
-            <div className={ui.flexRow}>
-              <button type="button" onClick={function () { toggleAllGroups(!allExpanded); }} className={s.expandAllBtn}>{allExpanded ? "Collapse all ▲" : "Expand all ▼"}</button>
-              {data.workouts.length > 0 && <button type="button" onClick={function () { setShowClearConfirm(true); }} className={btnDanger({ xsPill: true })}>Clear History</button>}
-            </div>
-            <div className={s.historyMetaRow}>
-              <span className={s.historyCount}>{filteredWorkouts.length} workouts</span>
-              <span className={s.historyCount}>•</span>
-              <span className={s.historyDaysLogged} style={{ color: ACCENT }}>{uniqueDates} {uniqueDates === 1 ? "day" : "days"} logged</span>
-            </div>
-            <div className={s.historyToggleRow}>
-              <div className={ui.pillToggleTrack}>
-                <button type="button" onClick={function () { setHistorySortBy("date"); }} className={historySortBy === "date" ? ui.pillToggleBtnActive : ui.pillToggleBtn}>By Date</button>
-                <button type="button" onClick={function () { setHistorySortBy("workout"); }} className={historySortBy === "workout" ? ui.pillToggleBtnActive : ui.pillToggleBtn}>By Workout</button>
+            <input value={searchQuery} onChange={function (e) { setSearchQuery(e.target.value); }} placeholder="Search by workout name..." className={cx(inputClass({ fullWidth: true }), ui.marginBottom12)} />
+            <div className={s.historyControls}>
+              <div className={s.historyActionsRow}>
+                <div className={ui.flexRow}>
+                  <button type="button" onClick={toggleAllGroups} className={s.expandAllBtn}>{allGroupsExpanded ? "Collapse all ▲" : "Expand all ▼"}</button>
+                  {data.workouts.length > 0 && <button type="button" onClick={function () { setShowClearConfirm(true); }} className={btnDanger({ xsPill: true })}>Clear History</button>}
+                </div>
+                <div className={s.historyMetaRow}>
+                  <span className={s.historyCount}>{filteredWorkouts.length} workouts</span>
+                  <span className={s.historyCount}>•</span>
+                  <span className={s.historyDaysLogged} style={{ color: ACCENT }}>{uniqueDates} {uniqueDates === 1 ? "day" : "days"} logged</span>
+                </div>
               </div>
-              <div className={ui.pillToggleTrack}>
-                <button type="button" onClick={function () { setHistoryOrder("newest"); }} className={historyOrder === "newest" ? ui.pillToggleBtnActive : ui.pillToggleBtn}>Newest</button>
-                <button type="button" onClick={function () { setHistoryOrder("oldest"); }} className={historyOrder === "oldest" ? ui.pillToggleBtnActive : ui.pillToggleBtn}>Oldest</button>
+              <div className={s.historyToggleRow}>
+                <div className={ui.pillToggleTrack}>
+                  <button type="button" onClick={function () { setHistorySortBy("date"); }} className={historySortBy === "date" ? ui.pillToggleBtnActive : ui.pillToggleBtn}>By Date</button>
+                  <button type="button" onClick={function () { setHistorySortBy("workout"); }} className={historySortBy === "workout" ? ui.pillToggleBtnActive : ui.pillToggleBtn}>By Workout</button>
+                </div>
+                <div className={ui.pillToggleTrack}>
+                  <button type="button" onClick={function () { setHistoryOrder("newest"); }} className={historyOrder === "newest" ? ui.pillToggleBtnActive : ui.pillToggleBtn}>Newest</button>
+                  <button type="button" onClick={function () { setHistoryOrder("oldest"); }} className={historyOrder === "oldest" ? ui.pillToggleBtnActive : ui.pillToggleBtn}>Oldest</button>
+                </div>
               </div>
             </div>
-          </div>
           </div>
         </div>
 
@@ -969,24 +985,24 @@ Bench Press
             <div className={s.emptySub}>{data.workouts.length === 0 ? "Start tracking your progress!" : "Try a different search term."}</div>
           </div>
         ) : (
-        <div ref={historyKb.listRef} tabIndex={0} onKeyDown={historyKb.handleKeyDown} className={ui.listOutline}>
+        <div ref={historyKb.listRef} tabIndex={0} onKeyDown={historyKb.handleKeyDown} className={cx(ui.listOutline, s.historyList)}>
         {groupedHistory.map(function (group, groupIdx) {
           return (
             <div key={group.groupKey + groupIdx} className={s.historyGroup}>
-              <div onClick={function () { toggleGroup(group.groupKey); }} onMouseEnter={function () { setHoveredGroup(group.groupKey); }} onMouseLeave={function () { setHoveredGroup(null); }} className={expandedGroups[group.groupKey] ? s.groupHeaderExpanded : (hoveredGroup === group.groupKey ? s.groupHeaderHover : s.groupHeaderDefault)}>
+              <div onClick={function () { toggleGroup(group.groupKey); }} onMouseEnter={function () { setHoveredGroup(group.groupKey); }} onMouseLeave={function () { setHoveredGroup(null); }} className={isGroupExpanded(group.groupKey) ? s.groupHeaderExpanded : (hoveredGroup === group.groupKey ? s.groupHeaderHover : s.groupHeaderDefault)}>
                 <div className={s.groupHeaderLeft}>
                   <div className={s.groupHeaderLabel} style={{ color: ACCENT }}>{historySortBy === "date" ? formatDate(group.date) : formatExerciseName(group.exercise)}</div>
                   <span className={s.groupEntryCount}>{group.items.length} {group.items.length === 1 ? "entry" : "entries"}</span>
                 </div>
-                <span className={s.groupChevron}>{expandedGroups[group.groupKey] ? "▾" : "▸"}</span>
+                <span className={s.groupChevron}>{isGroupExpanded(group.groupKey) ? "▾" : "▸"}</span>
               </div>
 
-              {expandedGroups[group.groupKey] !== false && (
+              {isGroupExpanded(group.groupKey) && (
                 <div>
                   {group.items.map(function (w) {
                     var kbIdx = historyFlatIdx++;
                     return (
-                      <div key={w._idx} data-kb-index={kbIdx} className={cx(s.historyItemCard, historyKb.kbClass(kbIdx))} onMouseEnter={function () { historyKb.setFocusIdx(kbIdx); }}>
+                      <div key={w._idx} data-kb-index={kbIdx} className={cx(s.historyItemCard, historyKb.kbClass(kbIdx))}>
                         {editIdx === w._idx ? (
                           <div>
                             <div className={cx(ui.grid2, ui.marginBottom8)}>

@@ -777,6 +777,25 @@
 }
 
 /* History */
+.historyControls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-inline: 10px;
+}
+
+.historyActionsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.historyList {
+  margin-top: 4px;
+}
+
 .expandAllBtn {
   padding: 5px 10px;
   border-radius: var(--ft-radius-pill);
