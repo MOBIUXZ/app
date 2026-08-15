@@ -72,3 +72,4 @@ Sets may include an optional `side` field: `"left"`, `"right"`, or `"both"`.
 - **Collapse panels** use `12px` top padding inside the body so the first field (e.g. Date on Body Comp **Log Entry**) is not flush against the header (see [styling.md](./styling.md#collapse-panels)).
 - **Workout History** groups default to expanded; **Expand all / Collapse all** works in a single click (see [workout.md](./workout.md#grouping)).
 - **Progress → Workout Details** best set uses label **Best e1RM {value}** (green), matching the chart metric toggle (see [progress.md](./progress.md#set-list-per-workout)).
+- **Progress tab** stays mounted in the DOM after the first visit (hidden when inactive) for faster return navigation; charts lazy-load as you scroll (see [progress.md](./progress.md#performance)).

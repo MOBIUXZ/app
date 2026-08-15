@@ -2,6 +2,20 @@
 
 The Progress page visualizes training and health trends with interactive line charts powered by Recharts.
 
+## Performance
+
+The Progress tab is the heaviest page (one Recharts instance per logged exercise, plus combined compound, body, and calorie charts). Several optimizations keep it responsive with large histories:
+
+| Technique | What it does |
+|-----------|----------------|
+| **Lazy chart mount** | Per-exercise charts and footer charts (body weight, body fat, calories) mount Recharts only when scrolled near the viewport (`useInView` + Intersection Observer). Off-screen cards show a `.chartPlaceholder` until then |
+| **No line animation** | Main Progress charts use `isAnimationActive={false}` — lines appear instantly instead of drawing in over ~1.5s |
+| **Memoized data** | Workouts are normalized once; `workoutsByExercise` indexes sessions by exercise; chart points and combined-compound series use `useMemo` |
+| **`React.memo` on exercise cards** | `MemoExerciseChart` skips re-rendering unchanged exercise cards when sibling state updates |
+| **Progress stays mounted** | After the first visit, `App.jsx` keeps `ProgressPage` in the DOM (hidden when another tab is active) so return visits skip full remount |
+
+**Session Performance** (per-workout popup from Workout Details) still animates metric toggles (600ms) — that is a single small chart, not the full page grid.
+
 ## Exercise Charts
 
 Every logged exercise gets its own chart card, grouped into two sections.
@@ -137,6 +151,8 @@ Sessions where left and right match, or where sets are logged without side info 
 - Charts render from **1 session** onward (single data point shown)
 - Hint shown when only 1 session: *"Log another session to see trends"*
 - Click a chart point to open the **Workout Details** modal
+- **Main charts** (exercise cards, combined compound, body weight/fat, calorie trend) render **without** Recharts line-draw animation
+- **Off-screen** exercise charts show a placeholder until scrolled into view (see [Performance](#performance))
 
 ### Chart Hover Tooltips (combined view)
 
@@ -201,7 +217,7 @@ When 2+ compound lifts are logged, an overlay chart compares all compounds on on
 - Click a lift to show or hide its line on the combined chart
 - **Visible:** filled with that lift’s chart color (from `getExerciseChartColor()`)
 - **Hidden:** dimmed outline in the lift color; line removed from chart and tooltip
-- All lifts start visible; visibility resets when leaving the page (not persisted)
+- All lifts start visible; lift visibility persists for the session while Progress remains mounted (not saved to `localStorage`)
 
 ### Colors
 
@@ -209,9 +225,10 @@ When 2+ compound lifts are logged, an overlay chart compares all compounds on on
 
 ### Implementation
 
-- `ProgressPage.jsx` — `compoundMetric`, `hiddenCompoundLifts`, `toggleCompoundLift()`
-- `ProgressPage.module.css` — `.compoundLegendRow` (spacing below chart)
-- Recharts `<Line>` components render only for lifts not in `hiddenCompoundLifts`
+- `ProgressPage.jsx` — `compoundMetric`, `compoundChartData` (`useMemo`), `hiddenCompoundLifts`, `toggleCompoundLift()`, `useInView()`, `MemoExerciseChart`
+- `App.jsx` — `progressMounted` keeps Progress in DOM after first tab visit
+- `ProgressPage.module.css` — `.compoundLegendRow`, `.chartPlaceholder`
+- Recharts `<Line>` components render only for lifts not in `hiddenCompoundLifts`; all use `isAnimationActive={false}`
 
 ## Workout Details Modal
 
@@ -244,7 +261,7 @@ Per-workout popup chart for that single logged session:
 | Feature | Description |
 |---------|-------------|
 | **Session stats** | **Weight** (max set load, kg), **Volume** (sum of weight × reps for the session, shown with kg suffix), **e1RM** (best set estimate, kg) |
-| **Metric toggles** | Weight / Volume / e1RM — line animates smoothly when switching (600ms ease-in-out), matching the main progress charts |
+| **Metric toggles** | Weight / Volume / e1RM — line animates smoothly when switching (600ms ease-in-out); main page charts do **not** animate |
 | **X-axis** | Set number (`S1`, `S2`, …) with `L` / `R` when side data exists; per-set **time** shown below the label when parsed from Smart Parser (`MM:SS` on the set) |
 | **Y-axis** | Selected metric per set (weight, set volume, or set e1RM) |
 | **Split view** | Only when the exercise **name** includes `single arm` and left/right set data exists: side-by-side Left (blue) and Right (pink) mini charts in one row, labels above each chart; compound lifts use one chart |
@@ -265,3 +282,5 @@ Per-workout popup chart for that single logged session:
 ## Data Normalization
 
 Before charting, all exercise names pass through `resolveExercise()` so variants like `Pushpress`, `barbell rows`, and `squats` map to canonical names and appear in the correct compound/isolation section.
+
+Sessions are grouped into `workoutsByExercise` (one array per canonical exercise) so each chart reads only its own workouts instead of filtering the full history on every render.

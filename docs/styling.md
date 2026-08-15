@@ -116,6 +116,10 @@ Applies to **Log Entry**, **History**, **Log Workout**, calorie log sections, et
 
 Do not use full-row green boxes or ★ stars — best sets are indicated by label wording + accent bar only.
 
+### Chart placeholders (Progress)
+
+**`.chartPlaceholder`** in `ProgressPage.module.css` — empty inset box (`min-height: 140px`) shown while an off-screen chart has not yet mounted Recharts. Paired with `useInView()` in `ProgressPage.jsx` (160px root margin for exercise cards, 240px for footer charts).
+
 ### Chart colors
 
 Exercise line colors are defined in JS (`getExerciseChartColor`, `EXERCISE_CHART_COLORS` in `shared.jsx`). **Do not move chart stroke colors to CSS** — see `docs/progress.md`.
