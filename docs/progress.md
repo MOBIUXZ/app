@@ -69,7 +69,7 @@ When **Split** view is active, the app compares left and right values for the cu
 | Feature | Description |
 |---------|-------------|
 | **Amber ring on dots** | Imbalanced points on both Left and Right charts get a larger dot with an amber (`#fbbf24`) outer ring instead of the standard small dot |
-| **Imbalance tooltip** | Hovering an imbalanced point shows **Left** and **Right** on one row — Left value aligned to the left, Right value aligned to the right — plus a `⚠ Imbalance` warning and an amber tooltip border |
+| **Imbalance detail** | Hovering a date shows a **docked panel** below the charts (not over them): **date** centered above, **⚠ Imbalance · Δ** centered below when sides differ, Left/Right values on the sides |
 | **Legend** | When any imbalanced sessions exist for the current metric, a legend appears below the split charts: *"Amber ring highlights left/right imbalance for [metric]"* |
 
 **How imbalance is detected:**
@@ -80,7 +80,7 @@ For each date and metric, the app compares the left-side value (`weight_left`, `
 
 Sessions where left and right match, or where sets are logged without side info (`both`), show normal dots with no amber ring.
 
-**Implementation:** Custom Recharts dot renderer (`SplitDot`) and tooltip component (`SplitTooltip`) in `ProgressPage.jsx`, driven by `isSplitImbalanced()` helper logic.
+**Implementation:** Custom Recharts dot renderer (`SplitDot`), docked detail panel (`ExerciseSplitDetail`), and `isSplitImbalanced()` helper logic in `ProgressPage.jsx`.
 
 ### Chart Behavior
 - Charts render from **1 session** onward (single data point shown)

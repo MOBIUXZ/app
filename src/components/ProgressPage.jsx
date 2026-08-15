@@ -496,38 +496,56 @@ function SplitDot(props) {
   var payload = props.payload;
   var fill = props.fill;
   var metric = props.metric;
+  var highlightIdx = props.highlightIdx;
+  var pointIdx = props.pointIdx;
   if (cx == null || cy == null) return null;
+  var highlighted = highlightIdx != null && pointIdx === highlightIdx;
   if (isSplitImbalanced(payload, metric)) {
+    var r = highlighted ? 6 : 5;
     return (
       <g>
-        <circle cx={cx} cy={cy} r={9} fill="rgba(251, 191, 36, 0.18)" stroke="#fbbf24" strokeWidth={2} />
-        <circle cx={cx} cy={cy} r={5} fill={fill} stroke="#fef3c7" strokeWidth={1.5} />
+        <circle cx={cx} cy={cy} r={highlighted ? 11 : 9} fill="rgba(251, 191, 36, 0.18)" stroke="#fbbf24" strokeWidth={2} />
+        <circle cx={cx} cy={cy} r={r} fill={fill} stroke="#fef3c7" strokeWidth={1.5} />
       </g>
     );
   }
-  return <circle cx={cx} cy={cy} r={4} fill={fill} />;
+  var nr = highlighted ? 6 : 4;
+  return <circle cx={cx} cy={cy} r={nr} fill={fill} stroke={highlighted ? "#fef3c7" : "none"} strokeWidth={1.5} />;
 }
 
-function SplitTooltip({ active, payload, label, metric, metricLabel }) {
-  if (!active || !payload || !payload.length) return null;
-  var point = payload[0].payload;
+function ExerciseSplitDetail({ point, metric, metricLabel }) {
+  if (!point) return null;
   var left = point[metric + "_left"];
   var right = point[metric + "_right"];
   var imbalanced = isSplitImbalanced(point, metric);
+  var delta = imbalanced && left != null && right != null ? Math.abs(left - right) : null;
+  var dateLabel = point.date || point.dateKey;
+
   return (
-    <div className={s.tooltip} style={{ border: imbalanced ? "1px solid #fbbf24" : "1px solid var(--ft-border-input)" }}>
-      <div className={s.tooltipTitle}>{label}</div>
-      <div className={s.splitTooltipValues}>
-        <div className={s.splitTooltipLeft} style={{ color: BLUE }}>Left: {left != null ? left : "—"}</div>
-        <div className={s.splitTooltipRight} style={{ color: PINK }}>Right: {right != null ? right : "—"}</div>
+    <div className={cx(s.sessionSplitDetail, imbalanced && s.sessionSplitDetailImbalanced)}>
+      <div className={s.sessionSplitDetailRow}>
+        <div className={s.sessionSplitSide}>
+          <div className={s.sessionSplitSideValue} style={{ color: BLUE }}>Left: {left != null ? left : "—"}</div>
+        </div>
+        <div className={s.sessionSplitCenter}>
+          <div className={s.sessionSplitSetTitle}>{dateLabel}</div>
+          {imbalanced ? (
+            <div className={s.sessionSplitImbalance}>
+              ⚠ Imbalance ({metricLabel}){delta != null ? " · Δ " + delta : ""}
+            </div>
+          ) : null}
+        </div>
+        <div className={cx(s.sessionSplitSide, s.sessionSplitSideRight)}>
+          <div className={s.sessionSplitSideValue} style={{ color: PINK }}>Right: {right != null ? right : "—"}</div>
+        </div>
       </div>
-      {imbalanced && <div style={{ color: "#fbbf24", fontSize: 11, fontWeight: 700, marginTop: 6 }}>⚠ Imbalance ({metricLabel})</div>}
     </div>
   );
 }
 
 function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartDate, getChartDateKey }) {
   var [metric, setMetric] = useState("weight");
+  var [hoveredPointIdx, setHoveredPointIdx] = useState(null);
   var isC = isCompoundLift(ex);
   var exColor = getExerciseChartColor(ex, colorFallbackIdx);
   var cs = { color: "#e2e8f0", fontSize: 10 };
@@ -550,6 +568,38 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
     return active ? ui.chartToggleBtnActive : ui.chartToggleBtn;
   }
 
+  function handleSplitChartHover(state) {
+    if (!state || typeof state.activeTooltipIndex !== "number" || state.activeTooltipIndex < 0) return;
+    setHoveredPointIdx(function (prev) {
+      return prev === state.activeTooltipIndex ? prev : state.activeTooltipIndex;
+    });
+  }
+
+  function clearExerciseSplitHover(ev) {
+    var next = ev.relatedTarget;
+    if (!next || !ev.currentTarget.contains(next)) setHoveredPointIdx(null);
+  }
+
+  function renderSplitLineChart(strokeColor, dataKey) {
+    return (
+      <ResponsiveContainer width="100%" height={140}>
+        <LineChart
+          data={chartData}
+          onMouseMove={handleSplitChartHover}
+          onClick={function (e) { if (e && e.activePayload && e.activePayload[0] && onPointSelect) { onPointSelect(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
+          <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
+          <YAxis tick={cs} width={35} />
+          <Tooltip content={function () { return null; }} cursor={{ stroke: "#64748b", strokeWidth: 1, strokeDasharray: "4 4" }} isAnimationActive={false} animationDuration={0} />
+          <Line type="monotone" dataKey={dataKey} stroke={strokeColor} strokeWidth={2} activeDot={false} isAnimationActive={false} dot={function (props) {
+            return <SplitDot cx={props.cx} cy={props.cy} payload={props.payload} fill={strokeColor} metric={metric} highlightIdx={hoveredPointIdx} pointIdx={props.index} />;
+          }} connectNulls={true} />
+        </LineChart>
+      </ResponsiveContainer>
+    );
+  }
+
   return (
     <div className={s.exerciseCard}>
       <div className={s.exerciseHeader}>
@@ -569,10 +619,10 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
       {latest && <div className={s.statStrip}>{[{ label: "Last Weight", val: latest.weight + " kg", color: exColor }, { label: "Last Volume", val: latest.volume + " kg", color: ORANGE }, { label: "Best e1RM", val: latest.e1rm != null ? latest.e1rm + " kg" : "—", color: GREEN }].map(function (st) { return <div key={st.label} className={s.miniStat}><div className={s.miniStatLabel}>{st.label}</div><div className={s.miniStatValue} style={{ color: st.color }}>{st.val}</div></div>; })}</div>}
       {cd.length < 1 ? <div className={s.noSessions}>No sessions logged yet</div> : <div>
         <div className={ui.chartToggleRow}>
-          {["weight", "volume", "e1rm"].map(function (m) { return <button key={m} type="button" onClick={function () { setMetric(m); }} className={chartToggleClass(metric === m)} style={metric === m ? { background: exColor, color: "#fff" } : undefined}>{metricLabelFor(m)}</button>; })}
+          {["weight", "volume", "e1rm"].map(function (m) { return <button key={m} type="button" onClick={function () { setMetric(m); setHoveredPointIdx(null); }} className={chartToggleClass(metric === m)} style={metric === m ? { background: exColor, color: "#fff" } : undefined}>{metricLabelFor(m)}</button>; })}
           {showSplit && <div className={s.splitToggleGroup}>
-            <button type="button" onClick={function () { setViewMode('combined'); }} className={chartToggleClass(viewMode === 'combined')} style={viewMode === 'combined' ? { background: exColor, color: "#fff" } : undefined}>Combined</button>
-            <button type="button" onClick={function () { setViewMode('split'); }} className={chartToggleClass(viewMode === 'split')} style={viewMode === 'split' ? { background: exColor, color: "#fff" } : undefined}>Split</button>
+            <button type="button" onClick={function () { setViewMode('combined'); setHoveredPointIdx(null); }} className={chartToggleClass(viewMode === 'combined')} style={viewMode === 'combined' ? { background: exColor, color: "#fff" } : undefined}>Combined</button>
+            <button type="button" onClick={function () { setViewMode('split'); setHoveredPointIdx(null); }} className={chartToggleClass(viewMode === 'split')} style={viewMode === 'split' ? { background: exColor, color: "#fff" } : undefined}>Split</button>
           </div>}
         </div>
         {(!showSplit || viewMode === 'combined') ? <div className={ui.chartContainer}>
@@ -586,35 +636,29 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
             </LineChart>
           </ResponsiveContainer>
         </div> : <div>
+          <div className={s.sessionSplitHoverZone} onMouseLeave={clearExerciseSplitHover}>
           <div className={s.splitRow}>
           <div className={s.splitCol}>
             <div className={s.splitLabel}>Left</div>
             <div className={ui.chartContainer}>
-              <ResponsiveContainer width="100%" height={140}>
-                <LineChart data={chartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0] && onPointSelect) { onPointSelect(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
-                  <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
-                  <YAxis tick={cs} width={35} />
-                  <Tooltip content={<SplitTooltip metric={metric} metricLabel={metricLabel} />} />
-                  <Line type="monotone" dataKey={metric + '_left'} stroke={BLUE} strokeWidth={2} dot={function (props) { return <SplitDot cx={props.cx} cy={props.cy} payload={props.payload} fill={BLUE} metric={metric} />; }} activeDot={{ r: 6, fill: BLUE, stroke: "#fef3c7", strokeWidth: 2 }} connectNulls={true} />
-                </LineChart>
-              </ResponsiveContainer>
+              {renderSplitLineChart(BLUE, metric + "_left")}
             </div>
           </div>
           <div className={s.splitCol}>
             <div className={s.splitLabel}>Right</div>
             <div className={ui.chartContainer}>
-              <ResponsiveContainer width="100%" height={140}>
-                <LineChart data={chartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0] && onPointSelect) { onPointSelect(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
-                  <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
-                  <YAxis tick={cs} width={35} />
-                  <Tooltip content={<SplitTooltip metric={metric} metricLabel={metricLabel} />} />
-                  <Line type="monotone" dataKey={metric + '_right'} stroke={PINK} strokeWidth={2} dot={function (props) { return <SplitDot cx={props.cx} cy={props.cy} payload={props.payload} fill={PINK} metric={metric} />; }} activeDot={{ r: 6, fill: PINK, stroke: "#fef3c7", strokeWidth: 2 }} connectNulls={true} />
-                </LineChart>
-              </ResponsiveContainer>
+              {renderSplitLineChart(PINK, metric + "_right")}
             </div>
           </div>
+          </div>
+          {hoveredPointIdx != null && chartData[hoveredPointIdx] && (
+            <ExerciseSplitDetail
+              key={"ex-split-" + hoveredPointIdx + "-" + metric}
+              point={chartData[hoveredPointIdx]}
+              metric={metric}
+              metricLabel={metricLabel}
+            />
+          )}
           </div>
           {hasImbalance && <div className={s.imbalanceHint}>
             <span className={s.imbalanceDot} />

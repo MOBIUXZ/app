@@ -191,23 +191,6 @@
   margin-bottom: 6px;
 }
 
-.splitTooltipValues {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  min-width: 200px;
-}
-
-.splitTooltipLeft {
-  color: inherit;
-  text-align: left;
-}
-
-.splitTooltipRight {
-  color: inherit;
-  text-align: right;
-}
-
 .detailBackdrop {
   composes: modalBackdrop from "../styles/ui.module.css";
   background: rgba(2, 6, 23, 0.76);
