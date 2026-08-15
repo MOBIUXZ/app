@@ -527,3 +527,9 @@
   text-align: center;
   padding: 20px 0;
 }
+
+.chartPlaceholder {
+  min-height: 140px;
+  background: var(--ft-bg-inset);
+  border-radius: var(--ft-radius-lg);
+}

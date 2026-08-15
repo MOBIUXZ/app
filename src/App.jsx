@@ -27,9 +27,14 @@ function saveData(d) {
 export default function App() {
   var [data, setData] = useState(loadData);
   var [tab, setTab] = useState("Dashboard");
+  var [progressMounted, setProgressMounted] = useState(false);
   var navKb = useAppNavKeyboard(NAV, tab, setTab);
   var navTrackRef = useRef(null);
   useDisableNumberInputWheel();
+
+  useEffect(function () {
+    if (tab === "Progress") setProgressMounted(true);
+  }, [tab]);
 
   useEffect(function () {
     var track = navTrackRef.current;
@@ -76,7 +81,11 @@ export default function App() {
         {tab === "Workout" && <WorkoutPage data={data} save={save} />}
         {tab === "Body Comp" && <BodyCompPage data={data} save={save} />}
         {tab === "Calories" && <CaloriePage data={data} save={save} />}
-        {tab === "Progress" && <ProgressPage data={data} />}
+        {progressMounted && (
+          <div hidden={tab !== "Progress"} aria-hidden={tab !== "Progress"}>
+            <ProgressPage data={data} />
+          </div>
+        )}
       </div>
     </div>
   );
