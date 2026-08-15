@@ -67,7 +67,21 @@ export default function BodyCompPage({ data, save }) {
         </div>
         <div className={ui.fieldBlock}>
           <div className={ui.fieldLabelSection}>Sex</div>
-          <div className={s.sexToggleRow}>{["male", "female"].map(function (sx) { return <button key={sx} type="button" onClick={function () { setSex(sx); }} className={sex === sx ? s.sexToggleBtnActive : s.sexToggleBtnInactive}>{sx}</button>; })}</div>
+          <div className={cx(ui.pillToggleTrack, s.sexToggleTrack)} role="group" aria-label="Sex">
+            {["male", "female"].map(function (sx) {
+              return (
+                <button
+                  key={sx}
+                  type="button"
+                  aria-pressed={sex === sx}
+                  onClick={function () { setSex(sx); }}
+                  className={cx(sex === sx ? ui.pillToggleBtnActive : ui.pillToggleBtn, s.sexToggleBtn)}
+                >
+                  {sx}
+                </button>
+              );
+            })}
+          </div>
         </div>
         <div className={s.metricsHint}>📊 Metrics {!hasBase && <span className={s.metricsHintFaint}> (enter weight + BF% to calculate)</span>}</div>
         <GL>🏋️ Total Body</GL><div className={ui.flexRow}><MBox label="Body Weight" val={wN > 0 ? wN : null} unit="kg" color={ACCENT} /><MBox label="BMI" val={bmi} unit="kg/m²" color={BLUE} /></div>

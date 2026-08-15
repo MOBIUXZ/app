@@ -567,12 +567,38 @@
   background: transparent;
   color: var(--ft-text-nav);
   font-family: inherit;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.pillToggleBtn:hover {
+  color: var(--ft-text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.pillToggleBtn:active {
+  transform: scale(0.97);
+}
+
+.pillToggleBtn:focus-visible {
+  outline: 2px solid var(--ft-accent);
+  outline-offset: 2px;
 }
 
 .pillToggleBtnActive {
   composes: pillToggleBtn;
   background: var(--ft-accent);
   color: var(--ft-text-dark);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.pillToggleBtnActive:hover {
+  background: var(--ft-accent-hover);
+  color: var(--ft-text-dark);
+}
+
+.pillToggleBtnActive:active {
+  transform: scale(0.97);
+  background: var(--ft-accent-hover);
 }
 
 .historyToolbar {

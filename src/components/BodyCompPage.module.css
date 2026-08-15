@@ -54,35 +54,17 @@
   margin-top: 4px;
 }
 
-.sexToggleRow {
-  display: flex;
-  gap: 6px;
+.sexToggleTrack {
+  width: 100%;
 }
 
 .sexToggleBtn {
   flex: 1;
-  padding: 10px;
-  border-radius: var(--ft-radius-md);
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 12px;
-  text-transform: capitalize;
   min-height: 40px;
-  transition: all 0.2s ease;
-  font-family: inherit;
-}
-
-.sexToggleBtnActive {
-  composes: sexToggleBtn;
-  background: var(--ft-accent);
-  color: var(--ft-text-dark);
-}
-
-.sexToggleBtnInactive {
-  composes: sexToggleBtn;
-  background: var(--ft-bg-btn);
-  color: var(--ft-text-nav);
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
 }
 
 .relationSection {
