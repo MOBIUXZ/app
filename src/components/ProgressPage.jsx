@@ -642,8 +642,8 @@ function ExerciseChart({ ex, data, colorFallbackIdx, onPointSelect, formatChartD
               <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
               <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
               <YAxis tick={cs} width={35} />
-              <Tooltip contentStyle={tt} />
-              <Line type="monotone" dataKey={metric} stroke={exColor} strokeWidth={2} dot={{ fill: exColor, r: 4 }} connectNulls={true} />
+              <Tooltip contentStyle={tt} formatter={function (value) { return [value, metricLabel]; }} />
+              <Line type="monotone" dataKey={metric} name={metricLabel} stroke={exColor} strokeWidth={2} dot={{ fill: exColor, r: 4 }} connectNulls={true} />
             </LineChart>
           </ResponsiveContainer>
         </div> : <div>
