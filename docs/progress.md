@@ -219,9 +219,23 @@ Click any chart data point to open a modal showing all workouts on that date:
 
 - Exercise name (compound lifts in caps)
 - Date and time
-- All sets listed one per row: weight × reps on the left, per-set **e1RM** on the right (Epley estimate; `—` when weight/reps are invalid). The **best e1RM** row(s) show a green left accent and label **Best e1RM {value}** in green (same wording as the chart metric toggle); other sets show **e1RM {value}** in muted text — values right-aligned (ties allowed)
-- **Left/right workouts (isolation only)** — side-by-side **Left** (blue) and **Right** (pink) columns when the exercise **name** contains `single arm` (case-insensitive), e.g. Single Arm Lat Pulldown. Sets logged without a side (`both`) appear in **both** columns, each with its own best-e1RM highlight. **Compound lifts** always use a single-column list
 - **📈 Show Graph** on each workout — opens a **Session Performance** overlay (layered on top of the day modal)
+
+### Set list (per workout)
+
+Each set is one row: **weight × reps** on the left, estimated 1RM on the right (Epley; `—` when weight/reps are invalid or 0 reps).
+
+| Row type | Right-side label | Style |
+|----------|------------------|--------|
+| Normal set | `e1RM {value}` | Muted gray text, right-aligned |
+| Best set(s) | `Best e1RM {value}` | Green text — **same label as the chart metric toggle** |
+| Best set row | (left accent) | Thin green inset bar on the row (`.setRowBest`) |
+
+- **Best** = highest e1RM in that workout session (ties all get the highlight)
+- Values use a fixed min-width column so labels stay right-aligned
+- **Left/right split workouts** — side-by-side **Left** (blue) and **Right** (pink) columns when the exercise **name** contains `single arm` (case-insensitive). Sets without side (`both`) appear in **both** columns; each column computes its own best e1RM. **Compound lifts** use a single-column list
+
+**Implementation:** `renderDetailSetRows()`, `getBestE1RM()`, `renderWorkoutSetPanel()` in `ProgressPage.jsx`; `.setRow`, `.setRowE1rm`, `.setRowE1rmBest`, `.setRowBest` in `ProgressPage.module.css` (see [styling.md](./styling.md#workout-detail-set-rows-progress))
 
 ### Session Performance Graph
 

@@ -103,6 +103,19 @@ Applies to **Log Entry**, **History**, **Log Workout**, calorie log sections, et
 - `padding-inline: 10px` for left/right inset on action and sort buttons
 - Used with **`.historyToolbarSticky`** for scroll-pinned header
 
+### Workout detail set rows (Progress)
+
+**`ProgressPage.module.css`** — set list inside the **Workout Details** modal:
+
+| Class | Role |
+|-------|------|
+| `.setRow` | Flex row: load left, e1RM right |
+| `.setRowE1rm` | Muted `e1RM {value}` label, right-aligned (`min-width: 92px`) |
+| `.setRowE1rmBest` | Green text for `Best e1RM {value}` |
+| `.setRowBest` | Green inset left bar on best set row(s) |
+
+Do not use full-row green boxes or ★ stars — best sets are indicated by label wording + accent bar only.
+
 ### Chart colors
 
 Exercise line colors are defined in JS (`getExerciseChartColor`, `EXERCISE_CHART_COLORS` in `shared.jsx`). **Do not move chart stroke colors to CSS** — see `docs/progress.md`.

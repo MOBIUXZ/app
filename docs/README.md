@@ -11,6 +11,7 @@ FitTrack is a client-side fitness tracking web app built with **React** and **Vi
 | Body Comp | [body-comp.md](./body-comp.md) | Body composition logging and derived metrics |
 | Calories | [calories.md](./calories.md) | Food logging, macros, BMR/TDEE, daily goals |
 | Progress | [progress.md](./progress.md) | Exercise charts, compound/isolation tracking, trends |
+| Styling | [styling.md](./styling.md) | CSS modules, theme tokens, shared UI patterns |
 | Shared Utilities | [shared-utilities.md](./shared-utilities.md) | Smart parser, exercise resolution, compound lifts, data helpers |
 | Keyboard Navigation | [keyboard-navigation.md](./keyboard-navigation.md) | Arrow keys, Enter, page shortcuts, focus highlights |
 
@@ -70,3 +71,4 @@ Sets may include an optional `side` field: `"left"`, `"right"`, or `"both"`.
 - **Number inputs** do not change on mouse wheel scroll while focused; spinner arrows are hidden (see [styling.md](./styling.md#number-inputs)).
 - **Collapse panels** use `12px` top padding inside the body so the first field (e.g. Date on Body Comp **Log Entry**) is not flush against the header (see [styling.md](./styling.md#collapse-panels)).
 - **Workout History** groups default to expanded; **Expand all / Collapse all** works in a single click (see [workout.md](./workout.md#grouping)).
+- **Progress → Workout Details** best set uses label **Best e1RM {value}** (green), matching the chart metric toggle (see [progress.md](./progress.md#set-list-per-workout)).
