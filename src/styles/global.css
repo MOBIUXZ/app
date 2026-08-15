@@ -17,6 +17,18 @@ body {
   min-height: 100vh;
 }
 
+/* Number inputs: hide stepper arrows; values change only via typing. */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 @keyframes ft-kb-activate {
   0% {
     background-color: rgba(52, 211, 153, 0.35);

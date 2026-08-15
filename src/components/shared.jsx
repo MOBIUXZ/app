@@ -603,6 +603,22 @@ export function useKeyboardListNav(count, onSelect, enabled) {
   return { focusIdx: focusIdx, setFocusIdx: setFocusIdx, activatedIdx: activatedIdx, handleKeyDown: handleKeyDown, listRef: listRef, reset: function () { setFocusIdx(-1); }, kbClass: function (i) { return kbItemClass(i, focusIdx, activatedIdx); } };
 }
 
+/** Block mouse-wheel from incrementing/decrementing focused number inputs. */
+export function useDisableNumberInputWheel() {
+  useEffect(function () {
+    function onWheel(e) {
+      var el = document.activeElement;
+      if (el && el.tagName === "INPUT" && el.type === "number") {
+        e.preventDefault();
+      }
+    }
+    document.addEventListener("wheel", onWheel, { passive: false, capture: true });
+    return function () {
+      document.removeEventListener("wheel", onWheel, { capture: true });
+    };
+  }, []);
+}
+
 export function useAppNavKeyboard(tabs, currentTab, setTab) {
   var [focusIdx, setFocusIdx] = useState(-1);
   var [activatedIdx, setActivatedIdx] = useState(-1);

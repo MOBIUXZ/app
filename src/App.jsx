@@ -4,7 +4,7 @@ import WorkoutPage from "./components/WorkoutPage.jsx";
 import BodyCompPage from "./components/BodyCompPage.jsx";
 import CaloriePage from "./components/CaloriePage.jsx";
 import ProgressPage from "./components/ProgressPage.jsx";
-import { cx, useAppNavKeyboard } from "./components/shared.jsx";
+import { cx, useAppNavKeyboard, useDisableNumberInputWheel } from "./components/shared.jsx";
 import styles from "./App.module.css";
 
 const NAV = ["Dashboard", "Workout", "Body Comp", "Calories", "Progress"];
@@ -28,6 +28,7 @@ export default function App() {
   var [data, setData] = useState(loadData);
   var [tab, setTab] = useState("Dashboard");
   var navKb = useAppNavKeyboard(NAV, tab, setTab);
+  useDisableNumberInputWheel();
 
   function save(d) {
     setData(d);
