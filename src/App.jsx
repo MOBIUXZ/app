@@ -8,6 +8,7 @@ import { useAppNavKeyboard, useDisableNumberInputWheel } from "./components/shar
 import appConfig from "../spec/app-config.json";
 import keyboardSpec from "../spec/keyboard-shortcuts.json";
 import { getAppLayout } from "./domain/pageLayout.js";
+import Logo from "./components/Logo.jsx";
 import styles from "./App.module.css";
 
 const NAV = keyboardSpec.navigation.tabs;
@@ -60,7 +61,10 @@ export default function App() {
   return (
     <div className={styles.app}>
       <div className={styles.header}>
-        <span className={styles.logo}>{appLayout.logo}</span>
+        <div className={styles.logo}>
+          <Logo size={appLayout.logo.size} rounded={appLayout.logo.rounded} />
+          <span className={styles.logoText}>{appLayout.logo.text}</span>
+        </div>
       </div>
       <nav className={styles.nav} aria-label="Main">
         <div ref={navTrackRef} className={styles.navTrack} role="tablist">

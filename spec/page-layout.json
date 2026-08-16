@@ -1,8 +1,16 @@
 {
   "app": {
-    "logo": "⚡ FitTrack",
+    "logo": {
+      "text": "FitTrack",
+      "component": "src/components/Logo.jsx",
+      "size": 32,
+      "rounded": true
+    },
+    "favicon": "/favicon.svg",
+    "faviconIco": "/favicon.ico",
+    "appleTouchIcon": "/icons/icon-180.png",
     "cssModule": "src/App.module.css",
-    "shellClasses": ["app", "header", "logo", "nav", "navTrack", "navBtn", "navBtnActive", "main"]
+    "shellClasses": ["app", "header", "logo", "logoText", "nav", "navTrack", "navBtn", "navBtnActive", "main"]
   },
   "pages": {
     "dashboard": {

@@ -26,7 +26,10 @@ describe('page layout spec (spec/page-layout.json)', function () {
   });
 
   it('app logo is defined', function () {
-    expect(getAppLayout().logo).toBe('⚡ FitTrack');
+    var layout = getAppLayout();
+    expect(layout.logo.text).toBe('FitTrack');
+    expect(layout.logo.component).toBe('src/components/Logo.jsx');
+    expect(existsSync(resolve(root, layout.logo.component))).toBe(true);
   });
 
   it('modal specs resolve for workout clear history', function () {

@@ -45,7 +45,7 @@ Machine-readable checklist: [`spec/manual-qa-checklist.json`](../spec/manual-qa-
 
 ### Global shell
 
-- [ ] Header shows **⚡ FitTrack**
+- [ ] Header shows **FitTrack** with gradient infinity icon
 - [ ] Five nav tabs; active tab has purple pill
 - [ ] Keys `1`–`5` switch tabs (no modal open)
 - [ ] Dark theme, readable text, accent purple on active UI

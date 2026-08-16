@@ -12,6 +12,12 @@
 }
 
 .logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logoText {
   font-size: 22px;
   font-weight: 900;
   color: var(--ft-accent);
