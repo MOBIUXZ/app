@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { ACCENT, GREEN, ORANGE, PINK, ACTIVITY, Card, Collapse, btnPrimary, btnSecondary, inputClass, useKeyboardListNav, ui, cx } from "./shared";
 import { computeMacroTotals, computeGoalBarPct, getGoalBarDisplayPct, getGoalBarColor, computeTdee, getTdeeTargets, DEFAULT_CALORIE_GOAL } from "../domain/calories.js";
+import { getPageLayout, getThemeColor, formatTemplateLabel, getCollapseSpec } from "../domain/pageLayout.js";
 import appConfig from "../../spec/app-config.json";
 import s from "./CaloriePage.module.css";
+
+var calLayout = getPageLayout("calories");
 
 export default function CaloriePage({ data, save }) {
   var [food, setFood] = useState(""), [cal, setCal] = useState(""), [protein, setProtein] = useState(""), [carbs, setCarbs] = useState(""), [fat, setFat] = useState("");
@@ -37,9 +40,9 @@ export default function CaloriePage({ data, save }) {
 
   return (
     <div>
-      <div className={s.pageTitle}>🍽️ Calories</div>
+      <div className={s.pageTitle}>{calLayout.pageTitle}</div>
       <Card>
-        <div className={ui.sectionTitle}>🔥 BMR & TDEE</div>
+        <div className={ui.sectionTitle}>{calLayout.sections[0].title}</div>
         {!bmr ? <div className={ui.mutedSm}>Log a Body Comp entry with weight, height, age and sex to calculate BMR.</div> : <div>
           <div className={cx(ui.flexRow, ui.marginBottom12)}>
             <div className={s.metricBoxLg}><div className={s.metricBoxLgLabel}>BMR</div><div className={s.metricBoxLgValue} style={{ color: ORANGE }}>{Math.round(bmr)}<span className={s.metricBoxLgUnit}>kcal/d</span></div><div className={s.metricBoxLgSub}>{lastBC.BMR_Mifflin ? "Mifflin-St Jeor" : "Katch-McArdle"}</div></div>
@@ -47,7 +50,10 @@ export default function CaloriePage({ data, save }) {
           </div>
           <div className={cx(ui.mutedSm, ui.marginBottom8)}>Activity Level</div>
           <div ref={actKb.listRef} tabIndex={0} onKeyDown={actKb.handleKeyDown} className={cx(ui.listOutline, s.activityList)}>{ACTIVITY.map(function (a, i) { return <button key={i} type="button" data-kb-index={i} aria-pressed={i === actIdx} className={cx(i === actIdx ? s.activityBtnActive : s.activityBtn, actKb.kbClass(i))} onClick={function () { setActIdx(i); }}><span className={i === actIdx ? s.activityBtnLabelActive : s.activityBtnLabel}>{a.label}</span><span className={s.activityBtnDesc}>{a.desc} · x{a.mult}</span></button>; })}</div>
-          <div className={cx(ui.flexRow, ui.marginTop12)}>{[{ label: "Cut (-500)", color: "#f87171", val: tdeeTargets.cut }, { label: "Maintain", color: GREEN, val: tdeeTargets.maintain }, { label: "Bulk (+300)", color: ACCENT, val: tdeeTargets.bulk }].map(function (g) { return <div key={g.label} className={s.goalChip}><div className={s.goalChipLabel}>{g.label}</div><div className={s.goalChipValue} style={{ color: g.color }}>{g.val} kcal</div></div>; })}</div>
+          <div className={cx(ui.flexRow, ui.marginTop12)}>{calLayout.goalChips.map(function (chip) {
+            if (!tdeeTargets) return null;
+            return <div key={chip.id} className={s.goalChip}><div className={s.goalChipLabel}>{chip.label}</div><div className={s.goalChipValue} style={{ color: getThemeColor(chip.colorToken) }}>{tdeeTargets[chip.offsetKey]} kcal</div></div>;
+          })}</div>
         </div>}
       </Card>
       <Card className={s.cardFlush}>
@@ -78,14 +84,14 @@ export default function CaloriePage({ data, save }) {
       </Card>
       <Card>
         <div className={cx(ui.flexBetween, s.dailyGoalHeader)}>
-          <span className={cx(ui.sectionTitle, s.dailyGoalTitle)}>Daily Goal</span>
+          <span className={cx(ui.sectionTitle, s.dailyGoalTitle)}>{calLayout.sections[1].title}</span>
           <div className={ui.flexRow}><input type="number" value={goal} onChange={function (e) { setGoal(e.target.value); }} className={s.goalInput} /><span className={ui.mutedSm}>kcal</span></div>
         </div>
         <div className={s.progressBarTrack}><div className={s.progressBarFill} style={{ width: barPct + "%", background: barColor }} /></div>
         <div className={cx(ui.flexBetween, ui.mutedSm, s.dailyTotals)}><span style={{ color: barColor, fontWeight: 700 }}>{totals.cal} kcal</span><span className={ui.muted}>{Math.max(0, goal - totals.cal)} remaining</span></div>
         <div className={ui.flexRow}>{[["Protein", totals.p, ACCENT], ["Carbs", totals.c, ORANGE], ["Fat", totals.f, PINK]].map(function (r) { return <div key={r[0]} className={s.macroBox}><div className={s.macroBoxLabel}>{r[0]}</div><div className={s.macroBoxValue} style={{ color: r[2] }}>{Math.round(r[1])}<span className={s.macroBoxUnit}>g</span></div></div>; })}</div>
       </Card>
-      <Collapse emoji="✏️" label="Custom Entry" defaultOpen={false}>
+      <Collapse emoji={getCollapseSpec("calories", "customEntry").emoji} label={getCollapseSpec("calories", "customEntry").label} defaultOpen={getCollapseSpec("calories", "customEntry").defaultOpen}>
         <div className={ui.marginBottom12}>
           <div className={ui.fieldLabelSection}>Food Details</div>
           <div className={s.foodGrid}>
@@ -99,7 +105,7 @@ export default function CaloriePage({ data, save }) {
         <button type="button" onClick={function () { if (food && cal) addEntry(food, cal, protein, carbs, fat); else setMsg("Enter food and calories."); }} className={btnPrimary({ fullWidth: true })}>Add Entry</button>
         {msg && <div className={cx(ui.successMsg, ui.marginTop8)}>{msg}</div>}
       </Collapse>
-      <Collapse emoji="📋" label={"Log for " + displayDate(selDate)} defaultOpen={true}>
+      <Collapse emoji={getCollapseSpec("calories", "foodLog").emoji} label={formatTemplateLabel(getCollapseSpec("calories", "foodLog").label, { date: displayDate(selDate) })} defaultOpen={getCollapseSpec("calories", "foodLog").defaultOpen}>
         {selEntries.length === 0 ? <div className={ui.emptyStateLg}><div className={ui.emptyIconLg}>🍽️</div><div>Nothing logged for this date.</div><div className={s.emptySub}>Add your meals to track calories!</div></div> : (
         <div ref={entryKb.listRef} tabIndex={0} onKeyDown={entryKb.handleKeyDown} className={ui.listOutline}>
         {selEntries.map(function (e, i) { var gi = data.calories.indexOf(e); return <div key={i} data-kb-index={i} className={cx(entryKb.kbClass(i), s.entryRow)} onMouseEnter={function () { entryKb.setFocusIdx(i); }}>

@@ -2,7 +2,10 @@ import { useState } from "react";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, Collapse, btnPrimary, btnSecondary, btnDanger, inputClass, formatDate, useConfirmDialogKeyboard, ui, cx } from "./shared";
 import { computeBodyCompEntry } from "../domain/metrics.js";
 import { syncBodyLogsAfterEdit, removeBodyLogForEntry } from "../domain/bodyCompSync.js";
+import { getPageLayout, getCollapseSpec, getModalSpec } from "../domain/pageLayout.js";
 import s from "./BodyCompPage.module.css";
+
+var bodyLayout = getPageLayout("bodyComp");
 
 export default function BodyCompPage({ data, save }) {
   var [logDate, setLogDate] = useState(formatDate(new Date()));
@@ -112,8 +115,8 @@ export default function BodyCompPage({ data, save }) {
   }
   return (
     <div>
-      <div className={s.pageTitle}>📏 Body Composition</div>
-      <Collapse emoji="➕" label="Log Entry" defaultOpen={false}>
+      <div className={s.pageTitle}>{bodyLayout.pageTitle}</div>
+      <Collapse emoji={getCollapseSpec("bodyComp", "logEntry").emoji} label={getCollapseSpec("bodyComp", "logEntry").label} defaultOpen={getCollapseSpec("bodyComp", "logEntry").defaultOpen}>
         <div className={ui.fieldBlock}>
           <div className={ui.fieldLabel}>Date</div>
           <input value={logDate} onChange={function (e) { setLogDate(e.target.value); }} placeholder="DD-MM-YYYY" className={inputClass({ fullWidth: true })} />
@@ -153,7 +156,7 @@ export default function BodyCompPage({ data, save }) {
         <button type="button" onClick={submit} className={btnPrimary({ fullWidth: true, marginTop14: true })}>Log Entry</button>
         {msg && <div className={cx(ui.successMsg, ui.marginTop10)}>✅ {msg}</div>}
       </Collapse>
-      <Collapse emoji="📋" label="History" defaultOpen={false}>
+      <Collapse emoji={getCollapseSpec("bodyComp", "history").emoji} label={getCollapseSpec("bodyComp", "history").label} defaultOpen={getCollapseSpec("bodyComp", "history").defaultOpen}>
         {historyEntries.length > 0 && (
           <div className={ui.historyToolbar}>
             <span className={ui.mutedXs}>{data.bodyComp.length} {data.bodyComp.length === 1 ? "entry" : "entries"}</span>
@@ -235,7 +238,7 @@ export default function BodyCompPage({ data, save }) {
         {showClearConfirm && (
           <div className={cx("ft-kb-modal-backdrop", ui.modalBackdrop)} style={{ zIndex: clearConfirmKb.zIndex }}>
             <div ref={clearConfirmKb.dialogRef} tabIndex={-1} className={ui.modalPanelConfirm}>
-              <div className={cx(ui.modalTitle, s.confirmTitle)}>Clear Body Comp History?</div>
+              <div className={cx(ui.modalTitle, s.confirmTitle)}>{getModalSpec("bodyComp", "clearHistory").title}</div>
               <div className={cx(ui.textMutedSm, s.confirmBody)}>This will permanently delete all {data.bodyComp.length} body composition entries and body weight chart data. Do you want to continue?</div>
               <div className="ft-kb-focus-indicator">Focused: <strong>{clearConfirmKb.focusLabel}</strong></div>
               <div className="ft-kb-hint">← → or Tab switch · Enter select · Esc cancel</div>

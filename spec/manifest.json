@@ -1,6 +1,6 @@
 {
   "$schema": "./manifest.schema.json",
-  "version": 2,
+  "version": 3,
   "description": "FitTrack machine-readable specification manifest. Specs are the source of truth; code and docs must conform.",
   "specs": [
     {
@@ -80,6 +80,36 @@
       "path": "spec/file-tree.json",
       "governs": ["expected project source layout"],
       "docs": ["docs/source-index.md", "docs/RECONSTRUCTION.md"]
+    },
+    {
+      "id": "page-layout",
+      "path": "spec/page-layout.json",
+      "governs": ["page titles", "sections", "stat boxes", "collapses", "modal titles", "hero blocks"],
+      "docs": ["docs/dashboard.md", "docs/workout.md", "docs/body-comp.md", "docs/calories.md", "docs/progress.md", "docs/architecture.md"]
+    },
+    {
+      "id": "css-modules",
+      "path": "spec/css-modules.json",
+      "governs": ["required CSS module class names per file"],
+      "docs": ["docs/styling.md"]
+    },
+    {
+      "id": "global-styles",
+      "path": "spec/global-styles.json",
+      "governs": ["global.css keyboard classes", "base rules", "number input behavior"],
+      "docs": ["docs/styling.md", "docs/keyboard-navigation.md"]
+    },
+    {
+      "id": "ui-module",
+      "path": "spec/ui-module.json",
+      "governs": ["shared UI component CSS class mapping", "modal/chart toggle classes"],
+      "docs": ["docs/styling.md", "docs/shared-utilities.md"]
+    },
+    {
+      "id": "style-helpers",
+      "path": "spec/style-helpers.json",
+      "governs": ["styleHelpers.js exports and modifier keys"],
+      "docs": ["docs/styling.md"]
     }
   ],
   "testSuites": [
@@ -91,6 +121,11 @@
     { "path": "tests/chart-domain.test.js", "spec": "chart-domain" },
     { "path": "tests/theme.test.js", "spec": "theme-tokens" },
     { "path": "tests/keyboard-shortcuts.test.js", "spec": "keyboard-shortcuts" },
+    { "path": "tests/page-layout.test.js", "spec": "page-layout" },
+    { "path": "tests/css-modules.test.js", "spec": "css-modules" },
+    { "path": "tests/global-styles.test.js", "spec": "global-styles" },
+    { "path": "tests/ui-module.test.js", "spec": "ui-module" },
+    { "path": "tests/style-helpers.test.js", "spec": "style-helpers" },
     { "path": "tests/file-tree.test.js", "spec": "file-tree" },
     { "path": "tests/spec-integrity.test.js", "spec": "manifest" }
   ]

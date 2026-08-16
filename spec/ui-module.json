@@ -1,0 +1,26 @@
+{
+  "outputPath": "src/styles/ui.module.css",
+  "sharedComponents": {
+    "Card": { "rootClass": "card", "variants": ["cardChart", "cardChartMb"] },
+    "StatBox": { "rootClass": "statBox", "parts": ["statLabel", "statValue", "statUnit"] },
+    "Collapse": { "rootClass": "collapse", "parts": ["collapseToggle", "collapseToggleOpen", "collapseChevron", "collapseChevronOpen", "collapseBody"] }
+  },
+  "modal": {
+    "backdrop": "modalBackdrop",
+    "panel": "modalPanel",
+    "panelScroll": "modalPanelScroll",
+    "panelConfirm": "modalPanelConfirm",
+    "header": "modalHeader",
+    "title": "modalTitle",
+    "close": "modalClose"
+  },
+  "chartToggles": {
+    "row": "chartToggleRow",
+    "btn": "chartToggleBtn",
+    "btnActive": "chartToggleBtnActive"
+  },
+  "requiredClasses": [
+    "btnPrimary", "btnSecondary", "btnDanger", "card", "statBox", "collapse", "sectionTitle",
+    "emptyState", "modalBackdrop", "modalPanel", "listOutline", "chartToggleBtn", "chartToggleBtnActive"
+  ]
+}

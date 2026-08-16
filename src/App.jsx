@@ -7,9 +7,11 @@ import ProgressPage from "./components/ProgressPage.jsx";
 import { useAppNavKeyboard, useDisableNumberInputWheel } from "./components/shared.jsx";
 import appConfig from "../spec/app-config.json";
 import keyboardSpec from "../spec/keyboard-shortcuts.json";
+import { getAppLayout } from "./domain/pageLayout.js";
 import styles from "./App.module.css";
 
 const NAV = keyboardSpec.navigation.tabs;
+const appLayout = getAppLayout();
 const defaultData = appConfig.defaultData;
 const STORAGE_KEY = appConfig.storageKey;
 
@@ -58,7 +60,7 @@ export default function App() {
   return (
     <div className={styles.app}>
       <div className={styles.header}>
-        <span className={styles.logo}>⚡ FitTrack</span>
+        <span className={styles.logo}>{appLayout.logo}</span>
       </div>
       <nav className={styles.nav} aria-label="Main">
         <div ref={navTrackRef} className={styles.navTrack} role="tablist">

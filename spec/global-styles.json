@@ -1,0 +1,35 @@
+{
+  "outputPath": "src/styles/global.css",
+  "imports": ["./theme.css"],
+  "base": {
+    "htmlBodyMargin": "0",
+    "bodyMinHeight": "100vh",
+    "bodyBackground": "var(--ft-bg-base)",
+    "bodyFont": "var(--ft-font)",
+    "bodyColor": "var(--ft-text)",
+    "rootMinHeight": "100vh"
+  },
+  "numberInput": {
+    "hideWebkitSpinners": true,
+    "mozAppearance": "textfield"
+  },
+  "keyboardClasses": [
+    "ft-kb-focus",
+    "ft-kb-activate",
+    "ft-kb-nav-focus",
+    "ft-kb-nav-activate",
+    "ft-kb-btn-focus",
+    "ft-kb-focus-indicator",
+    "ft-kb-hint",
+    "ft-kb-modal-backdrop"
+  ],
+  "animations": {
+    "activateDurationMs": 450,
+    "btnPulseDurationMs": 1600,
+    "backdropInDurationMs": 200
+  },
+  "keyboardClassTokens": {
+    "ft-kb-focus": { "outlineColor": "var(--ft-accent)", "outlineWidth": "2px" },
+    "ft-kb-activate": { "borderColor": "var(--ft-green)" }
+  }
+}

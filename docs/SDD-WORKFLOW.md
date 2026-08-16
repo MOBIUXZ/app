@@ -80,7 +80,9 @@ git commit -m "feat: describe what and why"
 | Change body comp math | `spec/formula-fixtures.json` | `src/domain/metrics.js` | `tests/metrics.test.js` |
 | Add exercise category | `spec/exercise-catalog.json` | (auto via `shared.jsx`) | `tests/spec-integrity.test.js` |
 | Change storage key | `spec/app-config.json` | `src/App.jsx` | `tests/spec-integrity.test.js` |
-| Add new source file | `spec/file-tree.json` | your new file | `tests/file-tree.test.js` |
+| Change page title / section | `spec/page-layout.json` | page component | `tests/page-layout.test.js` |
+| Add CSS module class | `spec/css-modules.json` | `*.module.css` | `tests/css-modules.test.js` |
+| Change keyboard CSS class | `spec/global-styles.json` | `global.css` | `tests/global-styles.test.js` |
 
 ---
 
@@ -97,10 +99,15 @@ FITTRACK/
 │   ├── parser-fixtures.json
 │   ├── formula-fixtures.json
 │   ├── resolve-exercise-fixtures.json
+│   ├── page-layout.json
+│   ├── css-modules.json
+│   ├── global-styles.json
+│   ├── ui-module.json
+│   ├── style-helpers.json
 │   └── file-tree.json
-├── tests/                ← ENFORCEMENT (Vitest)
+├── tests/                ← ENFORCEMENT (Vitest, 240+ tests)
 ├── src/
-│   ├── domain/metrics.js   ← pure formulas
+│   ├── domain/pageLayout.js  ← layout spec loader
 │   └── components/         ← UI + parser
 ├── scripts/
 │   └── verify-spec.mjs

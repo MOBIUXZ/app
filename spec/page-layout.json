@@ -1,0 +1,111 @@
+{
+  "app": {
+    "logo": "⚡ FitTrack",
+    "cssModule": "src/App.module.css",
+    "shellClasses": ["app", "header", "logo", "nav", "navTrack", "navBtn", "navBtnActive", "main"]
+  },
+  "pages": {
+    "dashboard": {
+      "id": "dashboard",
+      "component": "src/components/DashboardPage.jsx",
+      "cssModule": "src/components/DashboardPage.module.css",
+      "pageTitle": "👋 Dashboard",
+      "statBoxes": [
+        { "id": "bodyWeight", "label": "Body Weight", "unit": "kg", "valueKey": "lastBodyWeight" },
+        { "id": "bodyFat", "label": "Body Fat", "unit": "%", "valueKey": "lastBodyFat", "colorToken": "pink" },
+        { "id": "todayCals", "label": "Today Cals", "unit": "kcal", "valueKey": "todayCalories", "colorToken": "orange", "emptyAsNull": true },
+        { "id": "workouts", "label": "Workouts", "unit": "", "valueKey": "workoutCount", "colorToken": "green" }
+      ],
+      "sections": [
+        {
+          "id": "personalRecords",
+          "type": "card",
+          "title": "🏆 Personal Records",
+          "emptyIcon": "🏋️",
+          "emptyMessage": "No workouts yet.",
+          "emptyCta": "Log your first workout!",
+          "emptyCtaTab": "Workout"
+        }
+      ],
+      "collapses": [
+        { "id": "recentWorkouts", "emoji": "📋", "label": "Recent Workouts", "defaultOpen": false, "emptyIcon": "📝", "emptyMessage": "Nothing logged yet!" }
+      ]
+    },
+    "workout": {
+      "id": "workout",
+      "component": "src/components/WorkoutPage.jsx",
+      "cssModule": "src/components/WorkoutPage.module.css",
+      "hero": {
+        "eyebrow": "Training dashboard",
+        "title": "🏋️ Workout Log",
+        "chips": ["workoutCount", "uniqueExercises", "todayDate"]
+      },
+      "actions": [
+        { "id": "calendar", "label": "📅 Open Calendar" },
+        { "id": "smartParser", "label": "🧠 Smart Parser" }
+      ],
+      "collapses": [
+        { "id": "logWorkout", "emoji": "✍️", "label": "Log Workout", "defaultOpen": false },
+        { "id": "history", "emoji": "📋", "label": "Workout History", "defaultOpen": false },
+        { "id": "oneRm", "emoji": "🧮", "label": "1RM Calculator", "defaultOpen": false }
+      ],
+      "modals": [
+        { "id": "calendarModal", "title": "📅 Workout Calendar", "layerId": "calendar-modal" },
+        { "id": "smartParser", "title": "🧠 Smart Parser", "layerId": "smart-parser", "submitLabel": "Parse & Save" },
+        { "id": "setPicker", "title": "Select a logged set", "layerId": "set-picker" },
+        { "id": "clearHistory", "title": "Clear Workout History?", "layerId": "clear-workout-history", "buttons": ["Cancel", "Clear History"] }
+      ]
+    },
+    "bodyComp": {
+      "id": "bodyComp",
+      "component": "src/components/BodyCompPage.jsx",
+      "cssModule": "src/components/BodyCompPage.module.css",
+      "pageTitle": "📏 Body Composition",
+      "collapses": [
+        { "id": "logEntry", "emoji": "➕", "label": "Log Entry", "defaultOpen": false },
+        { "id": "history", "emoji": "📋", "label": "History", "defaultOpen": false }
+      ],
+      "modals": [
+        { "id": "clearHistory", "title": "Clear Body Comp History?", "layerId": "clear-body-comp-history", "buttons": ["Cancel", "Clear History"] }
+      ]
+    },
+    "calories": {
+      "id": "calories",
+      "component": "src/components/CaloriePage.jsx",
+      "cssModule": "src/components/CaloriePage.module.css",
+      "pageTitle": "🍽️ Calories",
+      "sections": [
+        { "id": "bmrTdee", "title": "🔥 BMR & TDEE" },
+        { "id": "dailyGoal", "title": "Daily Goal" }
+      ],
+      "collapses": [
+        { "id": "customEntry", "emoji": "✏️", "label": "Custom Entry", "defaultOpen": false },
+        { "id": "foodLog", "emoji": "📋", "label": "Log for {date}", "defaultOpen": true, "labelTemplate": true }
+      ],
+      "goalChips": [
+        { "id": "cut", "label": "Cut (-500)", "colorToken": "red", "offsetKey": "cut" },
+        { "id": "maintain", "label": "Maintain", "colorToken": "green", "offsetKey": "maintain" },
+        { "id": "bulk", "label": "Bulk (+300)", "colorToken": "accent", "offsetKey": "bulk" }
+      ]
+    },
+    "progress": {
+      "id": "progress",
+      "component": "src/components/ProgressPage.jsx",
+      "cssModule": "src/components/ProgressPage.module.css",
+      "pageTitle": "📈 Progress",
+      "sections": [
+        { "id": "compoundLifts", "label": "🏋️ COMPOUND LIFTS" },
+        { "id": "combinedCompound", "title": "📊 Combined Compound Lifts" },
+        { "id": "isolationLifts", "label": "💪 ISOLATION LIFTS" },
+        { "id": "bodyCharts", "title": "📉 Body Weight & Body Fat" },
+        { "id": "calorieTrend", "title": "🔥 Calorie Intake Trend" }
+      ],
+      "chartMetrics": ["weight", "volume", "e1rm", "mean_e1rm"],
+      "sessionGraphMetrics": ["weight", "volume", "e1rm"],
+      "modals": [
+        { "id": "workoutDetail", "title": "Workout Details", "layerId": "progress-detail" },
+        { "id": "sessionGraph", "title": "Session Performance", "layerId": "progress-session-graph" }
+      ]
+    }
+  }
+}

@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, formatExerciseName, btnPrimary, btnSecondary, btnDanger, inputClass, selectClass, textareaClass, formatDate, useKeyboardListNav, useConfirmDialogKeyboard, handleParserTextareaKeyDown, useParserTextareaKeyboard, useKeyboardLayer, isTypingTarget, ui, cx } from "./shared";
 import { computeOneRM, TRAINING_PERCENTAGES, DEFAULT_ONE_RM_FORMULA, ONE_RM_FORMULAS, collectLoggedSets } from "../domain/oneRm.js";
+import { getPageLayout, getCollapseSpec, getModalSpec } from "../domain/pageLayout.js";
 import s from "./WorkoutPage.module.css";
+
+var workoutLayout = getPageLayout("workout");
 
 function OneRMCalc({ data }) {
   var [weight, setWeight] = useState(""); var [reps, setReps] = useState(""); var [formula, setFormula] = useState(DEFAULT_ONE_RM_FORMULA); var [autoEx, setAutoEx] = useState("");
@@ -418,9 +421,9 @@ export default function WorkoutPage({ data, save }) {
   return (
     <div>
       <div className={s.heroCard}>
-        <div className={s.sectionLabelUpper}>Training dashboard</div>
+        <div className={s.sectionLabelUpper}>{workoutLayout.hero.eyebrow}</div>
         <div className={cx(ui.flexBetween, ui.flexRowWrap)}>
-          <div className={s.heroTitle}>🏋️ Workout Log</div>
+          <div className={s.heroTitle}>{workoutLayout.hero.title}</div>
           <div className={ui.flexRowWrap}>
             <span className={s.dashboardChip}>{data.workouts.length} workouts</span>
             <span className={s.dashboardChip} style={{ color: GREEN, borderColor: GREEN + "44" }}>{uniqueExercises} unique exercises</span>
@@ -443,8 +446,8 @@ export default function WorkoutPage({ data, save }) {
           setViewMonth(ref.getMonth());
           setViewYear(ref.getFullYear());
           setShowCalendarModal(true);
-        }} className={btnSecondary({ fullWidth: true, margin0: true })}>📅 Open Calendar</button>
-        <button type="button" onClick={function () { setShowSmartParserModal(true); }} className={btnSecondary({ fullWidth: true, margin0: true })}>🧠 Smart Parser</button>
+        }} className={btnSecondary({ fullWidth: true, margin0: true })}>{workoutLayout.actions[0].label}</button>
+        <button type="button" onClick={function () { setShowSmartParserModal(true); }} className={btnSecondary({ fullWidth: true, margin0: true })}>{workoutLayout.actions[1].label}</button>
       </div>
 
       {showCalendarModal && (
@@ -811,7 +814,7 @@ Bench Press
             <div className={ui.modalHeader}>
               <div className={s.parserHeaderRow}>
                 <span className={s.parserIcon}>🧠</span>
-                <span className={ui.modalTitle}>Smart Parser</span>
+                <span className={ui.modalTitle}>{getModalSpec("workout", "smartParser").title}</span>
               </div>
               <button type="button" onClick={function () { setShowSmartParserModal(false); setParseMsg(""); setParsePreview(null); }} className={ui.modalClose}>✕</button>
             </div>
@@ -837,7 +840,7 @@ Bench Press
             <div className={cx(s.parseHintSm, ui.marginBottom12)}>Enter parse & save · Shift+Enter new line · Esc close</div>
             
             <div className={cx(ui.flexBetween, ui.flexRowWrap, ui.marginBottom12)}>
-              <button type="button" onClick={doParse} className={btnPrimary({ flex1: true })}>Parse & Save</button>
+              <button type="button" onClick={doParse} className={btnPrimary({ flex1: true })}>{getModalSpec("workout", "smartParser").submitLabel}</button>
             </div>
             
             {parseMsg && (
@@ -874,7 +877,7 @@ Bench Press
         </div>
       )}
 
-      <Collapse emoji="✍️" label="Log Workout" defaultOpen={false}>
+      <Collapse emoji={getCollapseSpec("workout", "logWorkout").emoji} label={getCollapseSpec("workout", "logWorkout").label} defaultOpen={getCollapseSpec("workout", "logWorkout").defaultOpen}>
         <div className={s.manualLogHeader}>
           <div className={s.manualLogTitle}>Manual entry</div>
           <span className={s.dashboardChip}>Quick log</span>
@@ -921,7 +924,7 @@ Bench Press
         {msg && <div className={cx(ui.successMsg, ui.marginTop8)}>{msg}</div>}
       </Collapse>
 
-      <Collapse emoji="📋" label="Workout History" defaultOpen={false}>
+      <Collapse emoji={getCollapseSpec("workout", "history").emoji} label={getCollapseSpec("workout", "history").label} defaultOpen={getCollapseSpec("workout", "history").defaultOpen}>
         <div className={ui.marginBottom12}>
           <div className={ui.historyToolbarSticky}>
             <input value={searchQuery} onChange={function (e) { setSearchQuery(e.target.value); }} placeholder="Search by workout name..." className={cx(inputClass({ fullWidth: true }), ui.marginBottom12)} />
@@ -1030,7 +1033,7 @@ Bench Press
         {showClearConfirm && (
           <div className={cx("ft-kb-modal-backdrop", ui.modalBackdrop)} style={{ zIndex: clearConfirmKb.zIndex }}>
             <div ref={clearConfirmKb.dialogRef} tabIndex={-1} className={ui.modalPanelConfirm}>
-              <div className={s.confirmTitle}>Clear Workout History?</div>
+              <div className={s.confirmTitle}>{getModalSpec("workout", "clearHistory").title}</div>
               <div className={s.confirmBody}>This will permanently delete all {data.workouts.length} logged workouts. Do you want to continue?</div>
               <div className="ft-kb-focus-indicator">Focused: <strong>{clearConfirmKb.focusLabel}</strong></div>
               <div className="ft-kb-hint">← → or Tab switch · Enter select · Esc cancel</div>
@@ -1043,7 +1046,7 @@ Bench Press
         )}
       </Collapse>
 
-      <Collapse emoji="🧮" label="1RM Calculator" defaultOpen={false}>
+      <Collapse emoji={getCollapseSpec("workout", "oneRm").emoji} label={getCollapseSpec("workout", "oneRm").label} defaultOpen={getCollapseSpec("workout", "oneRm").defaultOpen}>
         <OneRMCalc data={data} />
       </Collapse>
     </div>

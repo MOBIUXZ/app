@@ -24,3 +24,5 @@ Before making non-trivial changes, read:
 - Constants: `spec/exercise-catalog.json`, `spec/exercise-aliases.json`, `spec/app-config.json`
 - Formulas: `src/domain/metrics.js` ↔ `spec/formula-fixtures.json`
 - Parser: `parseWorkoutText()` in `shared.jsx` ↔ `spec/parser-fixtures.json`
+- Layout: page components ↔ `spec/page-layout.json` via `src/domain/pageLayout.js`
+- CSS: `*.module.css` ↔ `spec/css-modules.json`

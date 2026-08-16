@@ -91,14 +91,18 @@ Constants that appear in multiple places (aliases, categories, storage key) **mu
 | Dashboard / Calories / Body sync | `spec/ui-behavior-fixtures.json` | `ui-behavior` |
 | Chart domain & animation | `spec/chart-domain.json`, `app-config` | `chart-domain` |
 | Keyboard shortcuts | `spec/keyboard-shortcuts.json` | `keyboard-shortcuts` |
+| Page layout & titles | `spec/page-layout.json` | `page-layout` |
+| CSS module classes | `spec/css-modules.json` | `css-modules` |
+| Global.css keyboard/base | `spec/global-styles.json` | `global-styles` |
+| Shared UI module | `spec/ui-module.json` | `ui-module` |
+| Style helper exports | `spec/style-helpers.json` | `style-helpers` |
 | Project layout | `spec/file-tree.json` | `file-tree` |
 
-### Remaining non-spec layers (acceptable)
+All definable layers — behavior, constants, layout labels, CSS class contracts, theme tokens — are spec-driven and tested via `npm run verify` (240+ tests).
 
-- **Presentational JSX/CSS layout** — component structure and spacing are implementation details; change via code review.
-- **Visual pixel perfection** — no screenshot/regression suite; manual QA for UI polish.
+### Optional manual QA only
 
-All **behavior, constants, formulas, and contracts** must go through spec → test → code.
+- Pixel-perfect visual polish across browsers (no screenshot regression suite yet).
 
 ---
 

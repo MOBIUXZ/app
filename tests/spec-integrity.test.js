@@ -10,7 +10,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 describe('spec manifest integrity', function () {
   it('every manifest spec file exists on disk', function () {
-    expect(manifest.specs.length).toBeGreaterThanOrEqual(13);
+    expect(manifest.specs.length).toBeGreaterThanOrEqual(18);
     manifest.specs.forEach(function (spec) {
       expect(existsSync(resolve(root, spec.path))).toBe(true);
     });

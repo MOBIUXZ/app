@@ -3,8 +3,11 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianG
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExerciseName, isNoSplitLift, isCompoundLift, COMPOUND_LIFTS, getExerciseChartColor, useKeyboardLayer, ui, cx } from "./shared";
 import { estimate1RM, roundE1RM, averageE1RM, computeSessionMetrics } from "../domain/metrics.js";
 import { CHART_CURSOR, computeYDomain, getTrendLineAnim, getFirstPaintDuration, FAILED_SET_COLOR } from "../domain/chartDomain.js";
+import { getPageLayout } from "../domain/pageLayout.js";
 import appConfig from "../../spec/app-config.json";
 import s from "./ProgressPage.module.css";
+
+var progressLayout = getPageLayout("progress");
 
 var TREND_LINE_ANIM = getTrendLineAnim(appConfig);
 var SESSION_GRAPH_ANIM = { animationDuration: appConfig.chartAnimation.sessionGraphMs, animationEasing: appConfig.chartAnimation.easing };
@@ -898,9 +901,9 @@ export default function ProgressPage({ data }) {
 
   return (
     <div>
-      <div className={s.pageTitle}>📈 Progress</div>
+      <div className={s.pageTitle}>{progressLayout.pageTitle}</div>
       {allEx.length === 0 ? <Card><div className={s.emptyChart}>No workouts logged yet.</div></Card> : <div>
-        {compounds.length > 0 && <div className={s.sectionLabel}>🏋️ COMPOUND LIFTS</div>}
+        {compounds.length > 0 && <div className={s.sectionLabel}>{progressLayout.sections[0].label}</div>}
         {compounds.map(function (ex, i) {
           return (
             <MemoExerciseChart
@@ -916,7 +919,7 @@ export default function ProgressPage({ data }) {
         })}
         {compounds.length > 1 && (
             <Card className={ui.cardChartMb}>
-              <div className={ui.sectionTitleLg}>📊 Combined Compound Lifts</div>
+              <div className={ui.sectionTitleLg}>{progressLayout.sections[1].title}</div>
               <div className={ui.chartToggleRow}>
                 {["weight", "volume", "e1rm", "mean_e1rm"].map(function (m) {
                   return (
@@ -1011,7 +1014,7 @@ export default function ProgressPage({ data }) {
             )}
           </div>
         )}
-        {(isolations.length > 0) && <div className={s.sectionLabelSpaced}>💪 ISOLATION LIFTS</div>}
+        {(isolations.length > 0) && <div className={s.sectionLabelSpaced}>{progressLayout.sections[2].label}</div>}
         {isolations.map(function (ex, i) {
           return (
             <MemoExerciseChart
@@ -1027,7 +1030,7 @@ export default function ProgressPage({ data }) {
         })}
         <div ref={footerChartsRef}>
         <Card className={ui.cardChart}>
-          <div className={ui.sectionTitleLg}>📉 Body Weight & Body Fat</div>
+          <div className={ui.sectionTitleLg}>{progressLayout.sections[3].title}</div>
           <div className={ui.chartContainer}>
             {footerChartsInView ? (
             <ResponsiveContainer width="100%" height={160}>
@@ -1044,7 +1047,7 @@ export default function ProgressPage({ data }) {
           {bfChart.length > 0 && footerChartsInView && <div className={s.bfSection}><div className={s.bfLabel} style={{ color: PINK }}>Body Fat %</div><div className={ui.chartContainer}><ResponsiveContainer width="100%" height={140}><LineChart data={bfChart}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} /><Line type="monotone" dataKey="bf" stroke={PINK} strokeWidth={2} dot={{ fill: PINK, r: 3 }} isAnimationActive={false} animationDuration={0} /></LineChart></ResponsiveContainer></div></div>}
         </Card>
         <Card className={ui.cardChart}>
-          <div className={ui.sectionTitleLg}>🔥 Calorie Intake Trend</div>
+          <div className={ui.sectionTitleLg}>{progressLayout.sections[4].title}</div>
           <div className={ui.chartContainer}>
             {footerChartsInView ? (
             <ResponsiveContainer width="100%" height={160}>
