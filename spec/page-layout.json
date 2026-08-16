@@ -9,6 +9,7 @@
     "favicon": "/favicon.svg",
     "faviconIco": "/favicon.ico",
     "appleTouchIcon": "/icons/icon-180.png",
+    "documentTitle": "Orbius — Always in orbit. Always evolving.",
     "cssModule": "src/App.module.css",
     "shellClasses": ["app", "header", "logo", "logoText", "nav", "navTrack", "navBtn", "navBtnActive", "main"]
   },

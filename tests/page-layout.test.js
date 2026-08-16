@@ -32,6 +32,13 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(existsSync(resolve(root, layout.logo.component))).toBe(true);
   });
 
+  it('document title includes brand tagline', function () {
+    var layout = getAppLayout();
+    expect(layout.documentTitle).toBe('Orbius — Always in orbit. Always evolving.');
+    var html = readFileSync(resolve(root, 'index.html'), 'utf8');
+    expect(html.indexOf('<title>' + layout.documentTitle + '</title>') !== -1).toBe(true);
+  });
+
   it('modal specs resolve for workout clear history', function () {
     var modal = getModalSpec('workout', 'clearHistory');
     expect(modal.title).toContain('Clear Workout History');

@@ -136,7 +136,7 @@ export default defineConfig({
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Orbius - Fitness Tracking App</title>
+    <title>Orbius — Always in orbit. Always evolving.</title>
   </head>
   <body>
     <div id="root"></div>
