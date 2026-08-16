@@ -17,6 +17,7 @@ Stats use a **filled strip** under the title: three columns (Workouts, Unique, T
 Opens a full-screen calendar modal with two views:
 
 #### Month View
+- Compact month grid (narrower panel than Year)
 - Navigate months with ◀ / ▶ controls
 - Days with logged workouts highlighted in green
 - Today outlined in accent purple

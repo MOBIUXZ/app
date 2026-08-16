@@ -66,6 +66,16 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(source.indexOf('heroStatGhost') === -1).toBe(true);
   });
 
+  it('calendar month panel is slightly narrower than year and year width stays put', function () {
+    var modal = getModalSpec('workout', 'calendarModal');
+    expect(modal.monthMaxWidthPx).toBe(389);
+    expect(modal.yearMaxWidthPx).toBe(680);
+    var css = readFileSync(resolve(root, pageLayout.pages.workout.cssModule), 'utf8');
+    expect(css.indexOf('.calModalPanel.calModalPanelMonth') !== -1).toBe(true);
+    expect(css.indexOf('max-width: ' + modal.monthMaxWidthPx + 'px') !== -1).toBe(true);
+    expect(css.indexOf('max-width: ' + modal.yearMaxWidthPx + 'px') !== -1).toBe(true);
+  });
+
   it('smart parser modal uses the spec title without a second icon', function () {
     var modal = getModalSpec('workout', 'smartParser');
     expect(modal.title).toBe('🧠 Smart Parser');

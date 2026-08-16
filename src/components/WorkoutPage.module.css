@@ -275,7 +275,12 @@
 
 .calModalPanelMonth {
   composes: calModalPanel;
-  max-width: 420px;
+}
+
+.calModalPanel.calModalPanelMonth {
+  width: 389px;
+  max-width: 389px;
+  padding: 16px;
 }
 
 .calModalPanelYear {
@@ -317,12 +322,12 @@
 .calDayHeaderRow {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+  gap: 6px;
   text-align: center;
   font-weight: 700;
   color: var(--ft-text-dim);
   font-size: 11px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -330,7 +335,7 @@
 .calDayGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+  gap: 6px;
 }
 
 .calDayPadding {
@@ -343,7 +348,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   transition: transform 0.1s ease, background-color 0.2s ease;
