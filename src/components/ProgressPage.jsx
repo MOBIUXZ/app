@@ -4,6 +4,7 @@ import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExercis
 import { estimate1RM, roundE1RM, averageE1RM, computeSessionMetrics } from "../domain/metrics.js";
 import { CHART_CURSOR, computeYDomain, getTrendLineAnim, getFirstPaintDuration, FAILED_SET_COLOR } from "../domain/chartDomain.js";
 import { getPageLayout } from "../domain/pageLayout.js";
+import { PageHeading } from "./PageIcon";
 import appConfig from "../../spec/app-config.json";
 import s from "./ProgressPage.module.css";
 
@@ -901,7 +902,7 @@ export default function ProgressPage({ data }) {
 
   return (
     <div>
-      <div className={s.pageTitle}>{progressLayout.pageTitle}</div>
+      <PageHeading className={s.pageTitle} title={progressLayout.pageTitle} icon={progressLayout.pageIcon} />
       {allEx.length === 0 ? <Card><div className={s.emptyChart}>No workouts logged yet.</div></Card> : <div>
         {compounds.length > 0 && <div className={s.sectionLabel}>{progressLayout.sections[0].label}</div>}
         {compounds.map(function (ex, i) {

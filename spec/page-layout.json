@@ -18,7 +18,8 @@
       "id": "dashboard",
       "component": "src/components/DashboardPage.jsx",
       "cssModule": "src/components/DashboardPage.module.css",
-      "pageTitle": "👋 Dashboard",
+      "pageTitle": "Dashboard",
+      "pageIcon": "gauge",
       "statBoxes": [
         { "id": "bodyWeight", "label": "Body Weight", "unit": "kg", "valueKey": "lastBodyWeight" },
         { "id": "bodyFat", "label": "Body Fat", "unit": "%", "valueKey": "lastBodyFat", "colorToken": "pink" },
@@ -46,7 +47,8 @@
       "cssModule": "src/components/WorkoutPage.module.css",
       "hero": {
         "eyebrow": "Training dashboard",
-        "title": "🏋️ Workout Log",
+        "title": "Workout Log",
+        "icon": "activity",
         "chips": ["workoutCount", "uniqueExercises", "todayDate"]
       },
       "actions": [
@@ -71,7 +73,8 @@
       "id": "bodyComp",
       "component": "src/components/BodyCompPage.jsx",
       "cssModule": "src/components/BodyCompPage.module.css",
-      "pageTitle": "📏 Body Composition",
+      "pageTitle": "Body Composition",
+      "pageIcon": "layers",
       "collapses": [
         { "id": "logEntry", "emoji": "➕", "label": "Log Entry", "defaultOpen": false },
         { "id": "history", "emoji": "📋", "label": "History", "defaultOpen": false }
@@ -84,7 +87,8 @@
       "id": "calories",
       "component": "src/components/CaloriePage.jsx",
       "cssModule": "src/components/CaloriePage.module.css",
-      "pageTitle": "🍽️ Calories",
+      "pageTitle": "Calories",
+      "pageIcon": "flame",
       "sections": [
         { "id": "bmrTdee", "title": "🔥 BMR & TDEE" },
         { "id": "dailyGoal", "title": "Daily Goal" }
@@ -103,7 +107,8 @@
       "id": "progress",
       "component": "src/components/ProgressPage.jsx",
       "cssModule": "src/components/ProgressPage.module.css",
-      "pageTitle": "📈 Progress",
+      "pageTitle": "Progress",
+      "pageIcon": "chart-spline",
       "sections": [
         { "id": "compoundLifts", "label": "🏋️ COMPOUND LIFTS" },
         { "id": "combinedCompound", "title": "📊 Combined Compound Lifts" },

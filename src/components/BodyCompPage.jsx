@@ -3,6 +3,7 @@ import { ACCENT, BLUE, GREEN, ORANGE, PINK, Collapse, btnPrimary, btnSecondary, 
 import { computeBodyCompEntry } from "../domain/metrics.js";
 import { syncBodyLogsAfterEdit, removeBodyLogForEntry } from "../domain/bodyCompSync.js";
 import { getPageLayout, getCollapseSpec, getModalSpec } from "../domain/pageLayout.js";
+import { PageHeading } from "./PageIcon";
 import s from "./BodyCompPage.module.css";
 
 var bodyLayout = getPageLayout("bodyComp");
@@ -115,7 +116,7 @@ export default function BodyCompPage({ data, save }) {
   }
   return (
     <div>
-      <div className={s.pageTitle}>{bodyLayout.pageTitle}</div>
+      <PageHeading className={s.pageTitle} title={bodyLayout.pageTitle} icon={bodyLayout.pageIcon} />
       <Collapse emoji={getCollapseSpec("bodyComp", "logEntry").emoji} label={getCollapseSpec("bodyComp", "logEntry").label} defaultOpen={getCollapseSpec("bodyComp", "logEntry").defaultOpen}>
         <div className={ui.fieldBlock}>
           <div className={ui.fieldLabel}>Date</div>

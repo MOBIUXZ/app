@@ -2,6 +2,7 @@ import React , {useState} from "react";
 import { resolveExercise, formatExerciseName, Card, StatBox, Collapse, useKeyboardListNav, ui, cx } from "./shared";
 import { getDashboardSnapshot, getRecentWorkouts } from "../domain/dashboard.js";
 import { getPageLayout, resolveStatBoxValue, getStatBoxColor } from "../domain/pageLayout.js";
+import { PageHeading } from "./PageIcon";
 import s from "./DashboardPage.module.css";
 
 var layout = getPageLayout("dashboard");
@@ -17,7 +18,7 @@ function DashboardPage({data,setTab}){
   var recentCollapse = layout.collapses[0];
   return (
     <div>
-      <div className={s.pageTitle}>{layout.pageTitle}</div>
+      <PageHeading className={s.pageTitle} title={layout.pageTitle} icon={layout.pageIcon} />
       <div className={s.statRow}>
         {layout.statBoxes.map(function (box) {
           return (

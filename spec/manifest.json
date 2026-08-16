@@ -84,8 +84,14 @@
     {
       "id": "page-layout",
       "path": "spec/page-layout.json",
-      "governs": ["page titles", "sections", "stat boxes", "collapses", "modal titles", "hero blocks"],
+      "governs": ["page titles", "page icons", "sections", "stat boxes", "collapses", "modal titles", "hero blocks"],
       "docs": ["docs/dashboard.md", "docs/workout.md", "docs/body-comp.md", "docs/calories.md", "docs/progress.md", "docs/architecture.md"]
+    },
+    {
+      "id": "page-icons",
+      "path": "spec/page-icons.json",
+      "governs": ["Lucide page-title icon paths", "PageIcon / PageHeading"],
+      "docs": ["docs/styling.md", "docs/source-index.md"]
     },
     {
       "id": "css-modules",
@@ -140,6 +146,7 @@
     { "path": "tests/theme.test.js", "spec": "theme-tokens" },
     { "path": "tests/keyboard-shortcuts.test.js", "spec": "keyboard-shortcuts" },
     { "path": "tests/page-layout.test.js", "spec": "page-layout" },
+    { "path": "tests/page-icons.test.js", "spec": "page-icons" },
     { "path": "tests/css-modules.test.js", "spec": "css-modules" },
     { "path": "tests/global-styles.test.js", "spec": "global-styles" },
     { "path": "tests/ui-module.test.js", "spec": "ui-module" },

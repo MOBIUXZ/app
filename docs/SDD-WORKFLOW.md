@@ -87,6 +87,7 @@ git commit -m "feat: describe what and why"
 | Add exercise category | `spec/exercise-catalog.json` | (auto via `shared.jsx`) | `tests/spec-integrity.test.js` |
 | Change storage key | `spec/app-config.json` | `src/App.jsx` | `tests/spec-integrity.test.js` |
 | Change page title / section | `spec/page-layout.json` | page component | `tests/page-layout.test.js` |
+| Change page title icon | `spec/page-icons.json` | `src/components/PageIcon.jsx` | `tests/page-icons.test.js` |
 | Add CSS module class | `spec/css-modules.json` | `*.module.css` | `tests/css-modules.test.js` |
 | Change keyboard CSS class | `spec/global-styles.json` | `global.css` | `tests/global-styles.test.js` |
 | Add visual snapshot | `spec/visual-regression.json` | (Playwright e2e) | `tests/visual-regression.test.js` |

@@ -92,6 +92,7 @@ Constants that appear in multiple places (aliases, categories, storage key) **mu
 | Chart domain & animation | `spec/chart-domain.json`, `app-config` | `chart-domain` |
 | Keyboard shortcuts | `spec/keyboard-shortcuts.json` | `keyboard-shortcuts` |
 | Page layout & titles | `spec/page-layout.json` | `page-layout` |
+| Page title icons | `spec/page-icons.json` | `page-icons` |
 | CSS module classes | `spec/css-modules.json` | `css-modules` |
 | Global.css keyboard/base | `spec/global-styles.json` | `global-styles` |
 | Shared UI module | `spec/ui-module.json` | `ui-module` |

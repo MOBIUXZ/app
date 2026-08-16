@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ACCENT, GREEN, ORANGE, PINK, ACTIVITY, Card, Collapse, btnPrimary, btnSecondary, inputClass, useKeyboardListNav, ui, cx } from "./shared";
 import { computeMacroTotals, computeGoalBarPct, getGoalBarDisplayPct, getGoalBarColor, computeTdee, getTdeeTargets, DEFAULT_CALORIE_GOAL } from "../domain/calories.js";
 import { getPageLayout, getThemeColor, formatTemplateLabel, getCollapseSpec } from "../domain/pageLayout.js";
+import { PageHeading } from "./PageIcon";
 import appConfig from "../../spec/app-config.json";
 import s from "./CaloriePage.module.css";
 
@@ -40,7 +41,7 @@ export default function CaloriePage({ data, save }) {
 
   return (
     <div>
-      <div className={s.pageTitle}>{calLayout.pageTitle}</div>
+      <PageHeading className={s.pageTitle} title={calLayout.pageTitle} icon={calLayout.pageIcon} />
       <Card>
         <div className={ui.sectionTitle}>{calLayout.sections[0].title}</div>
         {!bmr ? <div className={ui.mutedSm}>Log a Body Comp entry with weight, height, age and sex to calculate BMR.</div> : <div>

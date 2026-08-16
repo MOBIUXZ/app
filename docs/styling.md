@@ -33,10 +33,12 @@ import s from "./CaloriePage.module.css";
 
 <button className={btnPrimary({ fullWidth: true })}>Save</button>
 <input className={inputClass({ flex1: true })} />
-<div className={s.pageTitle}>🍽️ Calories</div>
+<PageHeading className={s.pageTitle} title="Calories" icon="flame" />
 ```
 
 Do **not** pass these helpers to `style=` — they return class name strings.
+
+Page titles use Lucide stroke icons from `spec/page-icons.json` via `PageHeading` (accent purple, no emoji).
 
 ### Shared vs page-specific
 

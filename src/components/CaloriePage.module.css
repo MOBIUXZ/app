@@ -1,6 +1,9 @@
 /* Calories page */
 
 .pageTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 24px;
   font-weight: 900;
   margin-bottom: 20px;

@@ -53,6 +53,10 @@ Complete inventory of every project file. Line counts approximate (Aug 2026).
 
 **~35 lines** — Orbius brand mark (gradient infinity loop). Spec: `page-layout.json` → `app.logo`. Used in `App.jsx` header with `rounded` dark tile.
 
+## `src/components/PageIcon.jsx`
+
+**~45 lines** — Lucide stroke icons for page titles (`PageIcon`, `PageHeading`). Spec: `spec/page-icons.json` + `pageIcon` / `hero.icon` in `page-layout.json`. Domain: `src/domain/pageIcons.js`.
+
 ---
 
 ## `src/components/shared.jsx`

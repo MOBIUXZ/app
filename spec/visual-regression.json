@@ -8,35 +8,35 @@
     {
       "id": "dashboard",
       "tab": "Dashboard",
-      "pageTitle": "👋 Dashboard",
+      "pageTitle": "Dashboard",
       "waitFor": "🏆 Personal Records",
       "fullPage": false
     },
     {
       "id": "workout",
       "tab": "Workout",
-      "pageTitle": "🏋️ Workout Log",
+      "pageTitle": "Workout Log",
       "waitFor": "Training dashboard",
       "fullPage": false
     },
     {
       "id": "body-comp",
       "tab": "Body Comp",
-      "pageTitle": "📏 Body Composition",
+      "pageTitle": "Body Composition",
       "waitFor": "Log Entry",
       "fullPage": false
     },
     {
       "id": "calories",
       "tab": "Calories",
-      "pageTitle": "🍽️ Calories",
+      "pageTitle": "Calories",
       "waitFor": "BMR & TDEE",
       "fullPage": false
     },
     {
       "id": "progress",
       "tab": "Progress",
-      "pageTitle": "📈 Progress",
+      "pageTitle": "Progress",
       "waitFor": "COMPOUND LIFTS",
       "fullPage": true,
       "extraWaitMs": 800
