@@ -1,43 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, formatExerciseName, btnPrimary, btnSecondary, btnDanger, inputClass, selectClass, textareaClass, formatDate, useKeyboardListNav, useConfirmDialogKeyboard, handleParserTextareaKeyDown, useParserTextareaKeyboard, useKeyboardLayer, isTypingTarget, ui, cx } from "./shared";
+import { computeOneRM, TRAINING_PERCENTAGES, DEFAULT_ONE_RM_FORMULA, ONE_RM_FORMULAS, collectLoggedSets } from "../domain/oneRm.js";
 import s from "./WorkoutPage.module.css";
 
 function OneRMCalc({ data }) {
-  var [weight, setWeight] = useState(""); var [reps, setReps] = useState(""); var [formula, setFormula] = useState("Epley"); var [autoEx, setAutoEx] = useState("");
+  var [weight, setWeight] = useState(""); var [reps, setReps] = useState(""); var [formula, setFormula] = useState(DEFAULT_ONE_RM_FORMULA); var [autoEx, setAutoEx] = useState("");
   var [setSearch, setSetSearch] = useState(""); var [showSetPicker, setShowSetPicker] = useState(false); var [loadedSet, setLoadedSet] = useState(null);
   var allEx = Array.from(new Set(data.workouts.map(function (w) { return resolveExercise(w.exercise); })));
-  var formulas = { Epley: function (w, r) { return w * (1 + r / 30); }, Brzycki: function (w, r) { return w * (36 / (37 - r)); }, Lander: function (w, r) { return (100 * w) / (101.3 - 2.67123 * r); }, Lombardi: function (w, r) { return w * Math.pow(r, 0.1); }, OConnor: function (w, r) { return w * (1 + r / 40); } };
-  var wN = parseFloat(weight), rN = parseInt(reps), oneRM = (wN > 0 && rN >= 1) ? formulas[formula](wN, rN) : null;
-  var pcts = [100, 95, 90, 85, 80, 75, 70, 65, 60];
+  var wN = parseFloat(weight), rN = parseInt(reps), oneRM = computeOneRM(formula, wN, rN);
+  var pcts = TRAINING_PERCENTAGES;
 
-  function parseSetDate(s) {
-    if (!s) return 0;
-    var dmy = s.match(/^(\d{2})-(\d{2})-(\d{4})$/);
-    if (dmy) return new Date(parseInt(dmy[3], 10), parseInt(dmy[2], 10) - 1, parseInt(dmy[1], 10)).getTime();
-    var ymd = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (ymd) return new Date(parseInt(ymd[1], 10), parseInt(ymd[2], 10) - 1, parseInt(ymd[3], 10)).getTime();
-    var parsed = new Date(s);
-    return isNaN(parsed.getTime()) ? 0 : parsed.getTime();
-  }
-
-  var loggedSets = [];
-  data.workouts.forEach(function (w, wi) {
-    w.sets.forEach(function (s, si) {
-      if (!s.weight || s.reps == null || s.reps < 1) return;
-      loggedSets.push({
-        id: wi + "-" + si,
-        exercise: resolveExercise(w.exercise),
-        displayEx: formatExerciseName(w.exercise),
-        date: w.date || "",
-        weight: s.weight,
-        reps: s.reps,
-        side: s.side || "",
-        note: s.note || "",
-        time: s.time || "",
-      });
-    });
-  });
-  loggedSets.sort(function (a, b) { return parseSetDate(b.date) - parseSetDate(a.date); });
+  var loggedSets = collectLoggedSets(data.workouts, resolveExercise, formatExerciseName);
 
   var filteredSets = loggedSets.filter(function (item) {
     if (!setSearch.trim()) return true;
@@ -119,7 +92,7 @@ function OneRMCalc({ data }) {
         <div><div className={ui.fieldLabel}>Weight (kg)</div><input type="number" value={weight} onChange={function (e) { setWeight(e.target.value); setLoadedSet(null); }} placeholder="100" className={inputClass({ fullWidth: true })} /></div>
         <div><div className={ui.fieldLabel}>Reps</div><input type="number" value={reps} onChange={function (e) { setReps(e.target.value); setLoadedSet(null); }} placeholder="5" className={inputClass({ fullWidth: true })} /></div>
       </div>
-      <div className={s.fieldBlockMd}><div className={s.labelXsMb6}>Formula</div><select value={formula} onChange={function (e) { setFormula(e.target.value); }} className={selectClass({ fullWidth: true })}>{Object.keys(formulas).map(function (f) { return <option key={f} value={f}>{f}</option>; })}</select></div>
+      <div className={s.fieldBlockMd}><div className={s.labelXsMb6}>Formula</div><select value={formula} onChange={function (e) { setFormula(e.target.value); }} className={selectClass({ fullWidth: true })}>{ONE_RM_FORMULAS.map(function (f) { return <option key={f} value={f}>{f}</option>; })}</select></div>
       {oneRM ? (<div><div className={s.oneRmResultBox}><div className={s.oneRmResultLabel}>Estimated 1RM ({formula})</div><div className={s.oneRmResultValue} style={{ color: ACCENT }}>{oneRM.toFixed(1)}<span className={s.oneRmResultUnit}> kg</span></div></div><div className={ui.sectionTitle}>📊 Training Percentages</div><div className={s.pctGrid}>{pcts.map(function (p) { return <div key={p} className={s.pctRow}><span className={s.pctLabel}>{p}%</span><span className={s.pctValue} style={{ color: ACCENT }}>{(oneRM * p / 100).toFixed(1)} kg</span></div>; })}</div></div>) : <div className={ui.emptyState}>Enter weight and reps to calculate your 1RM.</div>}
       <div className={cx(ui.sectionTitle, s.mt18, s.mb8)}>📖 Formula Guide</div>
       {fInfo.map(function (f) { return <div key={f.name} className={s.formulaGuideRow}><div className={s.formulaGuideHeader}><span className={s.formulaGuideName}>{f.name}</span><span style={{ background: f.bc + "33", color: f.bc, border: "1px solid " + f.bc + "44", borderRadius: 20, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{f.badge}</span></div><div className={s.formulaGuideWhen}>📌 {f.when}</div><div className={s.formulaGuideUse}>💡 {f.use}</div><div className={s.sportTagRow}>{f.sports.map(function (sport) { return <span key={sport} className={s.sportTag}>{sport}</span>; })}</div></div>; })}

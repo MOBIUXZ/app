@@ -2,7 +2,12 @@ import { useState, useMemo, useRef, useEffect, memo } from "react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExerciseName, isNoSplitLift, isCompoundLift, COMPOUND_LIFTS, getExerciseChartColor, useKeyboardLayer, ui, cx } from "./shared";
 import { estimate1RM, roundE1RM, averageE1RM, computeSessionMetrics } from "../domain/metrics.js";
+import { CHART_CURSOR, computeYDomain, getTrendLineAnim, getFirstPaintDuration, FAILED_SET_COLOR } from "../domain/chartDomain.js";
+import appConfig from "../../spec/app-config.json";
 import s from "./ProgressPage.module.css";
+
+var TREND_LINE_ANIM = getTrendLineAnim(appConfig);
+var SESSION_GRAPH_ANIM = { animationDuration: appConfig.chartAnimation.sessionGraphMs, animationEasing: appConfig.chartAnimation.easing };
 
 function parseChartDate(value) {
   if (!value) return null;
@@ -269,27 +274,7 @@ function sessionChartYDomain(plotData, metric) {
     if (p[metric] != null && !isNaN(p[metric])) values.push(Number(p[metric]));
     if (p.failedPlot != null && !isNaN(p.failedPlot)) values.push(Number(p.failedPlot));
   });
-  if (!values.length) return [0, 1];
-  var max = Math.max.apply(null, values);
-  var min = Math.min.apply(null, values);
-  if (max <= 0) return [0, 1];
-  var pad = Math.max(1, Math.ceil(max * 0.1));
-  var top = Math.ceil(max + pad);
-  if (top === max) top = max + 1;
-  var bottom = min > 0 ? Math.max(0, Math.floor(min - pad)) : 0;
-  return [bottom, top];
-}
-
-var CHART_CURSOR = { stroke: "#64748b", strokeWidth: 1, strokeDasharray: "4 4" };
-var TREND_LINE_ANIM = { animationDuration: 600, animationEasing: "ease-in-out" };
-
-function withTrendPlotValue(data, valueKey) {
-  return data.map(function (point) {
-    var val = point[valueKey];
-    return Object.assign({}, point, {
-      plotValue: val != null && !isNaN(val) ? Number(val) : null,
-    });
-  });
+  return computeYDomain(values);
 }
 
 function compoundChartYDomain(plotData, compounds, hiddenCompoundLifts) {
@@ -300,15 +285,16 @@ function compoundChartYDomain(plotData, compounds, hiddenCompoundLifts) {
       if (p[ex] != null && !isNaN(p[ex])) values.push(Number(p[ex]));
     });
   });
-  if (!values.length) return [0, 1];
-  var max = Math.max.apply(null, values);
-  var min = Math.min.apply(null, values);
-  if (max <= 0) return [0, 1];
-  var pad = Math.max(1, Math.ceil(max * 0.1));
-  var top = Math.ceil(max + pad);
-  if (top === max) top = max + 1;
-  var bottom = min > 0 ? Math.max(0, Math.floor(min - pad)) : 0;
-  return [bottom, top];
+  return computeYDomain(values);
+}
+
+function withTrendPlotValue(data, valueKey) {
+  return data.map(function (point) {
+    var val = point[valueKey];
+    return Object.assign({}, point, {
+      plotValue: val != null && !isNaN(val) ? Number(val) : null,
+    });
+  });
 }
 
 function useTrendChartAnimation(chartReady) {
@@ -321,7 +307,7 @@ function useTrendChartAnimation(chartReady) {
 
   return {
     isAnimationActive: true,
-    animationDuration: isFirstPaint ? 0 : TREND_LINE_ANIM.animationDuration,
+    animationDuration: getFirstPaintDuration(appConfig, chartReady, hasPaintedRef.current),
     animationEasing: TREND_LINE_ANIM.animationEasing,
   };
 }
@@ -460,8 +446,8 @@ function WorkoutSessionGraph({ workout, colorFallbackIdx, onClose, formatChartDa
               : <Tooltip content={<SessionSetTooltip metricLabel={metricLabel} />} />}
             <Line type="monotone" dataKey={metric} stroke={strokeColor} strokeWidth={2} activeDot={useDockedDetail ? false : undefined} dot={function (props) {
               return <SessionSetDot cx={props.cx} cy={props.cy} fill={strokeColor} payload={props.payload} peerPoint={peerData ? peerData[props.index] : null} metric={peerData ? metric : null} highlightIdx={highlightIdx} />;
-            }} connectNulls={false} animationDuration={600} animationEasing="ease-in-out" />
-            {hasFailed && <Line type="monotone" dataKey="failedPlot" stroke="none" connectNulls={false} dot={FailedSetDot} activeDot={{ r: 6, stroke: "#f87171", fill: "#f87171" }} animationDuration={600} animationEasing="ease-in-out" legendType="none" />}
+            }} connectNulls={false} animationDuration={SESSION_GRAPH_ANIM.animationDuration} animationEasing={SESSION_GRAPH_ANIM.animationEasing} />
+            {hasFailed && <Line type="monotone" dataKey="failedPlot" stroke="none" connectNulls={false} dot={FailedSetDot} activeDot={{ r: 6, stroke: FAILED_SET_COLOR, fill: FAILED_SET_COLOR }} animationDuration={SESSION_GRAPH_ANIM.animationDuration} animationEasing={SESSION_GRAPH_ANIM.animationEasing} legendType="none" />}
           </LineChart>
         </ResponsiveContainer>
         {hasFailed && <div className={s.sessionFailedHint}>Red ✕ marks failed sets (0 reps)</div>}

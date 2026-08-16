@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { ACCENT, GREEN, ORANGE, PINK, ACTIVITY, Card, Collapse, btnPrimary, btnSecondary, inputClass, useKeyboardListNav, ui, cx } from "./shared";
+import { computeMacroTotals, computeGoalBarPct, getGoalBarDisplayPct, getGoalBarColor, computeTdee, getTdeeTargets, DEFAULT_CALORIE_GOAL } from "../domain/calories.js";
+import appConfig from "../../spec/app-config.json";
 import s from "./CaloriePage.module.css";
 
 export default function CaloriePage({ data, save }) {
   var [food, setFood] = useState(""), [cal, setCal] = useState(""), [protein, setProtein] = useState(""), [carbs, setCarbs] = useState(""), [fat, setFat] = useState("");
-  var [goal, setGoal] = useState(2200), [msg, setMsg] = useState(""), [qf, setQf] = useState(""), [actIdx, setActIdx] = useState(2);
+  var [goal, setGoal] = useState(DEFAULT_CALORIE_GOAL), [msg, setMsg] = useState(""), [qf, setQf] = useState(""), [actIdx, setActIdx] = useState(appConfig.calories.defaultActivityIndex);
   var [selDate, setSelDate] = useState(new Date()), [showCal, setShowCal] = useState(false);
   var [editIdx, setEditIdx] = useState(null), [editForm, setEditForm] = useState({ food: "", calories: "", protein: "", carbs: "", fat: "" });
 
@@ -19,11 +21,12 @@ export default function CaloriePage({ data, save }) {
 
   var today = new Date().toLocaleDateString(), selDateStr = selDate.toLocaleDateString();
   var selEntries = data.calories.filter(function (e) { return e.date === selDateStr; });
-  var totals = selEntries.reduce(function (a, e) { return { cal: a.cal + (e.calories || 0), p: a.p + (e.protein || 0), c: a.c + (e.carbs || 0), f: a.f + (e.fat || 0) }; }, { cal: 0, p: 0, c: 0, f: 0 });
-  var pct = Math.min(100, Math.round((totals.cal / goal) * 100)), barColor = pct > 100 ? "#f87171" : pct > 80 ? ORANGE : GREEN;
+  var totals = computeMacroTotals(selEntries);
+  var pct = computeGoalBarPct(totals.cal, goal), barPct = getGoalBarDisplayPct(pct), barColor = getGoalBarColor(pct);
   var lastBC = data.bodyComp.length ? data.bodyComp[data.bodyComp.length - 1] : null;
   var bmr = lastBC ? (lastBC.BMR_Mifflin || lastBC.BMR_Katch || null) : null;
-  var tdee = bmr ? Math.round(bmr * ACTIVITY[actIdx].mult) : null;
+  var tdee = computeTdee(bmr, ACTIVITY[actIdx].mult);
+  var tdeeTargets = getTdeeTargets(tdee);
   var actKb = useKeyboardListNav(ACTIVITY.length, function (i) { setActIdx(i); }, !!bmr);
   var entryKb = useKeyboardListNav(selEntries.length, function (i) { startEdit(data.calories.indexOf(selEntries[i]), selEntries[i]); }, selEntries.length > 0);
 
@@ -44,7 +47,7 @@ export default function CaloriePage({ data, save }) {
           </div>
           <div className={cx(ui.mutedSm, ui.marginBottom8)}>Activity Level</div>
           <div ref={actKb.listRef} tabIndex={0} onKeyDown={actKb.handleKeyDown} className={cx(ui.listOutline, s.activityList)}>{ACTIVITY.map(function (a, i) { return <button key={i} type="button" data-kb-index={i} aria-pressed={i === actIdx} className={cx(i === actIdx ? s.activityBtnActive : s.activityBtn, actKb.kbClass(i))} onClick={function () { setActIdx(i); }}><span className={i === actIdx ? s.activityBtnLabelActive : s.activityBtnLabel}>{a.label}</span><span className={s.activityBtnDesc}>{a.desc} · x{a.mult}</span></button>; })}</div>
-          <div className={cx(ui.flexRow, ui.marginTop12)}>{[{ label: "Cut (-500)", color: "#f87171", val: tdee - 500 }, { label: "Maintain", color: GREEN, val: tdee }, { label: "Bulk (+300)", color: ACCENT, val: tdee + 300 }].map(function (g) { return <div key={g.label} className={s.goalChip}><div className={s.goalChipLabel}>{g.label}</div><div className={s.goalChipValue} style={{ color: g.color }}>{g.val} kcal</div></div>; })}</div>
+          <div className={cx(ui.flexRow, ui.marginTop12)}>{[{ label: "Cut (-500)", color: "#f87171", val: tdeeTargets.cut }, { label: "Maintain", color: GREEN, val: tdeeTargets.maintain }, { label: "Bulk (+300)", color: ACCENT, val: tdeeTargets.bulk }].map(function (g) { return <div key={g.label} className={s.goalChip}><div className={s.goalChipLabel}>{g.label}</div><div className={s.goalChipValue} style={{ color: g.color }}>{g.val} kcal</div></div>; })}</div>
         </div>}
       </Card>
       <Card className={s.cardFlush}>
@@ -78,7 +81,7 @@ export default function CaloriePage({ data, save }) {
           <span className={cx(ui.sectionTitle, s.dailyGoalTitle)}>Daily Goal</span>
           <div className={ui.flexRow}><input type="number" value={goal} onChange={function (e) { setGoal(e.target.value); }} className={s.goalInput} /><span className={ui.mutedSm}>kcal</span></div>
         </div>
-        <div className={s.progressBarTrack}><div className={s.progressBarFill} style={{ width: pct + "%", background: barColor }} /></div>
+        <div className={s.progressBarTrack}><div className={s.progressBarFill} style={{ width: barPct + "%", background: barColor }} /></div>
         <div className={cx(ui.flexBetween, ui.mutedSm, s.dailyTotals)}><span style={{ color: barColor, fontWeight: 700 }}>{totals.cal} kcal</span><span className={ui.muted}>{Math.max(0, goal - totals.cal)} remaining</span></div>
         <div className={ui.flexRow}>{[["Protein", totals.p, ACCENT], ["Carbs", totals.c, ORANGE], ["Fat", totals.f, PINK]].map(function (r) { return <div key={r[0]} className={s.macroBox}><div className={s.macroBoxLabel}>{r[0]}</div><div className={s.macroBoxValue} style={{ color: r[2] }}>{Math.round(r[1])}<span className={s.macroBoxUnit}>g</span></div></div>; })}</div>
       </Card>

@@ -10,7 +10,6 @@
   --ft-blue: #60a5fa;
   --ft-red: #f87171;
   --ft-yellow: #fbbf24;
-
   --ft-bg-base: #0f0f13;
   --ft-bg-panel: #18181f;
   --ft-bg-panel-alt: #1f1f2a;
@@ -26,12 +25,10 @@
   --ft-bg-btn: #2d2d3a;
   --ft-bg-btn-hover: #3d3d4a;
   --ft-bg-sticky: #0f0f13;
-
   --ft-border: #2d2d3a;
   --ft-border-input: #3d3d4a;
   --ft-border-card: #3a3a4a;
   --ft-border-muted: #3d3d52;
-
   --ft-text: #e2e8f0;
   --ft-text-muted: #9ca3af;
   --ft-text-dim: #6b7280;
@@ -39,7 +36,6 @@
   --ft-text-nav: #a0aec0;
   --ft-text-dark: #0f0f13;
   --ft-text-chip: #cbd5e1;
-
   --ft-radius-sm: 6px;
   --ft-radius-md: 8px;
   --ft-radius-lg: 10px;
@@ -47,7 +43,6 @@
   --ft-radius-2xl: 14px;
   --ft-radius-3xl: 16px;
   --ft-radius-pill: 999px;
-
   --ft-font: sans-serif;
   --ft-shadow-modal: 0 0 0 1px rgba(167, 139, 250, 0.15), 0 24px 48px rgba(0, 0, 0, 0.45);
   --ft-shadow-card: 0 10px 24px rgba(0, 0, 0, 0.16);

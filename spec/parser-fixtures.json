@@ -98,6 +98,85 @@
           }
         ]
       }
+    },
+    {
+      "id": "dot-separated-time",
+      "input": "# 11 AUGUST 2026\n==SQUAT==\n60KG - 10REPS.8:54",
+      "expected": {
+        "date": "11-08-2026",
+        "entries": [
+          {
+            "exercise": "Squat",
+            "sets": [{ "weight": 60, "reps": 10, "time": "8:54", "side": "both" }]
+          }
+        ]
+      }
+    },
+    {
+      "id": "dropset-braces",
+      "input": "# 11 AUGUST 2026\n==BENCH PRESS==\n{ 60KG - 7REPS 50KG - 2REPS } DROPSET",
+      "expected": {
+        "date": "11-08-2026",
+        "entries": [
+          {
+            "exercise": "Bench Press",
+            "sets": [
+              { "weight": 60, "reps": 7, "note": "dropset", "side": "both" },
+              { "weight": 50, "reps": 2, "note": "dropset", "side": "both" }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "time-hold-seconds",
+      "input": "# 11 AUGUST 2026\nBW = 68KG ==PLANK== - 60 SECONDS",
+      "expected": {
+        "date": "11-08-2026",
+        "entries": [
+          {
+            "exercise": "Plank",
+            "sets": [{ "weight": 68, "reps": 60, "note": "hold", "side": "both" }]
+          }
+        ]
+      }
+    },
+    {
+      "id": "fractional-reps",
+      "input": "# 11 AUGUST 2026\n==SQUAT==\n100KG - 10 1/2 REPS",
+      "expected": {
+        "date": "11-08-2026",
+        "entries": [
+          {
+            "exercise": "Squat",
+            "sets": [{ "weight": 100, "reps": 10.5, "side": "both" }]
+          }
+        ]
+      }
+    },
+    {
+      "id": "multi-exercise-paste",
+      "input": "# 11 AUGUST 2026\n==SQUAT==\n100KG - 5REPS\n==BENCH PRESS==\n80KG - 8REPS",
+      "expected": {
+        "date": "11-08-2026",
+        "entries": [
+          { "exercise": "Squat", "sets": [{ "weight": 100, "reps": 5, "side": "both" }] },
+          { "exercise": "Bench Press", "sets": [{ "weight": 80, "reps": 8, "side": "both" }] }
+        ]
+      }
+    },
+    {
+      "id": "partial-reps",
+      "input": "# 11 AUGUST 2026\n==SQUAT==\n100KG - 2 PARTIAL REPS",
+      "expected": {
+        "date": "11-08-2026",
+        "entries": [
+          {
+            "exercise": "Squat",
+            "sets": [{ "weight": 100, "reps": 2, "note": "partial", "side": "both" }]
+          }
+        ]
+      }
     }
   ]
 }

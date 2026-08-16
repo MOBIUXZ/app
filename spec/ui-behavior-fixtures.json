@@ -1,0 +1,85 @@
+{
+  "dashboard": {
+    "recentWorkoutCount": 3,
+    "fixtures": [
+      {
+        "id": "prs-and-recent",
+        "input": {
+          "workouts": [
+            { "exercise": "Squat", "date": "01-01-2026", "sets": [{ "weight": 100, "reps": 5 }, { "weight": 120, "reps": 3 }] },
+            { "exercise": "ohp", "date": "02-01-2026", "sets": [{ "weight": 50, "reps": 5 }] },
+            { "exercise": "Bench Press", "date": "03-01-2026", "sets": [{ "weight": 80, "reps": 8 }] },
+            { "exercise": "Deadlift", "date": "04-01-2026", "sets": [{ "weight": 140, "reps": 1 }] }
+          ],
+          "bodyLogs": [{ "weight": 75, "date": "01-01-2026" }],
+          "bodyComp": [{ "bf": 15, "weight": 75, "date": "01-01-2026" }],
+          "calories": [{ "food": "Oats", "calories": 300, "protein": 10, "carbs": 50, "fat": 5, "date": "FIXED_TODAY" }]
+        },
+        "expected": {
+          "workoutCount": 4,
+          "lastBodyWeight": 75,
+          "lastBodyFat": 15,
+          "prs": { "Squat": 120, "Overhead Press": 50, "Bench Press": 80, "Deadlift": 140 },
+          "recentExercises": ["Deadlift", "Bench Press", "Overhead Press"],
+          "todayCalories": 300
+        }
+      }
+    ]
+  },
+  "calories": {
+    "defaultGoal": 2200,
+    "defaultActivityIndex": 2,
+    "goalBarThresholds": { "warn": 80, "over": 100 },
+    "goalBarColors": { "under": "#34d399", "warn": "#fb923c", "over": "#f87171" },
+    "tdeeOffsets": { "cut": -500, "maintain": 0, "bulk": 300 },
+    "fixtures": [
+      {
+        "id": "macro-totals-and-tdee",
+        "input": {
+          "entries": [
+            { "food": "Chicken", "calories": 400, "protein": 40, "carbs": 0, "fat": 10 },
+            { "food": "Rice", "calories": 200, "protein": 4, "carbs": 45, "fat": 1 }
+          ],
+          "goal": 2200,
+          "bmr": 1780,
+          "activityIndex": 2,
+          "activityMult": 1.55
+        },
+        "expected": {
+          "totals": { "cal": 600, "p": 44, "c": 45, "f": 11 },
+          "goalPct": 27,
+          "goalBarColor": "#34d399",
+          "tdee": 2759
+        }
+      },
+      {
+        "id": "goal-bar-warn",
+        "input": { "entries": [{ "calories": 1900 }], "goal": 2200 },
+        "expected": { "goalPct": 86, "goalBarColor": "#fb923c" }
+      },
+      {
+        "id": "goal-bar-over",
+        "input": { "entries": [{ "calories": 2500 }], "goal": 2200 },
+        "expected": { "goalPct": 114, "goalBarColor": "#f87171" }
+      }
+    ]
+  },
+  "bodyCompSync": {
+    "fixtures": [
+      {
+        "id": "edit-weight-updates-log",
+        "oldEntry": { "weight": 80, "date": "11-08-2026", "BW": 80 },
+        "newEntry": { "weight": 82, "date": "11-08-2026", "BW": 82 },
+        "bodyLogs": [{ "weight": 80, "date": "11-08-2026" }, { "weight": 79, "date": "10-08-2026" }],
+        "expectedLogs": [{ "weight": 79, "date": "10-08-2026" }, { "weight": 82, "date": "11-08-2026" }]
+      },
+      {
+        "id": "delete-removes-matching-log",
+        "oldEntry": { "weight": 80, "date": "11-08-2026" },
+        "newEntry": null,
+        "bodyLogs": [{ "weight": 80, "date": "11-08-2026" }],
+        "expectedLogs": []
+      }
+    ]
+  }
+}

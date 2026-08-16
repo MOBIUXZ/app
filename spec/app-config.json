@@ -13,5 +13,14 @@
     "firstPaintMs": 0,
     "easing": "ease-in-out"
   },
-  "tabs": ["dashboard", "workout", "body", "calories", "progress"]
+  "tabs": ["Dashboard", "Workout", "Body Comp", "Calories", "Progress"],
+  "dashboard": {
+    "recentWorkoutCount": 3
+  },
+  "calories": {
+    "defaultGoal": 2200,
+    "defaultActivityIndex": 2,
+    "goalBarThresholds": { "warn": 80, "over": 100 },
+    "tdeeOffsets": { "cut": -500, "maintain": 0, "bulk": 300 }
+  }
 }

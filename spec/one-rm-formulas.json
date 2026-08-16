@@ -1,0 +1,15 @@
+{
+  "defaultFormula": "Epley",
+  "trainingPercentages": [100, 95, 90, 85, 80, 75, 70, 65, 60],
+  "formulas": ["Epley", "Brzycki", "Lander", "Lombardi", "OConnor"],
+  "fixtures": [
+    { "formula": "Epley", "weight": 100, "reps": 5, "expected": 116.66666666666667 },
+    { "formula": "Epley", "weight": 100, "reps": 1, "expected": 103.33333333333334 },
+    { "formula": "Brzycki", "weight": 100, "reps": 5, "expected": 112.5 },
+    { "formula": "Lander", "weight": 100, "reps": 5, "expected": 113.71 },
+    { "formula": "Lombardi", "weight": 100, "reps": 5, "expected": 117.46 },
+    { "formula": "OConnor", "weight": 100, "reps": 5, "expected": 112.5 },
+    { "formula": "Epley", "weight": 0, "reps": 5, "expected": null },
+    { "formula": "Epley", "weight": 100, "reps": 0, "expected": null }
+  ]
+}

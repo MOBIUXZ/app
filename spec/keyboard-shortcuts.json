@@ -1,0 +1,41 @@
+{
+  "navigation": {
+    "tabs": ["Dashboard", "Workout", "Body Comp", "Calories", "Progress"],
+    "numberKeys": ["1", "2", "3", "4", "5"],
+    "prevKey": "ArrowLeft",
+    "nextKey": "ArrowRight",
+    "activateKey": "Enter",
+    "blockedWhenTyping": true,
+    "blockedWhenPopupOpen": true
+  },
+  "listNav": {
+    "upKey": "ArrowUp",
+    "downKey": "ArrowDown",
+    "selectKey": "Enter",
+    "clearKey": "Escape",
+    "activatePulseMs": 450
+  },
+  "parserTextarea": {
+    "submitKey": "Enter",
+    "newlineModifier": "Shift",
+    "closeKey": "Escape"
+  },
+  "confirmDialog": {
+    "switchKeys": ["ArrowLeft", "ArrowRight", "Tab"],
+    "defaultFocus": "cancel"
+  },
+  "popups": [
+    { "id": "smart-parser", "layerId": "smart-parser", "closeKey": "Escape" },
+    { "id": "calendar-modal", "layerId": "calendar-modal", "closeKey": "Escape" },
+    { "id": "clear-workout-history", "layerId": "clear-workout-history" },
+    { "id": "clear-body-comp-history", "layerId": "clear-body-comp-history" },
+    { "id": "set-picker", "layerId": "set-picker", "closeKey": "Escape" }
+  ],
+  "cssClasses": {
+    "listFocus": "ft-kb-focus",
+    "btnFocus": "ft-kb-btn-focus",
+    "activate": "ft-kb-activate",
+    "focusIndicator": "ft-kb-focus-indicator",
+    "modalBackdrop": "ft-kb-modal-backdrop"
+  }
+}

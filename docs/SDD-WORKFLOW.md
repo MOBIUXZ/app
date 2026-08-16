@@ -21,10 +21,12 @@ Read the governing rules first: [CONSTITUTION.md](./CONSTITUTION.md).
 | Command | What it does | When to use |
 |---------|--------------|-------------|
 | `npm run spec:check` | Validate all spec JSON files exist and parse | After editing anything in `spec/` |
+| `npm run docs:check` | Validate docs reference specs and required files exist | After editing docs |
+| `npm run theme:generate` | Regenerate `theme.css` from `spec/theme-tokens.json` | After changing theme tokens |
 | `npm test` | Run all Vitest tests once | Before commit; after code/spec changes |
 | `npm run test:watch` | Vitest in watch mode | TDD while editing parser/formulas |
 | `npm run build` | Production bundle to `dist/` | Release check |
-| **`npm run verify`** | **spec:check + test + build** | **Always before pushing/merging** |
+| **`npm run verify`** | **spec:check + docs:check + theme:generate + test + build** | **Always before pushing/merging** |
 
 ### Git (typical flow)
 

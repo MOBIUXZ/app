@@ -6,9 +6,10 @@ import CaloriePage from "./components/CaloriePage.jsx";
 import ProgressPage from "./components/ProgressPage.jsx";
 import { useAppNavKeyboard, useDisableNumberInputWheel } from "./components/shared.jsx";
 import appConfig from "../spec/app-config.json";
+import keyboardSpec from "../spec/keyboard-shortcuts.json";
 import styles from "./App.module.css";
 
-const NAV = ["Dashboard", "Workout", "Body Comp", "Calories", "Progress"];
+const NAV = keyboardSpec.navigation.tabs;
 const defaultData = appConfig.defaultData;
 const STORAGE_KEY = appConfig.storageKey;
 

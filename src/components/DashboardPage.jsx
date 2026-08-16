@@ -1,34 +1,32 @@
 import React , {useState} from "react";
 import { resolveExercise, formatExerciseName, Card, StatBox, Collapse, useKeyboardListNav, ui, cx } from "./shared";
+import { getDashboardSnapshot, getRecentWorkouts } from "../domain/dashboard.js";
+import catalog from "../../spec/exercise-catalog.json";
 import s from "./DashboardPage.module.css";
 
-const GREEN = "#34d399";
-const PINK = "#f472b6";
-const ORANGE = "#fb923c";
+const GREEN = catalog.themeColors.green;
+const PINK = catalog.themeColors.pink;
+const ORANGE = catalog.themeColors.orange;
 
 function DashboardPage({data,setTab}){
-  var lastBW=data.bodyLogs.length?data.bodyLogs[data.bodyLogs.length-1]:null;
-  var lastBC=data.bodyComp.length?data.bodyComp[data.bodyComp.length-1]:null;
   var today=new Date().toLocaleDateString();
-  var todayCals=data.calories.filter(function(e){return e.date===today;}).reduce(function(a,e){return a+e.calories;},0);
-  var prs={};
-  data.workouts.forEach(function(w){var ex=resolveExercise(w.exercise);w.sets.forEach(function(s){if(!prs[ex]||s.weight>prs[ex])prs[ex]=s.weight;});});
-  var prList = Object.entries(prs);
-  var recentList = data.workouts.slice().reverse().slice(0, 3);
+  var snapshot = getDashboardSnapshot(data, resolveExercise, today);
+  var prList = Object.entries(snapshot.prs);
+  var recentList = getRecentWorkouts(data.workouts);
   var prKb = useKeyboardListNav(prList.length, function () {}, prList.length > 0);
   var recentKb = useKeyboardListNav(recentList.length, function () {}, recentList.length > 0);
   return (
     <div>
       <div className={s.pageTitle}>👋 Dashboard</div>
       <div className={s.statRow}>
-        <StatBox label="Body Weight" value={lastBW?lastBW.weight:null} unit="kg"/>
-        <StatBox label="Body Fat" value={lastBC?lastBC.bf:null} unit="%" color={PINK}/>
-        <StatBox label="Today Cals" value={todayCals||null} unit="kcal" color={ORANGE}/>
-        <StatBox label="Workouts" value={data.workouts.length} unit="" color={GREEN}/>
+        <StatBox label="Body Weight" value={snapshot.lastBodyWeight} unit="kg"/>
+        <StatBox label="Body Fat" value={snapshot.lastBodyFat} unit="%" color={PINK}/>
+        <StatBox label="Today Cals" value={snapshot.todayCalories||null} unit="kcal" color={ORANGE}/>
+        <StatBox label="Workouts" value={snapshot.workoutCount} unit="" color={GREEN}/>
       </div>
       <Card>
         <div className={ui.sectionTitle}>🏆 Personal Records</div>
-        {Object.keys(prs).length===0?<div className={ui.emptyState}><div className={ui.emptyIcon}>🏋️</div><div>No workouts yet.</div><div className={s.emptyLink}><span className={ui.linkAccent} onClick={function(){setTab("Workout");}}>Log your first workout!</span></div></div>:
+        {Object.keys(snapshot.prs).length===0?<div className={ui.emptyState}><div className={ui.emptyIcon}>🏋️</div><div>No workouts yet.</div><div className={s.emptyLink}><span className={ui.linkAccent} onClick={function(){setTab("Workout");}}>Log your first workout!</span></div></div>:
         <div ref={prKb.listRef} tabIndex={0} onKeyDown={prKb.handleKeyDown} className={ui.listOutline}>
           {prList.map(function(kv, i){return <div key={kv[0]} data-kb-index={i} className={cx(prKb.kbClass(i), s.prRow)}><span>{formatExerciseName(kv[0])}</span><span className={s.prValue}>{kv[1]} kg</span></div>;})}
         </div>}

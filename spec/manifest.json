@@ -1,6 +1,6 @@
 {
   "$schema": "./manifest.schema.json",
-  "version": 1,
+  "version": 2,
   "description": "FitTrack machine-readable specification manifest. Specs are the source of truth; code and docs must conform.",
   "specs": [
     {
@@ -12,13 +12,19 @@
     {
       "id": "exercise-catalog",
       "path": "spec/exercise-catalog.json",
-      "governs": ["EXERCISE_CATEGORIES", "COMPOUND_LIFTS", "chart colors", "TDEE activity levels"],
-      "docs": ["docs/data-model.md", "docs/workout.md", "docs/progress.md"]
+      "governs": ["EXERCISE_CATEGORIES", "COMPOUND_LIFTS", "chart colors", "TDEE activity levels", "theme color constants in JS"],
+      "docs": ["docs/data-model.md", "docs/workout.md", "docs/progress.md", "docs/styling.md"]
+    },
+    {
+      "id": "theme-tokens",
+      "path": "spec/theme-tokens.json",
+      "governs": ["src/styles/theme.css CSS custom properties"],
+      "docs": ["docs/styling.md"]
     },
     {
       "id": "app-config",
       "path": "spec/app-config.json",
-      "governs": ["localStorage key", "default data shape", "chart animation timing"],
+      "governs": ["localStorage key", "default data shape", "chart animation timing", "dashboard/calorie defaults", "nav tab ids"],
       "docs": ["docs/architecture.md", "docs/progress.md", "docs/data-model.md"]
     },
     {
@@ -46,6 +52,30 @@
       "docs": ["docs/shared-utilities.md"]
     },
     {
+      "id": "one-rm-formulas",
+      "path": "spec/one-rm-formulas.json",
+      "governs": ["Workout page 1RM calculator formulas and training percentages"],
+      "docs": ["docs/workout.md"]
+    },
+    {
+      "id": "ui-behavior-fixtures",
+      "path": "spec/ui-behavior-fixtures.json",
+      "governs": ["Dashboard PRs/recent stats", "Calorie macro totals/TDEE/goal bar", "Body comp bodyLogs sync"],
+      "docs": ["docs/dashboard.md", "docs/calories.md", "docs/body-comp.md"]
+    },
+    {
+      "id": "chart-domain",
+      "path": "spec/chart-domain.json",
+      "governs": ["Progress chart Y-axis domain", "chart cursor styling", "failed set color"],
+      "docs": ["docs/progress.md"]
+    },
+    {
+      "id": "keyboard-shortcuts",
+      "path": "spec/keyboard-shortcuts.json",
+      "governs": ["Global nav keys", "list navigation", "parser textarea keys", "popup layer ids"],
+      "docs": ["docs/keyboard-navigation.md"]
+    },
+    {
       "id": "file-tree",
       "path": "spec/file-tree.json",
       "governs": ["expected project source layout"],
@@ -56,6 +86,11 @@
     { "path": "tests/parser.test.js", "spec": "parser-fixtures" },
     { "path": "tests/resolve-exercise.test.js", "spec": "resolve-exercise-fixtures" },
     { "path": "tests/metrics.test.js", "spec": "formula-fixtures" },
+    { "path": "tests/one-rm.test.js", "spec": "one-rm-formulas" },
+    { "path": "tests/ui-behavior.test.js", "spec": "ui-behavior-fixtures" },
+    { "path": "tests/chart-domain.test.js", "spec": "chart-domain" },
+    { "path": "tests/theme.test.js", "spec": "theme-tokens" },
+    { "path": "tests/keyboard-shortcuts.test.js", "spec": "keyboard-shortcuts" },
     { "path": "tests/file-tree.test.js", "spec": "file-tree" },
     { "path": "tests/spec-integrity.test.js", "spec": "manifest" }
   ]

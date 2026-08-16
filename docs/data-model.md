@@ -2,6 +2,8 @@
 
 Complete persistence schema for reconstructing FitTrack. Storage key: **`ft_v5`** (single JSON blob in `localStorage`).
 
+**Machine-readable source of truth:** [`spec/data-model.schema.json`](../spec/data-model.schema.json), [`spec/app-config.json`](../spec/app-config.json), [`spec/formula-fixtures.json`](../spec/formula-fixtures.json).
+
 ---
 
 ## Root Object

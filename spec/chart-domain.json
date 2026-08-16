@@ -1,0 +1,32 @@
+{
+  "yDomainPaddingRatio": 0.1,
+  "yDomainMinPad": 1,
+  "chartCursor": {
+    "stroke": "#64748b",
+    "strokeWidth": 1,
+    "strokeDasharray": "4 4"
+  },
+  "failedSetColor": "#f87171",
+  "fixtures": [
+    {
+      "id": "positive-range",
+      "values": [100, 110, 95],
+      "expected": [84, 121]
+    },
+    {
+      "id": "from-zero",
+      "values": [50, 60],
+      "expected": [44, 66]
+    },
+    {
+      "id": "empty",
+      "values": [],
+      "expected": [0, 1]
+    },
+    {
+      "id": "all-nonpositive",
+      "values": [0, -5],
+      "expected": [0, 1]
+    }
+  ]
+}

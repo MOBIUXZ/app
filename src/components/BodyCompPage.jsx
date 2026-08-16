@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, Collapse, btnPrimary, btnSecondary, btnDanger, inputClass, formatDate, useConfirmDialogKeyboard, ui, cx } from "./shared";
 import { computeBodyCompEntry } from "../domain/metrics.js";
+import { syncBodyLogsAfterEdit, removeBodyLogForEntry } from "../domain/bodyCompSync.js";
 import s from "./BodyCompPage.module.css";
 
 export default function BodyCompPage({ data, save }) {
@@ -30,19 +31,8 @@ export default function BodyCompPage({ data, save }) {
   function compIdxFromDisplay(displayIdx) {
     return data.bodyComp.length - 1 - displayIdx;
   }
-  function syncBodyLogsAfterEdit(oldEntry, newEntry) {
-    var oldW = oldEntry.weight != null ? oldEntry.weight : oldEntry.BW;
-    var newW = newEntry.weight != null ? newEntry.weight : newEntry.BW;
-    var removedLog = false;
-    var logs = data.bodyLogs.filter(function (log) {
-      if (!removedLog && log.date === oldEntry.date && log.weight === oldW) {
-        removedLog = true;
-        return false;
-      }
-      return true;
-    });
-    if (newW > 0) logs.push({ weight: newW, date: newEntry.date });
-    return logs;
+  function syncLogsLocal(oldEntry, newEntry) {
+    return syncBodyLogsAfterEdit(data.bodyLogs, oldEntry, newEntry);
   }
   var historyEntries = data.bodyComp.slice().reverse().slice(0, 10);
   function deleteEntry(displayIdx) {
@@ -53,15 +43,7 @@ export default function BodyCompPage({ data, save }) {
       setEditIdx(null);
       setEditForm(null);
     }
-    var w = entry.weight != null ? entry.weight : entry.BW;
-    var removedLog = false;
-    var newBodyLogs = data.bodyLogs.filter(function (log) {
-      if (!removedLog && log.date === entry.date && log.weight === w) {
-        removedLog = true;
-        return false;
-      }
-      return true;
-    });
+    var newBodyLogs = removeBodyLogForEntry(data.bodyLogs, entry);
     save({
       workouts: data.workouts,
       calories: data.calories,
@@ -116,7 +98,7 @@ export default function BodyCompPage({ data, save }) {
       workouts: data.workouts,
       calories: data.calories,
       bodyComp: newBodyComp,
-      bodyLogs: syncBodyLogsAfterEdit(oldEntry, updatedEntry),
+      bodyLogs: syncLogsLocal(oldEntry, updatedEntry),
     });
     cancelEdit();
   }

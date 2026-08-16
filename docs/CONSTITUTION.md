@@ -78,16 +78,27 @@ Constants that appear in multiple places (aliases, categories, storage key) **mu
 
 ---
 
-## Article VI — What Is NOT Spec-Driven Yet
+## Article VI — Spec Coverage Map
 
-These areas still rely on prose docs and manual review (future work):
+| Layer | Spec source | Test suite |
+|-------|-------------|------------|
+| Exercise aliases & catalog | `spec/exercise-*.json` | `resolve-exercise`, `spec-integrity` |
+| Theme / CSS variables | `spec/theme-tokens.json` | `theme` |
+| Persistence & config | `spec/app-config.json`, `data-model.schema.json` | `spec-integrity`, `parser` |
+| Smart Parser | `spec/parser-fixtures.json` (13+ cases) | `parser` |
+| Progress formulas | `spec/formula-fixtures.json` | `metrics` |
+| 1RM calculator | `spec/one-rm-formulas.json` | `one-rm` |
+| Dashboard / Calories / Body sync | `spec/ui-behavior-fixtures.json` | `ui-behavior` |
+| Chart domain & animation | `spec/chart-domain.json`, `app-config` | `chart-domain` |
+| Keyboard shortcuts | `spec/keyboard-shortcuts.json` | `keyboard-shortcuts` |
+| Project layout | `spec/file-tree.json` | `file-tree` |
 
-- Full UI layout/CSS (visual regression not automated)
-- Recharts chart morph behavior (documented in `docs/progress.md`, not fixture-tested)
-- Keyboard navigation edge cases
-- Every line of JSX in page components
+### Remaining non-spec layers (acceptable)
 
-When automating these, add specs/tests before changing behavior.
+- **Presentational JSX/CSS layout** — component structure and spacing are implementation details; change via code review.
+- **Visual pixel perfection** — no screenshot/regression suite; manual QA for UI polish.
+
+All **behavior, constants, formulas, and contracts** must go through spec → test → code.
 
 ---
 

@@ -21,6 +21,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "spec:check": "node scripts/verify-spec.mjs",
-    "verify": "npm run spec:check && npm test && npm run build"
+    "docs:check": "node scripts/verify-docs.mjs",
+    "theme:generate": "node scripts/generate-theme-css.mjs",
+    "verify": "npm run spec:check && npm run docs:check && npm run theme:generate && npm test && npm run build"
   }
 }
