@@ -118,7 +118,7 @@ Do not use full-row green boxes or ★ stars — best sets are indicated by labe
 
 ### Chart placeholders (Progress)
 
-**`.chartPlaceholder`** in `ProgressPage.module.css` — empty inset box (`min-height: 140px`) shown while an off-screen chart has not yet mounted Recharts. Paired with `useInView()` in `ProgressPage.jsx` (160px root margin for exercise cards, 240px for footer charts).
+**`.chartPlaceholder`** in `ProgressPage.module.css` — empty inset box (`min-height: 140px`) shown while an off-screen chart has not yet mounted Recharts. Paired with `useInView()` in `ProgressPage.jsx` (160px root margin for exercise cards, 240px for footer charts). Charts render instantly on first mount (`animationDuration={0}`); exercise and combined-compound lines morph on metric toggle only (see [progress.md](./progress.md#chart-animation-exercise--combined-compound)).
 
 ### Chart colors
 

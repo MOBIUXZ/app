@@ -9,12 +9,26 @@ The Progress tab is the heaviest page (one Recharts instance per logged exercise
 | Technique | What it does |
 |-----------|----------------|
 | **Lazy chart mount** | Per-exercise charts and footer charts (body weight, body fat, calories) mount Recharts only when scrolled near the viewport (`useInView` + Intersection Observer). Off-screen cards show a `.chartPlaceholder` until then |
-| **No line animation** | Main Progress charts use `isAnimationActive={false}` — lines appear instantly instead of drawing in over ~1.5s |
+| **Instant first paint** | Exercise and combined-compound lines use `animationDuration={0}` on the first render after lazy mount — no line-draw animation while scrolling |
+| **Metric-toggle morph** | Switching Max Weight / Volume / Best e1RM / Mean e1RM morphs the line over **600ms ease-in-out** (same feel as Session Performance graphs). Footer health charts do **not** morph |
 | **Memoized data** | Workouts are normalized once; `workoutsByExercise` indexes sessions by exercise; chart points and combined-compound series use `useMemo` |
 | **`React.memo` on exercise cards** | `MemoExerciseChart` skips re-rendering unchanged exercise cards when sibling state updates |
 | **Progress stays mounted** | After the first visit, `App.jsx` keeps `ProgressPage` in the DOM (hidden when another tab is active) so return visits skip full remount |
 
-**Session Performance** (per-workout popup from Workout Details) still animates metric toggles (600ms) — that is a single small chart, not the full page grid.
+### Chart animation (exercise & combined compound)
+
+When you change a **metric toggle**, the active line morphs smoothly between values (600ms, ease-in-out). When a chart **first appears** (lazy scroll into view, or combined chart on first page load), it renders **instantly** with no draw animation.
+
+| Chart type | First appearance | Metric toggle |
+|------------|------------------|---------------|
+| Per-exercise (combined & split) | Instant | 600ms morph |
+| Combined Compound Lifts | Instant | 600ms morph (all visible lift lines) |
+| Body weight / body fat / calories | Instant | N/A (no metric toggles) |
+| Session Performance popup | 600ms draw on open | 600ms morph |
+
+**How it works (maintainers):** `withTrendPlotValue()` copies the active metric into a stable `plotValue` field; Recharts `<Line dataKey="plotValue" animationId={metric}>` interpolates between toggles. `useTrendChartAnimation(chartReady)` sets `animationDuration={0}` on first paint, then `600` on subsequent updates. Y-axis domain rescales per metric via `sessionChartYDomain()` (same helper as session graphs). Tooltips stay non-animated for snappy hover.
+
+**Session Performance** (per-workout popup) uses the same 600ms morph on Weight / Volume / e1RM toggles, plus failed-set handling and split-set imbalance UI not present on main exercise cards.
 
 ## Exercise Charts
 
@@ -115,8 +129,9 @@ Here the miss **adds ~2 kg** to the reported average — a failed heavy attempt 
 
 Available when left/right side data exists **and** the exercise is not a no-split compound:
 
-- **Combined** — single line chart (default for compounds)
+- **Combined** — single line chart
 - **Split** — two charts in a **horizontal row**: Left (blue) on the left, Right (pink) on the right, each with its **Left** / **Right** label above the chart
+- **Default view:** **Split** when the toggle is available (typical single-arm isolations); compounds and exercises without side data always use the combined chart (no toggle)
 
 Side data comes from Smart Parser entries like:
 ```
@@ -151,8 +166,12 @@ Sessions where left and right match, or where sets are logged without side info 
 - Charts render from **1 session** onward (single data point shown)
 - Hint shown when only 1 session: *"Log another session to see trends"*
 - Click a chart point to open the **Workout Details** modal
-- **Main charts** (exercise cards, combined compound, body weight/fat, calorie trend) render **without** Recharts line-draw animation
+- **X-axis:** calendar dates (`Mon D` format), equal spacing per logged session (one point per calendar date)
+- **First appearance:** exercise and combined-compound charts render instantly when scrolled into view (no line-draw animation)
+- **Metric toggles:** line morphs over 600ms when switching Max Weight / Volume / Best e1RM / Mean e1RM (combined view, split L/R charts, and combined compound overlay)
+- **Footer charts** (body weight, body fat, calories) always render without line animation
 - **Off-screen** exercise charts show a placeholder until scrolled into view (see [Performance](#performance))
+- **Hover:** dashed vertical cursor + tooltip on combined exercise charts and combined compound chart; split view uses the docked imbalance panel instead
 
 ### Chart Hover Tooltips (combined view)
 
@@ -225,10 +244,11 @@ When 2+ compound lifts are logged, an overlay chart compares all compounds on on
 
 ### Implementation
 
-- `ProgressPage.jsx` — `compoundMetric`, `compoundChartData` (`useMemo`), `hiddenCompoundLifts`, `toggleCompoundLift()`, `useInView()`, `MemoExerciseChart`
+- `ProgressPage.jsx` — `compoundMetric`, `compoundChartData` (`useMemo`), `compoundChartYDomain()`, `hiddenCompoundLifts`, `toggleCompoundLift()`, `useTrendChartAnimation()`, `withTrendPlotValue()`, `useInView()`, `MemoExerciseChart`
 - `App.jsx` — `progressMounted` keeps Progress in DOM after first tab visit
-- `ProgressPage.module.css` — `.compoundLegendRow`, `.chartPlaceholder`
-- Recharts `<Line>` components render only for lifts not in `hiddenCompoundLifts`; all use `isAnimationActive={false}`
+- `ProgressPage.module.css` — `.compoundLegendRow`, `.compoundMetricToggleActive`, `.chartPlaceholder`
+- Recharts `<Line>` per visible lift: `dataKey={ex}`, `animationId={compoundMetric}`, morph on metric toggle; hidden lifts omitted via `hiddenCompoundLifts`
+- Combined metric toggles use cyan active state (`.compoundMetricToggleActive`) so they stay distinct from lift legend colors
 
 ## Workout Details Modal
 
@@ -261,7 +281,7 @@ Per-workout popup chart for that single logged session:
 | Feature | Description |
 |---------|-------------|
 | **Session stats** | **Weight** (max set load, kg), **Volume** (sum of weight × reps for the session, shown with kg suffix), **e1RM** (best set estimate, kg) |
-| **Metric toggles** | Weight / Volume / e1RM — line animates smoothly when switching (600ms ease-in-out); main page charts do **not** animate |
+| **Metric toggles** | Weight / Volume / e1RM — line morphs smoothly when switching (600ms ease-in-out), same animation model as main exercise charts |
 | **X-axis** | Set number (`S1`, `S2`, …) with `L` / `R` when side data exists; per-set **time** shown below the label when parsed from Smart Parser (`MM:SS` on the set) |
 | **Y-axis** | Selected metric per set (weight, set volume, or set e1RM) |
 | **Split view** | Only when the exercise **name** includes `single arm` and left/right set data exists: side-by-side Left (blue) and Right (pink) mini charts in one row, labels above each chart; compound lifts use one chart |
@@ -274,13 +294,16 @@ Per-workout popup chart for that single logged session:
 
 - **Body Weight** line from `bodyLogs` entries
 - **Body Fat %** line (when BF data exists in `bodyComp`)
+- Lazy-mounted with footer `useInView` (240px root margin); `isAnimationActive={false}` — instant render, no metric toggles
 
 ## Calorie Intake Trend
 
-7-day rolling chart of daily calorie totals from the Calories page.
+7-day rolling chart of daily calorie totals from the Calories page. Lazy-mounted in the footer section; no line animation.
 
 ## Data Normalization
 
 Before charting, all exercise names pass through `resolveExercise()` so variants like `Pushpress`, `barbell rows`, and `squats` map to canonical names and appear in the correct compound/isolation section.
 
 Sessions are grouped into `workoutsByExercise` (one array per canonical exercise) so each chart reads only its own workouts instead of filtering the full history on every render.
+
+Per-exercise chart points are built with `buildExerciseChartPoints()` (one row per calendar date, merged sets). Metric values for plotting pass through `withTrendPlotValue()` so Recharts can morph lines on toggle without swapping `dataKey`.
