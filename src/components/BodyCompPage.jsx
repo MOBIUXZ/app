@@ -117,7 +117,7 @@ export default function BodyCompPage({ data, save }) {
   return (
     <div>
       <PageHeading className={s.pageTitle} title={bodyLayout.pageTitle} icon={bodyLayout.pageIcon} />
-      <Collapse emoji={getCollapseSpec("bodyComp", "logEntry").emoji} label={getCollapseSpec("bodyComp", "logEntry").label} defaultOpen={getCollapseSpec("bodyComp", "logEntry").defaultOpen}>
+      <Collapse icon={getCollapseSpec("bodyComp", "logEntry").icon} label={getCollapseSpec("bodyComp", "logEntry").label} defaultOpen={getCollapseSpec("bodyComp", "logEntry").defaultOpen}>
         <div className={ui.fieldBlock}>
           <div className={ui.fieldLabel}>Date</div>
           <input value={logDate} onChange={function (e) { setLogDate(e.target.value); }} placeholder="DD-MM-YYYY" className={inputClass({ fullWidth: true })} />
@@ -157,7 +157,7 @@ export default function BodyCompPage({ data, save }) {
         <button type="button" onClick={submit} className={btnPrimary({ fullWidth: true, marginTop14: true })}>Log Entry</button>
         {msg && <div className={cx(ui.successMsg, ui.marginTop10)}>✅ {msg}</div>}
       </Collapse>
-      <Collapse emoji={getCollapseSpec("bodyComp", "history").emoji} label={getCollapseSpec("bodyComp", "history").label} defaultOpen={getCollapseSpec("bodyComp", "history").defaultOpen}>
+      <Collapse icon={getCollapseSpec("bodyComp", "history").icon} label={getCollapseSpec("bodyComp", "history").label} defaultOpen={getCollapseSpec("bodyComp", "history").defaultOpen}>
         {historyEntries.length > 0 && (
           <div className={ui.historyToolbar}>
             <span className={ui.mutedXs}>{data.bodyComp.length} {data.bodyComp.length === 1 ? "entry" : "entries"}</span>

@@ -3,7 +3,7 @@ import pageLayout from '../spec/page-layout.json';
 import { getPageIcon, listPageIconIds } from '../src/domain/pageIcons.js';
 
 describe('page icons spec (spec/page-icons.json)', function () {
-  it('catalog includes page-title and workout collapse icons', function () {
+  it('catalog includes page-title and collapse icons', function () {
     expect(listPageIconIds()).toEqual([
       'gauge',
       'activity',
@@ -13,6 +13,8 @@ describe('page icons spec (spec/page-icons.json)', function () {
       'notebook',
       'square-function',
       'pencil-line',
+      'square-plus',
+      'history',
     ]);
   });
 
@@ -45,5 +47,7 @@ describe('page icons spec (spec/page-icons.json)', function () {
     expect(pageLayout.pages.workout.collapses.find(function (c) { return c.id === 'logWorkout'; }).icon).toBe('pencil-line');
     expect(pageLayout.pages.workout.collapses.find(function (c) { return c.id === 'history'; }).icon).toBe('notebook');
     expect(pageLayout.pages.workout.collapses.find(function (c) { return c.id === 'oneRm'; }).icon).toBe('square-function');
+    expect(pageLayout.pages.bodyComp.collapses.find(function (c) { return c.id === 'logEntry'; }).icon).toBe('square-plus');
+    expect(pageLayout.pages.bodyComp.collapses.find(function (c) { return c.id === 'history'; }).icon).toBe('history');
   });
 });

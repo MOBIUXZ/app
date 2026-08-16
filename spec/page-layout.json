@@ -76,8 +76,8 @@
       "pageTitle": "Body Composition",
       "pageIcon": "layers",
       "collapses": [
-        { "id": "logEntry", "emoji": "➕", "label": "Log Entry", "defaultOpen": false },
-        { "id": "history", "emoji": "📋", "label": "History", "defaultOpen": false }
+        { "id": "logEntry", "icon": "square-plus", "label": "Log Entry", "defaultOpen": false },
+        { "id": "history", "icon": "history", "label": "History", "defaultOpen": false }
       ],
       "modals": [
         { "id": "clearHistory", "title": "Clear Body Comp History?", "layerId": "clear-body-comp-history", "buttons": ["Cancel", "Clear History"] }
