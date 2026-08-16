@@ -35,6 +35,40 @@
   font-weight: 700;
 }
 
+.heroStatStrip {
+  display: flex;
+  margin-top: 16px;
+  background: var(--ft-bg-btn);
+  border: 1px solid var(--ft-border-input);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.heroStatStripCell {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  border-right: 1px solid var(--ft-border-input);
+}
+
+.heroStatStripCell:last-child {
+  border-right: none;
+}
+
+.heroStatValue {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ft-text);
+}
+
+.heroStatLabel {
+  font-size: 10px;
+  color: var(--ft-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
 .actionGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;

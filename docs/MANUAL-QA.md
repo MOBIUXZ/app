@@ -58,7 +58,7 @@ Machine-readable checklist: [`spec/manual-qa-checklist.json`](../spec/manual-qa-
 
 ### Workout
 
-- [ ] Hero chips show workout/exercise counts
+- [ ] Hero shows a filled stat strip with workout/exercise counts and today's date
 - [ ] **Open Calendar** → month grid, logged days green
 - [ ] **Smart Parser** → modal, Enter parses, Esc closes
 - [ ] Workout History lists grouped entries

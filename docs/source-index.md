@@ -154,7 +154,7 @@ Complete inventory of every project file. Line counts approximate (Aug 2026).
 
 **Sections:** Hero, Quick actions, Calendar modal (month/year), Smart Parser modal, Log Workout collapse, History collapse, 1RM collapse
 
-**CSS groups:** hero, calendar (`calModal*`, `calDayCell`, `miniMonth*`), day panels, parser modal, history groups, 1RM calc, set picker, confirm dialog
+**CSS groups:** hero (filled stat strip), calendar (`calModal*`, `calDayCell`, `miniMonth*`), day panels, parser modal, history groups, 1RM calc, set picker, confirm dialog
 
 Spec: [workout.md](./workout.md)
 

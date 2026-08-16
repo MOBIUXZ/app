@@ -6,7 +6,9 @@ The Workout page is the primary training hub. It supports manual logging, bulk i
 
 - Total workout count
 - Unique exercise count
-- Today's date
+- Today's date (short form under the title)
+
+Stats use a **filled strip** under the title: three columns (Workouts, Unique, Today) in one inset track.
 
 ## Quick Actions
 

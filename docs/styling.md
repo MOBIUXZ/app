@@ -38,7 +38,7 @@ import s from "./CaloriePage.module.css";
 
 Do **not** pass these helpers to `style=` — they return class name strings.
 
-Page titles use Lucide stroke icons from `spec/page-icons.json` via `PageHeading` (accent purple, no emoji). Workout and Body Comp collapses use the same catalog via `Collapse icon=`.
+Page titles use Lucide stroke icons from `spec/page-icons.json` via `PageHeading` (accent purple, no emoji). Workout and Body Comp collapses use the same catalog via `Collapse icon=`. The Workout hero stats are a filled strip under the title (Workouts, Unique, Today).
 
 ### Shared vs page-specific
 

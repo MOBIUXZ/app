@@ -34,7 +34,7 @@
       "title": "Workout",
       "visualSnapshot": "workout",
       "items": [
-        { "id": "hero", "check": "Hero shows workout count chips and today's date" },
+        { "id": "hero", "check": "Hero shows a filled stat strip: workout count, unique count, and today's date" },
         { "id": "calendar", "check": "Open Calendar — month grid, logged days highlighted" },
         { "id": "parser", "check": "Smart Parser modal opens; Enter parses, Esc closes", "visualSnapshot": "workout-smart-parser" },
         { "id": "history", "check": "Workout History expand shows grouped entries" }

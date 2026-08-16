@@ -57,6 +57,15 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(source.indexOf('calDayOpen = showCalendarModal && !!calSelectedDate && calPanel === "view"') === -1).toBe(true);
   });
 
+  it('workout hero uses a filled stat strip under the title', function () {
+    var hero = getPageLayout('workout').hero;
+    expect(hero.statLayout).toBe('filled-strip');
+    expect(hero.statMetrics.map(function (m) { return m.id; })).toEqual(['workouts', 'unique', 'today']);
+    var source = readFileSync(resolve(root, pageLayout.pages.workout.component), 'utf8');
+    expect(source.indexOf('heroStatStrip') !== -1).toBe(true);
+    expect(source.indexOf('heroStatGhost') === -1).toBe(true);
+  });
+
   it('smart parser modal uses the spec title without a second icon', function () {
     var modal = getModalSpec('workout', 'smartParser');
     expect(modal.title).toBe('🧠 Smart Parser');

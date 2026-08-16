@@ -49,7 +49,12 @@
         "eyebrow": "Training dashboard",
         "title": "Workout Log",
         "icon": "activity",
-        "chips": ["workoutCount", "uniqueExercises", "todayDate"]
+        "statLayout": "filled-strip",
+        "statMetrics": [
+          { "id": "workouts", "label": "Workouts" },
+          { "id": "unique", "label": "Unique" },
+          { "id": "today", "label": "Today" }
+        ]
       },
       "actions": [
         { "id": "calendar", "label": "📅 Open Calendar" },

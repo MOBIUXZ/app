@@ -387,6 +387,13 @@ export default function WorkoutPage({ data, save }) {
 
   var uniqueDates = new Set(data.workouts.map(function (w) { return w.date; })).size;
   var uniqueExercises = new Set(data.workouts.map(function (w) { return w.exercise; })).size;
+  var now = new Date();
+  var heroValues = {
+    workouts: data.workouts.length,
+    unique: uniqueExercises,
+    today: now.getDate() + " " + monthNames[now.getMonth()].slice(0, 3),
+  };
+  var heroMetrics = workoutLayout.hero.statMetrics;
   var filteredWorkouts = data.workouts.filter(function (w) {
     if (!searchQuery) return true;
     return w.exercise.toLowerCase().includes(searchQuery.toLowerCase());
@@ -425,13 +432,16 @@ export default function WorkoutPage({ data, save }) {
     <div>
       <div className={s.heroCard}>
         <div className={s.sectionLabelUpper}>{workoutLayout.hero.eyebrow}</div>
-        <div className={cx(ui.flexBetween, ui.flexRowWrap)}>
-          <PageHeading className={s.heroTitle} title={workoutLayout.hero.title} icon={workoutLayout.hero.icon} iconSize={22} />
-          <div className={ui.flexRowWrap}>
-            <span className={s.dashboardChip}>{data.workouts.length} workouts</span>
-            <span className={s.dashboardChip} style={{ color: GREEN, borderColor: GREEN + "44" }}>{uniqueExercises} unique exercises</span>
-            <span className={s.dashboardChip} style={{ color: ACCENT, borderColor: ACCENT + "44" }}>{formatDate(new Date())}</span>
-          </div>
+        <PageHeading className={s.heroTitle} title={workoutLayout.hero.title} icon={workoutLayout.hero.icon} iconSize={22} />
+        <div className={s.heroStatStrip}>
+          {heroMetrics.map(function (metric) {
+            return (
+              <div key={metric.id} className={s.heroStatStripCell}>
+                <div className={s.heroStatValue}>{heroValues[metric.id]}</div>
+                <div className={s.heroStatLabel}>{metric.label}</div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
