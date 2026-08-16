@@ -13,7 +13,7 @@
       "id": "global",
       "title": "Global shell",
       "items": [
-        { "id": "logo", "check": "Header shows FitTrack wordmark with gradient infinity icon", "visualSnapshot": null },
+        { "id": "logo", "check": "Header shows Orbius wordmark with gradient infinity icon", "visualSnapshot": null },
         { "id": "nav", "check": "Five nav tabs visible; active tab has purple pill", "visualSnapshot": null },
         { "id": "nav-keys", "check": "Press 1–5 switches tabs (when no modal open)", "visualSnapshot": null },
         { "id": "theme", "check": "Dark background (#0f0f13), readable text, accent purple on active elements", "visualSnapshot": null }

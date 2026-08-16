@@ -27,7 +27,7 @@ describe('page layout spec (spec/page-layout.json)', function () {
 
   it('app logo is defined', function () {
     var layout = getAppLayout();
-    expect(layout.logo.text).toBe('FitTrack');
+    expect(layout.logo.text).toBe('Orbius');
     expect(layout.logo.component).toBe('src/components/Logo.jsx');
     expect(existsSync(resolve(root, layout.logo.component))).toBe(true);
   });

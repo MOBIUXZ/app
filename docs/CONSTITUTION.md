@@ -1,6 +1,6 @@
-# FitTrack Constitution
+# Orbius Constitution
 
-This document is the **governing law** of the FitTrack project. All contributors (human and AI) must follow it.
+This document is the **governing law** of the Orbius project. All contributors (human and AI) must follow it.
 
 ---
 

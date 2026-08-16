@@ -1,7 +1,7 @@
 {
   "$schema": "./manifest.schema.json",
   "version": 4,
-  "description": "FitTrack machine-readable specification manifest. Specs are the source of truth; code and docs must conform.",
+  "description": "Orbius machine-readable specification manifest. Specs are the source of truth; code and docs must conform.",
   "specs": [
     {
       "id": "exercise-aliases",

@@ -1,4 +1,4 @@
-# FitTrack
+# Orbius
 
 Client-side fitness tracking app — React 18, Vite 4, Recharts, localStorage.
 
@@ -12,7 +12,7 @@ npm run verify   # spec check + tests + build (run before every commit)
 
 ## Spec-driven development
 
-FitTrack uses **SDD** — JSON specs in `spec/` are the source of truth; tests enforce them.
+Orbius uses **SDD** — JSON specs in `spec/` are the source of truth; tests enforce them.
 
 | Document | Contents |
 |----------|----------|
@@ -30,7 +30,7 @@ FitTrack uses **SDD** — JSON specs in `spec/` are the source of truth; tests e
 
 ### [docs/RECONSTRUCTION.md](./docs/RECONSTRUCTION.md)
 
-Complete guide to reproduce FitTrack identically in any IDE.
+Complete guide to reproduce Orbius identically in any IDE.
 
 | Document | Contents |
 |----------|----------|

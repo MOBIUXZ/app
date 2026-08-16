@@ -1,6 +1,6 @@
 # Dashboard
 
-The Dashboard is the home page of FitTrack. It provides a quick overview of your fitness data and links into other sections.
+The Dashboard is the home page of Orbius. It provides a quick overview of your fitness data and links into other sections.
 
 ## Stat Boxes
 

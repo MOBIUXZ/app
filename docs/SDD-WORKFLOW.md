@@ -1,6 +1,6 @@
 # Spec-Driven Development — Workflow & Commands
 
-FitTrack uses **SDD**: specs in `spec/` define behavior; tests enforce them; code implements them.
+Orbius uses **SDD**: specs in `spec/` define behavior; tests enforce them; code implements them.
 
 Read the governing rules first: [CONSTITUTION.md](./CONSTITUTION.md).
 
@@ -97,7 +97,7 @@ git commit -m "feat: describe what and why"
 ## Project Layout (SDD View)
 
 ```
-FITTRACK/
+ORBIUS/
 ├── spec/                 ← SOURCE OF TRUTH (JSON)
 │   ├── manifest.json
 │   ├── exercise-aliases.json

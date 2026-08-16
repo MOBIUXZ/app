@@ -1,5 +1,5 @@
 ---
-description: FitTrack spec-driven development rules — read before editing specs, parser, formulas, or constants
+description: Orbius spec-driven development rules — read before editing specs, parser, formulas, or constants
 globs:
   - spec/**
   - tests/**
@@ -8,7 +8,7 @@ globs:
 alwaysApply: true
 ---
 
-# FitTrack SDD Rules
+# Orbius SDD Rules
 
 Read `docs/CONSTITUTION.md` and `spec/manifest.json` before non-trivial work.
 

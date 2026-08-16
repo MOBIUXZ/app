@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://fittrack.local/spec/data-model.schema.json",
-  "title": "FitTrack ft_v5 Data Model",
-  "description": "localStorage persistence schema for FitTrack",
+  "$id": "https://orbius.local/spec/data-model.schema.json",
+  "title": "Orbius ft_v5 Data Model",
+  "description": "localStorage persistence schema for Orbius",
   "type": "object",
   "required": ["workouts", "bodyLogs", "bodyComp", "calories"],
   "additionalProperties": false,

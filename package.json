@@ -1,7 +1,7 @@
 {
-  "name": "fittrack",
+  "name": "orbius",
   "version": "1.0.0",
-  "description": "A comprehensive fitness tracking application",
+  "description": "Orbius — personal fitness tracking with smart parser, metrics, and progress charts",
   "private": true,
   "type": "module",
   "dependencies": {

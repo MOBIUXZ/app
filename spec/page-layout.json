@@ -1,7 +1,7 @@
 {
   "app": {
     "logo": {
-      "text": "FitTrack",
+      "text": "Orbius",
       "component": "src/components/Logo.jsx",
       "size": 32,
       "rounded": true

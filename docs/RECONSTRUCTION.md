@@ -1,6 +1,6 @@
-# FitTrack — Full Reconstruction Guide
+# Orbius — Full Reconstruction Guide
 
-Use this document to rebuild FitTrack **identically** in any IDE, with or without prior context. It is the **master index** for all specifications.
+Use this document to rebuild Orbius **identically** in any IDE, with or without prior context. It is the **master index** for all specifications.
 
 > **Canonical rule:** If this guide conflicts with a feature doc, **feature docs win for behavior** and **source files win for exact code**. When in doubt, compare against the file tree in [source-index.md](./source-index.md).
 
@@ -10,7 +10,7 @@ Use this document to rebuild FitTrack **identically** in any IDE, with or withou
 
 | Property | Value |
 |----------|-------|
-| Name | FitTrack |
+| Name | Orbius |
 | Type | Single-page React app (no backend, no router library) |
 | Storage | Browser `localStorage` key `ft_v5` |
 | Pages | Dashboard, Workout, Body Comp, Calories, Progress |
@@ -35,7 +35,7 @@ No database, env file, or API keys required.
 ### Step 1 — Create project folder
 
 ```bash
-mkdir fittrack && cd fittrack
+mkdir orbius && cd orbius
 ```
 
 ### Step 2 — Create root config files
@@ -96,7 +96,7 @@ Use the [Verification checklist](#verification-checklist) before considering the
 
 ```json
 {
-  "name": "fittrack",
+  "name": "orbius",
   "version": "1.0.0",
   "description": "A comprehensive fitness tracking application",
   "private": true,
@@ -136,7 +136,7 @@ export default defineConfig({
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FitTrack - Fitness Tracking App</title>
+    <title>Orbius - Fitness Tracking App</title>
   </head>
   <body>
     <div id="root"></div>
@@ -202,7 +202,7 @@ Read these for **every UI behavior, formula, and edge case**:
 
 ## 7. Styling System
 
-FitTrack uses **CSS Modules** (not Tailwind, not inline-only).
+Orbius uses **CSS Modules** (not Tailwind, not inline-only).
 
 | Layer | File | Role |
 |-------|------|------|
@@ -330,7 +330,7 @@ For **zero data loss** of *behavior*, you need: all files in [source-index.md](.
 
 ---
 
-## 12. What Is NOT in FitTrack
+## 12. What Is NOT in Orbius
 
 Document these absences so rebuilds do not add unrequested features:
 

@@ -1,4 +1,4 @@
-# FitTrack Agent Instructions
+# Orbius Agent Instructions
 
 Before making non-trivial changes, read:
 

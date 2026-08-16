@@ -123,7 +123,7 @@ Session: 45 kg × 5, 47.5 kg × 3, **60 kg × 0 (failed)**, 47.5 kg × 3
 
 Here the miss **adds ~2 kg** to the reported average — a failed heavy attempt makes the session look stronger than the sets you actually completed. Heavier failed weights inflate more; the formula cannot distinguish a near-miss from a total blowout (both become “weight as e1RM”).
 
-**FitTrack rule:** Mean e1RM averages only sets with reps > 0. Failure information belongs elsewhere (e.g. fail rate / red ✕ on session charts), not in e1RM math.
+**Orbius rule:** Mean e1RM averages only sets with reps > 0. Failure information belongs elsewhere (e.g. fail rate / red ✕ on session charts), not in e1RM math.
 
 ### Combined / Split Toggle
 

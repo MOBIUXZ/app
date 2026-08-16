@@ -1,6 +1,6 @@
-# FitTrack — Data Model
+# Orbius — Data Model
 
-Complete persistence schema for reconstructing FitTrack. Storage key: **`ft_v5`** (single JSON blob in `localStorage`).
+Complete persistence schema for reconstructing Orbius. Storage key: **`ft_v5`** (single JSON blob in `localStorage`).
 
 **Machine-readable source of truth:** [`spec/data-model.schema.json`](../spec/data-model.schema.json), [`spec/app-config.json`](../spec/app-config.json), [`spec/formula-fixtures.json`](../spec/formula-fixtures.json).
 
@@ -9,7 +9,7 @@ Complete persistence schema for reconstructing FitTrack. Storage key: **`ft_v5`*
 ## Root Object
 
 ```typescript
-interface FitTrackData {
+interface OrbiusData {
   workouts: WorkoutEntry[];
   bodyLogs: BodyLogEntry[];
   bodyComp: BodyCompEntry[];

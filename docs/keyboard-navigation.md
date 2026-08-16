@@ -1,6 +1,6 @@
 # Keyboard Navigation
 
-FitTrack supports full keyboard navigation across pages, lists, and popups.
+Orbius supports full keyboard navigation across pages, lists, and popups.
 
 ## Layer System
 

@@ -1,6 +1,6 @@
 # Shared Utilities
 
-Core logic shared across all FitTrack pages lives in `src/components/shared.jsx`.
+Core logic shared across all Orbius pages lives in `src/components/shared.jsx`.
 
 > **Reconstruction:** Full export list and line count in [source-index.md](./source-index.md#componentssharedjsx). Complete alias table is in source only — copy `shared.jsx` verbatim for identical parser behavior.
 

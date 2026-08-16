@@ -1,4 +1,4 @@
-# FitTrack — Source File Index
+# Orbius — Source File Index
 
 Complete inventory of every project file. Line counts approximate (Aug 2026).
 
@@ -51,7 +51,7 @@ Complete inventory of every project file. Line counts approximate (Aug 2026).
 
 ## `src/components/Logo.jsx`
 
-**~35 lines** — FitTrack brand mark (gradient infinity loop). Spec: `page-layout.json` → `app.logo`. Used in `App.jsx` header with `rounded` dark tile.
+**~35 lines** — Orbius brand mark (gradient infinity loop). Spec: `page-layout.json` → `app.logo`. Used in `App.jsx` header with `rounded` dark tile.
 
 ---
 

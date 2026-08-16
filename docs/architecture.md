@@ -1,6 +1,6 @@
-# FitTrack — Architecture
+# Orbius — Architecture
 
-System design for reconstructing FitTrack without reading source first.
+System design for reconstructing Orbius without reading source first.
 
 ---
 

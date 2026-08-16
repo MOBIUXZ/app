@@ -1,6 +1,6 @@
-# FitTrack — Feature Documentation
+# Orbius — Feature Documentation
 
-FitTrack is a client-side fitness tracking web app built with **React** and **Vite**. All data is stored locally in the browser using `localStorage` (key: `ft_v5`).
+Orbius is a client-side fitness tracking web app built with **React** and **Vite**. All data is stored locally in the browser using `localStorage` (key: `ft_v5`).
 
 ---
 
@@ -48,7 +48,7 @@ FitTrack is a client-side fitness tracking web app built with **React** and **Vi
 ## App Structure
 
 ```
-FitTrack
+Orbius
 ├── Dashboard    — Summary hub
 ├── Workout      — Training log & tools
 ├── Body Comp    — Composition measurements
