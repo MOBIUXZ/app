@@ -275,8 +275,17 @@
 
 .foodGrid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 6px;
+}
+
+.foodGrid > :first-child {
+  grid-column: 1 / -1;
+}
+
+.foodGrid input {
+  min-width: 0;
+  width: 100%;
 }
 
 .foodGridEdit {
