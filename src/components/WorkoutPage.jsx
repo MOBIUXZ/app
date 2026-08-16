@@ -177,7 +177,7 @@ export default function WorkoutPage({ data, save }) {
   var [showCalendarModal, setShowCalendarModal] = useState(false);
   var [calendarView, setCalendarView] = useState("month");
   var [calSelectedDate, setCalSelectedDate] = useState(null);
-  var [calPanel, setCalPanel] = useState("view"); // "view" | "log"
+  var [calPanel, setCalPanel] = useState("view"); // "view" | "log" | "parse"
   var [calLogCat, setCalLogCat] = useState("Powerlifting");
   var [calLogEx, setCalLogEx] = useState(EXERCISE_CATEGORIES["Powerlifting"][0]);
   var [calLogCustomEx, setCalLogCustomEx] = useState("");
@@ -293,7 +293,9 @@ export default function WorkoutPage({ data, save }) {
   var smartParserTextareaRef = useRef(null);
   var calParseTextareaRef = useRef(null);
   var calLogOpen = showCalendarModal && !!calSelectedDate && (calPanel === "log" || calPanel === "parse");
-  var calDayOpen = showCalendarModal && !!calSelectedDate && calPanel === "view";
+  // Stay mounted under Manual Log / Smart Paste so those layers fade in over the day
+  // panel the same way the day panel fades in over the calendar.
+  var calDayOpen = showCalendarModal && !!calSelectedDate;
   useParserTextareaKeyboard(smartParserTextareaRef, function () { doParseRef.current(); }, showSmartParserModal);
   useParserTextareaKeyboard(calParseTextareaRef, function () { calDoParseRef.current(); }, calLogOpen && calPanel === "parse");
 
@@ -638,7 +640,7 @@ export default function WorkoutPage({ data, save }) {
 
           {/* Day detail — centered popup over calendar (not inline dropdown) */}
           {calDayOpen && (
-            <div className={cx("ft-kb-modal-backdrop", s.calDayOverlay)} style={{ zIndex: calDayLayer.zIndex }} onClick={closeCalDayPanel}>
+            <div className={cx("ft-kb-modal-backdrop", s.calDayOverlay)} style={{ zIndex: calDayLayer.zIndex }} aria-hidden={calLogOpen || undefined} onClick={closeCalDayPanel}>
               <div className={s.calDayPanel} onClick={function (ev) { ev.stopPropagation(); }} tabIndex={-1}>
                 <div className={s.dayPanelHeader}>
                   <div className={s.dayPanelTitleRow}>

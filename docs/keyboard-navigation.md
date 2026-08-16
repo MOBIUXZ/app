@@ -71,6 +71,8 @@ Hovering an item with the mouse updates keyboard focus on most lists (Dashboard 
 | **Calendar → Smart Parser** | Same as Smart Parser | |
 | **1RM set picker** | ↑↓ sets · Enter load · Esc close | Search input ignores arrows |
 | **Calendar modal** | Esc close | |
+| **Calendar day panel** | Esc close | Stays mounted under Manual Log / Smart Paste |
+| **Calendar log / Smart Paste** | Esc back to day | Same fade-in as day panel; stacks on top |
 | **Progress workout detail** | ↑↓ cards · Esc close | |
 | **Workout History list** | ↑↓ entries · Enter edit · Esc clear focus | Mouse hover does not move focus |
 | **Calories activity level** | ↑↓ levels · Enter select · Esc clear focus | Mouse hover does not move focus; green keyboard outline |

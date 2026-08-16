@@ -126,6 +126,16 @@ Always pass the **full** data object with all four arrays.
 
 State is local to `WorkoutPage` — not lifted to App except via `save()`.
 
+### Calendar modal layers (keyboard)
+
+| Layer ID | When open | z-index from `useKeyboardLayer` |
+|----------|-----------|--------------------------------|
+| `calendar-modal` | Workout calendar | Stack order |
+| `calendar-day-panel` | Date selected (stays mounted under log/parse) | Above calendar |
+| `calendar-log-panel` | Manual Log or Smart Paste | Above day panel; same `ft-kb-modal-backdrop` fade-in |
+
+`Esc` on log/parse returns to the day panel; `Esc` on the day panel closes it and returns to the calendar.
+
 ---
 
 ## ProgressPage Internal Structure

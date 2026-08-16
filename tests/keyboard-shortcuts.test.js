@@ -26,4 +26,19 @@ describe('keyboard shortcuts spec', function () {
     expect(keyboardSpec.cssClasses.listFocus).toBe('ft-kb-focus');
     expect(keyboardSpec.cssClasses.activate).toBe('ft-kb-activate');
   });
+
+  it('calendar log/parse stacks over a mounted day panel', function () {
+    expect(keyboardSpec.calendarStack.order).toEqual([
+      'calendar-modal',
+      'calendar-day-panel',
+      'calendar-log-panel',
+    ]);
+    expect(keyboardSpec.calendarStack.dayPanelStaysMounted).toBe(true);
+    expect(keyboardSpec.calendarStack.logEnterAnimation).toBe('same-as-day');
+    var day = keyboardSpec.popups.find(function (p) { return p.id === 'calendar-day-panel'; });
+    var log = keyboardSpec.popups.find(function (p) { return p.id === 'calendar-log-panel'; });
+    expect(day.staysMountedUnder).toBe('calendar-log-panel');
+    expect(log.stacksOver).toBe('calendar-day-panel');
+    expect(log.enterClass).toBe(keyboardSpec.cssClasses.modalBackdrop);
+  });
 });

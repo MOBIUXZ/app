@@ -45,6 +45,18 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(modal.layerId).toBe('clear-workout-history');
   });
 
+  it('calendar log panel stacks over a mounted day panel', function () {
+    var day = getModalSpec('workout', 'calendarDay');
+    var log = getModalSpec('workout', 'calendarLog');
+    expect(day.layerId).toBe('calendar-day-panel');
+    expect(day.staysMountedUnder).toBe('calendarLog');
+    expect(log.layerId).toBe('calendar-log-panel');
+    expect(log.stacksOver).toBe('calendarDay');
+    var source = readFileSync(resolve(root, pageLayout.pages.workout.component), 'utf8');
+    expect(source.indexOf('calDayOpen = showCalendarModal && !!calSelectedDate;') !== -1).toBe(true);
+    expect(source.indexOf('calDayOpen = showCalendarModal && !!calSelectedDate && calPanel === "view"') === -1).toBe(true);
+  });
+
   it('template labels interpolate variables', function () {
     expect(formatTemplateLabel('Log for {date}', { date: 'Mon' })).toBe('Log for Mon');
   });
