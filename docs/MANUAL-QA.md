@@ -70,7 +70,7 @@ Machine-readable checklist: [`spec/manual-qa-checklist.json`](../spec/manual-qa-
 
 ### Calories
 
-- [ ] BMR & TDEE populated from body comp
+- [ ] BMR & TDEE populated from body comp, with TEF/NEAT/EAT/PAEE breakdown
 - [ ] Daily goal bar reflects seeded calories
 - [ ] Food log shows seeded items
 

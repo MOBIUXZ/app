@@ -66,6 +66,21 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(source.indexOf('heroStatGhost') === -1).toBe(true);
   });
 
+  it('calories page spec includes TDEE breakdown rows', function () {
+    var breakdown = getPageLayout('calories').tdeeBreakdown;
+    expect(breakdown.layout).toEqual(['formula', 'bar', 'legend', 'equation']);
+    expect(breakdown.rows.map(function (r) { return r.id; })).toEqual(['bmr', 'tef', 'neat', 'eat', 'paee']);
+    var colorById = {};
+    breakdown.rows.forEach(function (r) { colorById[r.id] = r.colorToken; });
+    expect(colorById.bmr).toBe('orange');
+    expect(colorById.tef).toBe('yellow');
+    expect(colorById.paee).toBe('accent');
+    var source = readFileSync(resolve(root, pageLayout.pages.calories.component), 'utf8');
+    expect(source.indexOf('tdeeBreakdown') !== -1).toBe(true);
+    expect(source.indexOf('tdeeLegendItem') !== -1).toBe(true);
+    expect(source.indexOf('tdeeRow') === -1).toBe(true);
+  });
+
   it('calendar month panel is slightly narrower than year and year width stays put', function () {
     var modal = getModalSpec('workout', 'calendarModal');
     expect(modal.monthMaxWidthPx).toBe(389);

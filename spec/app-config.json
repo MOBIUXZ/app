@@ -21,6 +21,7 @@
     "defaultGoal": 2200,
     "defaultActivityIndex": 2,
     "goalBarThresholds": { "warn": 80, "over": 100 },
-    "tdeeOffsets": { "cut": -500, "maintain": 0, "bulk": 300 }
+    "tdeeOffsets": { "cut": -500, "maintain": 0, "bulk": 300 },
+    "tdeeBreakdown": { "tefFractionOfTdee": 0.1, "neatShareOfPaee": 0.5 }
   }
 }

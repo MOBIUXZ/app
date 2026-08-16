@@ -135,6 +135,139 @@
   font-size: 14px;
 }
 
+.tdeeBreakdown {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ft-border);
+}
+
+.tdeeFormula {
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--ft-text-dim);
+  margin-bottom: 12px;
+}
+
+.tdeeBar {
+  display: flex;
+  height: 8px;
+  border-radius: 99px;
+  overflow: hidden;
+  background: var(--ft-bg-btn);
+  margin-bottom: 12px;
+}
+
+.tdeeBar > * {
+  height: 100%;
+}
+
+.tdeeBarBmr {
+  background: var(--ft-orange);
+}
+
+.tdeeBarTef {
+  background: var(--ft-yellow);
+}
+
+.tdeeBarPaee {
+  background: var(--ft-accent);
+}
+
+.tdeeLegend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tdeeLegendItem {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  column-gap: 8px;
+  align-items: center;
+}
+
+.tdeeLegendDot {
+  grid-column: 1;
+  grid-row: 1;
+  width: 8px;
+  height: 8px;
+  border-radius: 99px;
+  align-self: center;
+}
+
+.tdeeLegendName {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ft-text-nav);
+}
+
+.tdeeLegendValue {
+  grid-column: 3;
+  grid-row: 1;
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.tdeeLegendHint,
+.tdeeLegendSub {
+  grid-column: 2 / -1;
+  grid-row: 2;
+  font-size: 10px;
+  line-height: 1.35;
+  margin-top: 1px;
+}
+
+.tdeeLegendHint {
+  color: var(--ft-text-dim);
+}
+
+.tdeeLegendSub {
+  color: var(--ft-text-muted);
+}
+
+.tdeeEq {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ft-border);
+}
+
+.tdeeEqTerm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.tdeeEqLabel {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ft-text-dim);
+}
+
+.tdeeEqValue {
+  font-size: 13px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.tdeeEqOp {
+  color: var(--ft-text-faint);
+  font-weight: 700;
+  font-size: 13px;
+  padding-bottom: 1px;
+}
+
 .progressBarTrack {
   background: var(--ft-bg-btn);
   border-radius: 99px;

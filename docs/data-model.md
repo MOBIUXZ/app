@@ -223,6 +223,8 @@ Names containing `"Deadlift"` inherit Deadlift purple in `getExerciseChartColor(
 
 TDEE = BMR × multiplier. CaloriePage default activity index = 2 (Moderate).
 
+TDEE breakdown (same TDEE, split for display): TEF = 10% of TDEE; PAEE = TDEE − BMR − TEF; NEAT/EAT split PAEE 50/50.
+
 ---
 
 ## 1RM Calculator Formulas (Workout Page Only)

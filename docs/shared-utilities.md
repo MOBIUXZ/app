@@ -240,6 +240,8 @@ Used by the Calories page for TDEE calculation:
 ]
 ```
 
+`computeTdeeBreakdown()` in `src/domain/calories.js` splits TDEE into TEF (10%), PAEE, and NEAT/EAT.
+
 ## Exercise Categories
 
 Seven preset categories with 10 exercises each — used in Workout page dropdowns. See [workout.md](./workout.md#exercise-categories) for the full list.

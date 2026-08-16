@@ -54,7 +54,7 @@
       "title": "Calories",
       "visualSnapshot": "calories",
       "items": [
-        { "id": "tdee", "check": "BMR & TDEE show values when body comp exists" },
+        { "id": "tdee", "check": "BMR & TDEE show values when body comp exists, including TEF/NEAT/EAT/PAEE breakdown" },
         { "id": "goal-bar", "check": "Daily goal progress bar reflects logged calories" },
         { "id": "food-log", "check": "Food log lists seeded entries for selected date" }
       ]

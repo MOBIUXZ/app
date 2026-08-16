@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { ACCENT, GREEN, ORANGE, PINK, ACTIVITY, Card, Collapse, btnPrimary, btnSecondary, inputClass, useKeyboardListNav, ui, cx } from "./shared";
-import { computeMacroTotals, computeGoalBarPct, getGoalBarDisplayPct, getGoalBarColor, computeTdee, getTdeeTargets, DEFAULT_CALORIE_GOAL } from "../domain/calories.js";
+import { computeMacroTotals, computeGoalBarPct, getGoalBarDisplayPct, getGoalBarColor, computeTdee, getTdeeTargets, computeTdeeBreakdown, formatBmrFormula, DEFAULT_CALORIE_GOAL } from "../domain/calories.js";
+import { ACCENT, ORANGE, PINK, ACTIVITY, Card, Collapse, btnPrimary, btnSecondary, inputClass, useKeyboardListNav, ui, cx } from "./shared";
 import { getPageLayout, getThemeColor, formatTemplateLabel, getCollapseSpec } from "../domain/pageLayout.js";
 import { PageHeading } from "./PageIcon";
 import appConfig from "../../spec/app-config.json";
@@ -31,6 +31,9 @@ export default function CaloriePage({ data, save }) {
   var bmr = lastBC ? (lastBC.BMR_Mifflin || lastBC.BMR_Katch || null) : null;
   var tdee = computeTdee(bmr, ACTIVITY[actIdx].mult);
   var tdeeTargets = getTdeeTargets(tdee);
+  var breakdown = computeTdeeBreakdown(bmr, tdee);
+  var breakdownSpec = calLayout.tdeeBreakdown;
+  var bmrFormula = formatBmrFormula(lastBC, breakdownSpec.formulaTemplates);
   var actKb = useKeyboardListNav(ACTIVITY.length, function (i) { setActIdx(i); }, !!bmr);
   var entryKb = useKeyboardListNav(selEntries.length, function (i) { startEdit(data.calories.indexOf(selEntries[i]), selEntries[i]); }, selEntries.length > 0);
 
@@ -55,6 +58,56 @@ export default function CaloriePage({ data, save }) {
             if (!tdeeTargets) return null;
             return <div key={chip.id} className={s.goalChip}><div className={s.goalChipLabel}>{chip.label}</div><div className={s.goalChipValue} style={{ color: getThemeColor(chip.colorToken) }}>{tdeeTargets[chip.offsetKey]} kcal</div></div>;
           })}</div>
+          {breakdown && (
+            <div className={s.tdeeBreakdown}>
+              {bmrFormula ? <div className={s.tdeeFormula}>{bmrFormula}</div> : null}
+              <div className={s.tdeeBar}>
+                {breakdownSpec.barSegments.map(function (seg) {
+                  var pct = breakdown.tdee ? (breakdown[seg.id] / breakdown.tdee) * 100 : 0;
+                  return <div key={seg.id} className={s[seg.colorClass]} style={{ width: pct + "%" }} />;
+                })}
+              </div>
+              <div className={s.tdeeLegend}>
+                {breakdownSpec.barSegments.map(function (seg) {
+                  var row = breakdownSpec.rows.find(function (r) { return r.id === seg.id; });
+                  return (
+                    <div key={seg.id} className={s.tdeeLegendItem}>
+                      <span className={cx(s.tdeeLegendDot, s[seg.colorClass])} />
+                      <span className={s.tdeeLegendName}>{row.shortLabel}</span>
+                      <span className={s.tdeeLegendValue} style={{ color: getThemeColor(row.colorToken) }}>{breakdown[seg.id]}</span>
+                      {row.detailIds ? (
+                        <span className={s.tdeeLegendSub}>
+                          {row.detailIds.map(function (id) {
+                            var child = breakdownSpec.rows.find(function (r) { return r.id === id; });
+                            return child.shortLabel + " " + breakdown[id];
+                          }).join(" · ")}
+                        </span>
+                      ) : (
+                        <span className={s.tdeeLegendHint}>{row.hint}</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <div className={s.tdeeEq}>
+                {breakdownSpec.equation.map(function (id, idx) {
+                  var row = breakdownSpec.rows.find(function (r) { return r.id === id; });
+                  return [
+                    idx > 0 ? <span key={"op-" + id} className={s.tdeeEqOp}>+</span> : null,
+                    <span key={id} className={s.tdeeEqTerm}>
+                      <span className={s.tdeeEqLabel}>{row.shortLabel}</span>
+                      <span className={s.tdeeEqValue} style={{ color: getThemeColor(row.colorToken) }}>{breakdown[id]}</span>
+                    </span>
+                  ];
+                })}
+                <span className={s.tdeeEqOp}>=</span>
+                <span className={s.tdeeEqTerm}>
+                  <span className={s.tdeeEqLabel}>TDEE</span>
+                  <span className={s.tdeeEqValue} style={{ color: ACCENT }}>{breakdown.tdee}</span>
+                </span>
+              </div>
+            </div>
+          )}
         </div>}
       </Card>
       <Card className={s.cardFlush}>

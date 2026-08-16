@@ -185,7 +185,7 @@ Spec: [body-comp.md](./body-comp.md)
 
 **State:** `goal` (default 2200), `actIdx` (default 2), `selDate`, `editIdx`, `editForm`, food form fields
 
-**Features:** BMR/TDEE display, activity selector, date picker calendar, macro totals, goal progress bar, custom entry collapse, food log edit/delete
+**Features:** BMR/TDEE display, activity selector, TEF/NEAT/EAT/PAEE breakdown, date picker calendar, macro totals, goal progress bar, custom entry collapse, food log edit/delete
 
 Spec: [calories.md](./calories.md)
 

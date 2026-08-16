@@ -49,7 +49,8 @@
           "totals": { "cal": 600, "p": 44, "c": 45, "f": 11 },
           "goalPct": 27,
           "goalBarColor": "#34d399",
-          "tdee": 2759
+          "tdee": 2759,
+          "breakdown": { "bmr": 1780, "tef": 276, "neat": 352, "eat": 351, "paee": 703, "tdee": 2759 }
         }
       },
       {

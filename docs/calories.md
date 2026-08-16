@@ -38,6 +38,18 @@ The BMR card subtitle shows which formula was used (**Mifflin-St Jeor** or **Kat
 
 Selected level is shown under the TDEE value. Default selection is **Moderate** (index 2).
 
+### TDEE breakdown
+
+Partitions the same TDEE (so the pieces sum to the headline number):
+
+| Piece | Meaning | Formula |
+|-------|---------|---------|
+| **TEF** | Thermic effect of food | `round(TDEE × 0.10)` |
+| **PAEE** | Physical activity energy | `TDEE − BMR − TEF` |
+| **NEAT / EAT** | Split of PAEE | 50% / remainder |
+
+Shown once, quietly: formula caption, stacked bar, three-item legend (PAEE lists NEAT · EAT underneath), then `BMR + TEF + PAEE = TDEE` as a compact equation. Numbers are not repeated in a separate glossary. Colors: **BMR** orange, **TEF** yellow, **PAEE** accent.
+
 **Activity row UI:**
 - **Selected:** green left accent bar, darker inset background, bold label
 - **Unselected:** subtle hover lift; no purple highlight

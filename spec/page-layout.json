@@ -106,7 +106,28 @@
         { "id": "cut", "label": "Cut (-500)", "colorToken": "red", "offsetKey": "cut" },
         { "id": "maintain", "label": "Maintain", "colorToken": "green", "offsetKey": "maintain" },
         { "id": "bulk", "label": "Bulk (+300)", "colorToken": "accent", "offsetKey": "bulk" }
-      ]
+      ],
+      "tdeeBreakdown": {
+        "layout": ["formula", "bar", "legend", "equation"],
+        "formulaTemplates": {
+          "mifflinMale": "BMR = 10 × weight + 6.25 × height − 5 × age + 5 (Male)",
+          "mifflinFemale": "BMR = 10 × weight + 6.25 × height − 5 × age − 161 (Female)",
+          "katch": "BMR = 370 + 21.6 × FFM (Katch-McArdle)"
+        },
+        "rows": [
+          { "id": "bmr", "shortLabel": "BMR", "hint": "Basal metabolic rate", "colorToken": "orange" },
+          { "id": "tef", "shortLabel": "TEF", "hint": "Food thermic effect · 10%", "colorToken": "yellow" },
+          { "id": "neat", "shortLabel": "NEAT", "hint": "Non-exercise activity", "colorToken": "blue" },
+          { "id": "eat", "shortLabel": "EAT", "hint": "Exercise activity", "colorToken": "blue" },
+          { "id": "paee", "shortLabel": "PAEE", "hint": "Activity energy", "colorToken": "accent", "detailIds": ["neat", "eat"] }
+        ],
+        "equation": ["bmr", "tef", "paee"],
+        "barSegments": [
+          { "id": "bmr", "colorClass": "tdeeBarBmr" },
+          { "id": "tef", "colorClass": "tdeeBarTef" },
+          { "id": "paee", "colorClass": "tdeeBarPaee" }
+        ]
+      }
     },
     "progress": {
       "id": "progress",

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { getDashboardSnapshot } from '../src/domain/dashboard.js';
-import { computeMacroTotals, computeGoalBarPct, getGoalBarColor, computeTdee } from '../src/domain/calories.js';
+import { computeMacroTotals, computeGoalBarPct, getGoalBarColor, computeTdee, computeTdeeBreakdown } from '../src/domain/calories.js';
 import { syncBodyLogsAfterEdit, removeBodyLogForEntry } from '../src/domain/bodyCompSync.js';
 import { resolveExercise } from '../src/components/shared.jsx';
 import uiBehavior from '../spec/ui-behavior-fixtures.json';
@@ -49,6 +49,9 @@ describe('calorie behavior (spec/ui-behavior-fixtures.json)', function () {
       }
       if (fixture.expected.tdee != null) {
         expect(computeTdee(fixture.input.bmr, fixture.input.activityMult)).toBe(fixture.expected.tdee);
+      }
+      if (fixture.expected.breakdown) {
+        expect(computeTdeeBreakdown(fixture.input.bmr, fixture.expected.tdee)).toEqual(fixture.expected.breakdown);
       }
     });
   });
