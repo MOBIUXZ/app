@@ -1,0 +1,77 @@
+{
+  "description": "Deterministic localStorage seed for visual regression and manual QA",
+  "storageKey": "ft_v5",
+  "data": {
+    "workouts": [
+      {
+        "exercise": "Squat",
+        "date": "10-08-2026",
+        "time": "08:30",
+        "note": "",
+        "sets": [
+          { "weight": 100, "reps": 5, "side": "both" },
+          { "weight": 100, "reps": 3, "side": "both" }
+        ]
+      },
+      {
+        "exercise": "Bench Press",
+        "date": "10-08-2026",
+        "time": "09:00",
+        "note": "",
+        "sets": [{ "weight": 80, "reps": 8, "side": "both" }]
+      },
+      {
+        "exercise": "Overhead Press",
+        "date": "08-08-2026",
+        "time": "",
+        "note": "",
+        "sets": [{ "weight": 50, "reps": 5, "side": "both" }]
+      }
+    ],
+    "bodyLogs": [
+      { "weight": 75, "date": "10-08-2026" },
+      { "weight": 74.5, "date": "01-08-2026" }
+    ],
+    "bodyComp": [
+      {
+        "date": "10-08-2026",
+        "weight": 75,
+        "height": 180,
+        "bf": 15,
+        "smm": 35,
+        "waist": 82,
+        "age": 30,
+        "sex": "male",
+        "BW": 75,
+        "PBF": 15,
+        "FM": 11.25,
+        "FFM": 63.75,
+        "BMI": 23.15,
+        "FFMI": 19.68,
+        "FMI": 3.47,
+        "SMM": 35,
+        "SMI": 10.8,
+        "BMR_Mifflin": 1725,
+        "BMR_Katch": 1747
+      }
+    ],
+    "calories": [
+      {
+        "food": "Oats & whey",
+        "calories": 450,
+        "protein": 35,
+        "carbs": 55,
+        "fat": 8,
+        "date": "SEED_TODAY"
+      },
+      {
+        "food": "Chicken rice bowl",
+        "calories": 620,
+        "protein": 45,
+        "carbs": 70,
+        "fat": 12,
+        "date": "SEED_TODAY"
+      }
+    ]
+  }
+}

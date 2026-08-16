@@ -1,0 +1,54 @@
+{
+  "viewport": { "width": 1280, "height": 900 },
+  "maxDiffPixelRatio": 0.02,
+  "animations": "disabled",
+  "baseUrl": "http://localhost:4173",
+  "seedSpec": "spec/visual-seed-data.json",
+  "snapshots": [
+    {
+      "id": "dashboard",
+      "tab": "Dashboard",
+      "pageTitle": "👋 Dashboard",
+      "waitFor": "🏆 Personal Records",
+      "fullPage": false
+    },
+    {
+      "id": "workout",
+      "tab": "Workout",
+      "pageTitle": "🏋️ Workout Log",
+      "waitFor": "Training dashboard",
+      "fullPage": false
+    },
+    {
+      "id": "body-comp",
+      "tab": "Body Comp",
+      "pageTitle": "📏 Body Composition",
+      "waitFor": "Log Entry",
+      "fullPage": false
+    },
+    {
+      "id": "calories",
+      "tab": "Calories",
+      "pageTitle": "🍽️ Calories",
+      "waitFor": "BMR & TDEE",
+      "fullPage": false
+    },
+    {
+      "id": "progress",
+      "tab": "Progress",
+      "pageTitle": "📈 Progress",
+      "waitFor": "COMPOUND LIFTS",
+      "fullPage": true,
+      "extraWaitMs": 800
+    }
+  ],
+  "modalSnapshots": [
+    {
+      "id": "workout-smart-parser",
+      "tab": "Workout",
+      "openAction": { "type": "click", "text": "Smart Parser" },
+      "waitFor": "Parse & Save",
+      "maskSelectors": []
+    }
+  ]
+}

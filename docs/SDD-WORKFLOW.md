@@ -27,6 +27,12 @@ Read the governing rules first: [CONSTITUTION.md](./CONSTITUTION.md).
 | `npm run test:watch` | Vitest in watch mode | TDD while editing parser/formulas |
 | `npm run build` | Production bundle to `dist/` | Release check |
 | **`npm run verify`** | **spec:check + docs:check + theme:generate + test + build** | **Always before pushing/merging** |
+| `npm run test:visual` | Playwright pixel diff vs committed snapshots | After UI/CSS changes |
+| `npm run test:visual:update` | Regenerate visual baselines | After intentional UI changes |
+| `npm run test:visual:install` | Install Playwright Chromium | First time / CI setup |
+| **`npm run verify:full`** | **verify + test:visual** | **Release gate before merge** |
+
+See [MANUAL-QA.md](./MANUAL-QA.md) for the human exploratory checklist.
 
 ### Git (typical flow)
 
@@ -83,6 +89,8 @@ git commit -m "feat: describe what and why"
 | Change page title / section | `spec/page-layout.json` | page component | `tests/page-layout.test.js` |
 | Add CSS module class | `spec/css-modules.json` | `*.module.css` | `tests/css-modules.test.js` |
 | Change keyboard CSS class | `spec/global-styles.json` | `global.css` | `tests/global-styles.test.js` |
+| Add visual snapshot | `spec/visual-regression.json` | (Playwright e2e) | `tests/visual-regression.test.js` |
+| Manual release checklist item | `spec/manual-qa-checklist.json` | — | `tests/manual-qa-checklist.test.js` |
 
 ---
 
@@ -104,8 +112,12 @@ FITTRACK/
 │   ├── global-styles.json
 │   ├── ui-module.json
 │   ├── style-helpers.json
+│   ├── visual-regression.json
+│   ├── visual-seed-data.json
+│   ├── manual-qa-checklist.json
 │   └── file-tree.json
-├── tests/                ← ENFORCEMENT (Vitest, 240+ tests)
+├── tests/                ← ENFORCEMENT (Vitest, 256 tests)
+├── e2e/                  ← VISUAL REGRESSION (Playwright)
 ├── src/
 │   ├── domain/pageLayout.js  ← layout spec loader
 │   └── components/         ← UI + parser
@@ -142,5 +154,6 @@ Add a GitHub Action that runs on every PR:
 - [ ] Spec updated (if behavior/constants changed)
 - [ ] Tests updated or added
 - [ ] `npm run verify` passes
+- [ ] `npm run verify:full` passes (if UI/visual changes)
 - [ ] `docs/*.md` updated if user-visible
 - [ ] `spec/file-tree.json` updated if files added/removed

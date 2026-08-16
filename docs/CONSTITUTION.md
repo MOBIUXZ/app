@@ -98,11 +98,11 @@ Constants that appear in multiple places (aliases, categories, storage key) **mu
 | Style helper exports | `spec/style-helpers.json` | `style-helpers` |
 | Project layout | `spec/file-tree.json` | `file-tree` |
 
-All definable layers — behavior, constants, layout labels, CSS class contracts, theme tokens — are spec-driven and tested via `npm run verify` (240+ tests).
+All definable layers — behavior, constants, layout labels, CSS class contracts, theme tokens, **visual snapshots** — are spec-driven and tested via `npm run verify` (240+ unit tests) and `npm run test:visual` (Playwright pixel diff).
 
-### Optional manual QA only
+| Visual / QA | `spec/visual-regression.json`, `spec/visual-seed-data.json`, `spec/manual-qa-checklist.json` | Playwright `e2e/visual.spec.js` |
 
-- Pixel-perfect visual polish across browsers (no screenshot regression suite yet).
+Release gate: **`npm run verify:full`** = verify + visual regression.
 
 ---
 

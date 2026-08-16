@@ -18,10 +18,11 @@ FitTrack uses **SDD** — JSON specs in `spec/` are the source of truth; tests e
 |----------|----------|
 | **[docs/CONSTITUTION.md](./docs/CONSTITUTION.md)** | Project rules — read first |
 | **[docs/SDD-WORKFLOW.md](./docs/SDD-WORKFLOW.md)** | Commands, daily workflow, where to edit |
+| **[docs/MANUAL-QA.md](./docs/MANUAL-QA.md)** | Visual regression + manual release checklist |
 | [spec/manifest.json](./spec/manifest.json) | Machine-readable spec index |
 | [AGENTS.md](./AGENTS.md) | Instructions for AI assistants |
 
-**Key commands:** `npm test` · `npm run spec:check` · `npm run verify` · `npm run test:watch`
+**Key commands:** `npm test` · `npm run spec:check` · `npm run verify` · `npm run test:visual` · `npm run verify:full` · `npm run test:watch`
 
 ## Documentation
 

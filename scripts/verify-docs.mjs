@@ -38,8 +38,8 @@ requiredDocs.forEach(function (rel) {
 });
 
 var specFiles = readdirSync(resolve(root, 'spec')).filter(function (f) { return f.endsWith('.json'); });
-if (specFiles.length < 18) {
-  errors.push('Expected at least 18 spec JSON files, found ' + specFiles.length);
+if (specFiles.length < 21) {
+  errors.push('Expected at least 21 spec JSON files, found ' + specFiles.length);
 }
 
 if (errors.length) {

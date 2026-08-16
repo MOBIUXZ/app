@@ -1,6 +1,6 @@
 {
   "$schema": "./manifest.schema.json",
-  "version": 3,
+  "version": 4,
   "description": "FitTrack machine-readable specification manifest. Specs are the source of truth; code and docs must conform.",
   "specs": [
     {
@@ -110,6 +110,24 @@
       "path": "spec/style-helpers.json",
       "governs": ["styleHelpers.js exports and modifier keys"],
       "docs": ["docs/styling.md"]
+    },
+    {
+      "id": "visual-regression",
+      "path": "spec/visual-regression.json",
+      "governs": ["Playwright visual snapshots", "viewport", "pages to capture"],
+      "docs": ["docs/MANUAL-QA.md"]
+    },
+    {
+      "id": "visual-seed-data",
+      "path": "spec/visual-seed-data.json",
+      "governs": ["Deterministic localStorage for visual QA"],
+      "docs": ["docs/MANUAL-QA.md"]
+    },
+    {
+      "id": "manual-qa-checklist",
+      "path": "spec/manual-qa-checklist.json",
+      "governs": ["Human QA checklist for releases"],
+      "docs": ["docs/MANUAL-QA.md"]
     }
   ],
   "testSuites": [
@@ -126,6 +144,8 @@
     { "path": "tests/global-styles.test.js", "spec": "global-styles" },
     { "path": "tests/ui-module.test.js", "spec": "ui-module" },
     { "path": "tests/style-helpers.test.js", "spec": "style-helpers" },
+    { "path": "tests/visual-regression.test.js", "spec": "visual-regression" },
+    { "path": "tests/manual-qa-checklist.test.js", "spec": "manual-qa-checklist" },
     { "path": "tests/file-tree.test.js", "spec": "file-tree" },
     { "path": "tests/spec-integrity.test.js", "spec": "manifest" }
   ]

@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "description": "Manual QA checklist — mirrors automated visual regression; run before releases",
+  "prerequisites": [
+    "npm install",
+    "npm run build && npm run preview",
+    "Open http://localhost:4173",
+    "Load seed: DevTools → Application → localStorage → ft_v5 (paste from spec/visual-seed-data.json, replace SEED_TODAY with today's locale date string)"
+  ],
+  "automatedEquivalent": "npm run test:visual",
+  "sections": [
+    {
+      "id": "global",
+      "title": "Global shell",
+      "items": [
+        { "id": "logo", "check": "Header shows ⚡ FitTrack", "visualSnapshot": null },
+        { "id": "nav", "check": "Five nav tabs visible; active tab has purple pill", "visualSnapshot": null },
+        { "id": "nav-keys", "check": "Press 1–5 switches tabs (when no modal open)", "visualSnapshot": null },
+        { "id": "theme", "check": "Dark background (#0f0f13), readable text, accent purple on active elements", "visualSnapshot": null }
+      ]
+    },
+    {
+      "id": "dashboard",
+      "title": "Dashboard",
+      "visualSnapshot": "dashboard",
+      "items": [
+        { "id": "stats", "check": "Four stat boxes: Body Weight, Body Fat, Today Cals, Workouts" },
+        { "id": "prs", "check": "Personal Records lists Squat 100kg, Bench Press 80kg, Overhead Press 50kg" },
+        { "id": "recent", "check": "Expand Recent Workouts — shows latest sessions with set summaries" }
+      ]
+    },
+    {
+      "id": "workout",
+      "title": "Workout",
+      "visualSnapshot": "workout",
+      "items": [
+        { "id": "hero", "check": "Hero shows workout count chips and today's date" },
+        { "id": "calendar", "check": "Open Calendar — month grid, logged days highlighted" },
+        { "id": "parser", "check": "Smart Parser modal opens; Enter parses, Esc closes", "visualSnapshot": "workout-smart-parser" },
+        { "id": "history", "check": "Workout History expand shows grouped entries" }
+      ]
+    },
+    {
+      "id": "body-comp",
+      "title": "Body Comp",
+      "visualSnapshot": "body-comp",
+      "items": [
+        { "id": "live-metrics", "check": "Log Entry expand — typing weight/BF updates live metrics" },
+        { "id": "history", "check": "History shows saved entry with metric chips" }
+      ]
+    },
+    {
+      "id": "calories",
+      "title": "Calories",
+      "visualSnapshot": "calories",
+      "items": [
+        { "id": "tdee", "check": "BMR & TDEE show values when body comp exists" },
+        { "id": "goal-bar", "check": "Daily goal progress bar reflects logged calories" },
+        { "id": "food-log", "check": "Food log lists seeded entries for selected date" }
+      ]
+    },
+    {
+      "id": "progress",
+      "title": "Progress",
+      "visualSnapshot": "progress",
+      "items": [
+        { "id": "compound-charts", "check": "Compound lift charts render with data points" },
+        { "id": "metric-toggle", "check": "Toggle Max Weight / Volume / e1RM — line morphs smoothly (~600ms)" },
+        { "id": "body-chart", "check": "Body Weight chart shows trend" },
+        { "id": "detail-modal", "check": "Click chart point → Workout Details panel opens" }
+      ]
+    },
+    {
+      "id": "persistence",
+      "title": "Persistence",
+      "items": [
+        { "id": "refresh", "check": "Refresh page — all data persists" },
+        { "id": "storage-key", "check": "localStorage key is ft_v5" }
+      ]
+    }
+  ]
+}
