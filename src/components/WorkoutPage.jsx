@@ -877,7 +877,7 @@ Bench Press
         </div>
       )}
 
-      <Collapse emoji={getCollapseSpec("workout", "logWorkout").emoji} label={getCollapseSpec("workout", "logWorkout").label} defaultOpen={getCollapseSpec("workout", "logWorkout").defaultOpen}>
+      <Collapse icon={getCollapseSpec("workout", "logWorkout").icon} label={getCollapseSpec("workout", "logWorkout").label} defaultOpen={getCollapseSpec("workout", "logWorkout").defaultOpen}>
         <div className={s.manualLogHeader}>
           <div className={s.manualLogTitle}>Manual entry</div>
           <span className={s.dashboardChip}>Quick log</span>
@@ -924,7 +924,7 @@ Bench Press
         {msg && <div className={cx(ui.successMsg, ui.marginTop8)}>{msg}</div>}
       </Collapse>
 
-      <Collapse emoji={getCollapseSpec("workout", "history").emoji} label={getCollapseSpec("workout", "history").label} defaultOpen={getCollapseSpec("workout", "history").defaultOpen}>
+      <Collapse icon={getCollapseSpec("workout", "history").icon} label={getCollapseSpec("workout", "history").label} defaultOpen={getCollapseSpec("workout", "history").defaultOpen}>
         <div className={ui.marginBottom12}>
           <div className={ui.historyToolbarSticky}>
             <input value={searchQuery} onChange={function (e) { setSearchQuery(e.target.value); }} placeholder="Search by workout name..." className={cx(inputClass({ fullWidth: true }), ui.marginBottom12)} />
@@ -1046,7 +1046,7 @@ Bench Press
         )}
       </Collapse>
 
-      <Collapse emoji={getCollapseSpec("workout", "oneRm").emoji} label={getCollapseSpec("workout", "oneRm").label} defaultOpen={getCollapseSpec("workout", "oneRm").defaultOpen}>
+      <Collapse icon={getCollapseSpec("workout", "oneRm").icon} label={getCollapseSpec("workout", "oneRm").label} defaultOpen={getCollapseSpec("workout", "oneRm").defaultOpen}>
         <OneRMCalc data={data} />
       </Collapse>
     </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, createContext, useContext, useMemo } from "react";
+import { PageIcon } from "./PageIcon";
 import ui from "../styles/ui.module.css";
 import { cx, btnPrimaryClass, btnSecondaryClass, btnDangerClass, inputClass, selectClass, textareaClass } from "../styles/styleHelpers.js";
 import exerciseAliasesSpec from "../../spec/exercise-aliases.json";
@@ -699,12 +700,16 @@ export function StatBox({ label, value, unit, color }) {
   );
 }
 
-export function Collapse({ emoji, label, defaultOpen, children }) {
+export function Collapse({ emoji, icon, label, defaultOpen, children }) {
   var [open, setOpen] = useState(defaultOpen || false);
   return (
     <div className={ui.collapse}>
       <button type="button" onClick={function () { setOpen(!open); }} className={open ? ui.collapseToggleOpen : ui.collapseToggle}>
-        <span>{emoji}  {label}</span>
+        <span className={ui.flexRow}>
+          {icon ? <PageIcon id={icon} size={18} /> : null}
+          {!icon && emoji ? <span>{emoji}</span> : null}
+          <span>{label}</span>
+        </span>
         <span className={open ? ui.collapseChevronOpen : ui.collapseChevron}>›</span>
       </button>
       {open && <div className={ui.collapseBody}>{children}</div>}

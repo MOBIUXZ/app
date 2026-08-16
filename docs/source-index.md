@@ -55,7 +55,7 @@ Complete inventory of every project file. Line counts approximate (Aug 2026).
 
 ## `src/components/PageIcon.jsx`
 
-**~45 lines** — Lucide stroke icons for page titles (`PageIcon`, `PageHeading`). Spec: `spec/page-icons.json` + `pageIcon` / `hero.icon` in `page-layout.json`. Domain: `src/domain/pageIcons.js`.
+**~45 lines** — Lucide stroke icons for page titles and workout collapses (`PageIcon`, `PageHeading`). Spec: `spec/page-icons.json` + `pageIcon` / `hero.icon` / collapse `icon` in `page-layout.json`. Domain: `src/domain/pageIcons.js`.
 
 ---
 
@@ -115,7 +115,7 @@ Complete inventory of every project file. Line counts approximate (Aug 2026).
 |--------|-------|
 | `Card` | `children`, `className?` |
 | `StatBox` | `label`, `value`, `unit`, `color?` |
-| `Collapse` | `emoji`, `label`, `defaultOpen?`, `children` |
+| `Collapse` | `emoji`, `icon`, `label`, `defaultOpen?`, `children` |
 
 ### Internal (not exported)
 

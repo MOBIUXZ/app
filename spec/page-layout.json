@@ -56,9 +56,9 @@
         { "id": "smartParser", "label": "🧠 Smart Parser" }
       ],
       "collapses": [
-        { "id": "logWorkout", "emoji": "✍️", "label": "Log Workout", "defaultOpen": false },
-        { "id": "history", "emoji": "📋", "label": "Workout History", "defaultOpen": false },
-        { "id": "oneRm", "emoji": "🧮", "label": "1RM Calculator", "defaultOpen": false }
+        { "id": "logWorkout", "icon": "pencil-line", "label": "Log Workout", "defaultOpen": false },
+        { "id": "history", "icon": "notebook", "label": "Workout History", "defaultOpen": false },
+        { "id": "oneRm", "icon": "square-function", "label": "1RM Calculator", "defaultOpen": false }
       ],
       "modals": [
         { "id": "calendarModal", "title": "📅 Workout Calendar", "layerId": "calendar-modal" },
