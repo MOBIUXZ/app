@@ -2,7 +2,20 @@
 
 FitTrack is a client-side fitness tracking web app built with **React** and **Vite**. All data is stored locally in the browser using `localStorage` (key: `ft_v5`).
 
-## Navigation
+---
+
+## Reconstruction (start here for full rebuild)
+
+| Document | Purpose |
+|----------|---------|
+| **[RECONSTRUCTION.md](./RECONSTRUCTION.md)** | Master guide — bootstrap, config files, build order, verification checklist |
+| [architecture.md](./architecture.md) | System design, component tree, data flow |
+| [data-model.md](./data-model.md) | Complete schema, formulas, date format rules |
+| [source-index.md](./source-index.md) | Every file in the repo with exports and line counts |
+
+---
+
+## Feature docs (by page)
 
 | Page | File | Description |
 |------|------|-------------|
@@ -11,9 +24,16 @@ FitTrack is a client-side fitness tracking web app built with **React** and **Vi
 | Body Comp | [body-comp.md](./body-comp.md) | Body composition logging and derived metrics |
 | Calories | [calories.md](./calories.md) | Food logging, macros, BMR/TDEE, daily goals |
 | Progress | [progress.md](./progress.md) | Exercise charts, compound/isolation tracking, trends |
-| Styling | [styling.md](./styling.md) | CSS modules, theme tokens, shared UI patterns |
-| Shared Utilities | [shared-utilities.md](./shared-utilities.md) | Smart parser, exercise resolution, compound lifts, data helpers |
-| Keyboard Navigation | [keyboard-navigation.md](./keyboard-navigation.md) | Arrow keys, Enter, page shortcuts, focus highlights |
+
+## Cross-cutting docs
+
+| Topic | File |
+|-------|------|
+| CSS architecture | [styling.md](./styling.md) |
+| Smart parser, exercises, hooks | [shared-utilities.md](./shared-utilities.md) |
+| Keyboard & popup layers | [keyboard-navigation.md](./keyboard-navigation.md) |
+
+---
 
 ## App Structure
 
@@ -26,9 +46,13 @@ FitTrack
 └── Progress     — Charts & analytics
 ```
 
+Entry: `src/main.jsx` → `App.jsx` (tab routing, no React Router).
+
+---
+
 ## Data Model
 
-All pages read/write a single data object:
+All pages read/write a single object persisted at `localStorage["ft_v5"]`:
 
 ```json
 {
@@ -39,7 +63,9 @@ All pages read/write a single data object:
 }
 ```
 
-### Workout entry
+Full schema with computed fields, formulas, and date quirks: **[data-model.md](./data-model.md)**
+
+### Workout entry (summary)
 
 ```json
 {
@@ -53,23 +79,57 @@ All pages read/write a single data object:
 }
 ```
 
-Sets may include an optional `side` field: `"left"`, `"right"`, or `"both"`.
+Sets may include optional `side`: `"left"`, `"right"`, or `"both"`.
+
+---
 
 ## Tech Stack
 
-- **React 18** — UI components
-- **Recharts** — Line charts on Progress page
-- **Vite** — Build tool
-- **localStorage** — Persistent storage (no backend)
+| Layer | Choice |
+|-------|--------|
+| UI | React 18 |
+| Build | Vite 4 |
+| Charts | Recharts 2.8 (Progress only) |
+| Styling | CSS Modules + `theme.css` variables |
+| Storage | localStorage (no backend) |
+
+Dependencies: see `package.json` in [RECONSTRUCTION.md](./RECONSTRUCTION.md#root-config-files).
+
+---
 
 ## Key Conventions
 
 - **Main navigation** — five pages in a segmented pill track; active tab is a gradient purple pill (see [keyboard-navigation.md](./keyboard-navigation.md#main-navigation)).
 - **Compound lifts** (Squat, Bench Press, Deadlift, etc.) display in ALL CAPS in the UI (e.g. `SQUATS`, `PUSHPRESS`, `BARBELL ROWS`).
-- **Exercise names** are normalized via aliases (e.g. `pushpress` → Push Press, `barbell rows` → Barbell Row).
-- **Dates** are stored as `DD-MM-YYYY` for workouts; calorie entries use locale date strings.
+- **Exercise names** are normalized via aliases (e.g. `pushpress` → Push Press, `barbell rows` → Barbell Row). Full alias list in source: `shared.jsx`.
+- **Dates** — workouts/body use `DD-MM-YYYY`; calorie entries use locale date strings (see [data-model.md](./data-model.md#date-format-rules-critical)).
 - **Number inputs** do not change on mouse wheel scroll while focused; spinner arrows are hidden (see [styling.md](./styling.md#number-inputs)).
-- **Collapse panels** use `12px` top padding inside the body so the first field (e.g. Date on Body Comp **Log Entry**) is not flush against the header (see [styling.md](./styling.md#collapse-panels)).
-- **Workout History** groups default to expanded; **Expand all / Collapse all** works in a single click (see [workout.md](./workout.md#grouping)).
-- **Progress → Workout Details** best set uses label **Best e1RM {value}** (green), matching the chart metric toggle (see [progress.md](./progress.md#set-list-per-workout)).
-- **Progress tab** stays mounted in the DOM after the first visit (hidden when inactive) for faster return navigation; charts lazy-load as you scroll and appear instantly, then **morph over 600ms** when switching metric toggles (see [progress.md](./progress.md#performance)).
+- **Collapse panels** use `12px` top padding inside the body (see [styling.md](./styling.md#collapse-panels)).
+- **Workout History** groups default to expanded; **Expand all / Collapse all** in one click (see [workout.md](./workout.md#grouping)).
+- **Progress → Workout Details** best set uses **Best e1RM {value}** (green), matching chart toggles (see [progress.md](./progress.md#set-list-per-workout)).
+- **Progress tab** stays mounted after first visit; charts lazy-load, appear instantly, morph 600ms on metric toggle (see [progress.md](./progress.md#performance)).
+
+---
+
+## Source file map
+
+Complete inventory: **[source-index.md](./source-index.md)**
+
+```
+src/
+├── main.jsx, App.jsx, App.module.css
+├── styles/          theme, global, ui.module, styleHelpers
+└── components/
+    ├── shared.jsx
+    ├── DashboardPage.*
+    ├── WorkoutPage.*
+    ├── BodyCompPage.*
+    ├── CaloriePage.*
+    └── ProgressPage.*
+```
+
+---
+
+## Document maintenance
+
+When changing the application, update the matching feature doc **and** [data-model.md](./data-model.md) / [source-index.md](./source-index.md) / [RECONSTRUCTION.md](./RECONSTRUCTION.md) as needed so reconstruction docs stay accurate.

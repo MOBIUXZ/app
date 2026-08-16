@@ -2,6 +2,8 @@
 
 FitTrack uses **CSS Modules** with a shared theme. Static layout and typography live in `.module.css` files; dynamic values (chart line colors, calendar selection, metric accent colors) stay in JS via inline `style`.
 
+> **Reconstruction:** Full CSS variable list in `src/styles/theme.css`. Class inventory per file: [source-index.md](./source-index.md) and sections below.
+
 ## File layout
 
 | File | Purpose |

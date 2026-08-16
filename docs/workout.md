@@ -109,7 +109,7 @@ Stacked control layout inside **Workout History** (sticky header while scrolling
 
 ## 1RM Calculator
 
-Estimates one-rep max from submaximal sets using five formulas:
+Estimates one-rep max from submaximal sets using five formulas (exact math in [data-model.md](./data-model.md#1rm-calculator-formulas-workout-page-only)):
 
 | Formula | Best For |
 |---------|----------|
@@ -118,6 +118,8 @@ Estimates one-rep max from submaximal sets using five formulas:
 | Lander | Research-validated, 1–10 reps |
 | Lombardi | High reps (10–20) |
 | O'Connor | Conservative estimate |
+
+> **Note:** Progress page e1RM uses **Epley only**. The 1RM Calculator here supports all five formulas independently.
 
 **Features:**
 - Search logged sets by exercise, date, weight, reps, or notes — select any set to load into the calculator

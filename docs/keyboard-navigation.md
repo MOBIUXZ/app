@@ -19,7 +19,7 @@ These work only when **no popup is open** and focus is **not** inside an input, 
 |-----|--------|
 | `1` – `5` | Jump to page (Dashboard, Workout, Body Comp, Calories, Progress) |
 | `←` `→` | Previous / next page |
-| `Tab` | Move focus between main nav tabs (`role="tab"`) |
+| `Tab` | Native browser focus between nav tab buttons (not a custom handler) |
 | `Enter` | Activate focused nav tab (when a tab button is focused) |
 
 When the active page changes **and focus is inside the nav bar**, focus moves to the newly active tab so the green keyboard ring does not stay on the previous tab.

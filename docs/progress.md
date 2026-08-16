@@ -221,6 +221,14 @@ Other compounds (Snatch, Clean & Jerk, etc.) use the fallback palette until adde
 
 See also: [shared-utilities.md](./shared-utilities.md) → `getExerciseChartColor()`.
 
+## Implementation reference
+
+| Item | Location |
+|------|----------|
+| Chart helpers | `ProgressPage.jsx` — see [source-index.md](./source-index.md#componentsprogresspagejsx) |
+| Animation | `useTrendChartAnimation()`, `withTrendPlotValue()`, `animationId={metric}` |
+| Lazy mount | `useInView()` — 160px margin exercise cards, 240px footer |
+
 ## Combined Compound Lifts Chart
 
 When 2+ compound lifts are logged, an overlay chart compares all compounds on one graph.
