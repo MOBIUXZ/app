@@ -345,6 +345,52 @@ function sessionChartYDomain(plotData, metric) {
   return [bottom, top];
 }
 
+var CHART_CURSOR = { stroke: "#64748b", strokeWidth: 1, strokeDasharray: "4 4" };
+var TREND_LINE_ANIM = { animationDuration: 600, animationEasing: "ease-in-out" };
+
+function withTrendPlotValue(data, valueKey) {
+  return data.map(function (point) {
+    var val = point[valueKey];
+    return Object.assign({}, point, {
+      plotValue: val != null && !isNaN(val) ? Number(val) : null,
+    });
+  });
+}
+
+function compoundChartYDomain(plotData, compounds, hiddenCompoundLifts) {
+  var values = [];
+  plotData.forEach(function (p) {
+    compounds.forEach(function (ex) {
+      if (hiddenCompoundLifts[ex]) return;
+      if (p[ex] != null && !isNaN(p[ex])) values.push(Number(p[ex]));
+    });
+  });
+  if (!values.length) return [0, 1];
+  var max = Math.max.apply(null, values);
+  var min = Math.min.apply(null, values);
+  if (max <= 0) return [0, 1];
+  var pad = Math.max(1, Math.ceil(max * 0.1));
+  var top = Math.ceil(max + pad);
+  if (top === max) top = max + 1;
+  var bottom = min > 0 ? Math.max(0, Math.floor(min - pad)) : 0;
+  return [bottom, top];
+}
+
+function useTrendChartAnimation(chartReady) {
+  var hasPaintedRef = useRef(false);
+  var isFirstPaint = chartReady && !hasPaintedRef.current;
+
+  useEffect(function () {
+    if (chartReady) hasPaintedRef.current = true;
+  }, [chartReady]);
+
+  return {
+    isAnimationActive: true,
+    animationDuration: isFirstPaint ? 0 : TREND_LINE_ANIM.animationDuration,
+    animationEasing: TREND_LINE_ANIM.animationEasing,
+  };
+}
+
 function formatSessionSetLoad(point) {
   if (!point) return "—";
   if (point.failed) return (point.attemptWeight || 0) + "kg × 0";
@@ -642,6 +688,19 @@ function ExerciseChart({ ex, sessions, colorFallbackIdx, onPointSelect, formatCh
   var trend = cd.length >= 2 ? cd[cd.length - 1].weight - cd[cd.length - 2].weight : null;
   var metricLabel = metricLabelFor(metric);
   var hasImbalance = showSplit && viewMode === "split" && chartData.some(function (p) { return isSplitImbalanced(p, metric); });
+  var plotData = useMemo(function () {
+    return withTrendPlotValue(chartData, metric);
+  }, [chartData, metric]);
+  var leftPlotData = useMemo(function () {
+    return withTrendPlotValue(chartData, metric + "_left");
+  }, [chartData, metric]);
+  var rightPlotData = useMemo(function () {
+    return withTrendPlotValue(chartData, metric + "_right");
+  }, [chartData, metric]);
+  var lineAnim = useTrendChartAnimation(chartInView);
+  var yDomain = useMemo(function () {
+    return sessionChartYDomain(plotData, "plotValue");
+  }, [plotData]);
 
   function chartToggleClass(active) {
     return active ? ui.chartToggleBtnActive : ui.chartToggleBtn;
@@ -659,21 +718,22 @@ function ExerciseChart({ ex, sessions, colorFallbackIdx, onPointSelect, formatCh
     if (!next || !ev.currentTarget.contains(next)) setHoveredPointIdx(null);
   }
 
-  function renderSplitLineChart(strokeColor, dataKey) {
+  function renderSplitLineChart(strokeColor, splitPlotData) {
+    var splitYDomain = sessionChartYDomain(splitPlotData, "plotValue");
     return (
       <ResponsiveContainer width="100%" height={140}>
         <LineChart
-          data={chartData}
+          data={splitPlotData}
           onMouseMove={handleSplitChartHover}
           onClick={function (e) { if (e && e.activePayload && e.activePayload[0] && onPointSelect) { onPointSelect(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
           <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
-          <YAxis tick={cs} width={35} />
-          <Tooltip content={function () { return null; }} cursor={{ stroke: "#64748b", strokeWidth: 1, strokeDasharray: "4 4" }} isAnimationActive={false} animationDuration={0} />
-          <Line type="monotone" dataKey={dataKey} stroke={strokeColor} strokeWidth={2} activeDot={false} isAnimationActive={false} dot={function (props) {
+          <YAxis tick={cs} width={35} domain={splitYDomain} allowDataOverflow={false} />
+          <Tooltip content={function () { return null; }} cursor={CHART_CURSOR} isAnimationActive={false} animationDuration={0} />
+          <Line type="monotone" dataKey="plotValue" animationId={metric} stroke={strokeColor} strokeWidth={2} activeDot={false} dot={function (props) {
             return <SplitDot cx={props.cx} cy={props.cy} payload={props.payload} fill={strokeColor} metric={metric} highlightIdx={hoveredPointIdx} pointIdx={props.index} />;
-          }} connectNulls={true} />
+          }} connectNulls={true} isAnimationActive={lineAnim.isAnimationActive} animationDuration={lineAnim.animationDuration} animationEasing={lineAnim.animationEasing} />
         </LineChart>
       </ResponsiveContainer>
     );
@@ -712,12 +772,12 @@ function ExerciseChart({ ex, sessions, colorFallbackIdx, onPointSelect, formatCh
         {(!showSplit || viewMode === 'combined') ? <div ref={chartRef} className={ui.chartContainer}>
           {chartInView ? (
           <ResponsiveContainer width="100%" height={140}>
-            <LineChart data={chartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0] && onPointSelect) { onPointSelect(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}>
+            <LineChart data={plotData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0] && onPointSelect) { onPointSelect(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
               <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
-              <YAxis tick={cs} width={35} />
-              <Tooltip contentStyle={tt} formatter={function (value) { return [formatChartTooltipValue(value, metric), metricLabel]; }} />
-              <Line type="monotone" dataKey={metric} name={metricLabel} stroke={exColor} strokeWidth={2} dot={{ fill: exColor, r: 4 }} connectNulls={true} isAnimationActive={false} animationDuration={0} />
+              <YAxis tick={cs} width={35} domain={yDomain} allowDataOverflow={false} />
+              <Tooltip contentStyle={tt} formatter={function (value) { return [formatChartTooltipValue(value, metric), metricLabel]; }} cursor={CHART_CURSOR} isAnimationActive={false} animationDuration={0} />
+              <Line type="monotone" dataKey="plotValue" animationId={metric} name={metricLabel} stroke={exColor} strokeWidth={2} dot={{ fill: exColor, r: 4 }} connectNulls={true} isAnimationActive={lineAnim.isAnimationActive} animationDuration={lineAnim.animationDuration} animationEasing={lineAnim.animationEasing} />
             </LineChart>
           </ResponsiveContainer>
           ) : <div className={s.chartPlaceholder} aria-hidden="true" />}
@@ -728,13 +788,13 @@ function ExerciseChart({ ex, sessions, colorFallbackIdx, onPointSelect, formatCh
           <div className={s.splitCol}>
             <div className={s.splitLabel}>Left</div>
             <div className={ui.chartContainer}>
-              {renderSplitLineChart(BLUE, metric + "_left")}
+              {renderSplitLineChart(BLUE, leftPlotData)}
             </div>
           </div>
           <div className={s.splitCol}>
             <div className={s.splitLabel}>Right</div>
             <div className={ui.chartContainer}>
-              {renderSplitLineChart(PINK, metric + "_right")}
+              {renderSplitLineChart(PINK, rightPlotData)}
             </div>
           </div>
           </div>
@@ -864,6 +924,11 @@ export default function ProgressPage({ data }) {
     });
   }, [compounds, compoundMetric, normalizedWorkouts, workoutsByExercise]);
 
+  var compoundLineAnim = useTrendChartAnimation(compounds.length > 1);
+  var compoundYDomain = useMemo(function () {
+    return compoundChartYDomain(compoundChartData, compounds, hiddenCompoundLifts);
+  }, [compoundChartData, compounds, hiddenCompoundLifts]);
+
   var cs = { color: "#e2e8f0", fontSize: 10 }, tt = { background: "#23232f", border: "1px solid #3d3d4a", borderRadius: 8, fontSize: 12 };
 
   function toggleCompoundLift(ex) {
@@ -945,9 +1010,26 @@ export default function ProgressPage({ data }) {
                   <LineChart data={compoundChartData} onClick={function (e) { if (e && e.activePayload && e.activePayload[0]) { setSelectedDate(e.activePayload[0].payload.dateKey || e.activePayload[0].payload.rawDate || null); } }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
                     <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
-                    <YAxis tick={cs} width={35} />
-                    <Tooltip contentStyle={tt} />
-                    {compounds.filter(function (ex) { return !hiddenCompoundLifts[ex]; }).map(function (ex) { var lineColor = getExerciseChartColor(ex); return <Line key={ex} type="monotone" dataKey={ex} stroke={lineColor} strokeWidth={2} dot={{ fill: lineColor, r: 2 }} connectNulls={true} isAnimationActive={false} animationDuration={0} />; })}
+                    <YAxis tick={cs} width={35} domain={compoundYDomain} allowDataOverflow={false} />
+                    <Tooltip contentStyle={tt} cursor={CHART_CURSOR} isAnimationActive={false} animationDuration={0} />
+                    {compounds.filter(function (ex) { return !hiddenCompoundLifts[ex]; }).map(function (ex) {
+                      var lineColor = getExerciseChartColor(ex);
+                      return (
+                        <Line
+                          key={ex}
+                          type="monotone"
+                          dataKey={ex}
+                          animationId={compoundMetric}
+                          stroke={lineColor}
+                          strokeWidth={2}
+                          dot={{ fill: lineColor, r: 2 }}
+                          connectNulls={true}
+                          isAnimationActive={compoundLineAnim.isAnimationActive}
+                          animationDuration={compoundLineAnim.animationDuration}
+                          animationEasing={compoundLineAnim.animationEasing}
+                        />
+                      );
+                    })}
                   </LineChart>
                 </ResponsiveContainer>
               </div>
