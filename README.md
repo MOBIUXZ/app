@@ -7,8 +7,21 @@ Client-side fitness tracking app — React 18, Vite 4, Recharts, localStorage.
 ```bash
 npm install
 npm run dev      # http://localhost:5173
-npm run build    # production build → dist/
+npm run verify   # spec check + tests + build (run before every commit)
 ```
+
+## Spec-driven development
+
+FitTrack uses **SDD** — JSON specs in `spec/` are the source of truth; tests enforce them.
+
+| Document | Contents |
+|----------|----------|
+| **[docs/CONSTITUTION.md](./docs/CONSTITUTION.md)** | Project rules — read first |
+| **[docs/SDD-WORKFLOW.md](./docs/SDD-WORKFLOW.md)** | Commands, daily workflow, where to edit |
+| [spec/manifest.json](./spec/manifest.json) | Machine-readable spec index |
+| [AGENTS.md](./AGENTS.md) | Instructions for AI assistants |
+
+**Key commands:** `npm test` · `npm run spec:check` · `npm run verify` · `npm run test:watch`
 
 ## Documentation
 

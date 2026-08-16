@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, Collapse, btnPrimary, btnSecondary, btnDanger, inputClass, formatDate, useConfirmDialogKeyboard, ui, cx } from "./shared";
+import { computeBodyCompEntry } from "../domain/metrics.js";
 import s from "./BodyCompPage.module.css";
 
 export default function BodyCompPage({ data, save }) {
@@ -26,44 +27,6 @@ export default function BodyCompPage({ data, save }) {
     );
   }
   function GL(p) { return <div className={s.groupLabel}>{p.children}</div>; }
-  function computeBodyCompEntry(fields) {
-    var wN = parseFloat(fields.weight) || 0;
-    var hM = (parseFloat(fields.height) || 0) / 100;
-    var bfN = parseFloat(fields.bf) || 0;
-    var smmN = parseFloat(fields.smm) || 0;
-    var ageN = parseFloat(fields.age) || 0;
-    var sexVal = fields.sex || "male";
-    var hasBase = wN > 0 && bfN > 0;
-    var fm = hasBase ? wN * (bfN / 100) : null;
-    var ffm = hasBase ? wN - fm : null;
-    var bmi = (wN > 0 && hM > 0) ? wN / (hM * hM) : null;
-    var ffmi = (ffm != null && hM > 0) ? ffm / (hM * hM) : null;
-    var fmi = (fm != null && hM > 0) ? fm / (hM * hM) : null;
-    var smi = (smmN > 0 && hM > 0) ? smmN / (hM * hM) : null;
-    var bmrMifflin = (wN > 0 && hM > 0 && ageN > 0) ? (sexVal === "male" ? 10 * wN + 6.25 * (hM * 100) - 5 * ageN + 5 : 10 * wN + 6.25 * (hM * 100) - 5 * ageN - 161) : null;
-    var bmrKatch = ffm != null ? 370 + 21.6 * ffm : null;
-    return {
-      weight: wN,
-      height: parseFloat(fields.height) || null,
-      bf: bfN,
-      smm: smmN || null,
-      waist: parseFloat(fields.waist) || null,
-      age: ageN || null,
-      sex: sexVal,
-      BW: wN,
-      PBF: bfN,
-      FM: fm,
-      FFM: ffm,
-      BMI: bmi,
-      FFMI: ffmi,
-      FMI: fmi,
-      SMM: smmN || null,
-      SMI: smi,
-      BMR_Mifflin: bmrMifflin,
-      BMR_Katch: bmrKatch,
-      date: fields.date,
-    };
-  }
   function compIdxFromDisplay(displayIdx) {
     return data.bodyComp.length - 1 - displayIdx;
   }

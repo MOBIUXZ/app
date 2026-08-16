@@ -264,6 +264,10 @@ Key implementation facts:
 
 After rebuild, confirm **all** of the following:
 
+### Spec-driven gate (required)
+- [ ] `npm run verify` passes (spec check + 73 tests + production build)
+- [ ] `spec/manifest.json` lists all JSON specs; code imports from `spec/` (not inline constants)
+
 ### Build & boot
 - [ ] `npm run build` succeeds with no errors
 - [ ] App loads at `localhost:5173` with dark theme and 5 nav tabs

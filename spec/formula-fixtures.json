@@ -1,0 +1,96 @@
+{
+  "e1rm": [
+    { "weight": 100, "reps": 1, "expected": 100 },
+    { "weight": 100, "reps": 5, "expected": 116.7 },
+    { "weight": 60, "reps": 10, "expected": 80 },
+    { "weight": 50, "reps": 0, "expected": null },
+    { "weight": 0, "reps": 5, "expected": null }
+  ],
+  "bodyComp": [
+    {
+      "id": "male-full",
+      "fields": {
+        "weight": "80",
+        "height": "180",
+        "bf": "15",
+        "smm": "35",
+        "age": "30",
+        "sex": "male",
+        "date": "11-08-2026"
+      },
+      "expected": {
+        "BW": 80,
+        "PBF": 15,
+        "FM": 12,
+        "FFM": 68,
+        "BMI": 24.7,
+        "FFMI": 21,
+        "FMI": 3.7,
+        "SMI": 10.8,
+        "BMR_Mifflin": 1780,
+        "BMR_Katch": 1838.8
+      }
+    },
+    {
+      "id": "female-minimal",
+      "fields": {
+        "weight": "60",
+        "height": "165",
+        "bf": "25",
+        "smm": "",
+        "age": "28",
+        "sex": "female",
+        "date": "01-01-2026"
+      },
+      "expected": {
+        "BW": 60,
+        "FM": 15,
+        "FFM": 45,
+        "BMR_Mifflin": 1330.25
+      }
+    }
+  ],
+  "sessionMetrics": [
+    {
+      "id": "bilateral-sets",
+      "sets": [
+        { "weight": 100, "reps": 5, "side": "both" },
+        { "weight": 100, "reps": 3, "side": "both" }
+      ],
+      "expected": {
+        "weight": 100,
+        "volume": 800,
+        "e1rm": 116.7,
+        "mean_e1rm": 113.3
+      }
+    },
+    {
+      "id": "split-sets",
+      "sets": [
+        { "weight": 30, "reps": 10, "side": "left" },
+        { "weight": 32, "reps": 8, "side": "right" }
+      ],
+      "expected": {
+        "weight": 32,
+        "weight_left": 30,
+        "weight_right": 32,
+        "volume": 556,
+        "volume_left": 300,
+        "volume_right": 256
+      }
+    },
+    {
+      "id": "failed-set",
+      "sets": [
+        { "weight": 100, "reps": 5, "side": "both" },
+        { "weight": 100, "reps": 0, "side": "both" }
+      ],
+      "expected": {
+        "weight": 100,
+        "volume": 500,
+        "e1rm": 116.7,
+        "mean_e1rm": 116.7
+      }
+    }
+  ]
+}

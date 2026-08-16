@@ -1,128 +1,26 @@
 import { useState, useEffect, useRef, createContext, useContext, useMemo } from "react";
 import ui from "../styles/ui.module.css";
 import { cx, btnPrimaryClass, btnSecondaryClass, btnDangerClass, inputClass, selectClass, textareaClass } from "../styles/styleHelpers.js";
+import exerciseAliasesSpec from "../../spec/exercise-aliases.json";
+import catalog from "../../spec/exercise-catalog.json";
 
 export { ui, cx, btnPrimaryClass, btnSecondaryClass, btnDangerClass, inputClass, selectClass, textareaClass };
 export { btnPrimaryClass as btnPrimary, btnSecondaryClass as btnSecondary, btnDangerClass as btnDanger, inputClass as inp };
 
-export const ACCENT = "#a78bfa";
-export const GREEN = "#34d399";
-export const PINK = "#f472b6";
-export const ORANGE = "#fb923c";
-export const BLUE = "#60a5fa";
+export const ACCENT = catalog.themeColors.accent;
+export const GREEN = catalog.themeColors.green;
+export const PINK = catalog.themeColors.pink;
+export const ORANGE = catalog.themeColors.orange;
+export const BLUE = catalog.themeColors.blue;
 
-export const EXERCISE_CATEGORIES = {
-  "Powerlifting": ["Squat", "Bench Press", "Deadlift", "Pause Squat", "Pause Bench", "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Box Squat", "Floor Press"],
-  "Weightlifting": ["Clean & Jerk", "Snatch", "Power Clean", "Power Snatch", "Push Press", "Hang Clean", "Hang Snatch", "Clean Pull", "Snatch Pull", "Front Squat", "Overhead Squat"],
-  "Calisthenics": ["Pull-up", "Push-up", "Dip", "Muscle-up", "Handstand Push-up", "Pistol Squat", "L-sit", "Front Lever", "Back Lever", "Human Flag"],
-  "Street Lifting": ["Weighted Pull-up", "Weighted Dip", "Weighted Push-up", "Weighted Muscle-up", "Ring Dip", "Ring Pull-up", "Ring Muscle-up", "Bar Muscle-up", "360 Pull-up", "Typewriter Pull-up"],
-  "Strongman": ["Log Press", "Axle Press", "Farmer's Walk", "Atlas Stone", "Yoke Carry", "Tire Flip", "Sandbag Carry", "Keg Toss", "Circus Dumbbell", "Car Deadlift"],
-  "Grip": ["Wrist Roller", "Plate Pinch", "Hub Lift", "Blob Lift", "Thick Bar Deadlift", "Captains of Crush", "Axle Deadlift", "Two-Finger Deadlift", "Fat Gripz Curl", "Block Weight Lift"],
-  "General": ["Overhead Press", "Barbell Row", "Dumbbell Curl", "Tricep Pushdown", "Leg Press", "Incline Bench", "Lateral Raise", "Face Pull", "Cable Row", "Hip Thrust"],
-};
-
+export const EXERCISE_CATEGORIES = catalog.exerciseCategories;
 export const ALL_EXERCISES = Object.values(EXERCISE_CATEGORIES).reduce(function (a, b) { return a.concat(b); }, []);
+export const NO_SPLIT_LIFTS = catalog.noSplitLifts;
+export const COMPOUND_LIFTS = catalog.compoundLifts;
+export const ACTIVITY = catalog.activityLevels;
+export const MONTH_MAP = catalog.monthMap;
 
-export const NO_SPLIT_LIFTS = [
-  "Squat", "Bench Press", "Deadlift", "Overhead Press", "Barbell Row", "Push Press",
-  "Pause Squat", "Pause Bench", "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Box Squat", "Floor Press",
-  "Front Squat", "Incline Bench",
-];
-
-export const COMPOUND_LIFTS = [
-  "Squat", "Bench Press", "Deadlift", "Overhead Press", "Push Press", "Barbell Row",
-  "Clean & Jerk", "Snatch", "Power Clean", "Power Snatch", "Front Squat", "Overhead Squat",
-  "Log Press", "Axle Press", "Yoke Carry", "Farmer's Walk",
-  "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Box Squat", "Floor Press", "Pause Squat", "Pause Bench",
-];
-
-export const ACTIVITY = [
-  { label: "Sedentary", desc: "Little/no exercise", mult: 1.2 },
-  { label: "Light", desc: "1-3 days/week", mult: 1.375 },
-  { label: "Moderate", desc: "3-5 days/week", mult: 1.55 },
-  { label: "Active", desc: "6-7 days/week", mult: 1.725 },
-  { label: "Very Active", desc: "Hard daily / 2x/day", mult: 1.9 },
-];
-
-export const MONTH_MAP = { january: 0, february: 1, march: 2, april: 3, may: 4, june: 5, july: 6, august: 7, september: 8, october: 9, november: 10, december: 11, jan: 0, feb: 1, mar: 2, apr: 3, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
-
-var EXERCISE_ALIASES = {
-  ohp: "Overhead Press",
-  "overhead press": "Overhead Press",
-  squat: "Squat",
-  squats: "Squat",
-  sq: "Squat",
-  "back squat": "Squat",
-  bench: "Bench Press",
-  "bench press": "Bench Press",
-  bp: "Bench Press",
-  deadlift: "Deadlift",
-  deadlifts: "Deadlift",
-  dl: "Deadlift",
-  rdl: "Romanian Deadlift",
-  "romanian deadlift": "Romanian Deadlift",
-  sumo: "Sumo Deadlift",
-  "sumo deadlift": "Sumo Deadlift",
-  "barbell row": "Barbell Row",
-  "barbell rows": "Barbell Row",
-  "bb row": "Barbell Row",
-  "bent over row": "Barbell Row",
-  row: "Barbell Row",
-  "clean and jerk": "Clean & Jerk",
-  "clean & jerk": "Clean & Jerk",
-  snatch: "Snatch",
-  "power clean": "Power Clean",
-  "push press": "Push Press",
-  pushpress: "Push Press",
-  "push-press": "Push Press",
-  "front squat": "Front Squat",
-  fs: "Front Squat",
-  "log press": "Log Press",
-  "axle press": "Axle Press",
-  "pull up": "Pull-up",
-  "pull-up": "Pull-up",
-  pullup: "Pull-up",
-  "chin up": "Pull-up",
-  "push up": "Push-up",
-  "push-up": "Push-up",
-  pushup: "Push-up",
-  dip: "Dip",
-  "muscle up": "Muscle-up",
-  "muscle-up": "Muscle-up",
-  curl: "Dumbbell Curl",
-  "db curl": "Dumbbell Curl",
-  tricep: "Tricep Pushdown",
-  "tricep pushdown": "Tricep Pushdown",
-  "leg press": "Leg Press",
-  "incline bench": "Incline Bench",
-  incline: "Incline Bench",
-  "lateral raise": "Lateral Raise",
-  "face pull": "Face Pull",
-  "single arm latpulldown": "Single Arm Lat Pulldown",
-  "single arm lat pulldown": "Single Arm Lat Pulldown",
-  "rear delt machine flyes": "Rear Delt Machine Fly",
-  "rear delt machine fly": "Rear Delt Machine Fly",
-  "alternate dumbell hammer curls": "Alternate Dumbbell Hammer Curl",
-  "alternate dumbbell hammer curls": "Alternate Dumbbell Hammer Curl",
-  "alternate dumbbell hammer curl": "Alternate Dumbbell Hammer Curl",
-  "hip thrust": "Hip Thrust",
-  "farmers walk": "Farmer's Walk",
-  "farmer's walk": "Farmer's Walk",
-  yoke: "Yoke Carry",
-  "atlas stone": "Atlas Stone",
-  "tire flip": "Tire Flip",
-  "bw pushups": "Push-up",
-  "bw pushup": "Push-up",
-  "bw pullups": "Pull-up",
-  "bw pullup": "Pull-up",
-  "bw dips": "Dip",
-  "bw dip": "Dip",
-  "wtd pushups": "Weighted Push-up",
-  "wtd pushup": "Weighted Push-up",
-  "wtd pullups": "Weighted Pull-up",
-  "wtd pullup": "Weighted Pull-up",
-  "rear delt machine lfyes": "Rear Delt Machine Fly",
-};
+var EXERCISE_ALIASES = exerciseAliasesSpec;
 
 export function resolveExercise(raw) {
   var text = String(raw || "").trim();
@@ -143,14 +41,7 @@ export function isCompoundLift(exercise) {
   return COMPOUND_LIFTS.indexOf(resolveExercise(exercise)) !== -1;
 }
 
-var COMPOUND_DISPLAY_NAMES = {
-  "Overhead Press": "OVERHEAD PRESS",
-  "Push Press": "PUSHPRESS",
-  "Barbell Row": "BARBELL ROWS",
-  "Squat": "SQUATS",
-  "Deadlift": "DEADLIFTS",
-  "Bench Press": "BENCH PRESS",
-};
+var COMPOUND_DISPLAY_NAMES = catalog.compoundDisplayNames;
 
 export function formatExerciseName(exercise) {
   var resolved = resolveExercise(exercise);
@@ -159,16 +50,8 @@ export function formatExerciseName(exercise) {
   return resolved.toUpperCase();
 }
 
-export var EXERCISE_CHART_COLORS = {
-  "Overhead Press": "#ef4444",
-  "Barbell Row": "#22c55e",
-  "Push Press": "#eab308",
-  "Bench Press": "#fb923c",
-  "Squat": "#3b82f6",
-  "Deadlift": "#a78bfa",
-};
-
-var EXERCISE_CHART_FALLBACK = ["#60a5fa", "#f472b6", "#f59e0b", "#e879f9", "#34d399", "#818cf8", "#fb7185", "#6b7280"];
+export var EXERCISE_CHART_COLORS = catalog.chartColors;
+var EXERCISE_CHART_FALLBACK = catalog.chartColorFallback;
 
 export function getExerciseChartColor(exercise, fallbackIdx) {
   var ex = resolveExercise(exercise);

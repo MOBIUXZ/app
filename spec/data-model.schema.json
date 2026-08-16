@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fittrack.local/spec/data-model.schema.json",
+  "title": "FitTrack ft_v5 Data Model",
+  "description": "localStorage persistence schema for FitTrack",
+  "type": "object",
+  "required": ["workouts", "bodyLogs", "bodyComp", "calories"],
+  "additionalProperties": false,
+  "properties": {
+    "workouts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/WorkoutEntry" }
+    },
+    "bodyLogs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/BodyLogEntry" }
+    },
+    "bodyComp": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/BodyCompEntry" }
+    },
+    "calories": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/CalorieEntry" }
+    }
+  },
+  "$defs": {
+    "WorkoutSet": {
+      "type": "object",
+      "required": ["weight", "reps"],
+      "properties": {
+        "weight": { "type": "number" },
+        "reps": { "type": "number" },
+        "time": { "type": "string" },
+        "note": { "type": "string" },
+        "side": { "type": "string", "enum": ["left", "right", "both"] }
+      },
+      "additionalProperties": false
+    },
+    "WorkoutEntry": {
+      "type": "object",
+      "required": ["exercise", "date", "sets"],
+      "properties": {
+        "exercise": { "type": "string" },
+        "date": { "type": "string", "pattern": "^\\d{2}-\\d{2}-\\d{4}$" },
+        "time": { "type": "string" },
+        "note": { "type": "string" },
+        "sets": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/WorkoutSet" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "BodyLogEntry": {
+      "type": "object",
+      "required": ["weight", "date"],
+      "properties": {
+        "weight": { "type": "number" },
+        "date": { "type": "string", "pattern": "^\\d{2}-\\d{2}-\\d{4}$" }
+      },
+      "additionalProperties": false
+    },
+    "BodyCompEntry": {
+      "type": "object",
+      "required": ["date", "weight", "bf"],
+      "properties": {
+        "date": { "type": "string" },
+        "weight": { "type": "number" },
+        "height": { "type": ["number", "null"] },
+        "bf": { "type": "number" },
+        "smm": { "type": ["number", "null"] },
+        "waist": { "type": ["number", "null"] },
+        "age": { "type": ["number", "null"] },
+        "sex": { "type": "string", "enum": ["male", "female"] },
+        "BW": { "type": "number" },
+        "PBF": { "type": "number" },
+        "FM": { "type": ["number", "null"] },
+        "FFM": { "type": ["number", "null"] },
+        "BMI": { "type": ["number", "null"] },
+        "FFMI": { "type": ["number", "null"] },
+        "FMI": { "type": ["number", "null"] },
+        "SMM": { "type": ["number", "null"] },
+        "SMI": { "type": ["number", "null"] },
+        "BMR_Mifflin": { "type": ["number", "null"] },
+        "BMR_Katch": { "type": ["number", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "CalorieEntry": {
+      "type": "object",
+      "required": ["food", "calories", "date"],
+      "properties": {
+        "food": { "type": "string" },
+        "calories": { "type": "number" },
+        "protein": { "type": "number" },
+        "carbs": { "type": "number" },
+        "fat": { "type": "number" },
+        "date": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

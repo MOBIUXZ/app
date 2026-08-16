@@ -4,6 +4,16 @@ FitTrack is a client-side fitness tracking web app built with **React** and **Vi
 
 ---
 
+## Spec-driven development
+
+| Document | Purpose |
+|----------|---------|
+| **[CONSTITUTION.md](./CONSTITUTION.md)** | Governing rules — specs are source of truth |
+| **[SDD-WORKFLOW.md](./SDD-WORKFLOW.md)** | Commands (`npm test`, `npm run verify`) and change workflow |
+| [../spec/manifest.json](../spec/manifest.json) | Index of all machine-readable specs |
+
+---
+
 ## Reconstruction (start here for full rebuild)
 
 | Document | Purpose |

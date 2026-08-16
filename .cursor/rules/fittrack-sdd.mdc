@@ -1,0 +1,33 @@
+---
+description: FitTrack spec-driven development rules — read before editing specs, parser, formulas, or constants
+globs:
+  - spec/**
+  - tests/**
+  - src/**
+  - docs/**
+alwaysApply: true
+---
+
+# FitTrack SDD Rules
+
+Read `docs/CONSTITUTION.md` and `spec/manifest.json` before non-trivial work.
+
+## Change order (mandatory)
+
+1. Update `spec/*.json` (+ docs if user-visible)
+2. Update `tests/` fixtures or assertions
+3. Implement in `src/domain/` or `src/components/`
+4. Run `npm run verify` — must pass
+
+## Source of truth
+
+- Constants: `spec/exercise-aliases.json`, `spec/exercise-catalog.json`, `spec/app-config.json`
+- Formulas: `spec/formula-fixtures.json` → `src/domain/metrics.js`
+- Parser: `spec/parser-fixtures.json` → `parseWorkoutText()` in `shared.jsx`
+- Schema: `spec/data-model.schema.json`
+
+Never duplicate spec data inline in source files.
+
+## Before finishing
+
+Run `npm run verify`. Update `spec/file-tree.json` and `docs/source-index.md` when adding/removing files.

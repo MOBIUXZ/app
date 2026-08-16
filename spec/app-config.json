@@ -1,0 +1,17 @@
+{
+  "storageKey": "ft_v5",
+  "defaultData": {
+    "workouts": [],
+    "bodyLogs": [],
+    "bodyComp": [],
+    "calories": []
+  },
+  "dateFormat": "DD-MM-YYYY",
+  "chartAnimation": {
+    "trendToggleMs": 600,
+    "sessionGraphMs": 600,
+    "firstPaintMs": 0,
+    "easing": "ease-in-out"
+  },
+  "tabs": ["dashboard", "workout", "body", "calories", "progress"]
+}

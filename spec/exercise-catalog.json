@@ -1,0 +1,59 @@
+{
+  "themeColors": {
+    "accent": "#a78bfa",
+    "green": "#34d399",
+    "pink": "#f472b6",
+    "orange": "#fb923c",
+    "blue": "#60a5fa"
+  },
+  "exerciseCategories": {
+    "Powerlifting": ["Squat", "Bench Press", "Deadlift", "Pause Squat", "Pause Bench", "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Box Squat", "Floor Press"],
+    "Weightlifting": ["Clean & Jerk", "Snatch", "Power Clean", "Power Snatch", "Push Press", "Hang Clean", "Hang Snatch", "Clean Pull", "Snatch Pull", "Front Squat", "Overhead Squat"],
+    "Calisthenics": ["Pull-up", "Push-up", "Dip", "Muscle-up", "Handstand Push-up", "Pistol Squat", "L-sit", "Front Lever", "Back Lever", "Human Flag"],
+    "Street Lifting": ["Weighted Pull-up", "Weighted Dip", "Weighted Push-up", "Weighted Muscle-up", "Ring Dip", "Ring Pull-up", "Ring Muscle-up", "Bar Muscle-up", "360 Pull-up", "Typewriter Pull-up"],
+    "Strongman": ["Log Press", "Axle Press", "Farmer's Walk", "Atlas Stone", "Yoke Carry", "Tire Flip", "Sandbag Carry", "Keg Toss", "Circus Dumbbell", "Car Deadlift"],
+    "Grip": ["Wrist Roller", "Plate Pinch", "Hub Lift", "Blob Lift", "Thick Bar Deadlift", "Captains of Crush", "Axle Deadlift", "Two-Finger Deadlift", "Fat Gripz Curl", "Block Weight Lift"],
+    "General": ["Overhead Press", "Barbell Row", "Dumbbell Curl", "Tricep Pushdown", "Leg Press", "Incline Bench", "Lateral Raise", "Face Pull", "Cable Row", "Hip Thrust"]
+  },
+  "noSplitLifts": [
+    "Squat", "Bench Press", "Deadlift", "Overhead Press", "Barbell Row", "Push Press",
+    "Pause Squat", "Pause Bench", "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Box Squat", "Floor Press",
+    "Front Squat", "Incline Bench"
+  ],
+  "compoundLifts": [
+    "Squat", "Bench Press", "Deadlift", "Overhead Press", "Push Press", "Barbell Row",
+    "Clean & Jerk", "Snatch", "Power Clean", "Power Snatch", "Front Squat", "Overhead Squat",
+    "Log Press", "Axle Press", "Yoke Carry", "Farmer's Walk",
+    "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Box Squat", "Floor Press", "Pause Squat", "Pause Bench"
+  ],
+  "compoundDisplayNames": {
+    "Overhead Press": "OVERHEAD PRESS",
+    "Push Press": "PUSHPRESS",
+    "Barbell Row": "BARBELL ROWS",
+    "Squat": "SQUATS",
+    "Deadlift": "DEADLIFTS",
+    "Bench Press": "BENCH PRESS"
+  },
+  "activityLevels": [
+    { "label": "Sedentary", "desc": "Little/no exercise", "mult": 1.2 },
+    { "label": "Light", "desc": "1-3 days/week", "mult": 1.375 },
+    { "label": "Moderate", "desc": "3-5 days/week", "mult": 1.55 },
+    { "label": "Active", "desc": "6-7 days/week", "mult": 1.725 },
+    { "label": "Very Active", "desc": "Hard daily / 2x/day", "mult": 1.9 }
+  ],
+  "monthMap": {
+    "january": 0, "february": 1, "march": 2, "april": 3, "may": 4, "june": 5,
+    "july": 6, "august": 7, "september": 8, "october": 9, "november": 10, "december": 11,
+    "jan": 0, "feb": 1, "mar": 2, "apr": 3, "jun": 5, "jul": 6, "aug": 7,
+    "sep": 8, "oct": 9, "nov": 10, "dec": 11
+  },
+  "chartColors": {
+    "Overhead Press": "#ef4444",
+    "Barbell Row": "#22c55e",
+    "Push Press": "#eab308",
+    "Bench Press": "#fb923c",
+    "Squat": "#3b82f6",
+    "Deadlift": "#a78bfa"
+  },
+  "chartColorFallback": ["#60a5fa", "#f472b6", "#f59e0b", "#e879f9", "#34d399", "#818cf8", "#fb7185", "#6b7280"]
+}

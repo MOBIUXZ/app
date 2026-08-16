@@ -1,0 +1,62 @@
+{
+  "$schema": "./manifest.schema.json",
+  "version": 1,
+  "description": "FitTrack machine-readable specification manifest. Specs are the source of truth; code and docs must conform.",
+  "specs": [
+    {
+      "id": "exercise-aliases",
+      "path": "spec/exercise-aliases.json",
+      "governs": ["resolveExercise()", "Smart Parser exercise headers"],
+      "docs": ["docs/data-model.md", "docs/shared-utilities.md"]
+    },
+    {
+      "id": "exercise-catalog",
+      "path": "spec/exercise-catalog.json",
+      "governs": ["EXERCISE_CATEGORIES", "COMPOUND_LIFTS", "chart colors", "TDEE activity levels"],
+      "docs": ["docs/data-model.md", "docs/workout.md", "docs/progress.md"]
+    },
+    {
+      "id": "app-config",
+      "path": "spec/app-config.json",
+      "governs": ["localStorage key", "default data shape", "chart animation timing"],
+      "docs": ["docs/architecture.md", "docs/progress.md", "docs/data-model.md"]
+    },
+    {
+      "id": "data-model",
+      "path": "spec/data-model.schema.json",
+      "governs": ["ft_v5 persistence schema"],
+      "docs": ["docs/data-model.md"]
+    },
+    {
+      "id": "parser-fixtures",
+      "path": "spec/parser-fixtures.json",
+      "governs": ["parseWorkoutText() contract"],
+      "docs": ["docs/workout.md", "docs/shared-utilities.md"]
+    },
+    {
+      "id": "formula-fixtures",
+      "path": "spec/formula-fixtures.json",
+      "governs": ["estimate1RM", "computeSessionMetrics", "computeBodyCompEntry"],
+      "docs": ["docs/data-model.md", "docs/progress.md", "docs/body-comp.md"]
+    },
+    {
+      "id": "resolve-exercise-fixtures",
+      "path": "spec/resolve-exercise-fixtures.json",
+      "governs": ["resolveExercise() alias and normalization rules"],
+      "docs": ["docs/shared-utilities.md"]
+    },
+    {
+      "id": "file-tree",
+      "path": "spec/file-tree.json",
+      "governs": ["expected project source layout"],
+      "docs": ["docs/source-index.md", "docs/RECONSTRUCTION.md"]
+    }
+  ],
+  "testSuites": [
+    { "path": "tests/parser.test.js", "spec": "parser-fixtures" },
+    { "path": "tests/resolve-exercise.test.js", "spec": "resolve-exercise-fixtures" },
+    { "path": "tests/metrics.test.js", "spec": "formula-fixtures" },
+    { "path": "tests/file-tree.test.js", "spec": "file-tree" },
+    { "path": "tests/spec-integrity.test.js", "spec": "manifest" }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "resolveExercise": [
+    { "input": "ohp", "expected": "Overhead Press" },
+    { "input": "==SQUAT==", "expected": "Squat" },
+    { "input": "**bench press**", "expected": "Bench Press" },
+    { "input": "bw pushups", "expected": "Push-up" },
+    { "input": "wtd pullup", "expected": "Weighted Pull-up" },
+    { "input": "rdl", "expected": "Romanian Deadlift" },
+    { "input": "custom movement", "expected": "Custom Movement" },
+    { "input": "[[Overhead Press]]", "expected": "Overhead Press" }
+  ]
+}
