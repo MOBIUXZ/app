@@ -715,16 +715,6 @@
   width: 90%;
 }
 
-.parserHeaderRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.parserIcon {
-  font-size: 18px;
-}
-
 .parsePreviewBox {
   background: var(--ft-bg-card-alt);
   border: 1px solid var(--ft-border);

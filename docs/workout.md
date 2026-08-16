@@ -27,7 +27,7 @@ Opens a full-screen calendar modal with two views:
 
 ### Smart Parser
 
-Bulk-import workouts by pasting free-form text. Opens a modal with a textarea and **Parse & Save** button.
+Bulk-import workouts by pasting free-form text. Opens a modal titled **🧠 Smart Parser** (one emoji from the layout spec) with a textarea and **Parse & Save** button.
 
 See [shared-utilities.md](./shared-utilities.md#smart-parser) for supported formats.
 

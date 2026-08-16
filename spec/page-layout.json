@@ -62,7 +62,7 @@
         { "id": "calendarModal", "title": "📅 Workout Calendar", "layerId": "calendar-modal" },
         { "id": "calendarDay", "title": "Day detail", "layerId": "calendar-day-panel", "staysMountedUnder": "calendarLog" },
         { "id": "calendarLog", "title": "✍️ Manual Log", "altTitle": "🧠 Smart Paste", "layerId": "calendar-log-panel", "stacksOver": "calendarDay" },
-        { "id": "smartParser", "title": "🧠 Smart Parser", "layerId": "smart-parser", "submitLabel": "Parse & Save" },
+        { "id": "smartParser", "title": "🧠 Smart Parser", "layerId": "smart-parser", "submitLabel": "Parse & Save", "iconInTitle": true },
         { "id": "setPicker", "title": "Select a logged set", "layerId": "set-picker" },
         { "id": "clearHistory", "title": "Clear Workout History?", "layerId": "clear-workout-history", "buttons": ["Cancel", "Clear History"] }
       ]

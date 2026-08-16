@@ -814,10 +814,7 @@ Bench Press
         <div className={cx("ft-kb-modal-backdrop", ui.modalBackdrop)} style={{ zIndex: smartParserLayer.zIndex }}>
           <div className={s.parserModalPanel} tabIndex={-1}>
             <div className={ui.modalHeader}>
-              <div className={s.parserHeaderRow}>
-                <span className={s.parserIcon}>🧠</span>
-                <span className={ui.modalTitle}>{getModalSpec("workout", "smartParser").title}</span>
-              </div>
+              <span className={ui.modalTitle}>{getModalSpec("workout", "smartParser").title}</span>
               <button type="button" onClick={function () { setShowSmartParserModal(false); setParseMsg(""); setParsePreview(null); }} className={ui.modalClose}>✕</button>
             </div>
             
