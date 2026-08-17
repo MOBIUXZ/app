@@ -99,8 +99,9 @@
       },
       "modals": [
         { "id": "calendarModal", "title": "📅 Workout Calendar", "layerId": "calendar-modal", "monthMaxWidthPx": 389, "yearMaxWidthPx": 680 },
-        { "id": "calendarDay", "title": "Day detail", "layerId": "calendar-day-panel", "staysMountedUnder": "calendarLog" },
+        { "id": "calendarDay", "title": "Day detail", "layerId": "calendar-day-panel", "staysMountedUnder": ["calendarLog", "deleteCalendarEntry"] },
         { "id": "calendarLog", "title": "✍️ Manual Log", "altTitle": "🧠 Smart Paste", "layerId": "calendar-log-panel", "stacksOver": "calendarDay" },
+        { "id": "deleteCalendarEntry", "title": "Delete this workout?", "layerId": "delete-calendar-entry", "buttons": ["Cancel", "Delete"], "body": "This will permanently delete {exercise} on {date}.", "stacksOver": "calendarDay", "enterClass": "ft-kb-modal-backdrop", "portal": true, "zIndexFloor": 2000 },
         { "id": "smartParser", "title": "🧠 Smart Parser", "layerId": "smart-parser", "submitLabel": "Parse & Save", "iconInTitle": true },
         { "id": "setPicker", "title": "Select a logged set", "layerId": "set-picker" },
         { "id": "clearHistory", "title": "Clear Workout History?", "layerId": "clear-workout-history", "buttons": ["Cancel", "Clear History"] },

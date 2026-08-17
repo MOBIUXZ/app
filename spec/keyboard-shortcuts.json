@@ -23,13 +23,15 @@
   "confirmDialog": {
     "switchKeys": ["ArrowLeft", "ArrowRight", "Tab"],
     "defaultFocus": "cancel",
-    "focusStyle": "filled"
+    "focusStyle": "filled",
+    "ignoreBackdropClickMs": 600
   },
   "popups": [
     { "id": "smart-parser", "layerId": "smart-parser", "closeKey": "Escape" },
     { "id": "calendar-modal", "layerId": "calendar-modal", "closeKey": "Escape" },
-    { "id": "calendar-day-panel", "layerId": "calendar-day-panel", "closeKey": "Escape", "staysMountedUnder": "calendar-log-panel" },
+    { "id": "calendar-day-panel", "layerId": "calendar-day-panel", "closeKey": "Escape", "staysMountedUnder": ["calendar-log-panel", "delete-calendar-entry"] },
     { "id": "calendar-log-panel", "layerId": "calendar-log-panel", "closeKey": "Escape", "stacksOver": "calendar-day-panel", "enterClass": "ft-kb-modal-backdrop" },
+    { "id": "delete-calendar-entry", "layerId": "delete-calendar-entry", "closeKey": "Escape", "stacksOver": "calendar-day-panel", "enterClass": "ft-kb-modal-backdrop" },
     { "id": "clear-workout-history", "layerId": "clear-workout-history" },
     { "id": "delete-workout-entry", "layerId": "delete-workout-entry" },
     { "id": "clear-body-comp-history", "layerId": "clear-body-comp-history" },
@@ -37,7 +39,7 @@
     { "id": "set-picker", "layerId": "set-picker", "closeKey": "Escape" }
   ],
   "calendarStack": {
-    "order": ["calendar-modal", "calendar-day-panel", "calendar-log-panel"],
+    "order": ["calendar-modal", "calendar-day-panel", "calendar-log-panel", "delete-calendar-entry"],
     "dayPanelStaysMounted": true,
     "logEnterAnimation": "same-as-day"
   },

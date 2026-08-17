@@ -36,6 +36,7 @@
       "items": [
         { "id": "hero", "check": "Hero shows a filled stat strip: workout count, unique count, and today's date" },
         { "id": "calendar", "check": "Open Calendar — month grid, logged days highlighted" },
+        { "id": "calendar-delete", "check": "Day panel trash opens Delete this workout? on a layer above the day panel; Esc/Cancel returns to the day, not the month grid" },
         { "id": "parser", "check": "Smart Parser modal opens; Enter parses, Esc closes", "visualSnapshot": "workout-smart-parser" },
         { "id": "history", "check": "Workout History Newest-by-date shows latest DD-MM-YYYY day first; search matches exercise name or date; Collapse all stays collapsed when switching Date / Workout" }
       ]

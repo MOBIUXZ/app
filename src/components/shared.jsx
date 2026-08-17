@@ -622,21 +622,36 @@ export function useParserTextareaKeyboard(textareaRef, onSubmit, active) {
 export function useConfirmDialogKeyboard(open, onConfirm, onCancel, layerId, labels) {
   var [focusIdx, setFocusIdx] = useState(0);
   var [activatedIdx, setActivatedIdx] = useState(-1);
+  var [armed, setArmed] = useState(false);
   var dialogRef = useRef(null);
   var flashTimer = useRef(null);
   var cancelLabel = labels && labels.cancel ? labels.cancel : "Cancel";
   var confirmLabel = labels && labels.confirm ? labels.confirm : "Confirm";
+  var ignoreBackdropMs = keyboardSpec.confirmDialog.ignoreBackdropClickMs || 0;
+  var actionsLocked = open && !armed;
 
   useEffect(function () {
     return function () { if (flashTimer.current) clearTimeout(flashTimer.current); };
   }, []);
 
   useEffect(function () {
-    if (open) {
-      setFocusIdx(0);
-      setTimeout(function () { if (dialogRef.current) dialogRef.current.focus(); }, 0);
-    }
+    if (open) setFocusIdx(0);
   }, [open]);
+
+  useEffect(function () {
+    if (!open || !armed) return;
+    if (dialogRef.current) dialogRef.current.focus();
+  }, [open, armed]);
+
+  useEffect(function () {
+    if (!open) {
+      setArmed(false);
+      return;
+    }
+    setArmed(false);
+    var timer = setTimeout(function () { setArmed(true); }, ignoreBackdropMs);
+    return function () { clearTimeout(timer); };
+  }, [open, ignoreBackdropMs]);
 
   function flashActivate(idx) {
     setActivatedIdx(idx);
@@ -646,6 +661,7 @@ export function useConfirmDialogKeyboard(open, onConfirm, onCancel, layerId, lab
 
   function handleLayerKey(e) {
     if (!open) return;
+    if (actionsLocked && e.key === "Enter") return;
     if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
       e.preventDefault();
       setFocusIdx(0);
@@ -668,6 +684,12 @@ export function useConfirmDialogKeyboard(open, onConfirm, onCancel, layerId, lab
 
   var layer = useKeyboardLayer(layerId || "confirm-dialog", open, handleLayerKey);
 
+  function onBackdropClick(e) {
+    if (e.target !== e.currentTarget) return;
+    if (actionsLocked) return;
+    onCancel();
+  }
+
   function btnClass(idx) {
     var classes = [];
     var kb = keyboardSpec.cssClasses;
@@ -684,6 +706,8 @@ export function useConfirmDialogKeyboard(open, onConfirm, onCancel, layerId, lab
     focusIdx: focusIdx,
     setFocusIdx: setFocusIdx,
     btnClass: btnClass,
+    onBackdropClick: onBackdropClick,
+    actionsLocked: actionsLocked,
     zIndex: layer.zIndex,
     focusLabel: focusIdx === 0 ? cancelLabel : confirmLabel,
   };

@@ -71,8 +71,9 @@ Hovering an item with the mouse updates keyboard focus on most lists (Dashboard 
 | **Calendar → Smart Parser** | Same as Smart Parser | |
 | **1RM set picker** | ↑↓ sets · Enter load · Esc close | Search input ignores arrows |
 | **Calendar modal** | Esc close | |
-| **Calendar day panel** | Esc close | Stays mounted under Manual Log / Smart Paste |
+| **Calendar day panel** | Esc close | Stays mounted under Manual Log / Smart Paste and the calendar delete confirm |
 | **Calendar log / Smart Paste** | Esc back to day | Same fade-in as day panel; stacks on top |
+| **Calendar delete confirm** | `←` `→` / Tab · Enter select · Esc cancel | Stacks over the day panel; Cancel/Esc returns to the day, not the month grid |
 | **Progress workout detail** | ↑↓ cards · Esc close | |
 | **Workout History list** | ↑↓ entries · Enter edit · Esc clear focus | Mouse hover does not move focus |
 | **Calories activity level** | ↑↓ levels · Enter select · Esc clear focus | Mouse hover does not move focus; green keyboard outline |
@@ -87,7 +88,7 @@ Hovering an item with the mouse updates keyboard focus on most lists (Dashboard 
 
 ### Delete Entry Dialog
 
-Same two-button confirm pattern as Clear History, with **Cancel** / **Delete**. Used for Body Comp History and Workout History trash-can deletes. Esc cancels.
+Same two-button confirm pattern as Clear History, with **Cancel** / **Delete**. Used for Body Comp History, Workout History, and Calendar day-panel trash-can deletes. Esc cancels (on the calendar, Esc returns to the day panel). The calendar confirm is portaled above the calendar stack so the opening trash click cannot close it.
 
 ## Implementation
 

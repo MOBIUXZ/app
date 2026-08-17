@@ -133,8 +133,9 @@ State is local to `WorkoutPage` — not lifted to App except via `save()`.
 | `calendar-modal` | Workout calendar | Stack order |
 | `calendar-day-panel` | Date selected (stays mounted under log/parse) | Above calendar |
 | `calendar-log-panel` | Manual Log or Smart Paste | Above day panel; same `ft-kb-modal-backdrop` fade-in |
+| `delete-calendar-entry` | Confirm delete from day panel trash | Portaled above the calendar stack (`zIndexFloor` 2000); day panel stays mounted |
 
-`Esc` on log/parse returns to the day panel; `Esc` on the day panel closes it and returns to the calendar.
+`Esc` on the delete confirm cancels and returns to the day panel. `Esc` on log/parse returns to the day panel; `Esc` on the day panel closes it and returns to the calendar.
 
 ---
 

@@ -83,12 +83,36 @@ describe('page layout spec (spec/page-layout.json)', function () {
     var day = getModalSpec('workout', 'calendarDay');
     var log = getModalSpec('workout', 'calendarLog');
     expect(day.layerId).toBe('calendar-day-panel');
-    expect(day.staysMountedUnder).toBe('calendarLog');
+    expect(day.staysMountedUnder).toEqual(['calendarLog', 'deleteCalendarEntry']);
     expect(log.layerId).toBe('calendar-log-panel');
     expect(log.stacksOver).toBe('calendarDay');
     var source = readFileSync(resolve(root, pageLayout.pages.workout.component), 'utf8');
     expect(source.indexOf('calDayOpen = showCalendarModal && !!calSelectedDate;') !== -1).toBe(true);
     expect(source.indexOf('calDayOpen = showCalendarModal && !!calSelectedDate && calPanel === "view"') === -1).toBe(true);
+  });
+
+  it('calendar day panel delete asks for confirmation on a stacked layer', function () {
+    var modal = getModalSpec('workout', 'deleteCalendarEntry');
+    var day = getModalSpec('workout', 'calendarDay');
+    expect(modal.title).toBe('Delete this workout?');
+    expect(modal.layerId).toBe('delete-calendar-entry');
+    expect(modal.buttons).toEqual(['Cancel', 'Delete']);
+    expect(modal.body).toContain('{exercise}');
+    expect(modal.body).toContain('{date}');
+    expect(modal.stacksOver).toBe('calendarDay');
+    expect(modal.enterClass).toBe('ft-kb-modal-backdrop');
+    expect(modal.portal).toBe(true);
+    expect(modal.zIndexFloor).toBe(2000);
+    expect(day.staysMountedUnder).toContain('deleteCalendarEntry');
+    var source = readFileSync(resolve(root, pageLayout.pages.workout.component), 'utf8');
+    expect(source.indexOf('btnIconDeleteCal') !== -1).toBe(true);
+    expect(source.indexOf('delW(w._idx)') === -1).toBe(true);
+    expect(source.indexOf('requestDelete(w._idx)') !== -1).toBe(true);
+    expect(source.indexOf('deleteCalendarModal.layerId') !== -1).toBe(true);
+    expect(source.indexOf('createPortal') !== -1).toBe(true);
+    expect(source.indexOf('pendingDeleteRef') !== -1).toBe(true);
+    expect(source.indexOf('onBackdropClick') !== -1).toBe(true);
+    expect(source.indexOf('actionsLocked') !== -1).toBe(true);
   });
 
   it('workout hero uses a filled stat strip under the title', function () {

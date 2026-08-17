@@ -33,6 +33,7 @@ describe('keyboard shortcuts spec', function () {
   it('confirm dialog uses filled button focus', function () {
     expect(keyboardSpec.confirmDialog.focusStyle).toBe('filled');
     expect(keyboardSpec.confirmDialog.defaultFocus).toBe('cancel');
+    expect(keyboardSpec.confirmDialog.ignoreBackdropClickMs).toBeGreaterThan(0);
   });
 
   it('calendar log/parse stacks over a mounted day panel', function () {
@@ -40,13 +41,18 @@ describe('keyboard shortcuts spec', function () {
       'calendar-modal',
       'calendar-day-panel',
       'calendar-log-panel',
+      'delete-calendar-entry',
     ]);
     expect(keyboardSpec.calendarStack.dayPanelStaysMounted).toBe(true);
     expect(keyboardSpec.calendarStack.logEnterAnimation).toBe('same-as-day');
     var day = keyboardSpec.popups.find(function (p) { return p.id === 'calendar-day-panel'; });
     var log = keyboardSpec.popups.find(function (p) { return p.id === 'calendar-log-panel'; });
-    expect(day.staysMountedUnder).toBe('calendar-log-panel');
+    var del = keyboardSpec.popups.find(function (p) { return p.id === 'delete-calendar-entry'; });
+    expect(day.staysMountedUnder).toEqual(['calendar-log-panel', 'delete-calendar-entry']);
     expect(log.stacksOver).toBe('calendar-day-panel');
     expect(log.enterClass).toBe(keyboardSpec.cssClasses.modalBackdrop);
+    expect(del.stacksOver).toBe('calendar-day-panel');
+    expect(del.enterClass).toBe(keyboardSpec.cssClasses.modalBackdrop);
+    expect(del.closeKey).toBe('Escape');
   });
 });

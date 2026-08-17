@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, formatExerciseName, btnPrimary, btnSecondary, btnDanger, inputClass, selectClass, textareaClass, formatDate, useKeyboardListNav, useConfirmDialogKeyboard, handleParserTextareaKeyDown, useParserTextareaKeyboard, useKeyboardLayer, isTypingTarget, ui, cx } from "./shared";
 import { computeOneRM, TRAINING_PERCENTAGES, DEFAULT_ONE_RM_FORMULA, ONE_RM_FORMULAS, collectLoggedSets } from "../domain/oneRm.js";
 import { getPageLayout, getCollapseSpec, getModalSpec, isHistoryGroupExpanded, nextHistoryGroupToggle, nextHistoryGroupsAll, areAllHistoryGroupsExpanded, matchesHistorySearch, parseStoredDate, sortHistoryWorkouts, formatHeroTodayDate, formatTemplateLabel } from "../domain/pageLayout.js";
@@ -176,6 +177,7 @@ export default function WorkoutPage({ data, save }) {
   var [groupsDefaultExpanded, setGroupsDefaultExpanded] = useState(workoutLayout.historyGroups.defaultExpanded);
   var [showClearConfirm, setShowClearConfirm] = useState(false);
   var [pendingDeleteIdx, setPendingDeleteIdx] = useState(null);
+  var pendingDeleteRef = useRef(null);
   var [hoveredGroup, setHoveredGroup] = useState(null);
   var [showCalendarModal, setShowCalendarModal] = useState(false);
   var [calendarView, setCalendarView] = useState("month");
@@ -222,7 +224,13 @@ export default function WorkoutPage({ data, save }) {
 
   function changeCat(c) { setCat(c); setEx(EXERCISE_CATEGORIES[c][0]); }
 
-  function closeCalModal() { setShowCalendarModal(false); setCalSelectedDate(null); setCalPanel("view"); setCalLogMsg(""); }
+  function closeCalModal() {
+    if (pendingDeleteRef.current != null) return;
+    setShowCalendarModal(false);
+    setCalSelectedDate(null);
+    setCalPanel("view");
+    setCalLogMsg("");
+  }
   function handleCalDayClick(dateStr, mIdxOverride) {
     setCalSelectedDate(dateStr);
     setCalPanel("view");
@@ -302,15 +310,23 @@ export default function WorkoutPage({ data, save }) {
   function saveEdit() { var updated = data.workouts.map(function (w, i) { return i === editIdx ? Object.assign({}, w, { exercise: resolveExercise(editForm.exercise), note: editForm.note || "", sets: editForm.sets.map(function (s) { return { weight: parseFloat(s.weight), reps: parseInt(s.reps), time: s.time || "", note: s.note || "" }; }) }) : w; }); save({ workouts: updated, bodyLogs: data.bodyLogs, bodyComp: data.bodyComp, calories: data.calories }); setEditIdx(null); setEditForm(null); }
   function cancelEdit() { setEditIdx(null); setEditForm(null); }
   function delW(i) { save({ workouts: data.workouts.filter(function (_, idx) { return idx !== i; }), bodyLogs: data.bodyLogs, bodyComp: data.bodyComp, calories: data.calories }); }
-  function requestDelete(i) { setPendingDeleteIdx(i); }
-  function cancelDelete() { setPendingDeleteIdx(null); }
+  function requestDelete(i) {
+    pendingDeleteRef.current = i;
+    setPendingDeleteIdx(i);
+  }
+  function cancelDelete() {
+    pendingDeleteRef.current = null;
+    setPendingDeleteIdx(null);
+  }
   function confirmDelete() {
-    if (pendingDeleteIdx == null) return;
-    if (editIdx === pendingDeleteIdx) {
+    var idx = pendingDeleteRef.current;
+    if (idx == null) return;
+    if (editIdx === idx) {
       setEditIdx(null);
       setEditForm(null);
     }
-    delW(pendingDeleteIdx);
+    delW(idx);
+    pendingDeleteRef.current = null;
     setPendingDeleteIdx(null);
   }
   function startEdit(i) { var w = data.workouts[i]; setEditIdx(i); setEditForm({ exercise: w.exercise, note: w.note || "", sets: w.sets.map(function (s) { return { weight: s.weight, reps: s.reps, time: s.time || "", note: s.note || "" }; }) }); }
@@ -322,7 +338,9 @@ export default function WorkoutPage({ data, save }) {
   function clearHistory() { save({ workouts: [], bodyLogs: data.bodyLogs, bodyComp: data.bodyComp, calories: data.calories }); setShowClearConfirm(false); }
   var clearConfirmKb = useConfirmDialogKeyboard(showClearConfirm, clearHistory, function () { setShowClearConfirm(false); }, "clear-workout-history", { cancel: "Cancel", confirm: "Clear History" });
   var deleteModal = getModalSpec("workout", "deleteEntry");
-  var deleteConfirmKb = useConfirmDialogKeyboard(pendingDeleteIdx != null, confirmDelete, cancelDelete, deleteModal.layerId, { cancel: deleteModal.buttons[0], confirm: deleteModal.buttons[1] });
+  var deleteCalendarModal = getModalSpec("workout", "deleteCalendarEntry");
+  var deleteLayerId = calDayOpen ? deleteCalendarModal.layerId : deleteModal.layerId;
+  var deleteConfirmKb = useConfirmDialogKeyboard(pendingDeleteIdx != null, confirmDelete, cancelDelete, deleteLayerId, { cancel: deleteModal.buttons[0], confirm: deleteModal.buttons[1] });
   var pendingDeleteWorkout = pendingDeleteIdx != null ? data.workouts[pendingDeleteIdx] : null;
 
   var smartParserLayer = useKeyboardLayer("smart-parser", showSmartParserModal, function (e) {
@@ -337,6 +355,7 @@ export default function WorkoutPage({ data, save }) {
   });
 
   function closeCalDayPanel() {
+    if (pendingDeleteRef.current != null) return;
     cancelEdit();
     setCalSelectedDate(null);
     closeCalLogPanel();
@@ -648,7 +667,7 @@ export default function WorkoutPage({ data, save }) {
 
           {/* Day detail — centered popup over calendar (not inline dropdown) */}
           {calDayOpen && (
-            <div className={cx("ft-kb-modal-backdrop", s.calDayOverlay)} style={{ zIndex: calDayLayer.zIndex }} aria-hidden={calLogOpen || undefined} onClick={closeCalDayPanel}>
+            <div className={cx("ft-kb-modal-backdrop", s.calDayOverlay)} style={{ zIndex: calDayLayer.zIndex }} aria-hidden={calLogOpen || pendingDeleteIdx != null || undefined} onClick={closeCalDayPanel}>
               <div className={s.calDayPanel} onClick={function (ev) { ev.stopPropagation(); }} tabIndex={-1}>
                 <div className={s.dayPanelHeader}>
                   <div className={s.dayPanelTitleRow}>
@@ -709,7 +728,7 @@ export default function WorkoutPage({ data, save }) {
                             </div>
                             <div className={s.workoutCardActions}>
                               <button type="button" onClick={function () { startEdit(w._idx); }} className={s.btnIconEditCal} style={{ color: ACCENT }}>✏️</button>
-                              <button type="button" onClick={function () { delW(w._idx); }} className={s.btnIconDeleteCal}>🗑</button>
+                              <button type="button" onClick={function (e) { e.stopPropagation(); requestDelete(w._idx); }} className={s.btnIconDeleteCal}>🗑</button>
                             </div>
                           </div>
                         );
@@ -816,6 +835,22 @@ Bench Press
             </div>
           )}
         </div>
+      )}
+
+      {pendingDeleteWorkout && calDayOpen && createPortal(
+        <div className={cx(deleteCalendarModal.enterClass, ui.modalBackdrop)} style={{ zIndex: Math.max(deleteConfirmKb.zIndex, deleteCalendarModal.zIndexFloor) }} onClick={deleteConfirmKb.onBackdropClick}>
+          <div ref={deleteConfirmKb.dialogRef} tabIndex={-1} className={ui.modalPanelConfirm} onClick={function (ev) { ev.stopPropagation(); }}>
+            <div className={s.confirmTitle}>{deleteCalendarModal.title}</div>
+            <div className={s.confirmBody}>{formatTemplateLabel(deleteCalendarModal.body, { exercise: formatExerciseName(pendingDeleteWorkout.exercise), date: formatDate(pendingDeleteWorkout.date) })}</div>
+            <div className="ft-kb-focus-indicator">Focused: <strong>{deleteConfirmKb.focusLabel}</strong></div>
+            <div className="ft-kb-hint">← → or Tab switch · Enter select · Esc cancel</div>
+            <div className={ui.flexEnd}>
+              <button type="button" onClick={cancelDelete} onMouseEnter={function () { deleteConfirmKb.setFocusIdx(0); }} className={cx(deleteConfirmKb.btnClass(0), btnSecondary({ modal: true }))} style={deleteConfirmKb.actionsLocked ? { pointerEvents: "none" } : undefined}>{deleteCalendarModal.buttons[0]}</button>
+              <button type="button" onClick={confirmDelete} onMouseEnter={function () { deleteConfirmKb.setFocusIdx(1); }} className={cx(deleteConfirmKb.btnClass(1), btnDanger({ modal: true }))} style={deleteConfirmKb.actionsLocked ? { pointerEvents: "none" } : undefined}>{deleteCalendarModal.buttons[1]}</button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
 
       {showSmartParserModal && (
@@ -1036,7 +1071,7 @@ Bench Press
         </div>
         )}
 
-        {pendingDeleteWorkout && (
+        {pendingDeleteWorkout && !calDayOpen && (
           <div className={cx("ft-kb-modal-backdrop", ui.modalBackdrop)} style={{ zIndex: deleteConfirmKb.zIndex }}>
             <div ref={deleteConfirmKb.dialogRef} tabIndex={-1} className={ui.modalPanelConfirm}>
               <div className={s.confirmTitle}>{deleteModal.title}</div>

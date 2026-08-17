@@ -139,15 +139,15 @@ When a calendar day is selected, a **centered popup** opens over the calendar (n
 
 ### View Panel (popup layer 1)
 - Lists all workouts logged on that date
-- Edit/delete individual entries
+- Edit/delete individual entries — trash opens **Delete this workout?** on a layer above the day panel; **Cancel** / Esc returns to the day
 - **Manual Log** and **Smart Paste** open a second popup layer on top
-- Stays mounted while the log/parse layer is open (same fade-in stack as clicking a date)
+- Stays mounted while the log/parse or delete-confirm layer is open (same fade-in stack as clicking a date)
 
 ### Log Panel (popup layer 2)
 - Centered over the day panel when you choose Manual Log or Smart Paste
 - Uses the same backdrop fade-in as selecting a calendar date (day panel stays visible underneath)
 - Click backdrop, ✕, or **← Back** to return to the day view
-- `Esc` closes the top layer first (log → day → calendar)
+- `Esc` closes the top layer first (delete confirm → log → day → calendar)
 
 Quick manual log for the selected date:
 - Smart parser import scoped to the selected date
