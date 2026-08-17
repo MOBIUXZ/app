@@ -24,13 +24,13 @@
     {
       "id": "app-config",
       "path": "spec/app-config.json",
-      "governs": ["localStorage key", "default data shape", "chart animation timing", "dashboard/calorie defaults", "nav tab ids"],
+      "governs": ["localStorage key", "default data shape including settings", "chart animation timing", "dashboard/calorie defaults", "nav tab ids"],
       "docs": ["docs/architecture.md", "docs/progress.md", "docs/data-model.md"]
     },
     {
       "id": "data-model",
       "path": "spec/data-model.schema.json",
-      "governs": ["ft_v5 persistence schema"],
+      "governs": ["ft_v5 persistence schema including settings"],
       "docs": ["docs/data-model.md"]
     },
     {
@@ -74,6 +74,12 @@
       "path": "spec/keyboard-shortcuts.json",
       "governs": ["Global nav keys", "list navigation", "parser textarea keys", "popup layer ids"],
       "docs": ["docs/keyboard-navigation.md"]
+    },
+    {
+      "id": "storage-fixtures",
+      "path": "spec/storage-fixtures.json",
+      "governs": ["normalizeStoredData()", "parseImportedData()", "wipeLogs()", "export file name", "settings profile prefill"],
+      "docs": ["docs/data-model.md", "docs/architecture.md"]
     },
     {
       "id": "file-tree",
@@ -137,6 +143,7 @@
     }
   ],
   "testSuites": [
+    { "path": "tests/storage.test.js", "spec": "storage-fixtures" },
     { "path": "tests/parser.test.js", "spec": "parser-fixtures" },
     { "path": "tests/resolve-exercise.test.js", "spec": "resolve-exercise-fixtures" },
     { "path": "tests/metrics.test.js", "spec": "formula-fixtures" },

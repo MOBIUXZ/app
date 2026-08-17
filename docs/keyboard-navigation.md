@@ -75,6 +75,7 @@ Hovering an item with the mouse updates keyboard focus on most lists (Dashboard 
 | **Calendar log / Smart Paste** | Esc back to day | Same fade-in as day panel; stacks on top |
 | **Calendar delete confirm** | `←` `→` / Tab · Enter select · Esc cancel | Stacks over the day panel; Cancel/Esc returns to the day, not the month grid |
 | **Settings** | Esc close | Gear at top-right of the header; also closes on backdrop click or ✕ |
+| **Wipe all logs** | `←` `→` / Tab · Enter select · Esc cancel | Stacks over Settings; Cancel/Esc returns to Settings |
 | **Progress workout detail** | ↑↓ cards · Esc close | |
 | **Workout History list** | ↑↓ entries · Enter edit · Esc clear focus | Mouse hover does not move focus |
 | **Calories activity level** | ↑↓ levels · Enter select · Esc clear focus | Mouse hover does not move focus; green keyboard outline |

@@ -33,8 +33,12 @@ Complete inventory of every project file. Line counts approximate (Aug 2026).
 | File | Lines | Purpose |
 |------|-------|---------|
 | `main.jsx` | 12 | ReactDOM root, StrictMode, KeyboardLayerProvider, global.css |
-| `App.jsx` | 155 | Tab nav, Logo header, settings gear + modal, localStorage, progressMounted, page routing |
-| `App.module.css` | 183 | `.app`, `.header`, `.logo`, `.logoText`, `.settingsBtn`, `.navTrack`, `.navBtn`, `.navBtnActive`, `.main` |
+| `App.jsx` | 337 | Tab nav, Logo header, settings (profile, calories, export/import/wipe), localStorage, progressMounted, page routing |
+| `App.module.css` | 209 | `.app`, `.header`, `.logo`, `.settingsBtn`, settings form classes, `.navTrack`, `.navBtn`, `.main` |
+
+## `src/domain/storage.js`
+
+**~137 lines** — `normalizeStoredData()`, `parseImportedData()`, `wipeLogs()`, `patchSettings()`, `profilePrefill()`, export file name. Spec: `spec/storage-fixtures.json`. Used by `App.jsx`, Body Comp, and Calories.
 
 ---
 

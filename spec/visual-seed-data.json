@@ -72,6 +72,10 @@
         "fat": 12,
         "date": "SEED_TODAY"
       }
-    ]
+    ],
+    "settings": {
+      "profile": { "sex": "male", "height": 180, "age": 30 },
+      "calories": { "goal": 2200, "activityIndex": 2 }
+    }
   }
 }

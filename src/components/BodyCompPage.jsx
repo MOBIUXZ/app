@@ -1,20 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, Collapse, btnPrimary, btnSecondary, btnDanger, inputClass, formatDate, useConfirmDialogKeyboard, ui, cx } from "./shared";
 import { computeBodyCompEntry } from "../domain/metrics.js";
 import { syncBodyLogsAfterEdit, removeBodyLogForEntry } from "../domain/bodyCompSync.js";
 import { getPageLayout, getCollapseSpec, getModalSpec, formatTemplateLabel } from "../domain/pageLayout.js";
+import { profilePrefill } from "../domain/storage.js";
 import { PageHeading } from "./PageIcon";
 import s from "./BodyCompPage.module.css";
 
 var bodyLayout = getPageLayout("bodyComp");
 
 export default function BodyCompPage({ data, save }) {
+  var prefill = profilePrefill(data.settings);
   var [logDate, setLogDate] = useState(formatDate(new Date()));
-  var [w, setW] = useState(""), [h, setH] = useState(""), [bf, setBf] = useState(""), [smm, setSmm] = useState(""), [waist, setWaist] = useState(""), [age, setAge] = useState(""), [sex, setSex] = useState("male"), [msg, setMsg] = useState("");
+  var [w, setW] = useState(""), [h, setH] = useState(prefill.height), [bf, setBf] = useState(""), [smm, setSmm] = useState(""), [waist, setWaist] = useState(""), [age, setAge] = useState(prefill.age), [sex, setSex] = useState(prefill.sex), [msg, setMsg] = useState("");
   var [showClearConfirm, setShowClearConfirm] = useState(false);
   var [pendingDeleteIdx, setPendingDeleteIdx] = useState(null);
   var [editIdx, setEditIdx] = useState(null);
   var [editForm, setEditForm] = useState(null);
+  useEffect(function () {
+    setH(prefill.height);
+    setAge(prefill.age);
+    setSex(prefill.sex);
+  }, [prefill.sex, prefill.height, prefill.age]);
   var wN = parseFloat(w) || 0, hM = (parseFloat(h) || 0) / 100, bfN = parseFloat(bf) || 0, smmN = parseFloat(smm) || 0, ageN = parseFloat(age) || 0;
   var hasBase = wN > 0 && bfN > 0, fm = hasBase ? wN * (bfN / 100) : null, ffm = hasBase ? wN - fm : null;
   var bmi = (wN > 0 && hM > 0) ? wN / (hM * hM) : null, ffmi = (ffm != null && hM > 0) ? ffm / (hM * hM) : null, fmi = (fm != null && hM > 0) ? fm / (hM * hM) : null, smi = (smmN > 0 && hM > 0) ? smmN / (hM * hM) : null;
@@ -127,7 +134,7 @@ export default function BodyCompPage({ data, save }) {
     if (!logDate.trim()) { setMsg("Date is required."); return; }
     var entry = computeBodyCompEntry({ date: logDate, weight: w, height: h, bf: bf, smm: smm, waist: waist, age: age, sex: sex });
     save({ workouts: data.workouts, calories: data.calories, bodyComp: [...data.bodyComp, entry], bodyLogs: [...data.bodyLogs, { weight: entry.weight, date: logDate }] });
-    setW(""); setH(""); setBf(""); setSmm(""); setWaist(""); setAge(""); setLogDate(formatDate(new Date())); setMsg("Logged!"); setTimeout(function () { setMsg(""); }, 2000);
+    setW(""); setBf(""); setSmm(""); setWaist(""); setH(prefill.height); setAge(prefill.age); setSex(prefill.sex); setLogDate(formatDate(new Date())); setMsg("Logged!"); setTimeout(function () { setMsg(""); }, 2000);
   }
   return (
     <div>

@@ -7,6 +7,19 @@ export function getAppLayout() {
   return pageLayoutSpec.app;
 }
 
+export function groupByRow(items) {
+  var groups = [];
+  (items || []).forEach(function (item) {
+    var last = groups[groups.length - 1];
+    if (item.row && last && last.row === item.row) {
+      last.items.push(item);
+      return;
+    }
+    groups.push({ row: item.row || item.id, items: [item] });
+  });
+  return groups;
+}
+
 export function getPageLayout(pageId) {
   return pageLayoutSpec.pages[pageId] || null;
 }

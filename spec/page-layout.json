@@ -19,10 +19,44 @@
         "id": "settings",
         "title": "Settings",
         "layerId": "settings",
+        "staysMountedUnder": ["wipe-all-logs"],
+        "layout": "compact",
+        "maxWidthPx": 400,
         "sections": [
+          {
+            "id": "profile",
+            "title": "Profile",
+            "type": "fields",
+            "fields": [
+              { "id": "sex", "label": "Sex", "control": "sexToggle", "path": "profile.sex", "options": ["male", "female"] },
+              { "id": "height", "label": "Height", "unit": "cm", "control": "number", "path": "profile.height", "row": "measures" },
+              { "id": "age", "label": "Age", "unit": "years", "control": "number", "path": "profile.age", "row": "measures" }
+            ]
+          },
+          {
+            "id": "calories",
+            "title": "Calories",
+            "type": "fields",
+            "fields": [
+              { "id": "goal", "label": "Daily goal", "unit": "kcal", "control": "number", "path": "calories.goal", "row": "intake" },
+              { "id": "activity", "label": "Activity", "control": "activitySelect", "path": "calories.activityIndex", "row": "intake" }
+            ]
+          },
+          {
+            "id": "data",
+            "title": "Data",
+            "type": "actions",
+            "hint": "Export includes logs and settings. Wipe deletes logs only.",
+            "actions": [
+              { "id": "export", "label": "Export JSON", "row": "backup" },
+              { "id": "import", "label": "Import JSON", "row": "backup" },
+              { "id": "wipe", "label": "Wipe all logs", "style": "danger" }
+            ]
+          },
           {
             "id": "keyboard",
             "title": "Keyboard",
+            "type": "rows",
             "rows": [
               { "keys": "1–5", "action": "Jump to page" },
               { "keys": "← →", "action": "Previous / next page" },
@@ -30,9 +64,17 @@
             ]
           }
         ]
+      },
+      "wipeModal": {
+        "id": "wipeAllLogs",
+        "title": "Wipe all logs?",
+        "layerId": "wipe-all-logs",
+        "buttons": ["Cancel", "Wipe logs"],
+        "body": "This permanently deletes all workouts, body logs, body composition, and calorie entries. Profile and calorie defaults stay.",
+        "stacksOver": "settings"
       }
     },
-    "shellClasses": ["app", "header", "logo", "logoText", "settingsBtn", "settingsSection", "settingsRow", "settingsKeys", "settingsAction", "nav", "navTrack", "navBtn", "navBtnActive", "main"]
+    "shellClasses": ["app", "header", "logo", "logoText", "settingsBtn", "settingsPanel", "settingsHeader", "settingsSection", "settingsSectionTitle", "settingsGrid", "settingsField", "settingsFieldRow", "settingsSexTrack", "settingsInputWrap", "settingsUnit", "settingsActions", "settingsActionsRow", "settingsHint", "settingsFileInput", "settingsRow", "settingsKeys", "settingsAction", "nav", "navTrack", "navBtn", "navBtnActive", "main"]
   },
   "pages": {
     "dashboard": {

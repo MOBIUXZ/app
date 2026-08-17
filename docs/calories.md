@@ -36,7 +36,7 @@ The BMR card subtitle shows which formula was used (**Mifflin-St Jeor** or **Kat
 
 **TDEE** = `round(BMR × activity multiplier)`
 
-Selected level is shown under the TDEE value. Default selection is **Moderate** (index 2).
+Selected level is shown under the TDEE value. Default selection is **Moderate** (index 2) from `app-config` / `data.settings.calories.activityIndex`. Changing activity here or in **Settings** persists.
 
 ### TDEE breakdown
 
@@ -72,7 +72,7 @@ Collapsible calendar for selecting the logging date:
 
 ## Daily Goal & Progress
 
-- Set a custom daily calorie goal (default: 2200 kcal)
+- Set a custom daily calorie goal (default: 2200 kcal, from **Settings → Calories**; persists on blur)
 - Progress bar with color coding:
   - Green — under 80% of goal
   - Orange — 80–100%

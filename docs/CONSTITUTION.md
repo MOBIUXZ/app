@@ -91,6 +91,7 @@ Constants that appear in multiple places (aliases, categories, storage key) **mu
 | Dashboard / Calories / Body sync | `spec/ui-behavior-fixtures.json` | `ui-behavior` |
 | Chart domain & animation | `spec/chart-domain.json`, `app-config` | `chart-domain` |
 | Keyboard shortcuts | `spec/keyboard-shortcuts.json` | `keyboard-shortcuts` |
+| Storage / settings | `spec/storage-fixtures.json`, `app-config`, `data-model.schema` | `storage` |
 | Page layout & titles | `spec/page-layout.json` | `page-layout` |
 | Page title icons | `spec/page-icons.json` | `page-icons` |
 | CSS module classes | `spec/css-modules.json` | `css-modules` |

@@ -37,7 +37,8 @@
     { "id": "clear-body-comp-history", "layerId": "clear-body-comp-history" },
     { "id": "delete-body-comp-entry", "layerId": "delete-body-comp-entry" },
     { "id": "set-picker", "layerId": "set-picker", "closeKey": "Escape" },
-    { "id": "settings", "layerId": "settings", "closeKey": "Escape" }
+    { "id": "settings", "layerId": "settings", "closeKey": "Escape", "staysMountedUnder": ["wipe-all-logs"] },
+    { "id": "wipe-all-logs", "layerId": "wipe-all-logs", "closeKey": "Escape", "stacksOver": "settings" }
   ],
   "calendarStack": {
     "order": ["calendar-modal", "calendar-day-panel", "calendar-log-panel", "delete-calendar-entry"],

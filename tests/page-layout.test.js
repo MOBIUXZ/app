@@ -3,7 +3,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pageLayout from '../spec/page-layout.json';
-import { getPageLayout, getAppLayout, getModalSpec, formatTemplateLabel, formatHeroTodayDate } from '../src/domain/pageLayout.js';
+import { getPageLayout, getAppLayout, getModalSpec, formatTemplateLabel, formatHeroTodayDate, groupByRow } from '../src/domain/pageLayout.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -39,12 +39,23 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(layout.settings.iconSizePx).toBe(22);
     expect(layout.settings.modal.title).toBe('Settings');
     expect(layout.settings.modal.layerId).toBe('settings');
-    expect(layout.settings.modal.sections[0].id).toBe('keyboard');
+    expect(layout.settings.modal.sections.map(function (s) { return s.id; })).toEqual(['profile', 'calories', 'data', 'keyboard']);
+    expect(layout.settings.modal.layout).toBe('compact');
+    expect(layout.settings.modal.maxWidthPx).toBe(400);
+    expect(groupByRow(layout.settings.modal.sections[0].fields).map(function (g) { return g.items.map(function (f) { return f.id; }); })).toEqual([['sex'], ['height', 'age']]);
+    expect(groupByRow(layout.settings.modal.sections[1].fields).map(function (g) { return g.items.map(function (f) { return f.id; }); })).toEqual([['goal', 'activity']]);
+    expect(groupByRow(layout.settings.modal.sections[2].actions).map(function (g) { return g.items.map(function (a) { return a.id; }); })).toEqual([['export', 'import'], ['wipe']]);
+    expect(layout.settings.wipeModal.layerId).toBe('wipe-all-logs');
+    expect(layout.settings.wipeModal.buttons).toEqual(['Cancel', 'Wipe logs']);
     expect(layout.shellClasses).toContain('settingsBtn');
     var source = readFileSync(resolve(root, 'src/App.jsx'), 'utf8');
     expect(source.indexOf('settingsBtn') !== -1).toBe(true);
     expect(source.indexOf('appLayout.settings') !== -1).toBe(true);
     expect(source.indexOf('useKeyboardLayer') !== -1).toBe(true);
+    expect(source.indexOf('wipeLogs') !== -1).toBe(true);
+    expect(source.indexOf('parseImportedData') !== -1).toBe(true);
+    expect(source.indexOf('settingsPanel') !== -1).toBe(true);
+    expect(source.indexOf('groupByRow') !== -1).toBe(true);
   });
 
   it('document title includes brand tagline', function () {

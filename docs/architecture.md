@@ -70,7 +70,18 @@ useEffect(function () {
 
 ## Settings (app shell)
 
-The header gear (`spec/page-layout.json` → `app.settings`) opens an app-level Settings modal. It is not a page modal (`getModalSpec`); copy and layer id come from `app.settings.modal`. Esc, backdrop click, and ✕ close it (`spec/keyboard-shortcuts.json` popup `settings`). The first section lists keyboard shortcuts.
+The header gear (`spec/page-layout.json` → `app.settings`) opens an app-level Settings modal. It is not a page modal (`getModalSpec`); copy and layer id come from `app.settings.modal`. Esc, backdrop click, and ✕ close it (`spec/keyboard-shortcuts.json` popup `settings`).
+
+Sections (in order), compact layout (`maxWidthPx` 400): height/age and goal/activity share rows; Export/Import sit side by side.
+
+| Section | What it stores |
+|---------|----------------|
+| **Profile** | Sex, height (cm), age — prefill Body Comp log form |
+| **Calories** | Daily goal (kcal) and activity level — seed the Calories page |
+| **Data** | Export JSON, Import JSON, Wipe all logs (confirm; settings stay) |
+| **Keyboard** | Shortcut cheatsheet |
+
+Persistence: `data.settings` in `ft_v5`, normalized by `src/domain/storage.js`. Spec: `spec/storage-fixtures.json`.
 
 ---
 

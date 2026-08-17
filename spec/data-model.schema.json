@@ -22,9 +22,36 @@
     "calories": {
       "type": "array",
       "items": { "$ref": "#/$defs/CalorieEntry" }
-    }
+    },
+    "settings": { "$ref": "#/$defs/Settings" }
   },
   "$defs": {
+    "Settings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "calories"],
+      "properties": {
+        "profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sex"],
+          "properties": {
+            "sex": { "type": "string", "enum": ["male", "female"] },
+            "height": { "type": ["number", "null"] },
+            "age": { "type": ["number", "null"] }
+          }
+        },
+        "calories": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["goal", "activityIndex"],
+          "properties": {
+            "goal": { "type": "number" },
+            "activityIndex": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
     "WorkoutSet": {
       "type": "object",
       "required": ["weight", "reps"],

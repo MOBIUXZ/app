@@ -14,16 +14,31 @@ interface OrbiusData {
   bodyLogs: BodyLogEntry[];
   bodyComp: BodyCompEntry[];
   calories: CalorieEntry[];
+  settings?: Settings;  // optional on disk; App always normalizes it in
+}
+
+interface Settings {
+  profile: { sex: "male" | "female"; height: number | null; age: number | null };
+  calories: { goal: number; activityIndex: number };
 }
 ```
 
 Default when missing or corrupt:
 
 ```json
-{ "workouts": [], "bodyLogs": [], "bodyComp": [], "calories": [] }
+{
+  "workouts": [],
+  "bodyLogs": [],
+  "bodyComp": [],
+  "calories": [],
+  "settings": {
+    "profile": { "sex": "male", "height": null, "age": null },
+    "calories": { "goal": 2200, "activityIndex": 2 }
+  }
+}
 ```
 
-Load/save: `App.jsx` — `loadData()`, `saveData(d)`, `save(d)`.
+Load/save: `App.jsx` — `loadData()`, `saveData(d)`, `save(d)` via `normalizeStoredData()` in `src/domain/storage.js`. Page `save()` calls that omit `settings` keep the current settings. Export/import JSON is the full blob (logs + settings). **Wipe all logs** clears the four arrays and leaves settings.
 
 ---
 
@@ -222,7 +237,7 @@ Names containing `"Deadlift"` inherit Deadlift purple in `getExerciseChartColor(
 | Active | 1.725 |
 | Very Active | 1.9 |
 
-TDEE = BMR × multiplier. CaloriePage default activity index = 2 (Moderate).
+TDEE = BMR × multiplier. CaloriePage activity index and daily goal come from `data.settings.calories` (defaults: index 2 Moderate, 2200 kcal).
 
 TDEE breakdown (same TDEE, split for display): TEF = 10% of TDEE; PAEE = TDEE − BMR − TEF; NEAT/EAT split PAEE 50/50.
 

@@ -21,6 +21,10 @@ describe('keyboard shortcuts spec', function () {
     var settings = keyboardSpec.popups.find(function (p) { return p.id === 'settings'; });
     expect(settings.layerId).toBe('settings');
     expect(settings.closeKey).toBe('Escape');
+    expect(settings.staysMountedUnder).toEqual(['wipe-all-logs']);
+    var wipe = keyboardSpec.popups.find(function (p) { return p.id === 'wipe-all-logs'; });
+    expect(wipe.stacksOver).toBe('settings');
+    expect(wipe.closeKey).toBe('Escape');
   });
 
   it('parser textarea uses Enter submit and Shift+Enter newline', function () {

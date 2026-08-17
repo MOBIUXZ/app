@@ -1,0 +1,120 @@
+{
+  "description": "ft_v5 load/normalize, export, import, and wipe contracts",
+  "exportFileNamePattern": "orbius-backup-{YYYY}-{MM}-{DD}.json",
+  "messages": {
+    "imported": "Imported backup.",
+    "invalidJson": "That file is not valid JSON.",
+    "invalidShape": "This backup is missing workout, body, or calorie data."
+  },
+  "exportFileNameFixtures": [
+    { "year": 2026, "month": 8, "day": 17, "expected": "orbius-backup-2026-08-17.json" }
+  ],
+  "normalizeFixtures": [
+    {
+      "id": "missing-settings-gets-defaults",
+      "input": { "workouts": [], "bodyLogs": [], "bodyComp": [], "calories": [] },
+      "expectedSex": "male",
+      "expectedHeight": null,
+      "expectedAge": null,
+      "expectedGoal": 2200,
+      "expectedActivityIndex": 2
+    },
+    {
+      "id": "keeps-profile-and-clamps-activity",
+      "input": {
+        "workouts": [],
+        "bodyLogs": [],
+        "bodyComp": [],
+        "calories": [],
+        "settings": {
+          "profile": { "sex": "female", "height": 165, "age": 28 },
+          "calories": { "goal": 1800, "activityIndex": 99 }
+        }
+      },
+      "expectedSex": "female",
+      "expectedHeight": 165,
+      "expectedAge": 28,
+      "expectedGoal": 1800,
+      "expectedActivityIndex": 4
+    }
+  ],
+  "importFixtures": [
+    {
+      "id": "valid-legacy",
+      "input": {
+        "workouts": [{ "exercise": "Squat", "date": "01-01-2026", "sets": [{ "weight": 100, "reps": 5 }] }],
+        "bodyLogs": [],
+        "bodyComp": [],
+        "calories": []
+      },
+      "ok": true,
+      "expectedWorkoutCount": 1,
+      "expectedGoal": 2200
+    },
+    {
+      "id": "valid-with-settings",
+      "input": {
+        "workouts": [],
+        "bodyLogs": [],
+        "bodyComp": [],
+        "calories": [],
+        "settings": {
+          "profile": { "sex": "female", "height": 165, "age": 28 },
+          "calories": { "goal": 1800, "activityIndex": 1 }
+        }
+      },
+      "ok": true,
+      "expectedSex": "female",
+      "expectedGoal": 1800,
+      "expectedActivityIndex": 1
+    },
+    {
+      "id": "invalid-json",
+      "raw": "{not json",
+      "ok": false,
+      "errorId": "invalidJson"
+    },
+    {
+      "id": "invalid-shape",
+      "input": { "hello": "world" },
+      "ok": false,
+      "errorId": "invalidShape"
+    },
+    {
+      "id": "workouts-not-array",
+      "input": { "workouts": "nope", "bodyLogs": [], "bodyComp": [], "calories": [] },
+      "ok": false,
+      "errorId": "invalidShape"
+    }
+  ],
+  "wipeFixtures": [
+    {
+      "id": "clears-logs-keeps-settings",
+      "input": {
+        "workouts": [{ "exercise": "Squat", "date": "01-01-2026", "sets": [{ "weight": 100, "reps": 5 }] }],
+        "bodyLogs": [{ "weight": 75, "date": "01-01-2026" }],
+        "bodyComp": [{ "date": "01-01-2026", "weight": 75, "bf": 15, "sex": "female" }],
+        "calories": [{ "food": "Oats", "calories": 300, "date": "1/1/2026" }],
+        "settings": {
+          "profile": { "sex": "female", "height": 165, "age": 28 },
+          "calories": { "goal": 1800, "activityIndex": 1 }
+        }
+      },
+      "expectedCounts": { "workouts": 0, "bodyLogs": 0, "bodyComp": 0, "calories": 0 },
+      "expectedSex": "female",
+      "expectedGoal": 1800
+    }
+  ],
+  "profilePrefillFixtures": [
+    {
+      "id": "filled-profile",
+      "settings": { "profile": { "sex": "female", "height": 165, "age": 28 } },
+      "expected": { "sex": "female", "height": "165", "age": "28" }
+    },
+    {
+      "id": "empty-profile",
+      "settings": { "profile": { "sex": "male", "height": null, "age": null } },
+      "expected": { "sex": "male", "height": "", "age": "" }
+    }
+  ]
+}

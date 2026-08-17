@@ -70,6 +70,8 @@ Tabs use `role="tab"` / `aria-selected`. Focus sync in `App.jsx` moves DOM focus
 
 **Settings gear** (`.settingsBtn`) sits at the top-right of the header, opposite the Orbius wordmark. It is a 40×40 transparent button with accent color, hover wash, and a green `:focus-visible` ring like inactive nav tabs. Click opens the Settings modal (`page-layout.json` → `app.settings`).
 
+The Settings panel is compact (max 400px): paired fields (height/age, goal/activity), units inside the inputs, Export/Import on one row, and a tight keyboard cheatsheet. Classes live in `App.module.css` (`.settingsPanel`, `.settingsGrid`, `.settingsActionsRow`) so other modals are unchanged.
+
 ### Activity level list (Calories)
 
 **`CaloriePage.module.css`** — BMR/TDEE activity picker (not the shared pill track):

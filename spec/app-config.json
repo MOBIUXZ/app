@@ -4,7 +4,11 @@
     "workouts": [],
     "bodyLogs": [],
     "bodyComp": [],
-    "calories": []
+    "calories": [],
+    "settings": {
+      "profile": { "sex": "male", "height": null, "age": null },
+      "calories": { "goal": 2200, "activityIndex": 2 }
+    }
   },
   "dateFormat": "DD-MM-YYYY",
   "chartAnimation": {

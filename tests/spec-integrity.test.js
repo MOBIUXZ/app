@@ -49,4 +49,10 @@ describe('app config spec', function () {
   it('storage key is ft_v5', function () {
     expect(appConfig.storageKey).toBe('ft_v5');
   });
+
+  it('default settings match calorie defaults', function () {
+    expect(appConfig.defaultData.settings.calories.goal).toBe(appConfig.calories.defaultGoal);
+    expect(appConfig.defaultData.settings.calories.activityIndex).toBe(appConfig.calories.defaultActivityIndex);
+    expect(appConfig.defaultData.settings.profile.sex).toBe('male');
+  });
 });
