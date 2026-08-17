@@ -54,7 +54,16 @@
           { "id": "workouts", "label": "Workouts" },
           { "id": "unique", "label": "Unique" },
           { "id": "today", "label": "Today" }
-        ]
+        ],
+        "todayDate": {
+          "pattern": "D Mon YYYY",
+          "monthCase": "shortTitle",
+          "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+          "fixtures": [
+            { "iso": "2026-08-17", "expected": "17 Aug 2026" },
+            { "iso": "2026-01-01", "expected": "1 Jan 2026" }
+          ]
+        }
       },
       "actions": [
         { "id": "calendar", "label": "📅 Open Calendar" },

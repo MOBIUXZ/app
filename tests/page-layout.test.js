@@ -3,7 +3,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pageLayout from '../spec/page-layout.json';
-import { getPageLayout, getAppLayout, getModalSpec, formatTemplateLabel } from '../src/domain/pageLayout.js';
+import { getPageLayout, getAppLayout, getModalSpec, formatTemplateLabel, formatHeroTodayDate } from '../src/domain/pageLayout.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -64,6 +64,17 @@ describe('page layout spec (spec/page-layout.json)', function () {
     var source = readFileSync(resolve(root, pageLayout.pages.workout.component), 'utf8');
     expect(source.indexOf('heroStatStrip') !== -1).toBe(true);
     expect(source.indexOf('heroStatGhost') === -1).toBe(true);
+  });
+
+  it('workout hero today date is day short-month year', function () {
+    var todayDate = getPageLayout('workout').hero.todayDate;
+    expect(todayDate.pattern).toBe('D Mon YYYY');
+    expect(todayDate.monthCase).toBe('shortTitle');
+    todayDate.fixtures.forEach(function (fixture) {
+      expect(formatHeroTodayDate(new Date(fixture.iso + 'T12:00:00'), todayDate)).toBe(fixture.expected);
+    });
+    var source = readFileSync(resolve(root, pageLayout.pages.workout.component), 'utf8');
+    expect(source.indexOf('formatHeroTodayDate') !== -1).toBe(true);
   });
 
   it('workout history collapse-all persists across By Date and By Workout', function () {

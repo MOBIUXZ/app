@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, formatExerciseName, btnPrimary, btnSecondary, btnDanger, inputClass, selectClass, textareaClass, formatDate, useKeyboardListNav, useConfirmDialogKeyboard, handleParserTextareaKeyDown, useParserTextareaKeyboard, useKeyboardLayer, isTypingTarget, ui, cx } from "./shared";
 import { computeOneRM, TRAINING_PERCENTAGES, DEFAULT_ONE_RM_FORMULA, ONE_RM_FORMULAS, collectLoggedSets } from "../domain/oneRm.js";
-import { getPageLayout, getCollapseSpec, getModalSpec, isHistoryGroupExpanded, nextHistoryGroupToggle, nextHistoryGroupsAll, areAllHistoryGroupsExpanded, matchesHistorySearch, parseStoredDate, sortHistoryWorkouts } from "../domain/pageLayout.js";
+import { getPageLayout, getCollapseSpec, getModalSpec, isHistoryGroupExpanded, nextHistoryGroupToggle, nextHistoryGroupsAll, areAllHistoryGroupsExpanded, matchesHistorySearch, parseStoredDate, sortHistoryWorkouts, formatHeroTodayDate } from "../domain/pageLayout.js";
 import { PageHeading } from "./PageIcon";
 import s from "./WorkoutPage.module.css";
 
@@ -380,7 +380,7 @@ export default function WorkoutPage({ data, save }) {
   var heroValues = {
     workouts: data.workouts.length,
     unique: uniqueExercises,
-    today: now.getDate() + " " + monthNames[now.getMonth()].slice(0, 3),
+    today: formatHeroTodayDate(now, workoutLayout.hero.todayDate),
   };
   var heroMetrics = workoutLayout.hero.statMetrics;
   var filteredWorkouts = data.workouts.filter(function (w) {

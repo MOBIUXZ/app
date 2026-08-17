@@ -124,4 +124,15 @@ export function sortHistoryWorkouts(workouts, sortBy, order) {
   });
 }
 
+export function formatHeroTodayDate(date, todayDateSpec) {
+  var spec = todayDateSpec || (getPageLayout("workout").hero && getPageLayout("workout").hero.todayDate);
+  if (!spec) return "";
+  var d = date instanceof Date ? date : new Date(date);
+  if (isNaN(d.getTime())) return "";
+  var month = (spec.months || [])[d.getMonth()] || "";
+  if (spec.monthCase === "lower") month = String(month).toLowerCase();
+  if (spec.monthCase === "shortTitle") month = String(month).slice(0, 3);
+  return d.getDate() + " " + month + " " + d.getFullYear();
+}
+
 export { pageLayoutSpec };
