@@ -61,7 +61,7 @@ Machine-readable checklist: [`spec/manual-qa-checklist.json`](../spec/manual-qa-
 - [ ] Hero shows a filled stat strip with workout/exercise counts and today's date
 - [ ] **Open Calendar** → month grid, logged days green
 - [ ] **Smart Parser** → modal, Enter parses, Esc closes
-- [ ] Workout History Newest-by-date shows the latest DD-MM-YYYY day first; search matches name or date; Collapse all stays collapsed when switching By Date / By Workout
+- [ ] Workout History Newest-by-date shows the latest DD-MM-YYYY day first; search matches name or date; Collapse all stays collapsed when switching Date / Workout
 
 ### Body Comp
 

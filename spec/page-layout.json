@@ -73,6 +73,13 @@
         "placeholder": "Search by workout or date...",
         "matchFields": ["exercise", "date"]
       },
+      "historyChrome": {
+        "statsInSearch": false,
+        "groupCountStyle": "entries",
+        "shortToggleLabels": true,
+        "expandAllStyle": "text",
+        "clearLabel": "Clear History"
+      },
       "modals": [
         { "id": "calendarModal", "title": "📅 Workout Calendar", "layerId": "calendar-modal", "monthMaxWidthPx": 389, "yearMaxWidthPx": 680 },
         { "id": "calendarDay", "title": "Day detail", "layerId": "calendar-day-panel", "staysMountedUnder": "calendarLog" },

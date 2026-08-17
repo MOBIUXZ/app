@@ -816,37 +816,19 @@
   padding-inline: 10px;
 }
 
-.historyActionsRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
 .historyList {
   margin-top: 4px;
-}
-
-.expandAllBtn {
-  padding: 5px 10px;
-  border-radius: var(--ft-radius-pill);
-  border: 1px solid var(--ft-border-input);
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: 700;
-  background: var(--ft-bg-card);
-  color: var(--ft-text-nav);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-family: inherit;
 }
 
 .historyMetaRow {
   display: flex;
   gap: 6px;
   align-items: center;
+}
+
+.historyMetaRowEnd {
+  composes: historyMetaRow;
+  justify-content: flex-end;
 }
 
 .historyCount {
@@ -862,6 +844,33 @@
 .historyToggleRow {
   display: flex;
   gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.expandAllText {
+  background: none;
+  border: none;
+  color: var(--ft-text-nav);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 4px 2px;
+  margin-left: 12px;
+}
+
+.expandAllText:hover {
+  color: var(--ft-text);
+}
+
+.historyGroupQuiet {
+  margin-bottom: 0;
+}
+
+.groupEntryCountQuiet {
+  font-size: 11px;
+  color: var(--ft-text-dim);
 }
 
 .groupHeader {
@@ -876,20 +885,23 @@
   border: 1px solid transparent;
 }
 
-.groupHeaderExpanded {
+.groupHeaderQuiet {
   composes: groupHeader;
-  background: var(--ft-bg-card);
-  border-color: var(--ft-border-input);
+  margin-bottom: 0;
+  padding: 8px 2px;
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid var(--ft-border);
 }
 
-.groupHeaderHover {
-  composes: groupHeader;
-  background: var(--ft-bg-card-alt);
-  border-color: var(--ft-border-input);
+.groupHeaderQuietHover {
+  composes: groupHeaderQuiet;
+  background: transparent;
 }
 
-.groupHeaderDefault {
-  composes: groupHeader;
+.groupHeaderQuietOpen {
+  composes: groupHeaderQuiet;
+  background: transparent;
 }
 
 .groupHeaderLeft {
@@ -903,14 +915,6 @@
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-}
-
-.groupEntryCount {
-  font-size: 11px;
-  color: var(--ft-text-dim);
-  background: #1f2937;
-  padding: 2px 8px;
-  border-radius: var(--ft-radius-pill);
 }
 
 .groupChevron {
@@ -953,10 +957,6 @@
   font-size: 11px;
   color: var(--ft-text-dim);
   margin-top: 2px;
-}
-
-.historyGroup {
-  margin-bottom: 12px;
 }
 
 .confirmTitle {

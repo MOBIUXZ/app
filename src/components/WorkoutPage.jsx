@@ -408,6 +408,7 @@ export default function WorkoutPage({ data, save }) {
   }
   var historyKb = useKeyboardListNav(historyItems.length, function (i) { startEdit(historyItems[i]._idx); }, historyItems.length > 0);
   var historyFlatIdx = 0;
+  var historyChrome = workoutLayout.historyChrome;
 
   return (
     <div>
@@ -918,27 +919,26 @@ Bench Press
       <Collapse icon={getCollapseSpec("workout", "history").icon} label={getCollapseSpec("workout", "history").label} defaultOpen={getCollapseSpec("workout", "history").defaultOpen}>
         <div className={ui.marginBottom12}>
           <div className={ui.historyToolbarSticky}>
-            <input value={searchQuery} onChange={function (e) { setSearchQuery(e.target.value); }} placeholder={workoutLayout.historySearch.placeholder} className={cx(inputClass({ fullWidth: true }), ui.marginBottom12)} />
-            <div className={s.historyControls}>
-              <div className={s.historyActionsRow}>
-                <div className={ui.flexRow}>
-                  <button type="button" onClick={toggleAllGroups} className={s.expandAllBtn}>{allGroupsExpanded ? "Collapse all ▲" : "Expand all ▼"}</button>
-                  {data.workouts.length > 0 && <button type="button" onClick={function () { setShowClearConfirm(true); }} className={btnDanger({ xsPill: true })}>Clear History</button>}
-                </div>
-                <div className={s.historyMetaRow}>
+            <div>
+              <input value={searchQuery} onChange={function (e) { setSearchQuery(e.target.value); }} placeholder={workoutLayout.historySearch.placeholder} className={cx(inputClass({ fullWidth: true }), ui.marginBottom12)} />
+              <div className={s.historyControls}>
+                <div className={s.historyMetaRowEnd}>
                   <span className={s.historyCount}>{filteredWorkouts.length} workouts</span>
                   <span className={s.historyCount}>•</span>
                   <span className={s.historyDaysLogged} style={{ color: ACCENT }}>{uniqueDates} {uniqueDates === 1 ? "day" : "days"} logged</span>
                 </div>
-              </div>
-              <div className={s.historyToggleRow}>
-                <div className={ui.pillToggleTrack}>
-                  <button type="button" onClick={function () { setHistorySortBy("date"); }} className={historySortBy === "date" ? ui.pillToggleBtnActive : ui.pillToggleBtn}>By Date</button>
-                  <button type="button" onClick={function () { setHistorySortBy("workout"); }} className={historySortBy === "workout" ? ui.pillToggleBtnActive : ui.pillToggleBtn}>By Workout</button>
-                </div>
-                <div className={ui.pillToggleTrack}>
-                  <button type="button" onClick={function () { setHistoryOrder("newest"); }} className={historyOrder === "newest" ? ui.pillToggleBtnActive : ui.pillToggleBtn}>Newest</button>
-                  <button type="button" onClick={function () { setHistoryOrder("oldest"); }} className={historyOrder === "oldest" ? ui.pillToggleBtnActive : ui.pillToggleBtn}>Oldest</button>
+                <div className={s.historyToggleRow}>
+                  <div className={ui.pillToggleTrack}>
+                    <button type="button" onClick={function () { setHistorySortBy("date"); }} className={historySortBy === "date" ? ui.pillToggleBtnActive : ui.pillToggleBtn}>Date</button>
+                    <button type="button" onClick={function () { setHistorySortBy("workout"); }} className={historySortBy === "workout" ? ui.pillToggleBtnActive : ui.pillToggleBtn}>Workout</button>
+                  </div>
+                  <div className={ui.pillToggleTrack}>
+                    <button type="button" onClick={function () { setHistoryOrder("newest"); }} className={historyOrder === "newest" ? ui.pillToggleBtnActive : ui.pillToggleBtn}>Newest</button>
+                    <button type="button" onClick={function () { setHistoryOrder("oldest"); }} className={historyOrder === "oldest" ? ui.pillToggleBtnActive : ui.pillToggleBtn}>Oldest</button>
+                  </div>
+                  <button type="button" onClick={toggleAllGroups} className={s.expandAllText}>{allGroupsExpanded ? "Collapse all" : "Expand all"}</button>
+                  <div className={ui.flex1} />
+                  {data.workouts.length > 0 && <button type="button" onClick={function () { setShowClearConfirm(true); }} className={btnDanger({ xsPill: true })} aria-label="Clear History">{historyChrome.clearLabel}</button>}
                 </div>
               </div>
             </div>
@@ -955,11 +955,11 @@ Bench Press
         <div ref={historyKb.listRef} tabIndex={0} onKeyDown={historyKb.handleKeyDown} className={cx(ui.listOutline, s.historyList)}>
         {groupedHistory.map(function (group, groupIdx) {
           return (
-            <div key={group.groupKey + groupIdx} className={s.historyGroup}>
-              <div onClick={function () { toggleGroup(group.groupKey); }} onMouseEnter={function () { setHoveredGroup(group.groupKey); }} onMouseLeave={function () { setHoveredGroup(null); }} className={isGroupExpanded(group.groupKey) ? s.groupHeaderExpanded : (hoveredGroup === group.groupKey ? s.groupHeaderHover : s.groupHeaderDefault)}>
+            <div key={group.groupKey + groupIdx} className={s.historyGroupQuiet}>
+              <div onClick={function () { toggleGroup(group.groupKey); }} onMouseEnter={function () { setHoveredGroup(group.groupKey); }} onMouseLeave={function () { setHoveredGroup(null); }} className={isGroupExpanded(group.groupKey) ? s.groupHeaderQuietOpen : (hoveredGroup === group.groupKey ? s.groupHeaderQuietHover : s.groupHeaderQuiet)}>
                 <div className={s.groupHeaderLeft}>
                   <div className={s.groupHeaderLabel} style={{ color: ACCENT }}>{historySortBy === "date" ? formatDate(group.date) : formatExerciseName(group.exercise)}</div>
-                  <span className={s.groupEntryCount}>{group.items.length} {group.items.length === 1 ? "entry" : "entries"}</span>
+                  <span className={s.groupEntryCountQuiet}>{group.items.length} {group.items.length === 1 ? "entry" : "entries"}</span>
                 </div>
                 <span className={s.groupChevron}>{isGroupExpanded(group.groupKey) ? "▾" : "▸"}</span>
               </div>

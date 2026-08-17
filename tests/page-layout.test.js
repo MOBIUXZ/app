@@ -83,6 +83,20 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(source.indexOf('historySearch.placeholder') !== -1).toBe(true);
   });
 
+  it('workout history chrome uses the confirmed compact layout', function () {
+    var chrome = getPageLayout('workout').historyChrome;
+    expect(chrome.previewToggle).toBeUndefined();
+    expect(chrome.statsInSearch).toBe(false);
+    expect(chrome.groupCountStyle).toBe('entries');
+    expect(chrome.shortToggleLabels).toBe(true);
+    expect(chrome.expandAllStyle).toBe('text');
+    expect(chrome.clearLabel).toBe('Clear History');
+    var source = readFileSync(resolve(root, pageLayout.pages.workout.component), 'utf8');
+    expect(source.indexOf('historyPreview') === -1).toBe(true);
+    expect(source.indexOf('historyChrome.clearLabel') !== -1).toBe(true);
+    expect(source.indexOf('groupHeaderQuiet') !== -1).toBe(true);
+  });
+
   it('workout history sorts DD-MM-YYYY dates without native Date parsing', function () {
     var source = readFileSync(resolve(root, pageLayout.pages.workout.component), 'utf8');
     expect(source.indexOf('sortHistoryWorkouts') !== -1).toBe(true);
