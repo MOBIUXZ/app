@@ -8,7 +8,7 @@ The Progress tab is the heaviest page (one Recharts instance per logged exercise
 
 | Technique | What it does |
 |-----------|----------------|
-| **Lazy chart mount** | Per-exercise charts and footer charts (body weight, body fat, InBody trends, segmental lean/fat, calories) mount Recharts only when scrolled near the viewport (`useInView` + Intersection Observer). Off-screen cards show a `.chartPlaceholder` until then |
+| **Lazy chart mount** | Per-exercise charts and footer charts (body weight, body fat, visceral, BMR, score, segmental lean/fat, calories) mount Recharts only when scrolled near the viewport (`useInView` + Intersection Observer). Off-screen cards show a `.chartPlaceholder` until then |
 | **Instant first paint** | Exercise and combined-compound lines use `animationDuration={0}` on the first render after lazy mount — no line-draw animation while scrolling |
 | **Metric-toggle morph** | Switching Max Weight / Volume / Best e1RM / Mean e1RM morphs the line over **600ms ease-in-out** (same feel as Session Performance graphs). Footer health charts do **not** morph |
 | **Memoized data** | Workouts are normalized once; `workoutsByExercise` indexes sessions by exercise; chart points and combined-compound series use `useMemo` |
@@ -23,7 +23,7 @@ When you change a **metric toggle**, the active line morphs smoothly between val
 |------------|------------------|---------------|
 | Per-exercise (combined & split) | Instant | 600ms morph |
 | Combined Compound Lifts | Instant | 600ms morph (all visible lift lines) |
-| Body weight / body fat / InBody trends / Water, Protein & Mineral / calories | Instant | N/A (no metric toggles) |
+| Body weight / body fat / Visceral Fat / Water, Protein & Mineral / BMR / InBody Score / calories | Instant | N/A (no metric toggles) |
 | Segmental Analysis | Instant | Instant Soft Lean / Fat pill (swaps the grid; no line morph) |
 | Session Performance popup | 600ms draw on open | 600ms morph |
 
@@ -170,7 +170,7 @@ Sessions where left and right match, or where sets are logged without side info 
 - **X-axis:** calendar dates (`Mon D` format), equal spacing per logged session (one point per calendar date)
 - **First appearance:** exercise and combined-compound charts render instantly when scrolled into view (no line-draw animation)
 - **Metric toggles:** line morphs over 600ms when switching Max Weight / Volume / Best e1RM / Mean e1RM (combined view, split L/R charts, and combined compound overlay)
-- **Footer charts** (body weight, body fat, InBody trends, segmental lean/fat, calories) always render without line animation
+- **Footer charts** (body weight, body fat, visceral, BMR, score, segmental lean/fat, calories) always render without line animation
 - **Off-screen** exercise charts show a placeholder until scrolled into view (see [Performance](#performance))
 - **Hover:** dashed vertical cursor + tooltip on combined exercise charts and combined compound chart; split view uses the docked imbalance panel instead
 
@@ -299,32 +299,55 @@ Per-workout popup chart for that single logged session:
 | **Keyboard** | `Esc` closes the graph first, then the day modal |
 
 
-## Body Weight & Body Fat Chart
+## Body Weight Chart
 
 - **Body Weight** line from `bodyLogs` entries
+- Series label **Body Weight (kg)** sits above the plot (same style as BMI), from `spec/page-layout.json` → `pages.progress.bodyWeightChart`
 - Extra series from `spec/page-layout.json` → `pages.progress.bodyChartExtras` (hidden when empty):
-  - **Body Fat %** (`bf` / `PBF`)
-  - **Body Fat Mass (kg)** (`FM` / `fm`)
   - **BMI (kg/m²)** (`BMI`)
 - Lazy-mounted with footer `useInView` (240px root margin); `isAnimationActive={false}` — instant render, no metric toggles
 
-## InBody Trends
+## Fat Mass & Body Fat %
 
-Card on Progress after body charts. Series come from `bodyComp` via `buildAllBodyTrendSeries()` (`src/domain/bodyTrends.js`). Chart titles, colors, and field paths live in `spec/page-layout.json` → `pages.progress.bodyTrendCharts`.
+One Progress card after Body Weight. Fat Mass, Body Fat %, and FMI are stacked in this category (not a toggle). An empty series is hidden; the card is omitted when all three are empty. Hovering a point shows the unit after the value (`kg` for fat mass, `%` for body fat, `kg/m²` for FMI). Titles, colors, units, and field paths live in `spec/page-layout.json` → `pages.progress.fatTrends`. Series: `buildAllBodyTrendSeries()` in `src/domain/bodyTrends.js`. FMI uses `deriveFmi()` when the stored field is missing so InBody imports without Settings height still chart.
+
+| Chart | Source | Unit |
+|-------|--------|------|
+| Fat Mass (kg) | `FM` / `fm` | kg |
+| Body Fat % | `bf` / `PBF` | % |
+| FMI (kg/m²) | `FMI`, or derived `FM / height²` / `FM × BMI / weight` | kg/m² |
+
+## Skeletal Muscle Mass & SMI
+
+One Progress card after Fat Mass & Body Fat %. Skeletal Muscle Mass, Muscle Mass %, and SMI are stacked in this category (not a toggle). An empty series is hidden; the card is omitted when all three are empty. Hovering a point shows the unit after the value (`kg` for muscle mass, `%` for muscle mass share, `kg/m²` for SMI). Titles, colors, units, and field paths live in `spec/page-layout.json` → `pages.progress.muscleTrends`. Series: `buildAllBodyTrendSeries()` in `src/domain/bodyTrends.js`. Muscle Mass % uses `deriveSmmPct()` (`SMM / weight × 100`) when `PSMM` is not stored.
+
+| Chart | Source | Unit |
+|-------|--------|------|
+| Skeletal Muscle Mass (kg) | `SMM` / `smm` | kg |
+| Muscle Mass % | `PSMM`, or derived `SMM / weight × 100` | % |
+| SMI (kg/m²) | `SMI` | kg/m² |
+
+## Fat-Free Mass & FFMI
+
+One Progress card after Skeletal Muscle Mass & SMI. Fat-Free Mass, Fat-Free Mass %, and FFMI are stacked in this category (not a toggle). An empty series is hidden; the card is omitted when all three are empty. Hovering a point shows the unit after the value (`kg` for fat-free mass, `%` for fat-free share, `kg/m²` for FFMI). Titles, colors, units, and field paths live in `spec/page-layout.json` → `pages.progress.ffmTrends`. Series: `buildAllBodyTrendSeries()` in `src/domain/bodyTrends.js`. Fat-Free Mass uses `deriveFfm()` (`weight − FM`) when `FFM` is missing. Fat-Free Mass % uses `deriveFfmPct()` (`FFM / weight × 100`). FFMI uses `deriveFfmi()` (`FFM / height²`, or `FFM × BMI / weight` without height).
+
+| Chart | Source | Unit |
+|-------|--------|------|
+| Fat-Free Mass (kg) | `FFM`, or derived `weight − FM` | kg |
+| Fat-Free Mass % | `PFFM`, or derived `FFM / weight × 100` | % |
+| FFMI (kg/m²) | `FFMI`, or derived `FFM / height²` / `FFM × BMI / weight` | kg/m² |
+
+## Visceral Fat Level
+
+One Progress card after Segmental Analysis. Visceral Fat Level is its own stack. The card is omitted when the series is empty. Titles, colors, and field paths live in `spec/page-layout.json` → `pages.progress.visceralTrends`. Series: `buildAllBodyTrendSeries()` in `src/domain/bodyTrends.js`. Lazy-mounted with the same footer `useInView`; `isAnimationActive={false}`.
 
 | Chart | Source | Hidden when |
 |-------|--------|-------------|
-| Skeletal Muscle (kg) | `SMM` or `smm` | no points |
-| SMI (kg/m²) | `SMI` | no points |
 | Visceral Fat Level | `inbody.visceral` | no points |
-| InBody Score | `inbody.score` | no points |
-| BMR (kcal/d) | `BMR_InBody`, else `BMR_Mifflin`, else `BMR_Katch` | no points |
-
-The whole card is omitted when every series is empty. Manual logs with SMM/SMI still chart those series; visceral, score, and BMR appear after InBody CSV import. BMR prefers the InBody measured value, then Mifflin, then Katch. Whole-body fat mass and BMI live on the Body Weight & Body Fat card. Total body water, protein, and mineral live on the **Water, Protein & Mineral** card. Lazy-mounted with the same footer `useInView`; `isAnimationActive={false}`.
 
 ## Water, Protein & Mineral
 
-One Progress card after InBody Trends. Total Body Water, Protein, and Mineral are stacked in this category (not a toggle). An empty series is hidden; the card is omitted when all three are empty. Hovering a point shows the unit after the value (`L` for water, `kg` for protein and mineral). Titles, colors, units, and CSV paths live in `spec/page-layout.json` → `pages.progress.compositionTrends`. Series: `buildAllBodyTrendSeries()` in `src/domain/bodyTrends.js`.
+One Progress card after Visceral Fat Level. Total Body Water, Protein, and Mineral are stacked in this category (not a toggle). An empty series is hidden; the card is omitted when all three are empty. Hovering a point shows the unit after the value (`L` for water, `kg` for protein and mineral). Titles, colors, units, and CSV paths live in `spec/page-layout.json` → `pages.progress.compositionTrends`. Series: `buildAllBodyTrendSeries()` in `src/domain/bodyTrends.js`.
 
 | Chart | Source | Unit |
 |-------|--------|------|
@@ -332,9 +355,25 @@ One Progress card after InBody Trends. Total Body Water, Protein, and Mineral ar
 | Protein (kg) | `inbody.protein` | kg |
 | Mineral (kg) | `inbody.mineral` | kg |
 
+## BMR
+
+One Progress card just above InBody Score. BMR is its own stack (not mixed with visceral or score). The card is omitted when the series is empty. BMR prefers the InBody measured value, then Mifflin, then Katch. Titles, colors, and field paths live in `spec/page-layout.json` → `pages.progress.bmrTrends`. Series: `buildAllBodyTrendSeries()` in `src/domain/bodyTrends.js`.
+
+| Chart | Source | Hidden when |
+|-------|--------|-------------|
+| BMR (kcal/d) | `BMR_InBody`, else `BMR_Mifflin`, else `BMR_Katch` | no points |
+
+## InBody Score
+
+One Progress card after BMR. InBody Score is its own stack. The card is omitted when the series is empty. Titles, colors, and field paths live in `spec/page-layout.json` → `pages.progress.scoreTrends`. Series: `buildAllBodyTrendSeries()` in `src/domain/bodyTrends.js`.
+
+| Chart | Source | Hidden when |
+|-------|--------|-------------|
+| InBody Score | `inbody.score` | no points |
+
 ## Segmental Analysis
 
-One Progress card after Water, Protein & Mineral, with a **Soft Lean Mass / Fat Mass** pill toggle (same pattern as the Body Comp History map). The unused metric is hidden; if only one metric has points, the toggle is omitted. Each metric is a **body-shaped grid**: left/right arm beside a figure, trunk full-width in the middle, left/right leg below. Layout, titles, colors, CSV paths, and shared Y-axis groups live in `spec/page-layout.json` → `pages.progress.segmentalTrendGroups` + `segmentalBodyGrid`. View model: `buildSegmentalGridModel()` / `resolveSegmentalTrendGroup()` in `src/domain/bodyTrends.js`.
+One Progress card after Fat-Free Mass & FFMI, with a **Soft Lean Mass / Fat Mass** pill toggle (same pattern as the Body Comp History map). The unused metric is hidden; if only one metric has points, the toggle is omitted. Each metric is a **body-shaped grid**: left/right arm beside a figure, trunk full-width in the middle, left/right leg below. Layout, titles, colors, CSV paths, and shared Y-axis groups live in `spec/page-layout.json` → `pages.progress.segmentalTrendGroups` + `segmentalBodyGrid`. View model: `buildSegmentalGridModel()` / `resolveSegmentalTrendGroup()` in `src/domain/bodyTrends.js`.
 
 | Toggle | Regions |
 |--------|---------|

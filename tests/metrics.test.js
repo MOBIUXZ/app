@@ -4,6 +4,11 @@ import {
   roundE1RM,
   computeSessionMetrics,
   computeBodyCompEntry,
+  deriveFmi,
+  deriveSmmPct,
+  deriveFfm,
+  deriveFfmPct,
+  deriveFfmi,
 } from '../src/domain/metrics.js';
 import formulaFixtures from '../spec/formula-fixtures.json';
 
@@ -49,5 +54,58 @@ describe('computeBodyCompEntry (spec/formula-fixtures.json)', function () {
         }
       });
     });
+  });
+});
+
+describe('deriveFmi (spec/formula-fixtures.json)', function () {
+  formulaFixtures.deriveFmi.forEach(function (fixture) {
+    it(fixture.id, function () {
+      var result = deriveFmi(fixture.entry);
+      if (fixture.expected == null) {
+        expect(result).toBeNull();
+      } else {
+        expect(result).toBeCloseTo(fixture.expected, 5);
+      }
+    });
+  });
+});
+
+describe('deriveSmmPct (spec/formula-fixtures.json)', function () {
+  formulaFixtures.deriveSmmPct.forEach(function (fixture) {
+    it(fixture.id, function () {
+      var result = deriveSmmPct(fixture.entry);
+      if (fixture.expected == null) {
+        expect(result).toBeNull();
+      } else {
+        expect(result).toBeCloseTo(fixture.expected, 5);
+      }
+    });
+  });
+});
+
+function assertDeriveFixture(fn, fixture) {
+  var result = fn(fixture.entry);
+  if (fixture.expected == null) {
+    expect(result).toBeNull();
+  } else {
+    expect(result).toBeCloseTo(fixture.expected, 5);
+  }
+}
+
+describe('deriveFfm (spec/formula-fixtures.json)', function () {
+  formulaFixtures.deriveFfm.forEach(function (fixture) {
+    it(fixture.id, function () { assertDeriveFixture(deriveFfm, fixture); });
+  });
+});
+
+describe('deriveFfmPct (spec/formula-fixtures.json)', function () {
+  formulaFixtures.deriveFfmPct.forEach(function (fixture) {
+    it(fixture.id, function () { assertDeriveFixture(deriveFfmPct, fixture); });
+  });
+});
+
+describe('deriveFfmi (spec/formula-fixtures.json)', function () {
+  formulaFixtures.deriveFfmi.forEach(function (fixture) {
+    it(fixture.id, function () { assertDeriveFixture(deriveFfmi, fixture); });
   });
 });

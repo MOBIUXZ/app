@@ -66,6 +66,86 @@ export function computeSessionMetrics(sets) {
   };
 }
 
+function asMetricNumber(value) {
+  if (value == null || value === "" || value === "-") return null;
+  var n = typeof value === "number" ? value : parseFloat(String(value).replace(",", "."));
+  return isNaN(n) || !isFinite(n) ? null : n;
+}
+
+/** FMI from stored value, else FM / height_m², else FM × BMI / weight (InBody without profile height). */
+export function deriveFmi(entry) {
+  if (!entry) return null;
+  var stored = asMetricNumber(entry.FMI);
+  if (stored != null) return stored;
+  var fm = asMetricNumber(entry.FM != null ? entry.FM : entry.fm);
+  if (fm == null || fm < 0) return null;
+  var heightCm = asMetricNumber(entry.height);
+  if (heightCm != null && heightCm > 0) {
+    var hM = heightCm / 100;
+    return fm / (hM * hM);
+  }
+  var bmi = asMetricNumber(entry.BMI);
+  var weight = asMetricNumber(entry.weight != null ? entry.weight : entry.BW);
+  if (bmi != null && weight != null && weight > 0) return (fm * bmi) / weight;
+  return null;
+}
+
+/** Muscle mass % from stored PSMM, else SMM / weight × 100. */
+export function deriveSmmPct(entry) {
+  if (!entry) return null;
+  var stored = asMetricNumber(entry.PSMM);
+  if (stored != null) return stored;
+  var smm = asMetricNumber(entry.SMM != null ? entry.SMM : entry.smm);
+  if (smm == null || smm < 0) return null;
+  var weight = asMetricNumber(entry.weight != null ? entry.weight : entry.BW);
+  if (weight == null || weight <= 0) return null;
+  return (smm / weight) * 100;
+}
+
+/** Fat-free mass from stored FFM, else weight − FM, else weight × (1 − bf/100). */
+export function deriveFfm(entry) {
+  if (!entry) return null;
+  var stored = asMetricNumber(entry.FFM);
+  if (stored != null) return stored;
+  var weight = asMetricNumber(entry.weight != null ? entry.weight : entry.BW);
+  var fm = asMetricNumber(entry.FM != null ? entry.FM : entry.fm);
+  if (weight != null && weight > 0 && fm != null) return weight - fm;
+  var bf = asMetricNumber(entry.bf != null ? entry.bf : entry.PBF);
+  if (weight != null && weight > 0 && bf != null) return weight * (1 - bf / 100);
+  return null;
+}
+
+/** Fat-free mass % from stored PFFM, else FFM / weight × 100, else 100 − PBF. */
+export function deriveFfmPct(entry) {
+  if (!entry) return null;
+  var stored = asMetricNumber(entry.PFFM);
+  if (stored != null) return stored;
+  var ffm = deriveFfm(entry);
+  var weight = asMetricNumber(entry.weight != null ? entry.weight : entry.BW);
+  if (ffm != null && weight != null && weight > 0) return (ffm / weight) * 100;
+  var bf = asMetricNumber(entry.PBF != null ? entry.PBF : entry.bf);
+  if (bf != null) return 100 - bf;
+  return null;
+}
+
+/** FFMI from stored value, else FFM / height_m², else FFM × BMI / weight. */
+export function deriveFfmi(entry) {
+  if (!entry) return null;
+  var stored = asMetricNumber(entry.FFMI);
+  if (stored != null) return stored;
+  var ffm = deriveFfm(entry);
+  if (ffm == null || ffm < 0) return null;
+  var heightCm = asMetricNumber(entry.height);
+  if (heightCm != null && heightCm > 0) {
+    var hM = heightCm / 100;
+    return ffm / (hM * hM);
+  }
+  var bmi = asMetricNumber(entry.BMI);
+  var weight = asMetricNumber(entry.weight != null ? entry.weight : entry.BW);
+  if (bmi != null && weight != null && weight > 0) return (ffm * bmi) / weight;
+  return null;
+}
+
 export function computeBodyCompEntry(fields) {
   var wN = parseFloat(fields.weight) || 0;
   var hM = (parseFloat(fields.height) || 0) / 100;
@@ -80,6 +160,8 @@ export function computeBodyCompEntry(fields) {
   var ffmi = (ffm != null && hM > 0) ? ffm / (hM * hM) : null;
   var fmi = (fm != null && hM > 0) ? fm / (hM * hM) : null;
   var smi = (smmN > 0 && hM > 0) ? smmN / (hM * hM) : null;
+  var psmm = (smmN > 0 && wN > 0) ? (smmN / wN) * 100 : null;
+  var pffm = (ffm != null && wN > 0) ? (ffm / wN) * 100 : null;
   var bmrMifflin = (wN > 0 && hM > 0 && ageN > 0) ? (sexVal === "male" ? 10 * wN + 6.25 * (hM * 100) - 5 * ageN + 5 : 10 * wN + 6.25 * (hM * 100) - 5 * ageN - 161) : null;
   var bmrKatch = ffm != null ? 370 + 21.6 * ffm : null;
   return {
@@ -94,10 +176,12 @@ export function computeBodyCompEntry(fields) {
     PBF: bfN,
     FM: fm,
     FFM: ffm,
+    PFFM: pffm,
     BMI: bmi,
     FFMI: ffmi,
     FMI: fmi,
     SMM: smmN || null,
+    PSMM: psmm,
     SMI: smi,
     BMR_Mifflin: bmrMifflin,
     BMR_Katch: bmrKatch,

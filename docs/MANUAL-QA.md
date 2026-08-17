@@ -86,10 +86,15 @@ Machine-readable checklist: [`spec/manual-qa-checklist.json`](../spec/manual-qa-
 
 - [ ] Compound lift charts render
 - [ ] Metric toggle morphs smoothly (~600ms)
-- [ ] Body weight chart visible; body fat %, body fat mass, and BMI charts when those fields exist
-- [ ] InBody Trends: SMM, SMI, visceral, score, and BMR when those fields exist; empty series stay hidden
-- [ ] One Water, Protein & Mineral card with Total Body Water, Protein, and Mineral charts stacked when those fields exist; empty series hidden
+- [ ] Body weight chart visible with a Body Weight (kg) label above the plot; BMI when that field exists
+- [ ] One Fat Mass & Body Fat % card with Fat Mass, Body Fat %, and FMI stacked when those fields exist; empty series hidden
+- [ ] One Skeletal Muscle Mass & SMI card with Skeletal Muscle Mass, Muscle Mass %, and SMI stacked when those fields exist; empty series hidden
+- [ ] One Fat-Free Mass & FFMI card with Fat-Free Mass, Fat-Free Mass %, and FFMI stacked when those fields exist; empty series hidden
 - [ ] One Segmental Analysis card with a Soft Lean Mass / Fat Mass toggle on a body-shaped grid when those fields exist; unused metric hidden; arms share a Y-axis and legs share a Y-axis
+- [ ] One Visceral Fat Level card after Segmental Analysis when visceral exists; hidden when empty
+- [ ] One Water, Protein & Mineral card with Total Body Water, Protein, and Mineral charts stacked when those fields exist; empty series hidden
+- [ ] One BMR card just above InBody Score when BMR exists; hidden when empty
+- [ ] One InBody Score card below Water, Protein & Mineral when score exists; hidden when empty
 - [ ] Chart click → Workout Details panel
 
 ### Persistence

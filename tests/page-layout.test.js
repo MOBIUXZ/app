@@ -89,8 +89,12 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(importModal.buttons).toEqual(['Cancel', 'Import']);
     expect(importModal.body).toContain('{skipped}');
     expect(getPageLayout('bodyComp').historyChips.map(function (c) { return c.id; })).toEqual([
-      'BW', 'BMI', 'FM', 'FMI', 'PBF', 'FFM', 'FFMI', 'SMM', 'SMI', 'BMR', 'score', 'visceral', 'tbw', 'protein', 'mineral',
+      'BW', 'BMI', 'FM', 'PBF', 'FMI', 'FFM', 'PFFM', 'FFMI', 'SMM', 'PSMM', 'SMI', 'BMR', 'score', 'visceral', 'tbw', 'protein', 'mineral',
     ]);
+    expect(getPageLayout('bodyComp').historyChips.find(function (c) { return c.id === 'FMI'; }).derive).toBe('fmi');
+    expect(getPageLayout('bodyComp').historyChips.find(function (c) { return c.id === 'PFFM'; }).derive).toBe('ffmPct');
+    expect(getPageLayout('bodyComp').historyChips.find(function (c) { return c.id === 'FFMI'; }).derive).toBe('ffmi');
+    expect(getPageLayout('bodyComp').historyChips.find(function (c) { return c.id === 'PSMM'; }).derive).toBe('smmPct');
     var source = readFileSync(resolve(root, pageLayout.pages.bodyComp.component), 'utf8');
     expect(source.indexOf('slice(0, 10)') === -1).toBe(true);
     expect(source.indexOf('clearHistoryBtn') !== -1).toBe(true);
@@ -274,13 +278,39 @@ describe('page layout spec (spec/page-layout.json)', function () {
   it('progress InBody trend charts are spec-driven', function () {
     var progress = getPageLayout('progress');
     expect(progress.sections.map(function (s) { return s.id; })).toEqual([
-      'compoundLifts', 'combinedCompound', 'isolationLifts', 'bodyCharts', 'inbodyTrends', 'composition', 'segmental', 'calorieTrend',
+      'compoundLifts', 'combinedCompound', 'isolationLifts', 'bodyCharts', 'fat', 'muscle', 'ffm', 'segmental', 'visceral', 'composition', 'bmr', 'inbodyScore', 'calorieTrend',
     ]);
-    expect(getPageSection('progress', 'inbodyTrends').title).toBe('📉 InBody Trends');
+    expect(getPageSection('progress', 'bodyCharts').title).toBe('📉 Body Weight');
+    expect(progress.bodyWeightChart.title).toBe('Body Weight (kg)');
+    expect(progress.bodyWeightChart.colorToken).toBe('accent');
+    expect(getPageSection('progress', 'fat').title).toBe('📉 Fat Mass & Body Fat %');
+    expect(getPageSection('progress', 'muscle').title).toBe('📉 Skeletal Muscle Mass & SMI');
+    expect(getPageSection('progress', 'ffm').title).toBe('📉 Fat-Free Mass & FFMI');
+    expect(getPageSection('progress', 'visceral').title).toBe('📉 Visceral Fat Level');
     expect(getPageSection('progress', 'composition').title).toBe('📉 Water, Protein & Mineral');
+    expect(getPageSection('progress', 'bmr').title).toBe('📉 BMR (kcal/d)');
+    expect(getPageSection('progress', 'inbodyScore').title).toBe('📉 InBody Score');
     expect(getPageSection('progress', 'segmental').title).toBe('📉 Segmental Analysis');
-    expect(progress.bodyChartExtras.map(function (c) { return c.id; })).toEqual(['bf', 'fm', 'bmi']);
-    expect(progress.bodyTrendCharts.map(function (c) { return c.id; })).toEqual(['smm', 'smi', 'visceral', 'score', 'bmr']);
+    expect(progress.bodyChartExtras.map(function (c) { return c.id; })).toEqual(['bmi']);
+    expect(progress.fatTrends.charts.map(function (c) { return c.id; })).toEqual(['fm', 'bf', 'fmi']);
+    expect(progress.fatTrends.charts.map(function (c) { return c.title; })).toEqual(['Fat Mass (kg)', 'Body Fat %', 'FMI (kg/m²)']);
+    expect(progress.fatTrends.charts.find(function (c) { return c.id === 'fmi'; }).derive).toBe('fmi');
+    expect(progress.fatTrends.tooltipValueTemplate).toBe('{value} {unit}');
+    expect(progress.muscleTrends.charts.map(function (c) { return c.id; })).toEqual(['smm', 'smmPct', 'smi']);
+    expect(progress.muscleTrends.charts.map(function (c) { return c.title; })).toEqual(['Skeletal Muscle Mass (kg)', 'Muscle Mass %', 'SMI (kg/m²)']);
+    expect(progress.muscleTrends.charts.find(function (c) { return c.id === 'smmPct'; }).derive).toBe('smmPct');
+    expect(progress.muscleTrends.tooltipValueTemplate).toBe('{value} {unit}');
+    expect(progress.ffmTrends.charts.map(function (c) { return c.id; })).toEqual(['ffm', 'ffmPct', 'ffmi']);
+    expect(progress.ffmTrends.charts.map(function (c) { return c.title; })).toEqual(['Fat-Free Mass (kg)', 'Fat-Free Mass %', 'FFMI (kg/m²)']);
+    expect(progress.ffmTrends.charts.find(function (c) { return c.id === 'ffmPct'; }).derive).toBe('ffmPct');
+    expect(progress.ffmTrends.charts.find(function (c) { return c.id === 'ffmi'; }).derive).toBe('ffmi');
+    expect(progress.ffmTrends.tooltipValueTemplate).toBe('{value} {unit}');
+    expect(progress.visceralTrends.charts.map(function (c) { return c.id; })).toEqual(['visceral']);
+    expect(progress.visceralTrends.charts.map(function (c) { return c.title; })).toEqual(['Visceral Fat Level']);
+    expect(progress.bmrTrends.charts.map(function (c) { return c.id; })).toEqual(['bmr']);
+    expect(progress.bmrTrends.charts.map(function (c) { return c.title; })).toEqual(['BMR (kcal/d)']);
+    expect(progress.scoreTrends.charts.map(function (c) { return c.id; })).toEqual(['score']);
+    expect(progress.scoreTrends.charts.map(function (c) { return c.title; })).toEqual(['InBody Score']);
     expect(progress.compositionTrends.charts.map(function (c) { return c.id; })).toEqual(['tbw', 'protein', 'mineral']);
     expect(progress.compositionTrends.charts.map(function (c) { return c.title; })).toEqual(['Total Body Water (L)', 'Protein (kg)', 'Mineral (kg)']);
     expect(progress.compositionTrends.tooltipValueTemplate).toBe('{value} {unit}');
@@ -295,14 +325,20 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(progress.segmentalTrendGroups[0].charts.map(function (c) { return c.slot; })).toEqual(['leftArm', 'rightArm', 'trunk', 'leftLeg', 'rightLeg']);
     expect(progress.segmentalTrendGroups[1].charts.map(function (c) { return c.id; })).toEqual(['fatLeftArm', 'fatRightArm', 'fatTrunk', 'fatLeftLeg', 'fatRightLeg']);
     var source = readFileSync(resolve(root, progress.component), 'utf8');
-    expect(source.indexOf('bodyTrendCharts') !== -1).toBe(true);
+    expect(source.indexOf('visceralTrends') !== -1).toBe(true);
+    expect(source.indexOf('bmrTrends') !== -1).toBe(true);
     expect(source.indexOf('bodyChartExtras') !== -1).toBe(true);
+    expect(source.indexOf('bodyWeightChart') !== -1).toBe(true);
     expect(source.indexOf('segmentalTrendGroups') !== -1).toBe(true);
     expect(source.indexOf('segmentalBodyGrid') !== -1).toBe(true);
     expect(source.indexOf('buildSegmentalGridModel') !== -1).toBe(true);
     expect(source.indexOf('resolveSegmentalTrendGroup') !== -1).toBe(true);
     expect(source.indexOf('tooltipValueTemplate') !== -1).toBe(true);
     expect(source.indexOf('compositionTrends') !== -1).toBe(true);
+    expect(source.indexOf('scoreTrends') !== -1).toBe(true);
+    expect(source.indexOf('fatTrends') !== -1).toBe(true);
+    expect(source.indexOf('muscleTrends') !== -1).toBe(true);
+    expect(source.indexOf('ffmTrends') !== -1).toBe(true);
     expect(source.indexOf('getPageSection') !== -1).toBe(true);
     expect(source.indexOf('getThemeColor') !== -1).toBe(true);
   });

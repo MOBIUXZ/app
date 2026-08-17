@@ -10,8 +10,8 @@ import appConfig from "../../spec/app-config.json";
 import s from "./ProgressPage.module.css";
 
 var progressLayout = getPageLayout("progress");
-var bodyTrendCharts = progressLayout.bodyTrendCharts || [];
 var bodyChartExtras = progressLayout.bodyChartExtras || [];
+var bodyWeightChart = progressLayout.bodyWeightChart || {};
 var segmentalTrendGroups = progressLayout.segmentalTrendGroups || [];
 var segmentalTrendCharts = flattenTrendGroups(segmentalTrendGroups);
 var segmentalBodyGrid = progressLayout.segmentalBodyGrid || {};
@@ -20,6 +20,18 @@ var defaultSegmentalGroupId = ((segmentalTrendGroups.find(function (group) {
 }) || segmentalTrendGroups[0]) || {}).id;
 var compositionTrends = progressLayout.compositionTrends || {};
 var compositionCharts = compositionTrends.charts || [];
+var visceralTrends = progressLayout.visceralTrends || {};
+var visceralCharts = visceralTrends.charts || [];
+var bmrTrends = progressLayout.bmrTrends || {};
+var bmrCharts = bmrTrends.charts || [];
+var scoreTrends = progressLayout.scoreTrends || {};
+var scoreCharts = scoreTrends.charts || [];
+var fatTrends = progressLayout.fatTrends || {};
+var fatCharts = fatTrends.charts || [];
+var muscleTrends = progressLayout.muscleTrends || {};
+var muscleCharts = muscleTrends.charts || [];
+var ffmTrends = progressLayout.ffmTrends || {};
+var ffmCharts = ffmTrends.charts || [];
 
 function FooterTrendChartList({ charts, seriesById, inView, tickStyle, tooltipStyle, tooltipValueTemplate }) {
   return (charts || []).map(function (chart) {
@@ -937,16 +949,22 @@ export default function ProgressPage({ data }) {
     return data.bodyLogs.map(function (l) { return { date: l.date, weight: l.weight }; });
   }, [data.bodyLogs]);
 
-  var bodyTrendSeries = useMemo(function () {
-    return buildAllBodyTrendSeries(data.bodyComp, bodyTrendCharts);
-  }, [data.bodyComp]);
-
   var bodyExtraSeries = useMemo(function () {
     return buildAllBodyTrendSeries(data.bodyComp, bodyChartExtras);
   }, [data.bodyComp]);
 
-  var hasInbodyTrends = bodyTrendCharts.some(function (chart) {
-    return (bodyTrendSeries[chart.id] || []).length > 0;
+  var visceralTrendSeries = useMemo(function () {
+    return buildAllBodyTrendSeries(data.bodyComp, visceralCharts);
+  }, [data.bodyComp]);
+  var hasVisceralTrends = visceralCharts.some(function (chart) {
+    return (visceralTrendSeries[chart.id] || []).length > 0;
+  });
+
+  var bmrTrendSeries = useMemo(function () {
+    return buildAllBodyTrendSeries(data.bodyComp, bmrCharts);
+  }, [data.bodyComp]);
+  var hasBmrTrends = bmrCharts.some(function (chart) {
+    return (bmrTrendSeries[chart.id] || []).length > 0;
   });
 
   var compositionTrendSeries = useMemo(function () {
@@ -954,6 +972,34 @@ export default function ProgressPage({ data }) {
   }, [data.bodyComp]);
   var hasCompositionTrends = compositionCharts.some(function (chart) {
     return (compositionTrendSeries[chart.id] || []).length > 0;
+  });
+
+  var scoreTrendSeries = useMemo(function () {
+    return buildAllBodyTrendSeries(data.bodyComp, scoreCharts);
+  }, [data.bodyComp]);
+  var hasScoreTrends = scoreCharts.some(function (chart) {
+    return (scoreTrendSeries[chart.id] || []).length > 0;
+  });
+
+  var fatTrendSeries = useMemo(function () {
+    return buildAllBodyTrendSeries(data.bodyComp, fatCharts);
+  }, [data.bodyComp]);
+  var hasFatTrends = fatCharts.some(function (chart) {
+    return (fatTrendSeries[chart.id] || []).length > 0;
+  });
+
+  var muscleTrendSeries = useMemo(function () {
+    return buildAllBodyTrendSeries(data.bodyComp, muscleCharts);
+  }, [data.bodyComp]);
+  var hasMuscleTrends = muscleCharts.some(function (chart) {
+    return (muscleTrendSeries[chart.id] || []).length > 0;
+  });
+
+  var ffmTrendSeries = useMemo(function () {
+    return buildAllBodyTrendSeries(data.bodyComp, ffmCharts);
+  }, [data.bodyComp]);
+  var hasFfmTrends = ffmCharts.some(function (chart) {
+    return (ffmTrendSeries[chart.id] || []).length > 0;
   });
 
   var segmentalTrendSeries = useMemo(function () {
@@ -1212,37 +1258,60 @@ export default function ProgressPage({ data }) {
       <div ref={footerChartsRef}>
         <Card className={ui.cardChart}>
           <div className={ui.sectionTitleLg}>{getPageSection("progress", "bodyCharts").title}</div>
-          <div className={ui.chartContainer}>
-            {footerChartsInView ? (
-            <ResponsiveContainer width="100%" height={160}>
-              <LineChart data={bwChart.length ? bwChart : []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
-                <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
-                <YAxis tick={cs} width={35} />
-                <Tooltip contentStyle={tt} />
-                <Line type="monotone" dataKey="weight" stroke={ACCENT} strokeWidth={2} dot={{ fill: ACCENT, r: 3 }} isAnimationActive={false} animationDuration={0} />
-              </LineChart>
-            </ResponsiveContainer>
-            ) : <div className={s.chartPlaceholder} aria-hidden="true" />}
+          <div className={s.bfSection}>
+            <div className={s.bfLabel} style={{ color: getThemeColor(bodyWeightChart.colorToken) }}>{bodyWeightChart.title}</div>
+            <div className={ui.chartContainer}>
+              {footerChartsInView ? (
+              <ResponsiveContainer width="100%" height={160}>
+                <LineChart data={bwChart.length ? bwChart : []}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
+                  <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
+                  <YAxis tick={cs} width={35} />
+                  <Tooltip contentStyle={tt} />
+                  <Line type="monotone" dataKey={bodyWeightChart.dataKey || "weight"} name={bodyWeightChart.title} stroke={getThemeColor(bodyWeightChart.colorToken)} strokeWidth={2} dot={{ fill: getThemeColor(bodyWeightChart.colorToken), r: 3 }} isAnimationActive={false} animationDuration={0} />
+                </LineChart>
+              </ResponsiveContainer>
+              ) : <div className={s.chartPlaceholder} aria-hidden="true" />}
+            </div>
           </div>
           <FooterTrendChartList charts={bodyChartExtras} seriesById={bodyExtraSeries} inView={footerChartsInView} tickStyle={cs} tooltipStyle={tt} />
         </Card>
-        {hasInbodyTrends && (
+        {hasFatTrends && (
         <Card className={ui.cardChart}>
-          <div className={ui.sectionTitleLg}>{getPageSection("progress", "inbodyTrends").title}</div>
-          <FooterTrendChartList charts={bodyTrendCharts} seriesById={bodyTrendSeries} inView={footerChartsInView} tickStyle={cs} tooltipStyle={tt} />
-        </Card>
-        )}
-        {hasCompositionTrends && (
-        <Card className={ui.cardChart}>
-          <div className={ui.sectionTitleLg}>{getPageSection("progress", "composition").title}</div>
+          <div className={ui.sectionTitleLg}>{getPageSection("progress", "fat").title}</div>
           <FooterTrendChartList
-            charts={compositionCharts}
-            seriesById={compositionTrendSeries}
+            charts={fatCharts}
+            seriesById={fatTrendSeries}
             inView={footerChartsInView}
             tickStyle={cs}
             tooltipStyle={tt}
-            tooltipValueTemplate={compositionTrends.tooltipValueTemplate}
+            tooltipValueTemplate={fatTrends.tooltipValueTemplate}
+          />
+        </Card>
+        )}
+        {hasMuscleTrends && (
+        <Card className={ui.cardChart}>
+          <div className={ui.sectionTitleLg}>{getPageSection("progress", "muscle").title}</div>
+          <FooterTrendChartList
+            charts={muscleCharts}
+            seriesById={muscleTrendSeries}
+            inView={footerChartsInView}
+            tickStyle={cs}
+            tooltipStyle={tt}
+            tooltipValueTemplate={muscleTrends.tooltipValueTemplate}
+          />
+        </Card>
+        )}
+        {hasFfmTrends && (
+        <Card className={ui.cardChart}>
+          <div className={ui.sectionTitleLg}>{getPageSection("progress", "ffm").title}</div>
+          <FooterTrendChartList
+            charts={ffmCharts}
+            seriesById={ffmTrendSeries}
+            inView={footerChartsInView}
+            tickStyle={cs}
+            tooltipStyle={tt}
+            tooltipValueTemplate={ffmTrends.tooltipValueTemplate}
           />
         </Card>
         )}
@@ -1260,6 +1329,55 @@ export default function ProgressPage({ data }) {
           <SegmentalBodyGrid group={activeSegGroup} seriesById={segmentalTrendSeries} inView={footerChartsInView} tickStyle={cs} tooltipStyle={tt} />
         </Card>
         ) : null}
+        {hasVisceralTrends && (
+        <Card className={ui.cardChart}>
+          <div className={ui.sectionTitleLg}>{getPageSection("progress", "visceral").title}</div>
+          <FooterTrendChartList
+            charts={visceralCharts}
+            seriesById={visceralTrendSeries}
+            inView={footerChartsInView}
+            tickStyle={cs}
+            tooltipStyle={tt}
+          />
+        </Card>
+        )}
+        {hasCompositionTrends && (
+        <Card className={ui.cardChart}>
+          <div className={ui.sectionTitleLg}>{getPageSection("progress", "composition").title}</div>
+          <FooterTrendChartList
+            charts={compositionCharts}
+            seriesById={compositionTrendSeries}
+            inView={footerChartsInView}
+            tickStyle={cs}
+            tooltipStyle={tt}
+            tooltipValueTemplate={compositionTrends.tooltipValueTemplate}
+          />
+        </Card>
+        )}
+        {hasBmrTrends && (
+        <Card className={ui.cardChart}>
+          <div className={ui.sectionTitleLg}>{getPageSection("progress", "bmr").title}</div>
+          <FooterTrendChartList
+            charts={bmrCharts}
+            seriesById={bmrTrendSeries}
+            inView={footerChartsInView}
+            tickStyle={cs}
+            tooltipStyle={tt}
+          />
+        </Card>
+        )}
+        {hasScoreTrends && (
+        <Card className={ui.cardChart}>
+          <div className={ui.sectionTitleLg}>{getPageSection("progress", "inbodyScore").title}</div>
+          <FooterTrendChartList
+            charts={scoreCharts}
+            seriesById={scoreTrendSeries}
+            inView={footerChartsInView}
+            tickStyle={cs}
+            tooltipStyle={tt}
+          />
+        </Card>
+        )}
         <Card className={ui.cardChart}>
           <div className={ui.sectionTitleLg}>{getPageSection("progress", "calorieTrend").title}</div>
           <div className={ui.chartContainer}>

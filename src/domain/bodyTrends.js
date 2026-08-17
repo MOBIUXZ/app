@@ -1,6 +1,7 @@
-/** @file Progress body-trend series — spec/inbody-csv-fixtures.json trendFixtures + spec/page-layout.json bodyTrendCharts */
+/** @file Progress body-trend series — spec/inbody-csv-fixtures.json trendFixtures + spec/page-layout.json visceralTrends / bmrTrends / scoreTrends */
 
 import { computeYDomain } from "./chartDomain.js";
+import { deriveFmi, deriveSmmPct, deriveFfm, deriveFfmPct, deriveFfmi } from "./metrics.js";
 
 function dateSortKey(date) {
   var parts = String(date || "").split("-");
@@ -33,6 +34,21 @@ export function readBodyCompPath(entry, paths) {
   return null;
 }
 
+var chartDerives = {
+  fmi: deriveFmi,
+  smmPct: deriveSmmPct,
+  ffm: deriveFfm,
+  ffmPct: deriveFfmPct,
+  ffmi: deriveFfmi,
+};
+
+export function readBodyCompChartValue(entry, chart) {
+  var value = readBodyCompPath(entry, chart && chart.paths);
+  if (value != null) return value;
+  var derive = chart && chart.derive && chartDerives[chart.derive];
+  return derive ? derive(entry) : null;
+}
+
 export function segmentalGapRatio(left, right, relativeTo) {
   if (left == null || right == null) return 0;
   var delta = Math.abs(right - left);
@@ -48,7 +64,7 @@ export function segmentalGapRatio(left, right, relativeTo) {
 export function buildBodyTrendSeries(bodyComp, chart) {
   var points = [];
   (bodyComp || []).forEach(function (entry) {
-    var value = readBodyCompPath(entry, chart && chart.paths);
+    var value = readBodyCompChartValue(entry, chart);
     if (value == null) return;
     points.push({ date: entry.date, value: value });
   });

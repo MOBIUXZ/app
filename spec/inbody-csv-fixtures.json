@@ -156,7 +156,26 @@
       "expectedSmi": 8.6,
       "expectedBmrInBody": 1567,
       "expectedSource": "inbody",
-      "expectedScore": 67
+      "expectedScore": 67,
+      "expectedFmi": 6.094
+    },
+    {
+      "id": "fmi-from-measured-bmi-without-height",
+      "scan": {
+        "date": "25-03-2026",
+        "weight": 60,
+        "bf": 20,
+        "fm": 12,
+        "bmi": 24,
+        "extras": { "score": 70 }
+      },
+      "profile": { "sex": "male" },
+      "expectedFm": 12,
+      "expectedBmi": 24,
+      "expectedSmi": null,
+      "expectedSource": "inbody",
+      "expectedScore": 70,
+      "expectedFmi": 4.8
     }
   ],
   "mergeFixtures": [
@@ -208,19 +227,29 @@
       "bodyComp": [
         {
           "date": "04-04-2026",
+          "weight": 64,
           "SMM": 32,
           "FM": 12,
+          "FFM": 52,
+          "PFFM": 81.25,
+          "FFMI": 16,
           "BMR_InBody": 1542,
           "BMI": 23.6,
+          "FMI": 4.2,
           "SMI": 8,
           "inbody": { "score": 87, "visceral": 4, "tbw": 32, "protein": 8.8, "mineral": 2.8 }
         },
         {
           "date": "25-03-2026",
+          "weight": 65.8,
           "smm": 32.9,
           "FM": 17.2,
+          "FFM": 50,
+          "PFFM": 76,
+          "FFMI": 17,
           "BMR_Mifflin": 1567,
           "BMI": 24.4,
+          "FMI": 6.1,
           "SMI": 8.6,
           "inbody": { "score": 67, "visceral": 7, "tbw": 31.3, "protein": 8.5, "mineral": 2.71 }
         },
@@ -230,26 +259,51 @@
           "inbody": { "score": "-", "visceral": null }
         }
       ],
-      "expected": {
+      "expectedVisceral": {
+        "visceral": [
+          { "date": "25-03-2026", "value": 7 },
+          { "date": "04-04-2026", "value": 4 }
+        ]
+      },
+      "expectedBmr": {
+        "bmr": [
+          { "date": "25-03-2026", "value": 1567 },
+          { "date": "04-04-2026", "value": 1542 }
+        ]
+      },
+      "expectedScore": {
+        "score": [
+          { "date": "25-03-2026", "value": 67 },
+          { "date": "04-04-2026", "value": 87 }
+        ]
+      },
+      "expectedMuscle": {
         "smm": [
           { "date": "25-03-2026", "value": 32.9 },
           { "date": "04-04-2026", "value": 32 }
         ],
-        "visceral": [
-          { "date": "25-03-2026", "value": 7 },
-          { "date": "04-04-2026", "value": 4 }
-        ],
-        "score": [
-          { "date": "25-03-2026", "value": 67 },
-          { "date": "04-04-2026", "value": 87 }
-        ],
-        "bmr": [
-          { "date": "25-03-2026", "value": 1567 },
-          { "date": "04-04-2026", "value": 1542 }
+        "smmPct": [
+          { "date": "25-03-2026", "value": 50 },
+          { "date": "04-04-2026", "value": 50 }
         ],
         "smi": [
           { "date": "25-03-2026", "value": 8.6 },
           { "date": "04-04-2026", "value": 8 }
+        ]
+      },
+      "expectedFfm": {
+        "ffm": [
+          { "date": "25-03-2026", "value": 50 },
+          { "date": "04-04-2026", "value": 52 }
+        ],
+        "ffmPct": [
+          { "date": "01-01-2026", "value": 80 },
+          { "date": "25-03-2026", "value": 76 },
+          { "date": "04-04-2026", "value": 81.25 }
+        ],
+        "ffmi": [
+          { "date": "25-03-2026", "value": 17 },
+          { "date": "04-04-2026", "value": 16 }
         ]
       },
       "expectedComposition": {
@@ -266,18 +320,49 @@
           { "date": "04-04-2026", "value": 2.8 }
         ]
       },
-      "expectedExtras": {
-        "bf": [
-          { "date": "01-01-2026", "value": 20 }
-        ],
+      "expectedFat": {
         "fm": [
           { "date": "25-03-2026", "value": 17.2 },
           { "date": "04-04-2026", "value": 12 }
         ],
+        "bf": [
+          { "date": "01-01-2026", "value": 20 }
+        ],
+        "fmi": [
+          { "date": "25-03-2026", "value": 6.1 },
+          { "date": "04-04-2026", "value": 4.2 }
+        ]
+      },
+      "expectedExtras": {
         "bmi": [
           { "date": "25-03-2026", "value": 24.4 },
           { "date": "04-04-2026", "value": 23.6 }
         ]
+      }
+    },
+    {
+      "id": "derives-fmi-from-fm-bmi-weight",
+      "bodyComp": [
+        { "date": "15-02-2026", "weight": 60, "FM": 12, "BMI": 24 }
+      ],
+      "expectedFat": {
+        "fm": [{ "date": "15-02-2026", "value": 12 }],
+        "bf": [],
+        "fmi": [{ "date": "15-02-2026", "value": 4.8 }]
+      },
+      "expectedExtras": {
+        "bmi": [{ "date": "15-02-2026", "value": 24 }]
+      }
+    },
+    {
+      "id": "derives-ffm-pct-ffmi",
+      "bodyComp": [
+        { "date": "15-02-2026", "weight": 80, "FM": 12, "height": 200 }
+      ],
+      "expectedFfm": {
+        "ffm": [{ "date": "15-02-2026", "value": 68 }],
+        "ffmPct": [{ "date": "15-02-2026", "value": 85 }],
+        "ffmi": [{ "date": "15-02-2026", "value": 17 }]
       }
     },
     {

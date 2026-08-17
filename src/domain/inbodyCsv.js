@@ -1,7 +1,7 @@
 /** @file InBody CSV import — spec/inbody-csv-fixtures.json */
 
 import inbodySpec from "../../spec/inbody-csv-fixtures.json";
-import { computeBodyCompEntry } from "./metrics.js";
+import { computeBodyCompEntry, deriveFmi, deriveFfmPct, deriveFfmi } from "./metrics.js";
 
 export function getInbodyMessages() {
   return inbodySpec.messages;
@@ -245,10 +245,17 @@ export function buildInbodyEntry(scan, profile) {
       base.FMI = src.fm / (hM * hM);
     }
     base.BMR_Katch = 370 + 21.6 * base.FFM;
+    base.PFFM = null;
   }
   if (src.bmi != null) base.BMI = src.bmi;
   if (src.smi != null) base.SMI = src.smi;
   if (src.bmr != null) base.BMR_InBody = src.bmr;
+  var derivedFmi = deriveFmi(base);
+  if (derivedFmi != null) base.FMI = derivedFmi;
+  var derivedFfmi = deriveFfmi(base);
+  if (derivedFfmi != null) base.FFMI = derivedFfmi;
+  var derivedPffm = deriveFfmPct(base);
+  if (derivedPffm != null) base.PFFM = derivedPffm;
   base.source = "inbody";
   if (src.extras && Object.keys(src.extras).length) base.inbody = src.extras;
   return base;

@@ -203,11 +203,13 @@
         { "id": "BW", "label": "BW", "unit": "kg", "colorToken": "accent", "paths": ["BW", "weight"] },
         { "id": "BMI", "label": "BMI", "unit": "kg/m²", "colorToken": "blue", "paths": ["BMI"] },
         { "id": "FM", "label": "FM", "unit": "kg", "colorToken": "pink", "paths": ["FM"] },
-        { "id": "FMI", "label": "FMI", "unit": "kg/m²", "colorToken": "pink", "paths": ["FMI"] },
         { "id": "PBF", "label": "PBF", "unit": "%", "colorToken": "pink", "paths": ["PBF", "bf"] },
-        { "id": "FFM", "label": "FFM", "unit": "kg", "colorToken": "green", "paths": ["FFM"] },
-        { "id": "FFMI", "label": "FFMI", "unit": "kg/m²", "colorToken": "accent", "paths": ["FFMI"] },
+        { "id": "FMI", "label": "FMI", "unit": "kg/m²", "colorToken": "pink", "paths": ["FMI"], "derive": "fmi" },
+        { "id": "FFM", "label": "FFM", "unit": "kg", "colorToken": "green", "paths": ["FFM"], "derive": "ffm" },
+        { "id": "PFFM", "label": "FFM%", "unit": "%", "colorToken": "green", "paths": ["PFFM"], "derive": "ffmPct" },
+        { "id": "FFMI", "label": "FFMI", "unit": "kg/m²", "colorToken": "accent", "paths": ["FFMI"], "derive": "ffmi" },
         { "id": "SMM", "label": "SMM", "unit": "kg", "colorToken": "green", "paths": ["SMM", "smm"] },
+        { "id": "PSMM", "label": "MM%", "unit": "%", "colorToken": "green", "paths": ["PSMM"], "derive": "smmPct" },
         { "id": "SMI", "label": "SMI", "unit": "kg/m²", "colorToken": "orange", "paths": ["SMI"] },
         { "id": "BMR", "label": "BMR", "unit": "kcal", "colorToken": "orange", "paths": ["BMR_InBody"], "digits": 0 },
         { "id": "score", "label": "Score", "unit": "", "colorToken": "accent", "paths": ["inbody.score"], "digits": 0 },
@@ -295,24 +297,66 @@
         { "id": "compoundLifts", "label": "🏋️ COMPOUND LIFTS" },
         { "id": "combinedCompound", "title": "📊 Combined Compound Lifts" },
         { "id": "isolationLifts", "label": "💪 ISOLATION LIFTS" },
-        { "id": "bodyCharts", "title": "📉 Body Weight & Body Fat" },
-        { "id": "inbodyTrends", "title": "📉 InBody Trends" },
-        { "id": "composition", "title": "📉 Water, Protein & Mineral" },
+        { "id": "bodyCharts", "title": "📉 Body Weight" },
+        { "id": "fat", "title": "📉 Fat Mass & Body Fat %" },
+        { "id": "muscle", "title": "📉 Skeletal Muscle Mass & SMI" },
+        { "id": "ffm", "title": "📉 Fat-Free Mass & FFMI" },
         { "id": "segmental", "title": "📉 Segmental Analysis" },
+        { "id": "visceral", "title": "📉 Visceral Fat Level" },
+        { "id": "composition", "title": "📉 Water, Protein & Mineral" },
+        { "id": "bmr", "title": "📉 BMR (kcal/d)" },
+        { "id": "inbodyScore", "title": "📉 InBody Score" },
         { "id": "calorieTrend", "title": "🔥 Calorie Intake Trend" }
       ],
+      "bodyWeightChart": {
+        "id": "weight",
+        "title": "Body Weight (kg)",
+        "unit": "kg",
+        "colorToken": "accent",
+        "dataKey": "weight"
+      },
       "bodyChartExtras": [
-        { "id": "bf", "title": "Body Fat %", "colorToken": "pink", "paths": ["bf", "PBF"] },
-        { "id": "fm", "title": "Body Fat Mass (kg)", "colorToken": "pink", "paths": ["FM", "fm"] },
         { "id": "bmi", "title": "BMI (kg/m²)", "colorToken": "blue", "paths": ["BMI"] }
       ],
-      "bodyTrendCharts": [
-        { "id": "smm", "title": "Skeletal Muscle (kg)", "colorToken": "green", "paths": ["SMM", "smm"] },
-        { "id": "smi", "title": "SMI (kg/m²)", "colorToken": "orange", "paths": ["SMI"] },
-        { "id": "visceral", "title": "Visceral Fat Level", "colorToken": "orange", "paths": ["inbody.visceral"] },
-        { "id": "score", "title": "InBody Score", "colorToken": "accent", "paths": ["inbody.score"] },
-        { "id": "bmr", "title": "BMR (kcal/d)", "colorToken": "orange", "paths": ["BMR_InBody", "BMR_Mifflin", "BMR_Katch"] }
-      ],
+      "fatTrends": {
+        "tooltipValueTemplate": "{value} {unit}",
+        "charts": [
+          { "id": "fm", "title": "Fat Mass (kg)", "unit": "kg", "colorToken": "pink", "paths": ["FM", "fm"] },
+          { "id": "bf", "title": "Body Fat %", "unit": "%", "colorToken": "pink", "paths": ["bf", "PBF"] },
+          { "id": "fmi", "title": "FMI (kg/m²)", "unit": "kg/m²", "colorToken": "pink", "paths": ["FMI"], "derive": "fmi" }
+        ]
+      },
+      "muscleTrends": {
+        "tooltipValueTemplate": "{value} {unit}",
+        "charts": [
+          { "id": "smm", "title": "Skeletal Muscle Mass (kg)", "unit": "kg", "colorToken": "green", "paths": ["SMM", "smm"] },
+          { "id": "smmPct", "title": "Muscle Mass %", "unit": "%", "colorToken": "green", "paths": ["PSMM"], "derive": "smmPct" },
+          { "id": "smi", "title": "SMI (kg/m²)", "unit": "kg/m²", "colorToken": "orange", "paths": ["SMI"] }
+        ]
+      },
+      "ffmTrends": {
+        "tooltipValueTemplate": "{value} {unit}",
+        "charts": [
+          { "id": "ffm", "title": "Fat-Free Mass (kg)", "unit": "kg", "colorToken": "green", "paths": ["FFM"], "derive": "ffm" },
+          { "id": "ffmPct", "title": "Fat-Free Mass %", "unit": "%", "colorToken": "green", "paths": ["PFFM"], "derive": "ffmPct" },
+          { "id": "ffmi", "title": "FFMI (kg/m²)", "unit": "kg/m²", "colorToken": "accent", "paths": ["FFMI"], "derive": "ffmi" }
+        ]
+      },
+      "visceralTrends": {
+        "charts": [
+          { "id": "visceral", "title": "Visceral Fat Level", "colorToken": "orange", "paths": ["inbody.visceral"] }
+        ]
+      },
+      "bmrTrends": {
+        "charts": [
+          { "id": "bmr", "title": "BMR (kcal/d)", "colorToken": "orange", "paths": ["BMR_InBody", "BMR_Mifflin", "BMR_Katch"] }
+        ]
+      },
+      "scoreTrends": {
+        "charts": [
+          { "id": "score", "title": "InBody Score", "colorToken": "accent", "paths": ["inbody.score"] }
+        ]
+      },
       "compositionTrends": {
         "tooltipValueTemplate": "{value} {unit}",
         "charts": [

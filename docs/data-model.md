@@ -143,10 +143,12 @@ Raw inputs plus **persisted computed fields** (recomputed on save/edit).
 | `PBF` | = `bf` |
 | `FM` | `weight × (bf / 100)` when weight > 0 and bf > 0 |
 | `FFM` | `weight - FM` |
+| `PFFM` | `FFM / weight × 100` when FFM and weight > 0 |
 | `BMI` | `weight / (height_m)²` when height > 0 |
-| `FFMI` | `FFM / (height_m)²` |
-| `FMI` | `FM / (height_m)²` |
+| `FFMI` | `FFM / (height_m)²` when height is known; else `FFM × BMI / weight` when InBody stored BMI without profile height |
+| `FMI` | `FM / (height_m)²` when height is known; else `FM × BMI / weight` when InBody stored BMI without profile height |
 | `SMM` | = `smm` input or null |
+| `PSMM` | `SMM / weight × 100` when SMM and weight > 0 |
 | `SMI` | `smm / (height_m)²` when smm > 0 |
 | `BMR_Mifflin` | Male: `10×W + 6.25×H_cm − 5×age + 5`; Female: `10×W + 6.25×H_cm − 5×age − 161` |
 | `BMR_Katch` | `370 + 21.6 × FFM` when FFM known |
@@ -154,9 +156,9 @@ Raw inputs plus **persisted computed fields** (recomputed on save/edit).
 | `source` | `"inbody"` for CSV imports; omitted for manual logs |
 | `inbody` | Optional extras from the CSV (score, visceral, segmental, water, …) |
 
-InBody import prefers measured `FM` / `BMI` / `SMI` from the CSV over formula recomputes. Mifflin/Katch are still filled from Settings profile height/age/sex when available. Calories TDEE still uses Mifflin then Katch, not InBody BMR.
+InBody import prefers measured `FM` / `BMI` / `SMI` from the CSV over formula recomputes. FMI is stored from profile height when present, otherwise from `FM × BMI / weight` so Progress can chart it without Settings height. Mifflin/Katch are still filled from Settings profile height/age/sex when available. Calories TDEE still uses Mifflin then Katch, not InBody BMR.
 
-**Import:** Body Comp → History → Import InBody CSV. Merges by date (all rows for that date, latest same-day timestamp wins); does not replace workouts or calories. Incomplete CSV rows are skipped and counted in the confirm dialog. Editing an InBody history row keeps `inbody` extras and InBody BMR. Progress charts SMM, SMI, FM, BMI, visceral fat, InBody Score, BMR, Water / Protein / Mineral as one category, and segmental lean/fat on a body-shaped grid with a Soft Lean / Fat toggle (`src/domain/bodyTrends.js`). Body Comp History shows a segmental lean/fat map from `inbody.lean*` / `fat*` (`src/domain/bodySegmental.js`) and chips for score / visceral / water / protein / mineral / InBody BMR when present. Spec: [`spec/inbody-csv-fixtures.json`](../spec/inbody-csv-fixtures.json).
+**Import:** Body Comp → History → Import InBody CSV. Merges by date (all rows for that date, latest same-day timestamp wins); does not replace workouts or calories. Incomplete CSV rows are skipped and counted in the confirm dialog. Editing an InBody history row keeps `inbody` extras and InBody BMR. Progress charts visceral fat, BMR, and InBody Score as separate cards, Fat Mass / Body Fat % / FMI as one stacked category, Skeletal Muscle Mass / Muscle Mass % / SMI as one stacked category, Fat-Free Mass / Fat-Free Mass % / FFMI as one stacked category, Water / Protein / Mineral as one category, and segmental lean/fat on a body-shaped grid with a Soft Lean / Fat toggle (`src/domain/bodyTrends.js`). Body Comp History shows a segmental lean/fat map from `inbody.lean*` / `fat*` (`src/domain/bodySegmental.js`) and chips for score / visceral / water / protein / mineral / InBody BMR when present. Spec: [`spec/inbody-csv-fixtures.json`](../spec/inbody-csv-fixtures.json).
 
 `height_m = height_cm / 100`.
 

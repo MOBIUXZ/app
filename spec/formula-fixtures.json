@@ -23,9 +23,12 @@
         "PBF": 15,
         "FM": 12,
         "FFM": 68,
+        "PFFM": 85,
         "BMI": 24.7,
         "FFMI": 21,
         "FMI": 3.7,
+        "SMM": 35,
+        "PSMM": 43.75,
         "SMI": 10.8,
         "BMR_Mifflin": 1780,
         "BMR_Katch": 1838.8
@@ -46,9 +49,49 @@
         "BW": 60,
         "FM": 15,
         "FFM": 45,
+        "PFFM": 75,
         "BMR_Mifflin": 1330.25
       }
     }
+  ],
+  "deriveFmi": [
+    { "id": "stored", "entry": { "FMI": 3.47 }, "expected": 3.47 },
+    { "id": "from-height", "entry": { "FM": 12, "height": 200 }, "expected": 3 },
+    { "id": "from-fm-alias", "entry": { "fm": 12, "height": 200 }, "expected": 3 },
+    { "id": "from-bmi-weight", "entry": { "FM": 12, "BMI": 24, "weight": 60 }, "expected": 4.8 },
+    { "id": "from-bmi-bw", "entry": { "FM": 12, "BMI": 24, "BW": 60 }, "expected": 4.8 },
+    { "id": "prefers-stored", "entry": { "FMI": 9, "FM": 12, "height": 200 }, "expected": 9 },
+    { "id": "missing", "entry": { "FM": 12 }, "expected": null }
+  ],
+  "deriveSmmPct": [
+    { "id": "stored", "entry": { "PSMM": 47.1 }, "expected": 47.1 },
+    { "id": "from-smm-weight", "entry": { "SMM": 32, "weight": 64 }, "expected": 50 },
+    { "id": "from-smm-alias", "entry": { "smm": 32.9, "BW": 65.8 }, "expected": 50 },
+    { "id": "prefers-stored", "entry": { "PSMM": 40, "SMM": 32, "weight": 64 }, "expected": 40 },
+    { "id": "missing", "entry": { "SMM": 32 }, "expected": null }
+  ],
+  "deriveFfm": [
+    { "id": "stored", "entry": { "FFM": 68 }, "expected": 68 },
+    { "id": "from-weight-fm", "entry": { "weight": 80, "FM": 12 }, "expected": 68 },
+    { "id": "from-weight-bf", "entry": { "weight": 80, "bf": 15 }, "expected": 68 },
+    { "id": "prefers-stored", "entry": { "FFM": 70, "weight": 80, "FM": 12 }, "expected": 70 },
+    { "id": "missing", "entry": { "FM": 12 }, "expected": null }
+  ],
+  "deriveFfmPct": [
+    { "id": "stored", "entry": { "PFFM": 85 }, "expected": 85 },
+    { "id": "from-ffm-weight", "entry": { "FFM": 68, "weight": 80 }, "expected": 85 },
+    { "id": "from-weight-fm", "entry": { "weight": 80, "FM": 12 }, "expected": 85 },
+    { "id": "from-pbf", "entry": { "PBF": 15 }, "expected": 85 },
+    { "id": "prefers-stored", "entry": { "PFFM": 80, "FFM": 68, "weight": 80 }, "expected": 80 },
+    { "id": "missing", "entry": { "FFM": 68 }, "expected": null }
+  ],
+  "deriveFfmi": [
+    { "id": "stored", "entry": { "FFMI": 21 }, "expected": 21 },
+    { "id": "from-height", "entry": { "FFM": 68, "height": 200 }, "expected": 17 },
+    { "id": "from-bmi-weight", "entry": { "FFM": 48, "BMI": 24, "weight": 60 }, "expected": 19.2 },
+    { "id": "from-fm-height", "entry": { "weight": 80, "FM": 12, "height": 200 }, "expected": 17 },
+    { "id": "prefers-stored", "entry": { "FFMI": 9, "FFM": 68, "height": 200 }, "expected": 9 },
+    { "id": "missing", "entry": { "FFM": 68 }, "expected": null }
   ],
   "sessionMetrics": [
     {

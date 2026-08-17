@@ -61,9 +61,12 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
       expect(entry.FM).toBe(fixture.expectedFm);
       expect(entry.BMI).toBe(fixture.expectedBmi);
       expect(entry.SMI).toBe(fixture.expectedSmi);
-      expect(entry.BMR_InBody).toBe(fixture.expectedBmrInBody);
+      if (Object.prototype.hasOwnProperty.call(fixture, 'expectedBmrInBody')) {
+        expect(entry.BMR_InBody).toBe(fixture.expectedBmrInBody);
+      }
       expect(entry.source).toBe(fixture.expectedSource);
       expect(entry.inbody.score).toBe(fixture.expectedScore);
+      if (fixture.expectedFmi != null) expect(entry.FMI).toBeCloseTo(fixture.expectedFmi, 3);
     });
   });
 
@@ -82,16 +85,32 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
   inbodySpec.trendFixtures.forEach(function (fixture) {
     it('trend series: ' + fixture.id, function () {
       var progress = getPageLayout('progress');
-      var charts = fixture.useSegmentalCharts
-        ? flattenTrendGroups(progress.segmentalTrendGroups)
-        : progress.bodyTrendCharts;
-      var series = buildAllBodyTrendSeries(fixture.bodyComp, charts);
-      expect(series).toEqual(fixture.expected);
+      if (fixture.useSegmentalCharts) {
+        expect(buildAllBodyTrendSeries(fixture.bodyComp, flattenTrendGroups(progress.segmentalTrendGroups))).toEqual(fixture.expected);
+      }
+      if (fixture.expectedVisceral) {
+        expect(buildAllBodyTrendSeries(fixture.bodyComp, progress.visceralTrends.charts)).toEqual(fixture.expectedVisceral);
+      }
+      if (fixture.expectedBmr) {
+        expect(buildAllBodyTrendSeries(fixture.bodyComp, progress.bmrTrends.charts)).toEqual(fixture.expectedBmr);
+      }
       if (fixture.expectedExtras) {
         expect(buildAllBodyTrendSeries(fixture.bodyComp, progress.bodyChartExtras)).toEqual(fixture.expectedExtras);
       }
+      if (fixture.expectedFat) {
+        expect(buildAllBodyTrendSeries(fixture.bodyComp, progress.fatTrends.charts)).toEqual(fixture.expectedFat);
+      }
+      if (fixture.expectedMuscle) {
+        expect(buildAllBodyTrendSeries(fixture.bodyComp, progress.muscleTrends.charts)).toEqual(fixture.expectedMuscle);
+      }
+      if (fixture.expectedFfm) {
+        expect(buildAllBodyTrendSeries(fixture.bodyComp, progress.ffmTrends.charts)).toEqual(fixture.expectedFfm);
+      }
       if (fixture.expectedComposition) {
         expect(buildAllBodyTrendSeries(fixture.bodyComp, progress.compositionTrends.charts)).toEqual(fixture.expectedComposition);
+      }
+      if (fixture.expectedScore) {
+        expect(buildAllBodyTrendSeries(fixture.bodyComp, progress.scoreTrends.charts)).toEqual(fixture.expectedScore);
       }
     });
   });
@@ -149,9 +168,10 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
   it('Progress page wires InBody trend charts from the layout spec', function () {
     var source = readFileSync(resolve(root, 'src/components/ProgressPage.jsx'), 'utf8');
     expect(source.indexOf('buildAllBodyTrendSeries') !== -1).toBe(true);
-    expect(source.indexOf('bodyTrendCharts') !== -1).toBe(true);
     expect(source.indexOf('bodyChartExtras') !== -1).toBe(true);
-    expect(source.indexOf('inbodyTrends') !== -1).toBe(true);
+    expect(source.indexOf('bodyWeightChart') !== -1).toBe(true);
+    expect(source.indexOf('visceralTrends') !== -1).toBe(true);
+    expect(source.indexOf('bmrTrends') !== -1).toBe(true);
     expect(source.indexOf('segmentalTrendGroups') !== -1).toBe(true);
     expect(source.indexOf('buildSegmentalGridModel') !== -1).toBe(true);
     expect(source.indexOf('segmentalBodyGrid') !== -1).toBe(true);
@@ -159,12 +179,23 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
     expect(source.indexOf('pillToggleTrack') !== -1).toBe(true);
     expect(source.indexOf('tooltipValueTemplate') !== -1).toBe(true);
     expect(source.indexOf('compositionTrends') !== -1).toBe(true);
+    expect(source.indexOf('scoreTrends') !== -1).toBe(true);
+    expect(source.indexOf('fatTrends') !== -1).toBe(true);
+    expect(source.indexOf('muscleTrends') !== -1).toBe(true);
+    expect(source.indexOf('ffmTrends') !== -1).toBe(true);
     expect(source.indexOf('Skeletal Muscle') === -1).toBe(true);
     expect(source.indexOf('Visceral Fat') === -1).toBe(true);
     expect(source.indexOf('Left Arm') === -1).toBe(true);
     expect(source.indexOf('Body Fat Mass') === -1).toBe(true);
+    expect(source.indexOf('Fat Mass (kg)') === -1).toBe(true);
+    expect(source.indexOf('FMI (kg') === -1).toBe(true);
+    expect(source.indexOf('Muscle Mass %') === -1).toBe(true);
+    expect(source.indexOf('Fat-Free Mass') === -1).toBe(true);
     expect(source.indexOf('BMI (kg') === -1).toBe(true);
+    expect(source.indexOf('Body Weight (kg)') === -1).toBe(true);
     expect(source.indexOf('Total Body Water') === -1).toBe(true);
+    expect(source.indexOf('InBody Score') === -1).toBe(true);
+    expect(source.indexOf('BMR (kcal') === -1).toBe(true);
   });
 
   it('Body Comp page wires the InBody import helpers', function () {
@@ -175,6 +206,7 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
     expect(source.indexOf('latestSegmentalSnapshot') !== -1).toBe(true);
     expect(source.indexOf('segmentalMap') !== -1).toBe(true);
     expect(source.indexOf('historyChips') !== -1).toBe(true);
+    expect(source.indexOf('readBodyCompChartValue') !== -1).toBe(true);
     expect(source.indexOf('preserveMeasuredInbody') !== -1).toBe(true);
     expect(source.indexOf('upsertBodyCompByDate') !== -1).toBe(true);
     expect(source.indexOf('Left Arm') === -1).toBe(true);

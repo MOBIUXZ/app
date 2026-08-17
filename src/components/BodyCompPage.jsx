@@ -6,7 +6,7 @@ import { getPageLayout, getCollapseSpec, getModalSpec, formatTemplateLabel, getT
 import { profilePrefill, applyProfilePrefill, normalizeStoredData } from "../domain/storage.js";
 import { parseInbodyCsv, buildInbodyEntry, mergeInbodyIntoLogs, getInbodyMessages } from "../domain/inbodyCsv.js";
 import { latestSegmentalSnapshot, resolveSegmentalMetric } from "../domain/bodySegmental.js";
-import { readBodyCompPath } from "../domain/bodyTrends.js";
+import { readBodyCompChartValue } from "../domain/bodyTrends.js";
 import { PageHeading } from "./PageIcon";
 import s from "./BodyCompPage.module.css";
 
@@ -62,6 +62,8 @@ export default function BodyCompPage({ data, save }) {
   var hasBase = wN > 0 && bfN > 0, fm = hasBase ? wN * (bfN / 100) : null, ffm = hasBase ? wN - fm : null;
   var bmi = (wN > 0 && hM > 0) ? wN / (hM * hM) : null, ffmi = (ffm != null && hM > 0) ? ffm / (hM * hM) : null, fmi = (fm != null && hM > 0) ? fm / (hM * hM) : null, smi = (smmN > 0 && hM > 0) ? smmN / (hM * hM) : null;
   var residual = (fm != null && smmN > 0 && wN > 0) ? wN - fm - smmN : null;
+  var psmm = (smmN > 0 && wN > 0) ? (smmN / wN) * 100 : null;
+  var pffm = (ffm != null && wN > 0) ? (ffm / wN) * 100 : null;
   var bmrMifflin = (wN > 0 && hM > 0 && ageN > 0) ? (sex === "male" ? 10 * wN + 6.25 * (hM * 100) - 5 * ageN + 5 : 10 * wN + 6.25 * (hM * 100) - 5 * ageN - 161) : null;
   var bmrKatch = ffm != null ? 370 + 21.6 * ffm : null;
   function MBox(p) {
@@ -261,9 +263,9 @@ export default function BodyCompPage({ data, save }) {
         </div>
         <div className={s.metricsHint}>📊 Metrics {!hasBase && <span className={s.metricsHintFaint}> (enter weight + BF% to calculate)</span>}</div>
         <GL>🏋️ Total Body</GL><div className={ui.flexRow}><MBox label="Body Weight" val={wN > 0 ? wN : null} unit="kg" color={ACCENT} /><MBox label="BMI" val={bmi} unit="kg/m²" color={BLUE} /></div>
-        <GL>🔥 Fat Mass</GL><div className={ui.flexRow}><MBox label="Fat Mass" val={fm} unit="kg" color={PINK} /><MBox label="FMI" val={fmi} unit="kg/m²" color={PINK} /><MBox label="Body Fat %" val={bfN > 0 ? bfN : null} unit="%" color={PINK} /></div>
-        <GL>💪 Fat-Free Mass</GL><div className={ui.flexRow}><MBox label="Fat-Free Mass" val={ffm} unit="kg" color={GREEN} /><MBox label="FFMI" val={ffmi} unit="kg/m²" color={ACCENT} /></div>
-        <GL>🦾 Skeletal Muscle</GL><div className={ui.flexRow}><MBox label="Skel. Muscle" val={smmN > 0 ? smmN : null} unit="kg" color={GREEN} /><MBox label="SMI" val={smi} unit="kg/m²" color={ORANGE} /></div>
+        <GL>🔥 Fat Mass</GL><div className={ui.flexRow}><MBox label="Fat Mass" val={fm} unit="kg" color={PINK} /><MBox label="Body Fat %" val={bfN > 0 ? bfN : null} unit="%" color={PINK} /><MBox label="FMI" val={fmi} unit="kg/m²" color={PINK} /></div>
+        <GL>💪 Fat-Free Mass</GL><div className={ui.flexRow}><MBox label="Fat-Free Mass" val={ffm} unit="kg" color={GREEN} /><MBox label="Fat-Free Mass %" val={pffm} unit="%" color={GREEN} /><MBox label="FFMI" val={ffmi} unit="kg/m²" color={ACCENT} /></div>
+        <GL>🦾 Skeletal Muscle</GL><div className={ui.flexRow}><MBox label="Skel. Muscle" val={smmN > 0 ? smmN : null} unit="kg" color={GREEN} /><MBox label="Muscle Mass %" val={psmm} unit="%" color={GREEN} /><MBox label="SMI" val={smi} unit="kg/m²" color={ORANGE} /></div>
         <GL>🔥 BMR</GL><div className={ui.flexRow}><MBox label="BMR Mifflin" val={bmrMifflin} unit="kcal/d" color={ORANGE} /><MBox label="BMR Katch-McArdle" val={bmrKatch} unit="kcal/d" color={ORANGE} /></div>
         {(!bmrMifflin && !bmrKatch) && <div className={cx(ui.mutedXs, s.bmrHint)}>Mifflin: needs weight+height+age. Katch: needs BF% too.</div>}
         {hasBase && <div className={s.relationSection}><div className={s.relationDivider}>🔗 Body Composition Relations</div><div className={s.relationBox}><div className={s.relationFormula}>FM + FFM = BW</div><div className={s.relationRow}><span style={{ color: PINK, fontWeight: 700 }}>{fm.toFixed(2)} kg</span><span className={s.relationOp}>+</span><span style={{ color: GREEN, fontWeight: 700 }}>{ffm.toFixed(2)} kg</span><span className={s.relationOp}>=</span><span style={{ color: ACCENT, fontWeight: 800 }}>{wN.toFixed(2)} kg</span><span style={{ marginLeft: 4, color: Math.abs(fm + ffm - wN) < 0.01 ? GREEN : "#f87171", fontSize: 11 }}>{Math.abs(fm + ffm - wN) < 0.01 ? "✓ balanced" : "⚠ check values"}</span></div></div><div className={s.relationBoxLast}><div className={s.relationFormula}>FM + SMM + Residual = BW</div><div className={s.relationRow}><span style={{ color: PINK, fontWeight: 700 }}>{fm.toFixed(2)} kg</span><span className={s.relationOp}>+</span><span style={{ color: GREEN, fontWeight: 700 }}>{smmN > 0 ? smmN.toFixed(2) : "—"} kg</span><span className={s.relationOp}>+</span><span style={{ color: ORANGE, fontWeight: 700 }}>{residual != null ? residual.toFixed(2) : "—"} kg</span><span className={s.relationOp}>=</span><span style={{ color: ACCENT, fontWeight: 800 }}>{wN.toFixed(2)} kg</span></div>{residual != null && <div className={s.relationNote}>Residual = Bone + Organs + Water + Other tissue</div>}</div></div>}
@@ -396,7 +398,7 @@ export default function BodyCompPage({ data, save }) {
                   </div>
                   <div className={s.chipRow}>
                     {historyChips.map(function (chip) {
-                      var value = readBodyCompPath(e, chip.paths);
+                      var value = readBodyCompChartValue(e, chip);
                       if (value == null) return null;
                       var digits = chip.digits != null ? chip.digits : 2;
                       var color = getThemeColor(chip.colorToken);

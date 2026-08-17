@@ -125,12 +125,15 @@ Omitted keys (including `settings`) are kept from current state. If the write fa
 | Dashboard "Last BF%" | `bodyComp[last].bf` | |
 | Dashboard "Today Cals" | `calories` where `date === today` | `today = new Date().toLocaleDateString()` |
 | CaloriePage BMR | Latest `bodyComp` entry | Prefers `BMR_Mifflin`, falls back `BMR_Katch` |
-| Progress body weight chart | `bodyLogs` | |
-| Progress body fat chart | `bodyComp` `bf` / `PBF` | |
-| Progress body fat mass chart | `bodyComp` `FM` / `fm` | |
-| Progress BMI chart | `bodyComp` `BMI` | |
-| Progress InBody trends | `bodyComp` SMM/SMI + `inbody` visceral/score + BMR | Extra InBody fields hidden when missing |
+| Progress body weight chart | `bodyLogs` | Series label **Body Weight (kg)** above the plot |
+| Progress BMI chart | `bodyComp` `BMI` | Extra on the Body Weight card; hidden when missing |
+| Progress fat mass / body fat % / FMI | `bodyComp` `FM`/`fm`, `bf`/`PBF`, and `FMI` (or derived) | One category card; charts stacked; empty series hidden; FMI derived from FM+height or FM×BMI/weight |
+| Progress skeletal muscle / muscle mass % / SMI | `bodyComp` `SMM`/`smm`, `PSMM` (or `SMM / weight × 100`), and `SMI` | One category card; charts stacked; empty series hidden |
+| Progress fat-free mass / fat-free mass % / FFMI | `bodyComp` `FFM`, `PFFM` (or `FFM / weight × 100`), and `FFMI` (or derived) | One category card; charts stacked; empty series hidden |
+| Progress visceral fat | `inbody.visceral` | Own card after Segmental Analysis; hidden when missing |
 | Progress water/protein/mineral | `inbody.tbw` / `protein` / `mineral` | One category card; charts stacked; empty series hidden |
+| Progress BMR | `BMR_InBody`, else Mifflin, else Katch | Own card just above InBody Score; hidden when missing |
+| Progress InBody Score | `inbody.score` | Own card after BMR; hidden when missing |
 | Progress segmental lean/fat charts | `inbody.lean*` / `fat*` per region | One body-grid card with Soft Lean / Fat toggle; arms share a Y-axis, legs share a Y-axis; card hidden if empty |
 | Body Comp segmental map | Latest `bodyComp` entry with `inbody` lean/fat segments | Hidden when those fields are missing |
 | Body Comp InBody import | InBody CSV → `bodyComp` + `bodyLogs` | Merge by date; workouts/calories unchanged |
@@ -183,7 +186,7 @@ State is local to `WorkoutPage` — not lifted to App except via `save()`.
 1. COMPOUND LIFTS label + one `MemoExerciseChart` per logged compound (order from `COMPOUND_LIFTS` filter)
 2. Combined Compound Lifts card (if ≥2 compounds)
 3. ISOLATION LIFTS label + charts for non-compound exercises
-4. Footer: Body Weight & BF card, InBody Trends card (if any series), Water / Protein / Mineral card (if any series), Segmental Analysis card with Soft Lean / Fat toggle (if any series), Calorie Intake Trend card
+4. Footer: Body Weight card, Fat / Muscle / FFM stacked cards, Segmental Analysis card with Soft Lean / Fat toggle (if any series), Visceral Fat Level card (if any series), Water / Protein / Mineral card (if any series), BMR card (if any series), InBody Score card (if any series), Calorie Intake Trend card
 
 ### Modal layers (keyboard)
 

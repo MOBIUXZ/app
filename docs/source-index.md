@@ -46,7 +46,7 @@ Complete inventory of every project file. Line counts approximate (Aug 2026).
 
 ## `src/domain/bodyTrends.js`
 
-**~140 lines** — `buildAllBodyTrendSeries()` maps `bodyComp` onto Progress InBody, composition, and segmental trend charts (including BMR). `buildSegmentalGridModel()` places those series on the Progress body grid with shared arm/leg Y-axes. `resolveSegmentalTrendGroup()` picks Soft Lean vs Fat for the Progress toggle. Spec: `spec/inbody-csv-fixtures.json` `trendFixtures` / `gridFixtures` / `gridToggleFixtures` + `spec/page-layout.json` `bodyTrendCharts` / `compositionTrends` / `segmentalTrendGroups` / `segmentalBodyGrid`.
+**~140 lines** — `buildAllBodyTrendSeries()` maps `bodyComp` onto Progress visceral, BMR, fat, muscle, fat-free, composition, score, and segmental trend charts. `buildSegmentalGridModel()` places those series on the Progress body grid with shared arm/leg Y-axes. `resolveSegmentalTrendGroup()` picks Soft Lean vs Fat for the Progress toggle. Spec: `spec/inbody-csv-fixtures.json` `trendFixtures` / `gridFixtures` / `gridToggleFixtures` + `spec/page-layout.json` `visceralTrends` / `bmrTrends` / `fatTrends` / `muscleTrends` / `ffmTrends` / `compositionTrends` / `scoreTrends` / `segmentalTrendGroups` / `segmentalBodyGrid`.
 
 ## `src/domain/bodySegmental.js`
 
