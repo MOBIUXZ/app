@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, formatExerciseName, btnPrimary, btnSecondary, btnDanger, inputClass, selectClass, textareaClass, formatDate, useKeyboardListNav, useConfirmDialogKeyboard, handleParserTextareaKeyDown, useParserTextareaKeyboard, useKeyboardLayer, isTypingTarget, ui, cx } from "./shared";
 import { computeOneRM, TRAINING_PERCENTAGES, DEFAULT_ONE_RM_FORMULA, ONE_RM_FORMULAS, collectLoggedSets } from "../domain/oneRm.js";
-import { getPageLayout, getCollapseSpec, getModalSpec } from "../domain/pageLayout.js";
+import { getPageLayout, getCollapseSpec, getModalSpec, isHistoryGroupExpanded, nextHistoryGroupToggle, nextHistoryGroupsAll, areAllHistoryGroupsExpanded } from "../domain/pageLayout.js";
 import { PageHeading } from "./PageIcon";
 import s from "./WorkoutPage.module.css";
 
@@ -173,6 +173,7 @@ export default function WorkoutPage({ data, save }) {
   var [historySortBy, setHistorySortBy] = useState("date");
   var [searchQuery, setSearchQuery] = useState("");
   var [expandedGroups, setExpandedGroups] = useState({});
+  var [groupsDefaultExpanded, setGroupsDefaultExpanded] = useState(workoutLayout.historyGroups.defaultExpanded);
   var [showClearConfirm, setShowClearConfirm] = useState(false);
   var [hoveredGroup, setHoveredGroup] = useState(null);
   var [showCalendarModal, setShowCalendarModal] = useState(false);
@@ -313,9 +314,7 @@ export default function WorkoutPage({ data, save }) {
   function startEdit(i) { var w = data.workouts[i]; setEditIdx(i); setEditForm({ exercise: w.exercise, note: w.note || "", sets: w.sets.map(function (s) { return { weight: s.weight, reps: s.reps, time: s.time || "", note: s.note || "" }; }) }); }
   function toggleGroup(groupKey) {
     setExpandedGroups(function (prev) {
-      var next = Object.assign({}, prev);
-      next[groupKey] = prev[groupKey] !== false ? false : true;
-      return next;
+      return nextHistoryGroupToggle(prev, groupKey, groupsDefaultExpanded);
     });
   }
   function clearHistory() { save({ workouts: [], bodyLogs: data.bodyLogs, bodyComp: data.bodyComp, calories: data.calories }); setShowClearConfirm(false); }
@@ -416,14 +415,13 @@ export default function WorkoutPage({ data, save }) {
     }
   });
   function isGroupExpanded(groupKey) {
-    return expandedGroups[groupKey] !== false;
+    return isHistoryGroupExpanded(expandedGroups, groupKey, groupsDefaultExpanded);
   }
-  var allGroupsExpanded = groupedHistory.length > 0 && groupedHistory.every(function (g) { return isGroupExpanded(g.groupKey); });
+  var allGroupsExpanded = areAllHistoryGroupsExpanded(groupedHistory.map(function (g) { return g.groupKey; }), expandedGroups, groupsDefaultExpanded);
   function toggleAllGroups() {
-    var expand = !allGroupsExpanded;
-    var next = {};
-    groupedHistory.forEach(function (group) { next[group.groupKey] = expand; });
-    setExpandedGroups(next);
+    var next = nextHistoryGroupsAll(!allGroupsExpanded);
+    setExpandedGroups(next.expandedGroups);
+    setGroupsDefaultExpanded(next.defaultExpanded);
   }
   var historyKb = useKeyboardListNav(historyItems.length, function (i) { startEdit(historyItems[i]._idx); }, historyItems.length > 0);
   var historyFlatIdx = 0;

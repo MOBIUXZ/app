@@ -82,5 +82,45 @@
         "expectedLogs": []
       }
     ]
+  },
+  "workoutHistory": {
+    "defaultExpanded": true,
+    "fixtures": [
+      {
+        "id": "missing-keys-start-expanded",
+        "input": {
+          "expandedGroups": {},
+          "defaultExpanded": true,
+          "groupKeys": ["10-04-2026", "09-04-2026"]
+        },
+        "expected": {
+          "allExpanded": true,
+          "expanded": { "10-04-2026": true, "09-04-2026": true }
+        }
+      },
+      {
+        "id": "collapse-all-persists-across-grouping",
+        "input": {
+          "expandedGroups": {},
+          "defaultExpanded": false,
+          "groupKeys": ["Weighted Push-up", "Pull-up"]
+        },
+        "expected": {
+          "allExpanded": false,
+          "expanded": { "Weighted Push-up": false, "Pull-up": false }
+        }
+      },
+      {
+        "id": "expand-all-clears-per-group-overrides",
+        "input": {
+          "action": "setAll",
+          "expand": true
+        },
+        "expected": {
+          "expandedGroups": {},
+          "defaultExpanded": true
+        }
+      }
+    ]
   }
 }

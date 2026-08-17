@@ -115,7 +115,7 @@ Dependencies: see `package.json` in [RECONSTRUCTION.md](./RECONSTRUCTION.md#root
 - **Dates** — workouts/body use `DD-MM-YYYY`; calorie entries use locale date strings (see [data-model.md](./data-model.md#date-format-rules-critical)).
 - **Number inputs** do not change on mouse wheel scroll while focused; spinner arrows are hidden (see [styling.md](./styling.md#number-inputs)).
 - **Collapse panels** use `12px` top padding inside the body (see [styling.md](./styling.md#collapse-panels)).
-- **Workout History** groups default to expanded; **Expand all / Collapse all** in one click (see [workout.md](./workout.md#grouping)).
+- **Workout History** groups default to expanded; **Expand all / Collapse all** persists across **By Date** / **By Workout** (see [workout.md](./workout.md#grouping)).
 - **Progress → Workout Details** best set uses **Best e1RM {value}** (green), matching chart toggles (see [progress.md](./progress.md#set-list-per-workout)).
 - **Progress tab** stays mounted after first visit; charts lazy-load, appear instantly, morph 600ms on metric toggle (see [progress.md](./progress.md#performance)).
 

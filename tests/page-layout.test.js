@@ -66,6 +66,15 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(source.indexOf('heroStatGhost') === -1).toBe(true);
   });
 
+  it('workout history collapse-all persists across By Date and By Workout', function () {
+    var groups = getPageLayout('workout').historyGroups;
+    expect(groups.defaultExpanded).toBe(true);
+    expect(groups.expandAllPersistsAcrossGrouping).toBe(true);
+    var source = readFileSync(resolve(root, pageLayout.pages.workout.component), 'utf8');
+    expect(source.indexOf('groupsDefaultExpanded') !== -1).toBe(true);
+    expect(source.indexOf('nextHistoryGroupsAll') !== -1).toBe(true);
+  });
+
   it('calories page spec includes TDEE breakdown rows', function () {
     var breakdown = getPageLayout('calories').tdeeBreakdown;
     expect(breakdown.layout).toEqual(['formula', 'bar', 'legend', 'equation']);

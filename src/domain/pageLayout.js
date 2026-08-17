@@ -46,4 +46,27 @@ export function getCollapseSpec(pageId, collapseId) {
   return page.collapses.find(function (c) { return c.id === collapseId; }) || null;
 }
 
+export function isHistoryGroupExpanded(expandedGroups, groupKey, defaultExpanded) {
+  if (Object.prototype.hasOwnProperty.call(expandedGroups || {}, groupKey)) {
+    return !!expandedGroups[groupKey];
+  }
+  return defaultExpanded !== false;
+}
+
+export function nextHistoryGroupToggle(expandedGroups, groupKey, defaultExpanded) {
+  var next = Object.assign({}, expandedGroups);
+  next[groupKey] = !isHistoryGroupExpanded(expandedGroups, groupKey, defaultExpanded);
+  return next;
+}
+
+export function nextHistoryGroupsAll(expand) {
+  return { expandedGroups: {}, defaultExpanded: !!expand };
+}
+
+export function areAllHistoryGroupsExpanded(groupKeys, expandedGroups, defaultExpanded) {
+  return groupKeys.length > 0 && groupKeys.every(function (key) {
+    return isHistoryGroupExpanded(expandedGroups, key, defaultExpanded);
+  });
+}
+
 export { pageLayoutSpec };

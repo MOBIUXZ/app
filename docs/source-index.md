@@ -148,7 +148,7 @@ Complete inventory of every project file. Line counts approximate (Aug 2026).
 
 **Inner component:** `OneRMCalc({ data })`
 
-**Major state:** `cat`, `ex`, `sets`, `logDate`, `logTime`, `showCalendarModal`, `calPanel`, `historySortBy`, `historyOrder`, `expandedGroups`, `editIdx`, `editForm`, parser texts
+**Major state:** `cat`, `ex`, `sets`, `logDate`, `logTime`, `showCalendarModal`, `calPanel`, `historySortBy`, `historyOrder`, `expandedGroups`, `groupsDefaultExpanded`, `editIdx`, `editForm`, parser texts
 
 **Key functions:** `submit()`, `doParse()`, `calSubmit()`, `calDoParse()`, `saveEdit()`, `delW()`, `startEdit()`, `toggleGroup()`, `clearHistory()`, `parseDateString()`
 

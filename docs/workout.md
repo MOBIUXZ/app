@@ -98,6 +98,7 @@ Stacked control layout inside **Workout History** (sticky header while scrolling
 - **Expand all / Collapse all** toggles every group in **one click**
   - Button label is derived from actual group state (`allGroupsExpanded`), not a separate flag — avoids the old double-click bug
   - When all groups are expanded → **Collapse all ▲**; otherwise → **Expand all ▼**
+  - **Collapse all** (and **Expand all**) persists when switching **By Date** ↔ **By Workout** — new group keys follow that default instead of reopening
 - Group headers show date or exercise name (compound lifts in caps) plus entry count badge
 
 ### Per-Entry Actions

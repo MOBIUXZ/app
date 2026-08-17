@@ -65,6 +65,10 @@
         { "id": "history", "icon": "notebook", "label": "Workout History", "defaultOpen": false },
         { "id": "oneRm", "icon": "square-function", "label": "1RM Calculator", "defaultOpen": false }
       ],
+      "historyGroups": {
+        "defaultExpanded": true,
+        "expandAllPersistsAcrossGrouping": true
+      },
       "modals": [
         { "id": "calendarModal", "title": "📅 Workout Calendar", "layerId": "calendar-modal", "monthMaxWidthPx": 389, "yearMaxWidthPx": 680 },
         { "id": "calendarDay", "title": "Day detail", "layerId": "calendar-day-panel", "staysMountedUnder": "calendarLog" },

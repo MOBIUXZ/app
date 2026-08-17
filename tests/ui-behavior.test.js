@@ -2,9 +2,11 @@ import { describe, it, expect } from 'vitest';
 import { getDashboardSnapshot } from '../src/domain/dashboard.js';
 import { computeMacroTotals, computeGoalBarPct, getGoalBarColor, computeTdee, computeTdeeBreakdown } from '../src/domain/calories.js';
 import { syncBodyLogsAfterEdit, removeBodyLogForEntry } from '../src/domain/bodyCompSync.js';
+import { isHistoryGroupExpanded, areAllHistoryGroupsExpanded, nextHistoryGroupsAll } from '../src/domain/pageLayout.js';
 import { resolveExercise } from '../src/components/shared.jsx';
 import uiBehavior from '../spec/ui-behavior-fixtures.json';
 import appConfig from '../spec/app-config.json';
+import pageLayout from '../spec/page-layout.json';
 
 describe('dashboard behavior (spec/ui-behavior-fixtures.json)', function () {
   uiBehavior.dashboard.fixtures.forEach(function (fixture) {
@@ -65,6 +67,28 @@ describe('body comp sync (spec/ui-behavior-fixtures.json)', function () {
       } else {
         expect(syncBodyLogsAfterEdit(fixture.bodyLogs, fixture.oldEntry, fixture.newEntry)).toEqual(fixture.expectedLogs);
       }
+    });
+  });
+});
+
+describe('workout history groups (spec/ui-behavior-fixtures.json)', function () {
+  it('default expanded matches page layout spec', function () {
+    expect(pageLayout.pages.workout.historyGroups.defaultExpanded).toBe(uiBehavior.workoutHistory.defaultExpanded);
+    expect(pageLayout.pages.workout.historyGroups.expandAllPersistsAcrossGrouping).toBe(true);
+  });
+
+  uiBehavior.workoutHistory.fixtures.forEach(function (fixture) {
+    it(fixture.id, function () {
+      if (fixture.input.action === 'setAll') {
+        expect(nextHistoryGroupsAll(fixture.input.expand)).toEqual(fixture.expected);
+        return;
+      }
+      var expanded = {};
+      fixture.input.groupKeys.forEach(function (key) {
+        expanded[key] = isHistoryGroupExpanded(fixture.input.expandedGroups, key, fixture.input.defaultExpanded);
+      });
+      expect(expanded).toEqual(fixture.expected.expanded);
+      expect(areAllHistoryGroupsExpanded(fixture.input.groupKeys, fixture.input.expandedGroups, fixture.input.defaultExpanded)).toBe(fixture.expected.allExpanded);
     });
   });
 });
