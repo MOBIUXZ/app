@@ -65,11 +65,19 @@ When sufficient data is entered, two balance checks are shown:
 
 ## History
 
-Shows the **10 most recent** entries with all stored metrics displayed as chips:
+Shows **all** entries (newest first) with stored metrics displayed as chips:
 
 BW, BMI, FM, FMI, PBF, FFM, FFMI, SMM, SMI
 
-The history toolbar (entry count + actions) sits below the collapsible **History** header with spacing from the shared collapse body padding.
+The history toolbar (entry count, **Import InBody CSV**, and **Clear History**) sits below the collapsible **History** header with spacing from the shared collapse body padding. Import is always available, including when history is empty.
+
+### Import InBody CSV
+- Button in History; accepts `.csv` from the InBody phone export
+- Parser: `src/domain/inbodyCsv.js` ↔ `spec/inbody-csv-fixtures.json`
+- Dates like `25-3` become `DD-MM-YYYY`. The InBody app export uses timestamps (`20260725130008` → `25-07-2026`). Year for `D-M` dates comes from the file name (`InBody-20260817.csv` → 2026); December→January rows increment the year
+- Maps weight, body fat %, skeletal muscle, fat mass, BMI, SMI, and InBody BMR onto `bodyComp` (measured fat mass / BMI / SMI are kept, not recomputed). Extra columns are stored on `entry.inbody` for later graphs
+- Confirm dialog: adds N new scans and replaces existing dates. **Workouts and calories stay**
+- Same-date scans overwrite that day; `bodyLogs` stay in sync so Dashboard and Progress body-weight charts update
 
 ### Clear History
 - **Clear History** — quiet red pill (no hard border) that deletes all `bodyComp` and `bodyLogs` data when entries exist
@@ -96,7 +104,7 @@ The history toolbar (entry count + actions) sits below the collapsible **History
 
 Smart Parser lines like `BW = 60kg` in calisthenics workout logs are **only** used to calculate set loads (e.g. weighted pull-ups). They do **not** create body composition entries or update the Dashboard body weight stat.
 
-Body comp data only comes from the **Log Entry** form on this page.
+Body comp data comes from the **Log Entry** form on this page, or from **Import InBody CSV** in History.
 
 ## Integration
 

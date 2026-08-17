@@ -1,0 +1,163 @@
+{
+  "description": "InBody CSV parse, date year, measured-field mapping, and merge-by-date into bodyComp/bodyLogs",
+  "messages": {
+    "imported": "Imported InBody scans.",
+    "invalidCsv": "That file is not a valid InBody CSV.",
+    "missingColumns": "This CSV is missing Date, Weight, or Percent Body Fat columns.",
+    "noRows": "This CSV has no scan rows.",
+    "readFailed": "Could not read that file."
+  },
+  "requiredFields": ["date", "weight", "bf"],
+  "columns": {
+    "date": ["Date"],
+    "weight": ["Weight(kg)"],
+    "smm": ["Skeletal Muscle Mass(kg)"],
+    "fm": ["Body Fat Mass(kg)"],
+    "bmi": ["BMI(kg/m²)", "BMI(kg/m2)"],
+    "bf": ["Percent Body Fat(%)"],
+    "bmr": ["Basal Metabolic Rate(kcal)"],
+    "smi": ["SMI(kg/m²)", "SMI(kg/m2)"],
+    "waist": ["Waist(cm)", "Waist Circumference(cm)"]
+  },
+  "extraColumns": {
+    "score": ["InBody Score"],
+    "visceral": ["Visceral Fat Level", "Visceral Fat Level(Level)"],
+    "visceralArea": ["Visceral Fat Area(cm²)", "Visceral Fat Area(cm2)"],
+    "tbw": ["Total Body Water(L)"],
+    "protein": ["Protein(kg)"],
+    "mineral": ["Mineral(kg)"],
+    "bcm": ["Body Cell Mass(kg)"],
+    "phaseAngle": ["Body Phase Angle(°)", "Whole Body Phase Angle(°)"],
+    "leanRightArmKg": ["Lean Right Arm(kg)", "Right Arm Lean Mass(kg)"],
+    "leanLeftArmKg": ["Lean Left Arm(kg)", "Left Arm Lean Mass(kg)"],
+    "leanTrunkKg": ["Lean Trunk(kg)", "Trunk Lean Mass(kg)"],
+    "leanRightLegKg": ["Lean Right Leg(kg)", "Right Leg Lean Mass(kg)"],
+    "leanLeftLegKg": ["Lean Left Leg(kg)", "Left Leg Lean Mass(kg)", "Left leg Lean Mass(kg)"],
+    "fatRightArmKg": ["Fat Right Arm(kg)", "Right Arm Fat Mass(kg)"],
+    "fatLeftArmKg": ["Fat Left Arm(kg)", "Left Arm Fat Mass(kg)"],
+    "fatTrunkKg": ["Fat Trunk(kg)", "Trunk Fat Mass(kg)"],
+    "fatRightLegKg": ["Fat Right Leg(kg)", "Right Leg Fat Mass(kg)"],
+    "fatLeftLegKg": ["Fat Left Leg(kg)", "Left Leg Fat Mass(kg)"]
+  },
+  "yearFromFileNameFixtures": [
+    { "id": "inbody-yyyymmdd", "fileName": "InBody-20260817.csv", "expected": 2026 },
+    { "id": "plain-year", "fileName": "export-2025.csv", "expected": 2025 },
+    { "id": "no-year", "fileName": "scans.csv", "expected": null }
+  ],
+  "dateFixtures": [
+    { "id": "day-month", "raw": "25-3", "year": 2026, "expected": "25-03-2026" },
+    { "id": "padded", "raw": "04-04-2026", "year": 2026, "expected": "04-04-2026" },
+    { "id": "inbody-timestamp", "raw": "20260725130008", "year": 2026, "expected": "25-07-2026" },
+    { "id": "inbody-yyyymmdd", "raw": "20251216", "year": 2026, "expected": "16-12-2025" },
+    { "id": "invalid", "raw": "nope", "year": 2026, "expected": null }
+  ],
+  "parseFixtures": [
+    {
+      "id": "app-export-timestamp",
+      "fileName": "InBody-20260817.csv",
+      "csv": "Date,Measurement device.,Weight(kg),Skeletal Muscle Mass(kg),Soft Lean Mass(kg),Body Fat Mass(kg),BMI(kg/m²),Percent Body Fat(%),Basal Metabolic Rate(kcal),InBody Age,InBody Score,Right Arm Lean Mass(kg),Left Arm Lean Mass(kg),Trunk Lean Mass(kg),Right Leg Lean Mass(kg),Left leg Lean Mass(kg),Right Arm Fat Mass(kg),Left Arm Fat Mass(kg),Trunk Fat Mass(kg),Right Leg Fat Mass(kg),Left Leg Fat Mass(kg),Right Arm ECW Ratio,Left Arm ECW Ratio,Trunk ECW Ratio,Right Leg ECW Ratio,Left Leg ECW Ratio,Waist Hip Ratio,Waist Circumference(cm),Visceral Fat Area(cm²),Visceral Fat Level(Level),Total Body Water(L),Intracellular Water(L),Extracellular Water(L),ECW Ratio,Upper-Lower,Upper,Lower,Leg Muscle Level(Level),Leg Lean Mass(kg),Protein(kg),Mineral(kg),Bone Mineral Content(kg),Body Cell Mass(kg),SMI(kg/m²),Whole Body Phase Angle(°)\n20260725130008,260,59.7,23.8,-,17.2,24.2,28.8,1289,-,67.0,2.64,2.59,21.8,5.78,5.90,0.9,1.0,9.7,2.2,2.2,-,-,-,-,-,-,-,-,7.0,31.3,-,-,-,2,0,0,-,-,8.5,2.71,-,-,6.9,-\n20260627102843,260,60.0,23.0,-,18.7,24.3,31.2,1262,-,65.0,2.54,2.50,21.3,5.73,5.88,1.1,1.1,10.5,2.4,2.4,-,-,-,-,-,-,-,-,8.0,30.4,-,-,-,1,0,0,-,-,8.3,2.60,-,-,6.8,-\n",
+      "ok": true,
+      "expectedScanCount": 2,
+      "expectedFirstDate": "27-06-2026",
+      "expectedLastDate": "25-07-2026",
+      "expectedFirstWeight": 60,
+      "expectedLastWeight": 59.7,
+      "expectedFirstBf": 31.2,
+      "expectedFirstFm": 18.7,
+      "expectedFirstBmi": 24.3,
+      "expectedFirstSmi": 6.8,
+      "expectedFirstBmr": 1262,
+      "expectedFirstScore": 65
+    },
+    {
+      "id": "two-scans-from-export",
+      "fileName": "InBody-20260817.csv",
+      "csv": "Date,Weight(kg),Skeletal Muscle Mass(kg),Body Fat Mass(kg),BMI(kg/m²),Percent Body Fat(%),Basal Metabolic Rate(kcal),InBody Score,SMI(kg/m²),Visceral Fat Level\n25-3,69.3,32.9,17.2,24.4,24.8,1567,67,8.6,7\n4-4,67.0,32.0,12.0,23.6,17.9,1542,87,8.0,4\n",
+      "ok": true,
+      "expectedScanCount": 2,
+      "expectedFirstDate": "25-03-2026",
+      "expectedLastDate": "04-04-2026",
+      "expectedFirstWeight": 69.3,
+      "expectedFirstBf": 24.8,
+      "expectedFirstFm": 17.2,
+      "expectedFirstBmi": 24.4,
+      "expectedFirstSmi": 8.6,
+      "expectedFirstBmr": 1567,
+      "expectedFirstScore": 67
+    },
+    {
+      "id": "year-rollover-dec-jan",
+      "year": 2025,
+      "csv": "Date,Weight(kg),Percent Body Fat(%)\n30-12,70,20\n2-1,69.5,19.5\n",
+      "ok": true,
+      "expectedFirstDate": "30-12-2025",
+      "expectedLastDate": "02-01-2026"
+    },
+    {
+      "id": "semicolon-delimited",
+      "year": 2026,
+      "csv": "Date;Weight(kg);Percent Body Fat(%)\n1-4;68.1;18.2\n",
+      "ok": true,
+      "expectedScanCount": 1,
+      "expectedFirstDate": "01-04-2026",
+      "expectedFirstWeight": 68.1
+    },
+    {
+      "id": "missing-columns",
+      "csv": "Hello,World\n1,2\n",
+      "ok": false,
+      "errorId": "missingColumns"
+    },
+    {
+      "id": "header-only",
+      "csv": "Date,Weight(kg),Percent Body Fat(%)\n",
+      "ok": false,
+      "errorId": "noRows"
+    }
+  ],
+  "buildFixtures": [
+    {
+      "id": "keeps-measured-fm-bmi-smi",
+      "scan": {
+        "date": "25-03-2026",
+        "weight": 69.3,
+        "bf": 24.8,
+        "smm": 32.9,
+        "fm": 17.2,
+        "bmi": 24.4,
+        "smi": 8.6,
+        "bmr": 1567,
+        "extras": { "score": 67, "visceral": 7 }
+      },
+      "profile": { "sex": "male", "height": 168, "age": 28 },
+      "expectedFm": 17.2,
+      "expectedBmi": 24.4,
+      "expectedSmi": 8.6,
+      "expectedBmrInBody": 1567,
+      "expectedSource": "inbody",
+      "expectedScore": 67
+    }
+  ],
+  "mergeFixtures": [
+    {
+      "id": "adds-and-replaces-by-date",
+      "current": {
+        "bodyComp": [
+          { "date": "25-03-2026", "weight": 70, "bf": 20, "BW": 70, "PBF": 20 }
+        ],
+        "bodyLogs": [
+          { "date": "25-03-2026", "weight": 70 }
+        ]
+      },
+      "incoming": [
+        { "date": "25-03-2026", "weight": 69.3, "bf": 24.8, "BW": 69.3, "PBF": 24.8 },
+        { "date": "04-04-2026", "weight": 67, "bf": 17.9, "BW": 67, "PBF": 17.9 }
+      ],
+      "expectedAdded": 1,
+      "expectedReplaced": 1,
+      "expectedCompCount": 2,
+      "expectedLastWeight": 67,
+      "expectedFirstWeight": 69.3
+    }
+  ]
+}

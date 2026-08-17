@@ -222,3 +222,7 @@
 .clearHistoryBtn:hover {
   background: rgba(248, 113, 113, 0.26);
 }
+
+.fileInputHidden {
+  display: none;
+}

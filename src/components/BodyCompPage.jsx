@@ -3,11 +3,13 @@ import { ACCENT, BLUE, GREEN, ORANGE, PINK, Collapse, btnPrimary, btnSecondary, 
 import { computeBodyCompEntry } from "../domain/metrics.js";
 import { syncBodyLogsAfterEdit, removeBodyLogForEntry } from "../domain/bodyCompSync.js";
 import { getPageLayout, getCollapseSpec, getModalSpec, formatTemplateLabel } from "../domain/pageLayout.js";
-import { profilePrefill, applyProfilePrefill } from "../domain/storage.js";
+import { profilePrefill, applyProfilePrefill, normalizeStoredData } from "../domain/storage.js";
+import { parseInbodyCsv, buildInbodyEntry, mergeInbodyIntoLogs, getInbodyMessages } from "../domain/inbodyCsv.js";
 import { PageHeading } from "./PageIcon";
 import s from "./BodyCompPage.module.css";
 
 var bodyLayout = getPageLayout("bodyComp");
+var inbodyMessages = getInbodyMessages();
 
 export default function BodyCompPage({ data, save }) {
   var prefill = profilePrefill(data.settings);
@@ -15,8 +17,11 @@ export default function BodyCompPage({ data, save }) {
   var [w, setW] = useState(""), [h, setH] = useState(prefill.height), [bf, setBf] = useState(""), [smm, setSmm] = useState(""), [waist, setWaist] = useState(""), [age, setAge] = useState(prefill.age), [sex, setSex] = useState(prefill.sex), [msg, setMsg] = useState("");
   var [showClearConfirm, setShowClearConfirm] = useState(false);
   var [pendingDeleteIdx, setPendingDeleteIdx] = useState(null);
+  var [pendingInbody, setPendingInbody] = useState(null);
+  var [inbodyMsg, setInbodyMsg] = useState(null);
   var [editIdx, setEditIdx] = useState(null);
   var [editForm, setEditForm] = useState(null);
+  var importRef = useRef(null);
   var prevPrefillRef = useRef(prefill);
   var formRef = useRef({ sex: sex, height: h, age: age });
   formRef.current = { sex: sex, height: h, age: age };
@@ -51,7 +56,7 @@ export default function BodyCompPage({ data, save }) {
   function syncLogsLocal(oldEntry, newEntry) {
     return syncBodyLogsAfterEdit(data.bodyLogs, oldEntry, newEntry);
   }
-  var historyEntries = data.bodyComp.slice().reverse().slice(0, 10);
+  var historyEntries = data.bodyComp.slice().reverse();
   function deleteEntry(displayIdx) {
     var compIdx = compIdxFromDisplay(displayIdx);
     var entry = data.bodyComp[compIdx];
@@ -78,6 +83,43 @@ export default function BodyCompPage({ data, save }) {
     if (pendingDeleteIdx == null) return;
     deleteEntry(pendingDeleteIdx);
     setPendingDeleteIdx(null);
+  }
+  function onInbodyFile(e) {
+    var file = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var parsed = parseInbodyCsv(String(reader.result || ""), { fileName: file.name });
+      if (!parsed.ok) {
+        setInbodyMsg({ type: "error", text: inbodyMessages[parsed.errorId] });
+        return;
+      }
+      var profile = normalizeStoredData(data).settings.profile;
+      var entries = parsed.scans.map(function (scan) { return buildInbodyEntry(scan, profile); });
+      var preview = mergeInbodyIntoLogs(data, entries);
+      setPendingInbody({ entries: entries, added: preview.added, replaced: preview.replaced });
+      setInbodyMsg(null);
+    };
+    reader.onerror = function () {
+      setInbodyMsg({ type: "error", text: inbodyMessages.readFailed });
+    };
+    reader.readAsText(file);
+  }
+  function cancelInbodyImport() {
+    setPendingInbody(null);
+  }
+  function confirmInbodyImport() {
+    if (!pendingInbody) return;
+    var merged = mergeInbodyIntoLogs(data, pendingInbody.entries);
+    save({
+      workouts: data.workouts,
+      calories: data.calories,
+      bodyComp: merged.bodyComp,
+      bodyLogs: merged.bodyLogs,
+    });
+    setPendingInbody(null);
+    setInbodyMsg({ type: "ok", text: inbodyMessages.imported });
   }
   function clearHistory() {
     save({ workouts: data.workouts, calories: data.calories, bodyComp: [], bodyLogs: [] });
@@ -133,6 +175,8 @@ export default function BodyCompPage({ data, save }) {
   var clearConfirmKb = useConfirmDialogKeyboard(showClearConfirm, clearHistory, function () { setShowClearConfirm(false); }, "clear-body-comp-history", { cancel: "Cancel", confirm: "Clear History" });
   var deleteModal = getModalSpec("bodyComp", "deleteEntry");
   var deleteConfirmKb = useConfirmDialogKeyboard(pendingDeleteIdx != null, confirmDelete, cancelDelete, deleteModal.layerId, { cancel: deleteModal.buttons[0], confirm: deleteModal.buttons[1] });
+  var importModal = getModalSpec("bodyComp", "importInbody");
+  var importConfirmKb = useConfirmDialogKeyboard(!!pendingInbody, confirmInbodyImport, cancelInbodyImport, importModal.layerId, { cancel: importModal.buttons[0], confirm: importModal.buttons[1] });
   var pendingDeleteEntry = pendingDeleteIdx != null ? historyEntries[pendingDeleteIdx] : null;
   function submit() {
     if (!w || !bf) { setMsg("Weight and Body Fat % are required."); return; }
@@ -185,12 +229,15 @@ export default function BodyCompPage({ data, save }) {
         {msg && <div className={cx(ui.successMsg, ui.marginTop10)}>✅ {msg}</div>}
       </Collapse>
       <Collapse icon={getCollapseSpec("bodyComp", "history").icon} label={getCollapseSpec("bodyComp", "history").label} defaultOpen={getCollapseSpec("bodyComp", "history").defaultOpen}>
-        {historyEntries.length > 0 && (
-          <div className={ui.historyToolbar}>
-            <span className={ui.mutedXs}>{data.bodyComp.length} {data.bodyComp.length === 1 ? "entry" : "entries"}</span>
-            <button type="button" onClick={function () { setShowClearConfirm(true); }} className={s.clearHistoryBtn}>{bodyLayout.historyChrome.clearLabel}</button>
+        <div className={ui.historyToolbar}>
+          <span className={ui.mutedXs}>{data.bodyComp.length} {data.bodyComp.length === 1 ? "entry" : "entries"}</span>
+          <div className={ui.flexRow}>
+            <button type="button" onClick={function () { importRef.current && importRef.current.click(); }} className={btnSecondary({ sm: true })}>{bodyLayout.historyChrome.importLabel}</button>
+            {historyEntries.length > 0 ? <button type="button" onClick={function () { setShowClearConfirm(true); }} className={s.clearHistoryBtn}>{bodyLayout.historyChrome.clearLabel}</button> : null}
           </div>
-        )}
+        </div>
+        <input ref={importRef} type="file" accept={bodyLayout.historyChrome.importAccept} className={s.fileInputHidden} onChange={onInbodyFile} />
+        {inbodyMsg ? <div className={cx(inbodyMsg.type === "error" ? ui.errorMsg : ui.successMsg, ui.marginTop8)}>{inbodyMsg.text}</div> : null}
         {historyEntries.length === 0 ? <div className={ui.emptyStateLg}><div className={ui.emptyIconLg}>📏</div><div>No entries yet.</div><div className={s.emptySub}>Track your body composition over time!</div></div> : (
         <div>
         {historyEntries.map(function (e, i) {
@@ -287,6 +334,20 @@ export default function BodyCompPage({ data, save }) {
               <div className={ui.flexEnd}>
                 <button type="button" onClick={function () { setShowClearConfirm(false); }} onMouseEnter={function () { clearConfirmKb.setFocusIdx(0); }} className={cx(clearConfirmKb.btnClass(0), btnSecondary({ modal: true }))}>Cancel</button>
                 <button type="button" onClick={clearHistory} onMouseEnter={function () { clearConfirmKb.setFocusIdx(1); }} className={cx(clearConfirmKb.btnClass(1), btnDanger({ modal: true }))}>Clear History</button>
+              </div>
+            </div>
+          </div>
+        )}
+        {pendingInbody && (
+          <div className={cx("ft-kb-modal-backdrop", ui.modalBackdrop)} style={{ zIndex: importConfirmKb.zIndex }} onClick={importConfirmKb.onBackdropClick}>
+            <div ref={importConfirmKb.dialogRef} tabIndex={-1} className={ui.modalPanelConfirm} onClick={function (ev) { ev.stopPropagation(); }}>
+              <div className={cx(ui.modalTitle, s.confirmTitle)}>{importModal.title}</div>
+              <div className={cx(ui.textMutedSm, s.confirmBody)}>{formatTemplateLabel(importModal.body, { added: pendingInbody.added, replaced: pendingInbody.replaced })}</div>
+              <div className="ft-kb-focus-indicator">Focused: <strong>{importConfirmKb.focusLabel}</strong></div>
+              <div className="ft-kb-hint">← → or Tab switch · Enter select · Esc cancel</div>
+              <div className={ui.flexEnd}>
+                <button type="button" onClick={cancelInbodyImport} onMouseEnter={function () { importConfirmKb.setFocusIdx(0); }} className={cx(importConfirmKb.btnClass(0), btnSecondary({ modal: true }))}>{importModal.buttons[0]}</button>
+                <button type="button" onClick={confirmInbodyImport} onMouseEnter={function () { importConfirmKb.setFocusIdx(1); }} className={cx(importConfirmKb.btnClass(1), btnDanger({ modal: true }))}>{importModal.buttons[1]}</button>
               </div>
             </div>
           </div>

@@ -40,6 +40,10 @@ Complete inventory of every project file. Line counts approximate (Aug 2026).
 
 **~250 lines** — `normalizeStoredData()`, `parseImportedData()`, `wipeLogs()`, `patchSettings()`, `mergePersistedData()`, `persistStoredData()`, `profilePrefill()`, `applyProfilePrefill()`, export file name. Spec: `spec/storage-fixtures.json`. Used by `App.jsx`, Body Comp, and Calories.
 
+## `src/domain/inbodyCsv.js`
+
+**~240 lines** — `parseInbodyCsv()`, `buildInbodyEntry()`, `mergeInbodyIntoLogs()`. Spec: `spec/inbody-csv-fixtures.json`. Used by Body Comp History import.
+
 ---
 
 ## `src/styles/`
@@ -175,7 +179,7 @@ Spec: [workout.md](./workout.md)
 - `syncBodyLogsAfterEdit(old, new)` — bodyLogs sync
 - `compIdxFromDisplay(displayIdx)` — history is reversed display
 
-**Features:** Log Entry collapse, live metric preview, sex pill toggle, history (last 10), inline edit, delete, clear-all confirm
+**Features:** Log Entry collapse, live metric preview, sex pill toggle, history (all entries, newest first), InBody CSV import (merge by date), inline edit, delete, clear-all confirm
 
 Spec: [body-comp.md](./body-comp.md)
 

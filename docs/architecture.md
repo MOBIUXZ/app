@@ -127,6 +127,7 @@ Omitted keys (including `settings`) are kept from current state. If the write fa
 | CaloriePage BMR | Latest `bodyComp` entry | Prefers `BMR_Mifflin`, falls back `BMR_Katch` |
 | Progress body weight chart | `bodyLogs` | |
 | Progress body fat chart | `bodyComp` where `bf` exists | |
+| Body Comp InBody import | InBody CSV → `bodyComp` + `bodyLogs` | Merge by date; workouts/calories unchanged |
 | Progress calorie chart | `calories` last 7 days | |
 | Progress exercise charts | `workouts` via `workoutsByExercise` | Normalized with `resolveExercise()` |
 

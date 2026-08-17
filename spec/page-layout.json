@@ -194,11 +194,15 @@
       ],
       "historyChrome": {
         "clearStyle": "quietPill",
-        "clearLabel": "Clear History"
+        "clearLabel": "Clear History",
+        "importLabel": "Import InBody CSV",
+        "importAccept": ".csv,text/csv",
+        "listAll": true
       },
       "modals": [
         { "id": "clearHistory", "title": "Clear Body Comp History?", "layerId": "clear-body-comp-history", "buttons": ["Cancel", "Clear History"] },
-        { "id": "deleteEntry", "title": "Delete this entry?", "layerId": "delete-body-comp-entry", "buttons": ["Cancel", "Delete"], "body": "This will permanently delete the {date} body composition entry and its body weight chart point." }
+        { "id": "deleteEntry", "title": "Delete this entry?", "layerId": "delete-body-comp-entry", "buttons": ["Cancel", "Delete"], "body": "This will permanently delete the {date} body composition entry and its body weight chart point." },
+        { "id": "importInbody", "title": "Import InBody scans?", "layerId": "import-inbody", "buttons": ["Cancel", "Import"], "body": "This adds {added} new scans and replaces {replaced} existing dates. Workouts and calories stay." }
       ]
     },
     "calories": {

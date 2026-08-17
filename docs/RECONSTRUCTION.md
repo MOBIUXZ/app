@@ -292,6 +292,7 @@ After rebuild, confirm **all** of the following:
 - [ ] Live computed metrics (BMI, FFMI, BMR) update as you type
 - [ ] Entry saves to `bodyComp` and appends matching `bodyLogs` row
 - [ ] Edit/delete syncs `bodyLogs`
+- [ ] Import InBody CSV merges scans by date (workouts stay)
 
 ### Calories
 - [ ] BMR from latest body comp entry

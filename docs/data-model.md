@@ -150,6 +150,13 @@ Raw inputs plus **persisted computed fields** (recomputed on save/edit).
 | `SMI` | `smm / (height_m)²` when smm > 0 |
 | `BMR_Mifflin` | Male: `10×W + 6.25×H_cm − 5×age + 5`; Female: `10×W + 6.25×H_cm − 5×age − 161` |
 | `BMR_Katch` | `370 + 21.6 × FFM` when FFM known |
+| `BMR_InBody` | InBody CSV BMR when imported |
+| `source` | `"inbody"` for CSV imports; omitted for manual logs |
+| `inbody` | Optional extras from the CSV (score, visceral, segmental, water, …) |
+
+InBody import prefers measured `FM` / `BMI` / `SMI` from the CSV over formula recomputes. Mifflin/Katch are still filled from Settings profile height/age/sex when available. Calories TDEE still uses Mifflin then Katch, not InBody BMR.
+
+**Import:** Body Comp → History → Import InBody CSV. Merges by date; does not replace workouts or calories. Spec: [`spec/inbody-csv-fixtures.json`](../spec/inbody-csv-fixtures.json).
 
 `height_m = height_cm / 100`.
 

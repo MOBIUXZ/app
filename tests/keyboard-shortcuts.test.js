@@ -30,6 +30,12 @@ describe('keyboard shortcuts spec', function () {
     expect(importBackup.closeKey).toBe('Escape');
   });
 
+  it('inbody import confirm is a popup layer', function () {
+    var inbody = keyboardSpec.popups.find(function (p) { return p.id === 'import-inbody'; });
+    expect(inbody.layerId).toBe('import-inbody');
+    expect(inbody.closeKey).toBe('Escape');
+  });
+
   it('parser textarea uses Enter submit and Shift+Enter newline', function () {
     expect(keyboardSpec.parserTextarea.submitKey).toBe('Enter');
     expect(keyboardSpec.parserTextarea.newlineModifier).toBe('Shift');

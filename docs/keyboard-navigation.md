@@ -77,6 +77,7 @@ Hovering an item with the mouse updates keyboard focus on most lists (Dashboard 
 | **Settings** | Esc close | Gear at top-right of the header; also closes on backdrop click or ✕. Stays mounted under Wipe and Import confirm. |
 | **Wipe all logs** | `←` `→` / Tab · Enter select · Esc cancel | Stacks over Settings; Cancel/Esc returns to Settings |
 | **Import backup** | `←` `→` / Tab · Enter select · Esc cancel | Stacks over Settings after a valid file is parsed; body shows log counts; Cancel/Esc returns to Settings |
+| **Import InBody CSV** | `←` `→` / Tab · Enter select · Esc cancel | Body Comp History; confirms add/replace counts; workouts stay |
 | **Progress workout detail** | ↑↓ cards · Esc close | |
 | **Workout History list** | ↑↓ entries · Enter edit · Esc clear focus | Mouse hover does not move focus |
 | **Calories activity level** | ↑↓ levels · Enter select · Esc clear focus | Mouse hover does not move focus; green keyboard outline |

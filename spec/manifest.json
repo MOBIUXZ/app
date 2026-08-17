@@ -76,6 +76,12 @@
       "docs": ["docs/keyboard-navigation.md"]
     },
     {
+      "id": "inbody-csv",
+      "path": "spec/inbody-csv-fixtures.json",
+      "governs": ["parseInbodyCsv()", "buildInbodyEntry()", "mergeInbodyIntoLogs()", "InBody CSV column map"],
+      "docs": ["docs/body-comp.md", "docs/data-model.md"]
+    },
+    {
       "id": "storage-fixtures",
       "path": "spec/storage-fixtures.json",
       "governs": ["normalizeStoredData()", "parseImportedData()", "wipeLogs()", "persistWith()", "mergePersistedData()", "export file name", "settings profile prefill"],
@@ -143,6 +149,7 @@
     }
   ],
   "testSuites": [
+    { "path": "tests/inbody-csv.test.js", "spec": "inbody-csv" },
     { "path": "tests/storage.test.js", "spec": "storage-fixtures" },
     { "path": "tests/parser.test.js", "spec": "parser-fixtures" },
     { "path": "tests/resolve-exercise.test.js", "spec": "resolve-exercise-fixtures" },

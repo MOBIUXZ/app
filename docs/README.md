@@ -31,7 +31,7 @@ Orbius is a client-side fitness tracking web app built with **React** and **Vite
 |------|------|-------------|
 | Dashboard | [dashboard.md](./dashboard.md) | At-a-glance stats, PRs, and recent workouts |
 | Workout | [workout.md](./workout.md) | Logging, calendar, smart parser, history, 1RM calculator |
-| Body Comp | [body-comp.md](./body-comp.md) | Body composition logging and derived metrics |
+| Body Comp | [body-comp.md](./body-comp.md) | Body composition logging, InBody CSV import, derived metrics |
 | Calories | [calories.md](./calories.md) | Food logging, macros, BMR/TDEE, daily goals |
 | Progress | [progress.md](./progress.md) | Exercise charts, compound/isolation tracking, trends |
 

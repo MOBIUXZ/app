@@ -71,6 +71,7 @@ Machine-readable checklist: [`spec/manual-qa-checklist.json`](../spec/manual-qa-
 
 - [ ] Log Entry — live metrics update while typing
 - [ ] History entry shows metric chips
+- [ ] Import InBody CSV asks to confirm and merges by date; workouts stay
 
 ### Calories
 

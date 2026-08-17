@@ -51,7 +51,8 @@
       "visualSnapshot": "body-comp",
       "items": [
         { "id": "live-metrics", "check": "Log Entry expand — typing weight/BF updates live metrics" },
-        { "id": "history", "check": "History shows saved entry with metric chips" }
+        { "id": "history", "check": "History shows saved entry with metric chips" },
+        { "id": "inbody-import", "check": "History Import InBody CSV parses the export, asks to confirm, and merges scans by date without touching workouts" }
       ]
     },
     {

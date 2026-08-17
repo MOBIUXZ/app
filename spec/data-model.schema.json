@@ -110,7 +110,13 @@
         "SMM": { "type": ["number", "null"] },
         "SMI": { "type": ["number", "null"] },
         "BMR_Mifflin": { "type": ["number", "null"] },
-        "BMR_Katch": { "type": ["number", "null"] }
+        "BMR_Katch": { "type": ["number", "null"] },
+        "BMR_InBody": { "type": ["number", "null"] },
+        "source": { "type": "string", "enum": ["manual", "inbody"] },
+        "inbody": {
+          "type": "object",
+          "additionalProperties": { "type": ["number", "null"] }
+        }
       },
       "additionalProperties": false
     },

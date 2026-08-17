@@ -82,9 +82,16 @@ describe('page layout spec (spec/page-layout.json)', function () {
     var chrome = getPageLayout('bodyComp').historyChrome;
     expect(chrome.clearStyle).toBe('quietPill');
     expect(chrome.clearLabel).toBe('Clear History');
+    expect(chrome.importLabel).toBe('Import InBody CSV');
+    expect(chrome.listAll).toBe(true);
+    var importModal = getModalSpec('bodyComp', 'importInbody');
+    expect(importModal.layerId).toBe('import-inbody');
+    expect(importModal.buttons).toEqual(['Cancel', 'Import']);
     var source = readFileSync(resolve(root, pageLayout.pages.bodyComp.component), 'utf8');
+    expect(source.indexOf('slice(0, 10)') === -1).toBe(true);
     expect(source.indexOf('clearHistoryBtn') !== -1).toBe(true);
     expect(source.indexOf('historyChrome.clearLabel') !== -1).toBe(true);
+    expect(source.indexOf('historyChrome.importLabel') !== -1).toBe(true);
   });
 
   it('workout history delete asks for confirmation', function () {
