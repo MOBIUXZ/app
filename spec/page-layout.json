@@ -103,7 +103,8 @@
         { "id": "calendarLog", "title": "✍️ Manual Log", "altTitle": "🧠 Smart Paste", "layerId": "calendar-log-panel", "stacksOver": "calendarDay" },
         { "id": "smartParser", "title": "🧠 Smart Parser", "layerId": "smart-parser", "submitLabel": "Parse & Save", "iconInTitle": true },
         { "id": "setPicker", "title": "Select a logged set", "layerId": "set-picker" },
-        { "id": "clearHistory", "title": "Clear Workout History?", "layerId": "clear-workout-history", "buttons": ["Cancel", "Clear History"] }
+        { "id": "clearHistory", "title": "Clear Workout History?", "layerId": "clear-workout-history", "buttons": ["Cancel", "Clear History"] },
+        { "id": "deleteEntry", "title": "Delete this workout?", "layerId": "delete-workout-entry", "buttons": ["Cancel", "Delete"], "body": "This will permanently delete {exercise} on {date}." }
       ]
     },
     "bodyComp": {
@@ -116,8 +117,13 @@
         { "id": "logEntry", "icon": "square-plus", "label": "Log Entry", "defaultOpen": false },
         { "id": "history", "icon": "history", "label": "History", "defaultOpen": false }
       ],
+      "historyChrome": {
+        "clearStyle": "quietPill",
+        "clearLabel": "Clear History"
+      },
       "modals": [
-        { "id": "clearHistory", "title": "Clear Body Comp History?", "layerId": "clear-body-comp-history", "buttons": ["Cancel", "Clear History"] }
+        { "id": "clearHistory", "title": "Clear Body Comp History?", "layerId": "clear-body-comp-history", "buttons": ["Cancel", "Clear History"] },
+        { "id": "deleteEntry", "title": "Delete this entry?", "layerId": "delete-body-comp-entry", "buttons": ["Cancel", "Delete"], "body": "This will permanently delete the {date} body composition entry and its body weight chart point." }
       ]
     },
     "calories": {

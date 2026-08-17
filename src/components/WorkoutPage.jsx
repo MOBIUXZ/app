@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, formatExerciseName, btnPrimary, btnSecondary, btnDanger, inputClass, selectClass, textareaClass, formatDate, useKeyboardListNav, useConfirmDialogKeyboard, handleParserTextareaKeyDown, useParserTextareaKeyboard, useKeyboardLayer, isTypingTarget, ui, cx } from "./shared";
 import { computeOneRM, TRAINING_PERCENTAGES, DEFAULT_ONE_RM_FORMULA, ONE_RM_FORMULAS, collectLoggedSets } from "../domain/oneRm.js";
-import { getPageLayout, getCollapseSpec, getModalSpec, isHistoryGroupExpanded, nextHistoryGroupToggle, nextHistoryGroupsAll, areAllHistoryGroupsExpanded, matchesHistorySearch, parseStoredDate, sortHistoryWorkouts, formatHeroTodayDate } from "../domain/pageLayout.js";
+import { getPageLayout, getCollapseSpec, getModalSpec, isHistoryGroupExpanded, nextHistoryGroupToggle, nextHistoryGroupsAll, areAllHistoryGroupsExpanded, matchesHistorySearch, parseStoredDate, sortHistoryWorkouts, formatHeroTodayDate, formatTemplateLabel } from "../domain/pageLayout.js";
 import { PageHeading } from "./PageIcon";
 import s from "./WorkoutPage.module.css";
 
@@ -175,6 +175,7 @@ export default function WorkoutPage({ data, save }) {
   var [expandedGroups, setExpandedGroups] = useState({});
   var [groupsDefaultExpanded, setGroupsDefaultExpanded] = useState(workoutLayout.historyGroups.defaultExpanded);
   var [showClearConfirm, setShowClearConfirm] = useState(false);
+  var [pendingDeleteIdx, setPendingDeleteIdx] = useState(null);
   var [hoveredGroup, setHoveredGroup] = useState(null);
   var [showCalendarModal, setShowCalendarModal] = useState(false);
   var [calendarView, setCalendarView] = useState("month");
@@ -301,6 +302,17 @@ export default function WorkoutPage({ data, save }) {
   function saveEdit() { var updated = data.workouts.map(function (w, i) { return i === editIdx ? Object.assign({}, w, { exercise: resolveExercise(editForm.exercise), note: editForm.note || "", sets: editForm.sets.map(function (s) { return { weight: parseFloat(s.weight), reps: parseInt(s.reps), time: s.time || "", note: s.note || "" }; }) }) : w; }); save({ workouts: updated, bodyLogs: data.bodyLogs, bodyComp: data.bodyComp, calories: data.calories }); setEditIdx(null); setEditForm(null); }
   function cancelEdit() { setEditIdx(null); setEditForm(null); }
   function delW(i) { save({ workouts: data.workouts.filter(function (_, idx) { return idx !== i; }), bodyLogs: data.bodyLogs, bodyComp: data.bodyComp, calories: data.calories }); }
+  function requestDelete(i) { setPendingDeleteIdx(i); }
+  function cancelDelete() { setPendingDeleteIdx(null); }
+  function confirmDelete() {
+    if (pendingDeleteIdx == null) return;
+    if (editIdx === pendingDeleteIdx) {
+      setEditIdx(null);
+      setEditForm(null);
+    }
+    delW(pendingDeleteIdx);
+    setPendingDeleteIdx(null);
+  }
   function startEdit(i) { var w = data.workouts[i]; setEditIdx(i); setEditForm({ exercise: w.exercise, note: w.note || "", sets: w.sets.map(function (s) { return { weight: s.weight, reps: s.reps, time: s.time || "", note: s.note || "" }; }) }); }
   function toggleGroup(groupKey) {
     setExpandedGroups(function (prev) {
@@ -309,6 +321,9 @@ export default function WorkoutPage({ data, save }) {
   }
   function clearHistory() { save({ workouts: [], bodyLogs: data.bodyLogs, bodyComp: data.bodyComp, calories: data.calories }); setShowClearConfirm(false); }
   var clearConfirmKb = useConfirmDialogKeyboard(showClearConfirm, clearHistory, function () { setShowClearConfirm(false); }, "clear-workout-history", { cancel: "Cancel", confirm: "Clear History" });
+  var deleteModal = getModalSpec("workout", "deleteEntry");
+  var deleteConfirmKb = useConfirmDialogKeyboard(pendingDeleteIdx != null, confirmDelete, cancelDelete, deleteModal.layerId, { cancel: deleteModal.buttons[0], confirm: deleteModal.buttons[1] });
+  var pendingDeleteWorkout = pendingDeleteIdx != null ? data.workouts[pendingDeleteIdx] : null;
 
   var smartParserLayer = useKeyboardLayer("smart-parser", showSmartParserModal, function (e) {
     if (e.key === "Escape") {
@@ -1003,7 +1018,7 @@ Bench Press
                               <div className={s.historyItemMeta}>
                                 <span className={s.historyItemDate}>{formatDate(w.date)}{w.time ? " · " + w.time : ""}</span>
                                 <button type="button" onClick={function () { startEdit(w._idx); }} className={s.btnIconEdit} style={{ color: ACCENT }}>✏️</button>
-                                <button type="button" onClick={function () { delW(w._idx); }} className={s.btnIconDelete}>🗑</button>
+                                <button type="button" onClick={function () { requestDelete(w._idx); }} className={s.btnIconDelete}>🗑</button>
                               </div>
                             </div>
                             <div className={s.historyItemSets}>{w.sets.map(function (setItem) { return setItem.weight + "kg×" + setItem.reps + (setItem.time ? " @" + setItem.time : ""); }).join(" • ")}</div>
@@ -1021,6 +1036,20 @@ Bench Press
         </div>
         )}
 
+        {pendingDeleteWorkout && (
+          <div className={cx("ft-kb-modal-backdrop", ui.modalBackdrop)} style={{ zIndex: deleteConfirmKb.zIndex }}>
+            <div ref={deleteConfirmKb.dialogRef} tabIndex={-1} className={ui.modalPanelConfirm}>
+              <div className={s.confirmTitle}>{deleteModal.title}</div>
+              <div className={s.confirmBody}>{formatTemplateLabel(deleteModal.body, { exercise: formatExerciseName(pendingDeleteWorkout.exercise), date: formatDate(pendingDeleteWorkout.date) })}</div>
+              <div className="ft-kb-focus-indicator">Focused: <strong>{deleteConfirmKb.focusLabel}</strong></div>
+              <div className="ft-kb-hint">← → or Tab switch · Enter select · Esc cancel</div>
+              <div className={ui.flexEnd}>
+                <button type="button" onClick={cancelDelete} onMouseEnter={function () { deleteConfirmKb.setFocusIdx(0); }} className={cx(deleteConfirmKb.btnClass(0), btnSecondary({ modal: true }))}>{deleteModal.buttons[0]}</button>
+                <button type="button" onClick={confirmDelete} onMouseEnter={function () { deleteConfirmKb.setFocusIdx(1); }} className={cx(deleteConfirmKb.btnClass(1), btnDanger({ modal: true }))}>{deleteModal.buttons[1]}</button>
+              </div>
+            </div>
+          </div>
+        )}
         {showClearConfirm && (
           <div className={cx("ft-kb-modal-backdrop", ui.modalBackdrop)} style={{ zIndex: clearConfirmKb.zIndex }}>
             <div ref={clearConfirmKb.dialogRef} tabIndex={-1} className={ui.modalPanelConfirm}>

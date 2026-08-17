@@ -84,6 +84,10 @@ Hovering an item with the mouse updates keyboard focus on most lists (Dashboard 
 - **Enter** activates the **currently focused** button (green pulse).
 - A **Focused: …** pill shows the active target at all times.
 
+### Delete Entry Dialog
+
+Same two-button confirm pattern as Clear History, with **Cancel** / **Delete**. Used for Body Comp History and Workout History trash-can deletes. Esc cancels.
+
 ## Implementation
 
 | Hook / Component | Purpose |

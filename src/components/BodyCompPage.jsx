@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, Collapse, btnPrimary, btnSecondary, btnDanger, inputClass, formatDate, useConfirmDialogKeyboard, ui, cx } from "./shared";
 import { computeBodyCompEntry } from "../domain/metrics.js";
 import { syncBodyLogsAfterEdit, removeBodyLogForEntry } from "../domain/bodyCompSync.js";
-import { getPageLayout, getCollapseSpec, getModalSpec } from "../domain/pageLayout.js";
+import { getPageLayout, getCollapseSpec, getModalSpec, formatTemplateLabel } from "../domain/pageLayout.js";
 import { PageHeading } from "./PageIcon";
 import s from "./BodyCompPage.module.css";
 
@@ -12,6 +12,7 @@ export default function BodyCompPage({ data, save }) {
   var [logDate, setLogDate] = useState(formatDate(new Date()));
   var [w, setW] = useState(""), [h, setH] = useState(""), [bf, setBf] = useState(""), [smm, setSmm] = useState(""), [waist, setWaist] = useState(""), [age, setAge] = useState(""), [sex, setSex] = useState("male"), [msg, setMsg] = useState("");
   var [showClearConfirm, setShowClearConfirm] = useState(false);
+  var [pendingDeleteIdx, setPendingDeleteIdx] = useState(null);
   var [editIdx, setEditIdx] = useState(null);
   var [editForm, setEditForm] = useState(null);
   var wN = parseFloat(w) || 0, hM = (parseFloat(h) || 0) / 100, bfN = parseFloat(bf) || 0, smmN = parseFloat(smm) || 0, ageN = parseFloat(age) || 0;
@@ -54,6 +55,17 @@ export default function BodyCompPage({ data, save }) {
       bodyComp: data.bodyComp.filter(function (_, i) { return i !== compIdx; }),
       bodyLogs: newBodyLogs,
     });
+  }
+  function requestDelete(displayIdx) {
+    setPendingDeleteIdx(displayIdx);
+  }
+  function cancelDelete() {
+    setPendingDeleteIdx(null);
+  }
+  function confirmDelete() {
+    if (pendingDeleteIdx == null) return;
+    deleteEntry(pendingDeleteIdx);
+    setPendingDeleteIdx(null);
   }
   function clearHistory() {
     save({ workouts: data.workouts, calories: data.calories, bodyComp: [], bodyLogs: [] });
@@ -107,6 +119,9 @@ export default function BodyCompPage({ data, save }) {
     cancelEdit();
   }
   var clearConfirmKb = useConfirmDialogKeyboard(showClearConfirm, clearHistory, function () { setShowClearConfirm(false); }, "clear-body-comp-history", { cancel: "Cancel", confirm: "Clear History" });
+  var deleteModal = getModalSpec("bodyComp", "deleteEntry");
+  var deleteConfirmKb = useConfirmDialogKeyboard(pendingDeleteIdx != null, confirmDelete, cancelDelete, deleteModal.layerId, { cancel: deleteModal.buttons[0], confirm: deleteModal.buttons[1] });
+  var pendingDeleteEntry = pendingDeleteIdx != null ? historyEntries[pendingDeleteIdx] : null;
   function submit() {
     if (!w || !bf) { setMsg("Weight and Body Fat % are required."); return; }
     if (!logDate.trim()) { setMsg("Date is required."); return; }
@@ -161,7 +176,7 @@ export default function BodyCompPage({ data, save }) {
         {historyEntries.length > 0 && (
           <div className={ui.historyToolbar}>
             <span className={ui.mutedXs}>{data.bodyComp.length} {data.bodyComp.length === 1 ? "entry" : "entries"}</span>
-            <button type="button" onClick={function () { setShowClearConfirm(true); }} className={btnDanger({ xsPill: true })}>Clear History</button>
+            <button type="button" onClick={function () { setShowClearConfirm(true); }} className={s.clearHistoryBtn}>{bodyLayout.historyChrome.clearLabel}</button>
           </div>
         )}
         {historyEntries.length === 0 ? <div className={ui.emptyStateLg}><div className={ui.emptyIconLg}>📏</div><div>No entries yet.</div><div className={s.emptySub}>Track your body composition over time!</div></div> : (
@@ -216,7 +231,7 @@ export default function BodyCompPage({ data, save }) {
                     <div className={s.historyEntryDate}>{e.date}</div>
                     <div className={s.historyEntryActions}>
                       <button type="button" onClick={function () { startEdit(i); }} title="Edit entry" className={s.btnIconEdit}>✏️</button>
-                      <button type="button" onClick={function () { deleteEntry(i); }} title="Delete entry" className={ui.iconBtnDelete}>🗑</button>
+                      <button type="button" onClick={function () { requestDelete(i); }} title="Delete entry" className={ui.iconBtnDelete}>🗑</button>
                     </div>
                   </div>
                   <div className={s.chipRow}>
@@ -235,6 +250,20 @@ export default function BodyCompPage({ data, save }) {
           );
         })}
         </div>
+        )}
+        {pendingDeleteEntry && (
+          <div className={cx("ft-kb-modal-backdrop", ui.modalBackdrop)} style={{ zIndex: deleteConfirmKb.zIndex }}>
+            <div ref={deleteConfirmKb.dialogRef} tabIndex={-1} className={ui.modalPanelConfirm}>
+              <div className={cx(ui.modalTitle, s.confirmTitle)}>{deleteModal.title}</div>
+              <div className={cx(ui.textMutedSm, s.confirmBody)}>{formatTemplateLabel(deleteModal.body, { date: pendingDeleteEntry.date })}</div>
+              <div className="ft-kb-focus-indicator">Focused: <strong>{deleteConfirmKb.focusLabel}</strong></div>
+              <div className="ft-kb-hint">← → or Tab switch · Enter select · Esc cancel</div>
+              <div className={ui.flexEnd}>
+                <button type="button" onClick={cancelDelete} onMouseEnter={function () { deleteConfirmKb.setFocusIdx(0); }} className={cx(deleteConfirmKb.btnClass(0), btnSecondary({ modal: true }))}>{deleteModal.buttons[0]}</button>
+                <button type="button" onClick={confirmDelete} onMouseEnter={function () { deleteConfirmKb.setFocusIdx(1); }} className={cx(deleteConfirmKb.btnClass(1), btnDanger({ modal: true }))}>{deleteModal.buttons[1]}</button>
+              </div>
+            </div>
+          </div>
         )}
         {showClearConfirm && (
           <div className={cx("ft-kb-modal-backdrop", ui.modalBackdrop)} style={{ zIndex: clearConfirmKb.zIndex }}>

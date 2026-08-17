@@ -105,7 +105,7 @@ Stacked control layout inside **Workout History** (sticky header while scrolling
 
 ### Per-Entry Actions
 - **Edit** — modify exercise, notes, and all sets inline
-- **Delete** — remove a single workout entry
+- **Delete** — trash can opens a confirmation (**Delete this workout?**) naming the exercise and date; **Cancel** (default) or **Delete**; Esc cancels
 - **No purple focus ring on mouse hover** — keyboard list focus (`.ft-kb-focus`) applies only when navigating the list with ↑↓ after focusing the list; hovering an entry does not highlight it
 
 ### Bulk Actions

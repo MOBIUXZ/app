@@ -72,7 +72,7 @@ BW, BMI, FM, FMI, PBF, FFM, FFMI, SMM, SMI
 The history toolbar (entry count + actions) sits below the collapsible **History** header with spacing from the shared collapse body padding.
 
 ### Clear History
-- **Clear History** button (when entries exist) deletes all `bodyComp` and `bodyLogs` data
+- **Clear History** — quiet red pill (no hard border) that deletes all `bodyComp` and `bodyLogs` data when entries exist
 - Confirmation dialog with keyboard support (`Enter` confirm · `Esc` cancel)
 - Clears Dashboard body weight/body fat stats and Progress body weight chart data
 
@@ -85,7 +85,11 @@ The history toolbar (entry count + actions) sits below the collapsible **History
 - If date or weight changes, the paired **`bodyLogs`** point is updated (old date+weight removed, new point appended) so the Progress body weight chart stays in sync
 
 ### Delete Entry
-- **🗑** on each history row deletes that entry only
+- **🗑** on each history row opens a confirmation dialog before deleting that entry
+  - Title: **Delete this entry?**
+  - Body names the entry date
+  - **Cancel** (default) or **Delete**
+  - `←` `→` / Tab switch · Enter selects focused · Esc cancel
 - Removes the matching `bodyComp` record and its paired `bodyLogs` point (same date + weight)
 
 ## Workout `BW=` Notes vs Body Comp

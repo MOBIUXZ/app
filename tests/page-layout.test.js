@@ -45,6 +45,40 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(modal.layerId).toBe('clear-workout-history');
   });
 
+  it('body comp history Clear History uses a quiet pill', function () {
+    var chrome = getPageLayout('bodyComp').historyChrome;
+    expect(chrome.clearStyle).toBe('quietPill');
+    expect(chrome.clearLabel).toBe('Clear History');
+    var source = readFileSync(resolve(root, pageLayout.pages.bodyComp.component), 'utf8');
+    expect(source.indexOf('clearHistoryBtn') !== -1).toBe(true);
+    expect(source.indexOf('historyChrome.clearLabel') !== -1).toBe(true);
+  });
+
+  it('workout history delete asks for confirmation', function () {
+    var modal = getModalSpec('workout', 'deleteEntry');
+    expect(modal.title).toBe('Delete this workout?');
+    expect(modal.layerId).toBe('delete-workout-entry');
+    expect(modal.buttons).toEqual(['Cancel', 'Delete']);
+    expect(modal.body).toContain('{exercise}');
+    expect(modal.body).toContain('{date}');
+    var source = readFileSync(resolve(root, pageLayout.pages.workout.component), 'utf8');
+    expect(source.indexOf('pendingDeleteIdx') !== -1).toBe(true);
+    expect(source.indexOf('requestDelete') !== -1).toBe(true);
+    expect(source.indexOf('confirmDelete') !== -1).toBe(true);
+  });
+
+  it('body comp history delete asks for confirmation', function () {
+    var modal = getModalSpec('bodyComp', 'deleteEntry');
+    expect(modal.title).toBe('Delete this entry?');
+    expect(modal.layerId).toBe('delete-body-comp-entry');
+    expect(modal.buttons).toEqual(['Cancel', 'Delete']);
+    expect(modal.body).toContain('{date}');
+    var source = readFileSync(resolve(root, pageLayout.pages.bodyComp.component), 'utf8');
+    expect(source.indexOf('pendingDeleteIdx') !== -1).toBe(true);
+    expect(source.indexOf('deleteEntry') !== -1).toBe(true);
+    expect(source.indexOf('confirmDelete') !== -1).toBe(true);
+  });
+
   it('calendar log panel stacks over a mounted day panel', function () {
     var day = getModalSpec('workout', 'calendarDay');
     var log = getModalSpec('workout', 'calendarLog');

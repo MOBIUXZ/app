@@ -30,7 +30,9 @@
     { "id": "calendar-day-panel", "layerId": "calendar-day-panel", "closeKey": "Escape", "staysMountedUnder": "calendar-log-panel" },
     { "id": "calendar-log-panel", "layerId": "calendar-log-panel", "closeKey": "Escape", "stacksOver": "calendar-day-panel", "enterClass": "ft-kb-modal-backdrop" },
     { "id": "clear-workout-history", "layerId": "clear-workout-history" },
+    { "id": "delete-workout-entry", "layerId": "delete-workout-entry" },
     { "id": "clear-body-comp-history", "layerId": "clear-body-comp-history" },
+    { "id": "delete-body-comp-entry", "layerId": "delete-body-comp-entry" },
     { "id": "set-picker", "layerId": "set-picker", "closeKey": "Escape" }
   ],
   "calendarStack": {
