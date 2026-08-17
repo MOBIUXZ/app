@@ -58,6 +58,9 @@
         "inbody": {
           "score": 72,
           "visceral": 7,
+          "tbw": 42.1,
+          "protein": 10.4,
+          "mineral": 3.52,
           "leanTrunkKg": 21.8,
           "leanLeftArmKg": 2.59,
           "leanRightArmKg": 2.64,
@@ -95,6 +98,9 @@
         "inbody": {
           "score": 70,
           "visceral": 8,
+          "tbw": 41.6,
+          "protein": 10.2,
+          "mineral": 3.48,
           "leanTrunkKg": 21.3,
           "leanLeftArmKg": 2.5,
           "leanRightArmKg": 2.54,

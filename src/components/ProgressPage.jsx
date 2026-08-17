@@ -18,12 +18,19 @@ var segmentalBodyGrid = progressLayout.segmentalBodyGrid || {};
 var defaultSegmentalGroupId = ((segmentalTrendGroups.find(function (group) {
   return group.metric === (segmentalBodyGrid.defaultMetric || "lean");
 }) || segmentalTrendGroups[0]) || {}).id;
+var compositionTrends = progressLayout.compositionTrends || {};
+var compositionCharts = compositionTrends.charts || [];
 
-function FooterTrendChartList({ charts, seriesById, inView, tickStyle, tooltipStyle }) {
+function FooterTrendChartList({ charts, seriesById, inView, tickStyle, tooltipStyle, tooltipValueTemplate }) {
   return (charts || []).map(function (chart) {
     var series = seriesById[chart.id] || [];
     if (!series.length) return null;
     var color = getThemeColor(chart.colorToken);
+    var unit = chart.unit;
+    function formatTooltipValue(value) {
+      if (!unit) return value;
+      return formatTemplateLabel(tooltipValueTemplate || "{value} {unit}", { value: value, unit: unit });
+    }
     return (
       <div key={chart.id} className={s.bfSection}>
         <div className={s.bfLabel} style={{ color: color }}>{chart.title}</div>
@@ -34,7 +41,7 @@ function FooterTrendChartList({ charts, seriesById, inView, tickStyle, tooltipSt
               <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
               <XAxis dataKey="date" tick={tickStyle} interval="preserveStartEnd" />
               <YAxis tick={tickStyle} width={35} />
-              <Tooltip contentStyle={tooltipStyle} />
+              <Tooltip contentStyle={tooltipStyle} formatter={unit ? function (value) { return [formatTooltipValue(value), chart.title]; } : undefined} />
               <Line type="monotone" dataKey="value" name={chart.title} stroke={color} strokeWidth={2} dot={{ fill: color, r: 3 }} isAnimationActive={false} animationDuration={0} />
             </LineChart>
           </ResponsiveContainer>
@@ -43,6 +50,28 @@ function FooterTrendChartList({ charts, seriesById, inView, tickStyle, tooltipSt
       </div>
     );
   });
+}
+
+function MetricPillToggle({ label, items, activeId, onSelect }) {
+  if ((items || []).length < 2) return null;
+  return (
+    <div className={cx(ui.pillToggleTrack, s.segToggle)} role="group" aria-label={label}>
+      {items.map(function (item) {
+        var on = item.id === activeId;
+        return (
+          <button
+            key={item.id}
+            type="button"
+            aria-pressed={on}
+            onClick={function () { onSelect(item.id); }}
+            className={on ? ui.pillToggleBtnActive : ui.pillToggleBtn}
+          >
+            {item.toggleLabel}
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 function SegmentalMiniChart({ slotModel, domain, height, inView, tickStyle, tooltipStyle, unit, latestTemplate, tooltipValueTemplate }) {
@@ -920,6 +949,13 @@ export default function ProgressPage({ data }) {
     return (bodyTrendSeries[chart.id] || []).length > 0;
   });
 
+  var compositionTrendSeries = useMemo(function () {
+    return buildAllBodyTrendSeries(data.bodyComp, compositionCharts);
+  }, [data.bodyComp]);
+  var hasCompositionTrends = compositionCharts.some(function (chart) {
+    return (compositionTrendSeries[chart.id] || []).length > 0;
+  });
+
   var segmentalTrendSeries = useMemo(function () {
     return buildAllBodyTrendSeries(data.bodyComp, segmentalTrendCharts);
   }, [data.bodyComp]);
@@ -1197,28 +1233,29 @@ export default function ProgressPage({ data }) {
           <FooterTrendChartList charts={bodyTrendCharts} seriesById={bodyTrendSeries} inView={footerChartsInView} tickStyle={cs} tooltipStyle={tt} />
         </Card>
         )}
+        {hasCompositionTrends && (
+        <Card className={ui.cardChart}>
+          <div className={ui.sectionTitleLg}>{getPageSection("progress", "composition").title}</div>
+          <FooterTrendChartList
+            charts={compositionCharts}
+            seriesById={compositionTrendSeries}
+            inView={footerChartsInView}
+            tickStyle={cs}
+            tooltipStyle={tt}
+            tooltipValueTemplate={compositionTrends.tooltipValueTemplate}
+          />
+        </Card>
+        )}
         {activeSegGroup ? (
         <Card className={ui.cardChart}>
           <div className={s.segHeader}>
             <div className={ui.sectionTitleLg}>{getPageSection("progress", "segmental").title}</div>
-            {visibleSegGroups.length > 1 ? (
-              <div className={cx(ui.pillToggleTrack, s.segToggle)} role="group" aria-label={getPageSection("progress", "segmental").title}>
-                {visibleSegGroups.map(function (group) {
-                  var on = activeSegGroup.id === group.id;
-                  return (
-                    <button
-                      key={group.id}
-                      type="button"
-                      aria-pressed={on}
-                      onClick={function () { setSegmentalGroupId(group.id); }}
-                      className={on ? ui.pillToggleBtnActive : ui.pillToggleBtn}
-                    >
-                      {group.toggleLabel}
-                    </button>
-                  );
-                })}
-              </div>
-            ) : null}
+            <MetricPillToggle
+              label={getPageSection("progress", "segmental").title}
+              items={visibleSegGroups}
+              activeId={activeSegGroup.id}
+              onSelect={setSegmentalGroupId}
+            />
           </div>
           <SegmentalBodyGrid group={activeSegGroup} seriesById={segmentalTrendSeries} inView={footerChartsInView} tickStyle={cs} tooltipStyle={tt} />
         </Card>

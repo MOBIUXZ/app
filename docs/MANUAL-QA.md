@@ -85,7 +85,8 @@ Machine-readable checklist: [`spec/manual-qa-checklist.json`](../spec/manual-qa-
 - [ ] Compound lift charts render
 - [ ] Metric toggle morphs smoothly (~600ms)
 - [ ] Body weight chart visible; body fat %, body fat mass, and BMI charts when those fields exist
-- [ ] InBody Trends: SMM, SMI, visceral, score, BMR, total body water, protein, and mineral when those fields exist; empty series stay hidden
+- [ ] InBody Trends: SMM, SMI, visceral, score, and BMR when those fields exist; empty series stay hidden
+- [ ] One Water, Protein & Mineral card with Total Body Water, Protein, and Mineral charts stacked when those fields exist; empty series hidden
 - [ ] One Segmental Analysis card with a Soft Lean Mass / Fat Mass toggle on a body-shaped grid when those fields exist; unused metric hidden; arms share a Y-axis and legs share a Y-axis
 - [ ] Chart click → Workout Details panel
 

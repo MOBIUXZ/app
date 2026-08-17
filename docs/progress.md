@@ -23,7 +23,7 @@ When you change a **metric toggle**, the active line morphs smoothly between val
 |------------|------------------|---------------|
 | Per-exercise (combined & split) | Instant | 600ms morph |
 | Combined Compound Lifts | Instant | 600ms morph (all visible lift lines) |
-| Body weight / body fat / InBody trends / calories | Instant | N/A (no metric toggles) |
+| Body weight / body fat / InBody trends / Water, Protein & Mineral / calories | Instant | N/A (no metric toggles) |
 | Segmental Analysis | Instant | Instant Soft Lean / Fat pill (swaps the grid; no line morph) |
 | Session Performance popup | 600ms draw on open | 600ms morph |
 
@@ -310,7 +310,7 @@ Per-workout popup chart for that single logged session:
 
 ## InBody Trends
 
-Card on Progress between body charts and calories. Series come from `bodyComp` via `buildAllBodyTrendSeries()` (`src/domain/bodyTrends.js`). Chart titles, colors, and field paths live in `spec/page-layout.json` → `pages.progress.bodyTrendCharts`.
+Card on Progress after body charts. Series come from `bodyComp` via `buildAllBodyTrendSeries()` (`src/domain/bodyTrends.js`). Chart titles, colors, and field paths live in `spec/page-layout.json` → `pages.progress.bodyTrendCharts`.
 
 | Chart | Source | Hidden when |
 |-------|--------|-------------|
@@ -319,15 +319,22 @@ Card on Progress between body charts and calories. Series come from `bodyComp` v
 | Visceral Fat Level | `inbody.visceral` | no points |
 | InBody Score | `inbody.score` | no points |
 | BMR (kcal/d) | `BMR_InBody`, else `BMR_Mifflin`, else `BMR_Katch` | no points |
-| Total Body Water (L) | `inbody.tbw` | no points |
-| Protein (kg) | `inbody.protein` | no points |
-| Mineral (kg) | `inbody.mineral` | no points |
 
-The whole card is omitted when every series is empty. Manual logs with SMM/SMI still chart those series; visceral, score, water, protein, and mineral appear after InBody CSV import. BMR prefers the InBody measured value, then Mifflin, then Katch. Whole-body fat mass and BMI live on the Body Weight & Body Fat card, not here. Lazy-mounted with the same footer `useInView`; `isAnimationActive={false}`.
+The whole card is omitted when every series is empty. Manual logs with SMM/SMI still chart those series; visceral, score, and BMR appear after InBody CSV import. BMR prefers the InBody measured value, then Mifflin, then Katch. Whole-body fat mass and BMI live on the Body Weight & Body Fat card. Total body water, protein, and mineral live on the **Water, Protein & Mineral** card. Lazy-mounted with the same footer `useInView`; `isAnimationActive={false}`.
+
+## Water, Protein & Mineral
+
+One Progress card after InBody Trends. Total Body Water, Protein, and Mineral are stacked in this category (not a toggle). An empty series is hidden; the card is omitted when all three are empty. Hovering a point shows the unit after the value (`L` for water, `kg` for protein and mineral). Titles, colors, units, and CSV paths live in `spec/page-layout.json` → `pages.progress.compositionTrends`. Series: `buildAllBodyTrendSeries()` in `src/domain/bodyTrends.js`.
+
+| Chart | Source | Unit |
+|-------|--------|------|
+| Total Body Water (L) | `inbody.tbw` | L |
+| Protein (kg) | `inbody.protein` | kg |
+| Mineral (kg) | `inbody.mineral` | kg |
 
 ## Segmental Analysis
 
-One Progress card after InBody Trends, with a **Soft Lean Mass / Fat Mass** pill toggle (same pattern as the Body Comp History map). The unused metric is hidden; if only one metric has points, the toggle is omitted. Each metric is a **body-shaped grid**: left/right arm beside a figure, trunk full-width in the middle, left/right leg below. Layout, titles, colors, CSV paths, and shared Y-axis groups live in `spec/page-layout.json` → `pages.progress.segmentalTrendGroups` + `segmentalBodyGrid`. View model: `buildSegmentalGridModel()` / `resolveSegmentalTrendGroup()` in `src/domain/bodyTrends.js`.
+One Progress card after Water, Protein & Mineral, with a **Soft Lean Mass / Fat Mass** pill toggle (same pattern as the Body Comp History map). The unused metric is hidden; if only one metric has points, the toggle is omitted. Each metric is a **body-shaped grid**: left/right arm beside a figure, trunk full-width in the middle, left/right leg below. Layout, titles, colors, CSV paths, and shared Y-axis groups live in `spec/page-layout.json` → `pages.progress.segmentalTrendGroups` + `segmentalBodyGrid`. View model: `buildSegmentalGridModel()` / `resolveSegmentalTrendGroup()` in `src/domain/bodyTrends.js`.
 
 | Toggle | Regions |
 |--------|---------|

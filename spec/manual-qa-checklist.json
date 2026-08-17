@@ -74,7 +74,8 @@
         { "id": "compound-charts", "check": "Compound lift charts render with data points" },
         { "id": "metric-toggle", "check": "Toggle Max Weight / Volume / e1RM — line morphs smoothly (~600ms)" },
         { "id": "body-chart", "check": "Body Weight chart shows trend; Body Fat %, Body Fat Mass, and BMI charts appear when those fields exist" },
-        { "id": "inbody-trends", "check": "InBody Trends card shows SMM, SMI, visceral, score, BMR, total body water, protein, and mineral when those fields exist; empty series stay hidden" },
+        { "id": "inbody-trends", "check": "InBody Trends card shows SMM, SMI, visceral, score, and BMR when those fields exist; empty series stay hidden" },
+        { "id": "composition-trends", "check": "Progress shows one Water, Protein & Mineral card with Total Body Water, Protein, and Mineral charts stacked when those InBody fields exist; empty series stay hidden" },
         { "id": "segmental-trends", "check": "Progress shows one Segmental Analysis card with a Soft Lean Mass / Fat Mass toggle on a body-shaped grid when InBody segmental fields exist; the unused metric and empty regions stay hidden; arms share a Y-axis and legs share a Y-axis" },
         { "id": "detail-modal", "check": "Click chart point → Workout Details panel opens" }
       ]

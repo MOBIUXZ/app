@@ -156,7 +156,7 @@ Raw inputs plus **persisted computed fields** (recomputed on save/edit).
 
 InBody import prefers measured `FM` / `BMI` / `SMI` from the CSV over formula recomputes. Mifflin/Katch are still filled from Settings profile height/age/sex when available. Calories TDEE still uses Mifflin then Katch, not InBody BMR.
 
-**Import:** Body Comp → History → Import InBody CSV. Merges by date; does not replace workouts or calories. Progress charts SMM, SMI, FM, BMI, visceral fat, InBody Score, BMR, TBW, protein, mineral, and segmental lean/fat on a body-shaped grid with a Soft Lean / Fat toggle (`src/domain/bodyTrends.js`). Body Comp History shows a segmental lean/fat map from `inbody.lean*` / `fat*` (`src/domain/bodySegmental.js`). Spec: [`spec/inbody-csv-fixtures.json`](../spec/inbody-csv-fixtures.json).
+**Import:** Body Comp → History → Import InBody CSV. Merges by date; does not replace workouts or calories. Progress charts SMM, SMI, FM, BMI, visceral fat, InBody Score, BMR, Water / Protein / Mineral as one category, and segmental lean/fat on a body-shaped grid with a Soft Lean / Fat toggle (`src/domain/bodyTrends.js`). Body Comp History shows a segmental lean/fat map from `inbody.lean*` / `fat*` (`src/domain/bodySegmental.js`). Spec: [`spec/inbody-csv-fixtures.json`](../spec/inbody-csv-fixtures.json).
 
 `height_m = height_cm / 100`.
 

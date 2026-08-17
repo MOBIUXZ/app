@@ -269,12 +269,16 @@ describe('page layout spec (spec/page-layout.json)', function () {
   it('progress InBody trend charts are spec-driven', function () {
     var progress = getPageLayout('progress');
     expect(progress.sections.map(function (s) { return s.id; })).toEqual([
-      'compoundLifts', 'combinedCompound', 'isolationLifts', 'bodyCharts', 'inbodyTrends', 'segmental', 'calorieTrend',
+      'compoundLifts', 'combinedCompound', 'isolationLifts', 'bodyCharts', 'inbodyTrends', 'composition', 'segmental', 'calorieTrend',
     ]);
     expect(getPageSection('progress', 'inbodyTrends').title).toBe('📉 InBody Trends');
+    expect(getPageSection('progress', 'composition').title).toBe('📉 Water, Protein & Mineral');
     expect(getPageSection('progress', 'segmental').title).toBe('📉 Segmental Analysis');
     expect(progress.bodyChartExtras.map(function (c) { return c.id; })).toEqual(['bf', 'fm', 'bmi']);
-    expect(progress.bodyTrendCharts.map(function (c) { return c.id; })).toEqual(['smm', 'smi', 'visceral', 'score', 'bmr', 'tbw', 'protein', 'mineral']);
+    expect(progress.bodyTrendCharts.map(function (c) { return c.id; })).toEqual(['smm', 'smi', 'visceral', 'score', 'bmr']);
+    expect(progress.compositionTrends.charts.map(function (c) { return c.id; })).toEqual(['tbw', 'protein', 'mineral']);
+    expect(progress.compositionTrends.charts.map(function (c) { return c.title; })).toEqual(['Total Body Water (L)', 'Protein (kg)', 'Mineral (kg)']);
+    expect(progress.compositionTrends.tooltipValueTemplate).toBe('{value} {unit}');
     expect(progress.segmentalBodyGrid.layout).toBe('bodyGrid');
     expect(progress.segmentalBodyGrid.defaultMetric).toBe('lean');
     expect(progress.segmentalBodyGrid.tooltipValueTemplate).toBe('{value} {unit}');
@@ -292,6 +296,7 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(source.indexOf('buildSegmentalGridModel') !== -1).toBe(true);
     expect(source.indexOf('resolveSegmentalTrendGroup') !== -1).toBe(true);
     expect(source.indexOf('tooltipValueTemplate') !== -1).toBe(true);
+    expect(source.indexOf('compositionTrends') !== -1).toBe(true);
     expect(source.indexOf('getPageSection') !== -1).toBe(true);
     expect(source.indexOf('getThemeColor') !== -1).toBe(true);
   });

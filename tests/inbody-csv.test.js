@@ -88,6 +88,9 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
       if (fixture.expectedExtras) {
         expect(buildAllBodyTrendSeries(fixture.bodyComp, progress.bodyChartExtras)).toEqual(fixture.expectedExtras);
       }
+      if (fixture.expectedComposition) {
+        expect(buildAllBodyTrendSeries(fixture.bodyComp, progress.compositionTrends.charts)).toEqual(fixture.expectedComposition);
+      }
     });
   });
 
@@ -153,6 +156,7 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
     expect(source.indexOf('resolveSegmentalTrendGroup') !== -1).toBe(true);
     expect(source.indexOf('pillToggleTrack') !== -1).toBe(true);
     expect(source.indexOf('tooltipValueTemplate') !== -1).toBe(true);
+    expect(source.indexOf('compositionTrends') !== -1).toBe(true);
     expect(source.indexOf('Skeletal Muscle') === -1).toBe(true);
     expect(source.indexOf('Visceral Fat') === -1).toBe(true);
     expect(source.indexOf('Left Arm') === -1).toBe(true);

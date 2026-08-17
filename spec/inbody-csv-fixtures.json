@@ -208,7 +208,9 @@
         "smi": [
           { "date": "25-03-2026", "value": 8.6 },
           { "date": "04-04-2026", "value": 8 }
-        ],
+        ]
+      },
+      "expectedComposition": {
         "tbw": [
           { "date": "25-03-2026", "value": 31.3 },
           { "date": "04-04-2026", "value": 32 }

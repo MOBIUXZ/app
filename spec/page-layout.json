@@ -279,6 +279,7 @@
         { "id": "isolationLifts", "label": "💪 ISOLATION LIFTS" },
         { "id": "bodyCharts", "title": "📉 Body Weight & Body Fat" },
         { "id": "inbodyTrends", "title": "📉 InBody Trends" },
+        { "id": "composition", "title": "📉 Water, Protein & Mineral" },
         { "id": "segmental", "title": "📉 Segmental Analysis" },
         { "id": "calorieTrend", "title": "🔥 Calorie Intake Trend" }
       ],
@@ -292,11 +293,16 @@
         { "id": "smi", "title": "SMI (kg/m²)", "colorToken": "orange", "paths": ["SMI"] },
         { "id": "visceral", "title": "Visceral Fat Level", "colorToken": "orange", "paths": ["inbody.visceral"] },
         { "id": "score", "title": "InBody Score", "colorToken": "accent", "paths": ["inbody.score"] },
-        { "id": "bmr", "title": "BMR (kcal/d)", "colorToken": "orange", "paths": ["BMR_InBody", "BMR_Mifflin", "BMR_Katch"] },
-        { "id": "tbw", "title": "Total Body Water (L)", "colorToken": "blue", "paths": ["inbody.tbw"] },
-        { "id": "protein", "title": "Protein (kg)", "colorToken": "green", "paths": ["inbody.protein"] },
-        { "id": "mineral", "title": "Mineral (kg)", "colorToken": "yellow", "paths": ["inbody.mineral"] }
+        { "id": "bmr", "title": "BMR (kcal/d)", "colorToken": "orange", "paths": ["BMR_InBody", "BMR_Mifflin", "BMR_Katch"] }
       ],
+      "compositionTrends": {
+        "tooltipValueTemplate": "{value} {unit}",
+        "charts": [
+          { "id": "tbw", "title": "Total Body Water (L)", "unit": "L", "colorToken": "blue", "paths": ["inbody.tbw"] },
+          { "id": "protein", "title": "Protein (kg)", "unit": "kg", "colorToken": "green", "paths": ["inbody.protein"] },
+          { "id": "mineral", "title": "Mineral (kg)", "unit": "kg", "colorToken": "yellow", "paths": ["inbody.mineral"] }
+        ]
+      },
       "segmentalBodyGrid": {
         "layout": "bodyGrid",
         "unit": "kg",
