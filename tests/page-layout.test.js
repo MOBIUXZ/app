@@ -90,10 +90,12 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(chrome.groupCountStyle).toBe('entries');
     expect(chrome.shortToggleLabels).toBe(true);
     expect(chrome.expandAllStyle).toBe('text');
+    expect(chrome.clearStyle).toBe('quietPill');
     expect(chrome.clearLabel).toBe('Clear History');
     var source = readFileSync(resolve(root, pageLayout.pages.workout.component), 'utf8');
     expect(source.indexOf('historyPreview') === -1).toBe(true);
     expect(source.indexOf('historyChrome.clearLabel') !== -1).toBe(true);
+    expect(source.indexOf('clearHistoryBtn') !== -1).toBe(true);
     expect(source.indexOf('groupHeaderQuiet') !== -1).toBe(true);
   });
 

@@ -109,7 +109,7 @@ Stacked control layout inside **Workout History** (sticky header while scrolling
 - **No purple focus ring on mouse hover** — keyboard list focus (`.ft-kb-focus`) applies only when navigating the list with ↑↓ after focusing the list; hovering an entry does not highlight it
 
 ### Bulk Actions
-- **Clear History** — delete all workouts (with confirmation)
+- **Clear History** — quiet red pill (no hard border) that deletes all workouts (with confirmation)
   - `←` `→` / Tab switch buttons · Enter selects focused · Esc cancel
   - Focus indicator shows **Cancel** or **Clear History**
 

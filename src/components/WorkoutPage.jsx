@@ -938,7 +938,7 @@ Bench Press
                   </div>
                   <button type="button" onClick={toggleAllGroups} className={s.expandAllText}>{allGroupsExpanded ? "Collapse all" : "Expand all"}</button>
                   <div className={ui.flex1} />
-                  {data.workouts.length > 0 && <button type="button" onClick={function () { setShowClearConfirm(true); }} className={btnDanger({ xsPill: true })} aria-label="Clear History">{historyChrome.clearLabel}</button>}
+                  {data.workouts.length > 0 && <button type="button" onClick={function () { setShowClearConfirm(true); }} className={s.clearHistoryBtn} aria-label="Clear History">{historyChrome.clearLabel}</button>}
                 </div>
               </div>
             </div>

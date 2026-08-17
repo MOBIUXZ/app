@@ -78,6 +78,7 @@
         "groupCountStyle": "entries",
         "shortToggleLabels": true,
         "expandAllStyle": "text",
+        "clearStyle": "quietPill",
         "clearLabel": "Clear History"
       },
       "modals": [

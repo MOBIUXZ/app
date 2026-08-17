@@ -864,6 +864,23 @@
   color: var(--ft-text);
 }
 
+.clearHistoryBtn {
+  background: rgba(248, 113, 113, 0.16);
+  color: var(--ft-red);
+  border: none;
+  border-radius: var(--ft-radius-pill);
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1.2;
+}
+
+.clearHistoryBtn:hover {
+  background: rgba(248, 113, 113, 0.26);
+}
+
 .historyGroupQuiet {
   margin-bottom: 0;
 }
