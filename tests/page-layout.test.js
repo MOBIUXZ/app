@@ -269,20 +269,26 @@ describe('page layout spec (spec/page-layout.json)', function () {
   it('progress InBody trend charts are spec-driven', function () {
     var progress = getPageLayout('progress');
     expect(progress.sections.map(function (s) { return s.id; })).toEqual([
-      'compoundLifts', 'combinedCompound', 'isolationLifts', 'bodyCharts', 'inbodyTrends', 'segmentalLean', 'segmentalFat', 'calorieTrend',
+      'compoundLifts', 'combinedCompound', 'isolationLifts', 'bodyCharts', 'inbodyTrends', 'segmental', 'calorieTrend',
     ]);
     expect(getPageSection('progress', 'inbodyTrends').title).toBe('📉 InBody Trends');
-    expect(getPageSection('progress', 'segmentalLean').title).toBe('📉 Segmental Lean');
-    expect(getPageSection('progress', 'segmentalFat').title).toBe('📉 Segmental Fat');
+    expect(getPageSection('progress', 'segmental').title).toBe('📉 Segmental Analysis');
     expect(progress.bodyChartExtras.map(function (c) { return c.id; })).toEqual(['bf', 'fm', 'bmi']);
     expect(progress.bodyTrendCharts.map(function (c) { return c.id; })).toEqual(['smm', 'smi', 'visceral', 'score', 'bmr', 'tbw', 'protein', 'mineral']);
+    expect(progress.segmentalBodyGrid.layout).toBe('bodyGrid');
+    expect(progress.segmentalBodyGrid.defaultMetric).toBe('lean');
     expect(progress.segmentalTrendGroups.map(function (g) { return g.id; })).toEqual(['segmentalLean', 'segmentalFat']);
-    expect(progress.segmentalTrendGroups[0].charts.map(function (c) { return c.id; })).toEqual(['leanTrunk', 'leanLeftArm', 'leanRightArm', 'leanLeftLeg', 'leanRightLeg']);
-    expect(progress.segmentalTrendGroups[1].charts.map(function (c) { return c.id; })).toEqual(['fatTrunk', 'fatLeftArm', 'fatRightArm', 'fatLeftLeg', 'fatRightLeg']);
+    expect(progress.segmentalTrendGroups.map(function (g) { return g.toggleLabel; })).toEqual(['Soft Lean Mass', 'Fat Mass']);
+    expect(progress.segmentalTrendGroups[0].charts.map(function (c) { return c.id; })).toEqual(['leanLeftArm', 'leanRightArm', 'leanTrunk', 'leanLeftLeg', 'leanRightLeg']);
+    expect(progress.segmentalTrendGroups[0].charts.map(function (c) { return c.slot; })).toEqual(['leftArm', 'rightArm', 'trunk', 'leftLeg', 'rightLeg']);
+    expect(progress.segmentalTrendGroups[1].charts.map(function (c) { return c.id; })).toEqual(['fatLeftArm', 'fatRightArm', 'fatTrunk', 'fatLeftLeg', 'fatRightLeg']);
     var source = readFileSync(resolve(root, progress.component), 'utf8');
     expect(source.indexOf('bodyTrendCharts') !== -1).toBe(true);
     expect(source.indexOf('bodyChartExtras') !== -1).toBe(true);
     expect(source.indexOf('segmentalTrendGroups') !== -1).toBe(true);
+    expect(source.indexOf('segmentalBodyGrid') !== -1).toBe(true);
+    expect(source.indexOf('buildSegmentalGridModel') !== -1).toBe(true);
+    expect(source.indexOf('resolveSegmentalTrendGroup') !== -1).toBe(true);
     expect(source.indexOf('getPageSection') !== -1).toBe(true);
     expect(source.indexOf('getThemeColor') !== -1).toBe(true);
   });

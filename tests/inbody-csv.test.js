@@ -10,7 +10,7 @@ import {
   buildInbodyEntry,
   mergeInbodyIntoLogs,
 } from '../src/domain/inbodyCsv.js';
-import { buildAllBodyTrendSeries, flattenTrendGroups } from '../src/domain/bodyTrends.js';
+import { buildAllBodyTrendSeries, flattenTrendGroups, buildSegmentalGridModel, resolveSegmentalTrendGroup, visibleSegmentalTrendGroups } from '../src/domain/bodyTrends.js';
 import { buildSegmentalSnapshot, latestSegmentalSnapshot } from '../src/domain/bodySegmental.js';
 import { getPageLayout } from '../src/domain/pageLayout.js';
 
@@ -118,6 +118,29 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
     });
   });
 
+  inbodySpec.gridFixtures.forEach(function (fixture) {
+    it('segmental body grid: ' + fixture.id, function () {
+      var progress = getPageLayout('progress');
+      var group = progress.segmentalTrendGroups.find(function (item) { return item.id === fixture.groupId; });
+      var model = buildSegmentalGridModel(group, fixture.seriesById, progress.segmentalBodyGrid);
+      Object.keys(fixture.expectedLatest).forEach(function (slot) {
+        expect(model.slots[slot].latest).toBe(fixture.expectedLatest[slot]);
+      });
+      expect(model.domains).toEqual(fixture.expectedDomains);
+      expect(model.gaps.map(function (gap) { return gap.pairId; })).toEqual(fixture.expectedGapPairIds);
+    });
+  });
+
+  inbodySpec.gridToggleFixtures.forEach(function (fixture) {
+    it('segmental toggle: ' + fixture.id, function () {
+      var progress = getPageLayout('progress');
+      var visible = visibleSegmentalTrendGroups(progress.segmentalTrendGroups, fixture.seriesById);
+      var active = resolveSegmentalTrendGroup(progress.segmentalTrendGroups, fixture.seriesById, fixture.requestedId);
+      expect(visible.map(function (group) { return group.id; })).toEqual(fixture.expectedVisibleIds);
+      expect(active && active.id).toBe(fixture.expectedId);
+    });
+  });
+
   it('Progress page wires InBody trend charts from the layout spec', function () {
     var source = readFileSync(resolve(root, 'src/components/ProgressPage.jsx'), 'utf8');
     expect(source.indexOf('buildAllBodyTrendSeries') !== -1).toBe(true);
@@ -125,6 +148,10 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
     expect(source.indexOf('bodyChartExtras') !== -1).toBe(true);
     expect(source.indexOf('inbodyTrends') !== -1).toBe(true);
     expect(source.indexOf('segmentalTrendGroups') !== -1).toBe(true);
+    expect(source.indexOf('buildSegmentalGridModel') !== -1).toBe(true);
+    expect(source.indexOf('segmentalBodyGrid') !== -1).toBe(true);
+    expect(source.indexOf('resolveSegmentalTrendGroup') !== -1).toBe(true);
+    expect(source.indexOf('pillToggleTrack') !== -1).toBe(true);
     expect(source.indexOf('Skeletal Muscle') === -1).toBe(true);
     expect(source.indexOf('Visceral Fat') === -1).toBe(true);
     expect(source.indexOf('Left Arm') === -1).toBe(true);

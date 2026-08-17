@@ -1,5 +1,5 @@
 {
-  "description": "InBody CSV parse, date year, measured-field mapping, merge-by-date into bodyComp/bodyLogs, Progress body-trend series, and Body Comp segmental map",
+  "description": "InBody CSV parse, date year, measured-field mapping, merge-by-date into bodyComp/bodyLogs, Progress body-trend series, Body Comp segmental map, and Progress body-grid model",
   "messages": {
     "imported": "Imported InBody scans.",
     "invalidCsv": "That file is not a valid InBody CSV.",
@@ -383,6 +383,59 @@
         { "date": "01-08-2026", "inbody": { "leanTrunkKg": 21 } }
       ],
       "expectedDate": "01-08-2026"
+    }
+  ],
+  "gridFixtures": [
+    {
+      "id": "shared-arm-scale-and-arm-gap",
+      "groupId": "segmentalLean",
+      "seriesById": {
+        "leanLeftArm": [
+          { "date": "01-01-2026", "value": 2 },
+          { "date": "01-02-2026", "value": 2.2 }
+        ],
+        "leanRightArm": [
+          { "date": "01-01-2026", "value": 2.1 },
+          { "date": "01-02-2026", "value": 2.8 }
+        ],
+        "leanTrunk": [{ "date": "01-01-2026", "value": 21 }],
+        "leanLeftLeg": [{ "date": "01-01-2026", "value": 8 }],
+        "leanRightLeg": [{ "date": "01-01-2026", "value": 8.1 }]
+      },
+      "expectedLatest": {
+        "leftArm": 2.2,
+        "rightArm": 2.8,
+        "trunk": 21,
+        "leftLeg": 8,
+        "rightLeg": 8.1
+      },
+      "expectedDomains": {
+        "arm": [1, 4],
+        "trunk": [18, 24],
+        "leg": [7, 10]
+      },
+      "expectedGapPairIds": ["arms"]
+    }
+  ],
+  "gridToggleFixtures": [
+    {
+      "id": "uses-requested-when-both-have-points",
+      "requestedId": "segmentalFat",
+      "seriesById": {
+        "leanTrunk": [{ "date": "01-01-2026", "value": 21 }],
+        "fatTrunk": [{ "date": "01-01-2026", "value": 9 }]
+      },
+      "expectedId": "segmentalFat",
+      "expectedVisibleIds": ["segmentalLean", "segmentalFat"]
+    },
+    {
+      "id": "falls-back-when-requested-empty",
+      "requestedId": "segmentalFat",
+      "seriesById": {
+        "leanTrunk": [{ "date": "01-01-2026", "value": 21 }]
+      },
+      "expectedId": "segmentalLean",
+      "expectedVisibleIds": ["segmentalLean"]
     }
   ]
 }

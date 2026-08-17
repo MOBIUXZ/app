@@ -536,3 +536,106 @@
   background: var(--ft-bg-inset);
   border-radius: var(--ft-radius-lg);
 }
+
+.segHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.segToggle {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.segGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 52px minmax(0, 1fr);
+  grid-template-areas:
+    "la fig ra"
+    "tr tr tr"
+    "ll . rl";
+  column-gap: 8px;
+  row-gap: 10px;
+  margin-top: 8px;
+  align-items: start;
+}
+
+.segLa { grid-area: la; }
+.segRa { grid-area: ra; }
+.segTrunk { grid-area: tr; }
+.segLl { grid-area: ll; }
+.segRl { grid-area: rl; }
+
+.segCellHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.segCellTitle {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.segCellLatest {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--ft-text);
+}
+
+.segFigure {
+  grid-area: fig;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding-top: 22px;
+}
+
+.segHead {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--ft-border);
+}
+
+.segFigRow {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 3px;
+}
+
+.segArm {
+  width: 8px;
+  height: 24px;
+  border-radius: 5px;
+  background: var(--ft-border);
+}
+
+.segTorso {
+  width: 22px;
+  height: 28px;
+  border-radius: 7px;
+  background: var(--ft-border);
+}
+
+.segLeg {
+  width: 10px;
+  height: 26px;
+  border-radius: 5px;
+  background: var(--ft-border);
+}
+
+.segHint {
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ft-orange);
+}

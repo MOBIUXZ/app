@@ -3,8 +3,8 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianG
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExerciseName, isNoSplitLift, isCompoundLift, COMPOUND_LIFTS, getExerciseChartColor, useKeyboardLayer, ui, cx } from "./shared";
 import { estimate1RM, roundE1RM, averageE1RM, computeSessionMetrics } from "../domain/metrics.js";
 import { CHART_CURSOR, computeYDomain, getTrendLineAnim, getFirstPaintDuration, FAILED_SET_COLOR } from "../domain/chartDomain.js";
-import { getPageLayout, getPageSection, getThemeColor } from "../domain/pageLayout.js";
-import { buildAllBodyTrendSeries, flattenTrendGroups } from "../domain/bodyTrends.js";
+import { getPageLayout, getPageSection, getThemeColor, formatTemplateLabel } from "../domain/pageLayout.js";
+import { buildAllBodyTrendSeries, flattenTrendGroups, buildSegmentalGridModel, resolveSegmentalTrendGroup, visibleSegmentalTrendGroups } from "../domain/bodyTrends.js";
 import { PageHeading } from "./PageIcon";
 import appConfig from "../../spec/app-config.json";
 import s from "./ProgressPage.module.css";
@@ -14,6 +14,10 @@ var bodyTrendCharts = progressLayout.bodyTrendCharts || [];
 var bodyChartExtras = progressLayout.bodyChartExtras || [];
 var segmentalTrendGroups = progressLayout.segmentalTrendGroups || [];
 var segmentalTrendCharts = flattenTrendGroups(segmentalTrendGroups);
+var segmentalBodyGrid = progressLayout.segmentalBodyGrid || {};
+var defaultSegmentalGroupId = ((segmentalTrendGroups.find(function (group) {
+  return group.metric === (segmentalBodyGrid.defaultMetric || "lean");
+}) || segmentalTrendGroups[0]) || {}).id;
 
 function FooterTrendChartList({ charts, seriesById, inView, tickStyle, tooltipStyle }) {
   return (charts || []).map(function (chart) {
@@ -39,6 +43,92 @@ function FooterTrendChartList({ charts, seriesById, inView, tickStyle, tooltipSt
       </div>
     );
   });
+}
+
+function SegmentalMiniChart({ slotModel, domain, height, inView, tickStyle, tooltipStyle, unit, latestTemplate }) {
+  if (!slotModel || !(slotModel.series || []).length) return null;
+  var chart = slotModel.chart;
+  var color = getThemeColor(chart.colorToken);
+  var latestLabel = slotModel.latest != null
+    ? formatTemplateLabel(latestTemplate || "{value} {unit}", { value: Number(slotModel.latest).toFixed(2), unit: unit || "kg" })
+    : "";
+  var showDates = !!chart.showDates;
+  return (
+    <div>
+      <div className={s.segCellHead}>
+        <div className={s.segCellTitle} style={{ color: color }}>{chart.title}</div>
+        {latestLabel ? <div className={s.segCellLatest}>{latestLabel}</div> : null}
+      </div>
+      <div className={ui.chartContainer}>
+        {inView ? (
+          <ResponsiveContainer width="100%" height={height}>
+            <LineChart data={slotModel.series} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
+              <XAxis dataKey="date" tick={showDates ? tickStyle : false} interval="preserveStartEnd" height={showDates ? 22 : 8} />
+              <YAxis domain={domain} tick={tickStyle} width={28} />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Line type="monotone" dataKey="value" name={chart.title} stroke={color} strokeWidth={2} dot={{ fill: color, r: 2 }} isAnimationActive={false} animationDuration={0} />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : <div className={s.chartPlaceholder} style={{ minHeight: height }} aria-hidden="true" />}
+      </div>
+    </div>
+  );
+}
+
+function SegmentalBodyGrid({ group, seriesById, inView, tickStyle, tooltipStyle }) {
+  var grid = segmentalBodyGrid;
+  var model = buildSegmentalGridModel(group, seriesById, grid);
+  var unit = grid.unit || "kg";
+  var limbHeight = grid.chartHeight || 110;
+  var trunkHeight = grid.trunkChartHeight || 132;
+  function renderSlot(slotId, height) {
+    var item = model.slots[slotId];
+    if (!item || !(item.series || []).length) return null;
+    var scale = item.chart.scaleGroup || slotId;
+    return (
+      <SegmentalMiniChart
+        slotModel={item}
+        domain={model.domains[scale]}
+        height={height}
+        inView={inView}
+        tickStyle={tickStyle}
+        tooltipStyle={tooltipStyle}
+        unit={unit}
+        latestTemplate={grid.latestTemplate}
+      />
+    );
+  }
+  return (
+    <div>
+      <div className={s.segGrid}>
+        <div className={s.segLa}>{renderSlot("leftArm", limbHeight)}</div>
+        <div className={s.segFigure} aria-hidden="true">
+          <div className={s.segHead} />
+          <div className={s.segFigRow}>
+            <div className={s.segArm} />
+            <div className={s.segTorso} />
+            <div className={s.segArm} />
+          </div>
+          <div className={s.segFigRow}>
+            <div className={s.segLeg} />
+            <div className={s.segLeg} />
+          </div>
+        </div>
+        <div className={s.segRa}>{renderSlot("rightArm", limbHeight)}</div>
+        <div className={s.segTrunk}>{renderSlot("trunk", trunkHeight)}</div>
+        <div className={s.segLl}>{renderSlot("leftLeg", limbHeight)}</div>
+        <div className={s.segRl}>{renderSlot("rightLeg", limbHeight)}</div>
+      </div>
+      {model.gaps.map(function (item) {
+        return (
+          <div key={item.pairId} className={s.segHint}>
+            {formatTemplateLabel(grid.imbalanceTemplate, { label: item.label, delta: item.delta.toFixed(2) })}
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 var TREND_LINE_ANIM = getTrendLineAnim(appConfig);
@@ -782,6 +872,7 @@ export default function ProgressPage({ data }) {
   var [hiddenCompoundLifts, setHiddenCompoundLifts] = useState({});
   var [selectedDate, setSelectedDate] = useState(null);
   var [sessionGraphIdx, setSessionGraphIdx] = useState(null);
+  var [segmentalGroupId, setSegmentalGroupId] = useState(defaultSegmentalGroupId);
   var [footerChartsRef, footerChartsInView] = useInView("240px");
 
   var normalizedWorkouts = useMemo(function () {
@@ -828,6 +919,11 @@ export default function ProgressPage({ data }) {
   var segmentalTrendSeries = useMemo(function () {
     return buildAllBodyTrendSeries(data.bodyComp, segmentalTrendCharts);
   }, [data.bodyComp]);
+
+  var visibleSegGroups = useMemo(function () {
+    return visibleSegmentalTrendGroups(segmentalTrendGroups, segmentalTrendSeries);
+  }, [segmentalTrendSeries]);
+  var activeSegGroup = resolveSegmentalTrendGroup(segmentalTrendGroups, segmentalTrendSeries, segmentalGroupId);
 
   var calChart = useMemo(function () {
     var calDates = [];
@@ -1097,18 +1193,32 @@ export default function ProgressPage({ data }) {
           <FooterTrendChartList charts={bodyTrendCharts} seriesById={bodyTrendSeries} inView={footerChartsInView} tickStyle={cs} tooltipStyle={tt} />
         </Card>
         )}
-        {segmentalTrendGroups.map(function (group) {
-          var hasGroup = (group.charts || []).some(function (chart) {
-            return (segmentalTrendSeries[chart.id] || []).length > 0;
-          });
-          if (!hasGroup) return null;
-          return (
-            <Card key={group.id} className={ui.cardChart}>
-              <div className={ui.sectionTitleLg}>{getPageSection("progress", group.id).title}</div>
-              <FooterTrendChartList charts={group.charts} seriesById={segmentalTrendSeries} inView={footerChartsInView} tickStyle={cs} tooltipStyle={tt} />
-            </Card>
-          );
-        })}
+        {activeSegGroup ? (
+        <Card className={ui.cardChart}>
+          <div className={s.segHeader}>
+            <div className={ui.sectionTitleLg}>{getPageSection("progress", "segmental").title}</div>
+            {visibleSegGroups.length > 1 ? (
+              <div className={cx(ui.pillToggleTrack, s.segToggle)} role="group" aria-label={getPageSection("progress", "segmental").title}>
+                {visibleSegGroups.map(function (group) {
+                  var on = activeSegGroup.id === group.id;
+                  return (
+                    <button
+                      key={group.id}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={function () { setSegmentalGroupId(group.id); }}
+                      className={on ? ui.pillToggleBtnActive : ui.pillToggleBtn}
+                    >
+                      {group.toggleLabel}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
+          <SegmentalBodyGrid group={activeSegGroup} seriesById={segmentalTrendSeries} inView={footerChartsInView} tickStyle={cs} tooltipStyle={tt} />
+        </Card>
+        ) : null}
         <Card className={ui.cardChart}>
           <div className={ui.sectionTitleLg}>{getPageSection("progress", "calorieTrend").title}</div>
           <div className={ui.chartContainer}>

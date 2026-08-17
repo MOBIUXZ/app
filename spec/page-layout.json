@@ -279,8 +279,7 @@
         { "id": "isolationLifts", "label": "💪 ISOLATION LIFTS" },
         { "id": "bodyCharts", "title": "📉 Body Weight & Body Fat" },
         { "id": "inbodyTrends", "title": "📉 InBody Trends" },
-        { "id": "segmentalLean", "title": "📉 Segmental Lean" },
-        { "id": "segmentalFat", "title": "📉 Segmental Fat" },
+        { "id": "segmental", "title": "📉 Segmental Analysis" },
         { "id": "calorieTrend", "title": "🔥 Calorie Intake Trend" }
       ],
       "bodyChartExtras": [
@@ -298,25 +297,43 @@
         { "id": "protein", "title": "Protein (kg)", "colorToken": "green", "paths": ["inbody.protein"] },
         { "id": "mineral", "title": "Mineral (kg)", "colorToken": "yellow", "paths": ["inbody.mineral"] }
       ],
+      "segmentalBodyGrid": {
+        "layout": "bodyGrid",
+        "unit": "kg",
+        "latestTemplate": "{value} {unit}",
+        "chartHeight": 110,
+        "trunkChartHeight": 132,
+        "imbalanceRatio": 0.05,
+        "imbalanceTemplate": "{label} · Δ {delta} kg",
+        "defaultMetric": "lean",
+        "pairs": [
+          { "id": "arms", "label": "Arms", "leftSlot": "leftArm", "rightSlot": "rightArm" },
+          { "id": "legs", "label": "Legs", "leftSlot": "leftLeg", "rightSlot": "rightLeg" }
+        ]
+      },
       "segmentalTrendGroups": [
         {
           "id": "segmentalLean",
+          "metric": "lean",
+          "toggleLabel": "Soft Lean Mass",
           "charts": [
-            { "id": "leanTrunk", "title": "Trunk (kg)", "colorToken": "accent", "paths": ["inbody.leanTrunkKg"] },
-            { "id": "leanLeftArm", "title": "Left Arm (kg)", "colorToken": "blue", "paths": ["inbody.leanLeftArmKg"] },
-            { "id": "leanRightArm", "title": "Right Arm (kg)", "colorToken": "green", "paths": ["inbody.leanRightArmKg"] },
-            { "id": "leanLeftLeg", "title": "Left Leg (kg)", "colorToken": "orange", "paths": ["inbody.leanLeftLegKg"] },
-            { "id": "leanRightLeg", "title": "Right Leg (kg)", "colorToken": "yellow", "paths": ["inbody.leanRightLegKg"] }
+            { "id": "leanLeftArm", "slot": "leftArm", "scaleGroup": "arm", "title": "Left Arm", "colorToken": "blue", "paths": ["inbody.leanLeftArmKg"] },
+            { "id": "leanRightArm", "slot": "rightArm", "scaleGroup": "arm", "title": "Right Arm", "colorToken": "green", "paths": ["inbody.leanRightArmKg"] },
+            { "id": "leanTrunk", "slot": "trunk", "scaleGroup": "trunk", "showDates": true, "title": "Trunk", "colorToken": "accent", "paths": ["inbody.leanTrunkKg"] },
+            { "id": "leanLeftLeg", "slot": "leftLeg", "scaleGroup": "leg", "title": "Left Leg", "colorToken": "orange", "paths": ["inbody.leanLeftLegKg"] },
+            { "id": "leanRightLeg", "slot": "rightLeg", "scaleGroup": "leg", "title": "Right Leg", "colorToken": "yellow", "paths": ["inbody.leanRightLegKg"] }
           ]
         },
         {
           "id": "segmentalFat",
+          "metric": "fat",
+          "toggleLabel": "Fat Mass",
           "charts": [
-            { "id": "fatTrunk", "title": "Trunk (kg)", "colorToken": "pink", "paths": ["inbody.fatTrunkKg"] },
-            { "id": "fatLeftArm", "title": "Left Arm (kg)", "colorToken": "blue", "paths": ["inbody.fatLeftArmKg"] },
-            { "id": "fatRightArm", "title": "Right Arm (kg)", "colorToken": "green", "paths": ["inbody.fatRightArmKg"] },
-            { "id": "fatLeftLeg", "title": "Left Leg (kg)", "colorToken": "orange", "paths": ["inbody.fatLeftLegKg"] },
-            { "id": "fatRightLeg", "title": "Right Leg (kg)", "colorToken": "yellow", "paths": ["inbody.fatRightLegKg"] }
+            { "id": "fatLeftArm", "slot": "leftArm", "scaleGroup": "arm", "title": "Left Arm", "colorToken": "blue", "paths": ["inbody.fatLeftArmKg"] },
+            { "id": "fatRightArm", "slot": "rightArm", "scaleGroup": "arm", "title": "Right Arm", "colorToken": "green", "paths": ["inbody.fatRightArmKg"] },
+            { "id": "fatTrunk", "slot": "trunk", "scaleGroup": "trunk", "showDates": true, "title": "Trunk", "colorToken": "pink", "paths": ["inbody.fatTrunkKg"] },
+            { "id": "fatLeftLeg", "slot": "leftLeg", "scaleGroup": "leg", "title": "Left Leg", "colorToken": "orange", "paths": ["inbody.fatLeftLegKg"] },
+            { "id": "fatRightLeg", "slot": "rightLeg", "scaleGroup": "leg", "title": "Right Leg", "colorToken": "yellow", "paths": ["inbody.fatRightLegKg"] }
           ]
         }
       ],

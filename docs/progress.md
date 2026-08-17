@@ -23,7 +23,8 @@ When you change a **metric toggle**, the active line morphs smoothly between val
 |------------|------------------|---------------|
 | Per-exercise (combined & split) | Instant | 600ms morph |
 | Combined Compound Lifts | Instant | 600ms morph (all visible lift lines) |
-| Body weight / body fat / InBody trends / segmental lean-fat / calories | Instant | N/A (no metric toggles) |
+| Body weight / body fat / InBody trends / calories | Instant | N/A (no metric toggles) |
+| Segmental Analysis | Instant | Instant Soft Lean / Fat pill (swaps the grid; no line morph) |
 | Session Performance popup | 600ms draw on open | 600ms morph |
 
 **How it works (maintainers):** `withTrendPlotValue()` copies the active metric into a stable `plotValue` field; Recharts `<Line dataKey="plotValue" animationId={metric}>` interpolates between toggles. `useTrendChartAnimation(chartReady)` sets `animationDuration={0}` on first paint, then `600` on subsequent updates. Y-axis domain rescales per metric via `sessionChartYDomain()` (same helper as session graphs). Tooltips stay non-animated for snappy hover.
@@ -324,16 +325,16 @@ Card on Progress between body charts and calories. Series come from `bodyComp` v
 
 The whole card is omitted when every series is empty. Manual logs with SMM/SMI still chart those series; visceral, score, water, protein, and mineral appear after InBody CSV import. BMR prefers the InBody measured value, then Mifflin, then Katch. Whole-body fat mass and BMI live on the Body Weight & Body Fat card, not here. Lazy-mounted with the same footer `useInView`; `isAnimationActive={false}`.
 
-## Segmental Lean & Fat
+## Segmental Analysis
 
-Two Progress cards after InBody Trends. Each region is its **own** chart (trunk kg is much larger than arms, so they do not share a Y-axis). Titles, colors, and CSV paths live in `spec/page-layout.json` → `pages.progress.segmentalTrendGroups`.
+One Progress card after InBody Trends, with a **Soft Lean Mass / Fat Mass** pill toggle (same pattern as the Body Comp History map). The unused metric is hidden; if only one metric has points, the toggle is omitted. Each metric is a **body-shaped grid**: left/right arm beside a figure, trunk full-width in the middle, left/right leg below. Layout, titles, colors, CSV paths, and shared Y-axis groups live in `spec/page-layout.json` → `pages.progress.segmentalTrendGroups` + `segmentalBodyGrid`. View model: `buildSegmentalGridModel()` / `resolveSegmentalTrendGroup()` in `src/domain/bodyTrends.js`.
 
-| Card | Charts |
-|------|--------|
-| Segmental Lean | Trunk, Left Arm, Right Arm, Left Leg, Right Leg (`inbody.lean*Kg`) |
-| Segmental Fat | Trunk, Left Arm, Right Arm, Left Leg, Right Leg (`inbody.fat*Kg`) |
+| Toggle | Regions |
+|--------|---------|
+| Soft Lean Mass | Trunk, Left Arm, Right Arm, Left Leg, Right Leg (`inbody.lean*Kg`) |
+| Fat Mass | Trunk, Left Arm, Right Arm, Left Leg, Right Leg (`inbody.fat*Kg`) |
 
-A chart is hidden when that region has no points. A card is omitted when every region in it is empty. Same footer lazy-mount as the other health charts. The Body Comp History **segmental map** is the latest-scan snapshot; these Progress charts are the history over time.
+Arms share one Y-axis, legs share one Y-axis, trunk keeps its own (trunk kg is much larger than arms). Latest kg is labeled on each mini-chart. A left/right pair that differs by 5% or more of the larger side shows a gap hint. A region is omitted when it has no points. The card is omitted when both metrics are empty. Same footer lazy-mount as the other health charts. The Body Comp History **segmental map** is the latest-scan snapshot; these Progress charts are the history over time.
 
 ## Calorie Intake Trend
 

@@ -46,7 +46,7 @@ Complete inventory of every project file. Line counts approximate (Aug 2026).
 
 ## `src/domain/bodyTrends.js`
 
-**~60 lines** — `buildAllBodyTrendSeries()` maps `bodyComp` onto Progress InBody and segmental trend charts (including BMR). Spec: `spec/inbody-csv-fixtures.json` `trendFixtures` + `spec/page-layout.json` `bodyTrendCharts` / `segmentalTrendGroups`.
+**~140 lines** — `buildAllBodyTrendSeries()` maps `bodyComp` onto Progress InBody and segmental trend charts (including BMR). `buildSegmentalGridModel()` places those series on the Progress body grid with shared arm/leg Y-axes. `resolveSegmentalTrendGroup()` picks Soft Lean vs Fat for the Progress toggle. Spec: `spec/inbody-csv-fixtures.json` `trendFixtures` / `gridFixtures` / `gridToggleFixtures` + `spec/page-layout.json` `bodyTrendCharts` / `segmentalTrendGroups` / `segmentalBodyGrid`.
 
 ## `src/domain/bodySegmental.js`
 
@@ -266,7 +266,7 @@ Key class groups:
 |-------|---------|
 | Layout | `pageTitle`, `sectionLabel`, `exerciseCard`, `exerciseHeader` |
 | Stats | `prBlock`, `statStrip`, `miniStat*` |
-| Charts | `chartPlaceholder`, `splitRow`, `splitCol`, `splitLabel` |
+| Charts | `chartPlaceholder`, `splitRow`, `splitCol`, `splitLabel`, `segHeader`, `segGrid`, `segFigure` |
 | Toggles | `splitToggleGroup`, `compoundMetricToggleActive`, `compoundLegendRow` |
 | Modals | `detailBackdrop`, `detailPanel`, `sessionGraphOverlay`, `sessionGraphPanel` |
 | Sets | `setRow`, `setRowBest`, `setRowE1rm`, `setRowE1rmBest` |

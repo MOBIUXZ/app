@@ -86,7 +86,7 @@ The history toolbar (entry count, **Import InBody CSV**, and **Clear History**) 
 - Simple body figure with left/right arm and leg values; trunk is labeled under the figure
 - A left/right pair that differs by **5% or more** of the larger side shows an imbalance hint
 - Hidden for manual logs and for InBody rows that lack segmental columns
-- Time-series graphs for each region live on **Progress** (Segmental Lean and Segmental Fat cards)
+- Time-series graphs for each region live on **Progress** (one Segmental Analysis card with a Soft Lean Mass / Fat Mass toggle)
 - Spec: `spec/page-layout.json` → `pages.bodyComp.segmentalMap`; series builder: `src/domain/bodySegmental.js`
 
 ### Clear History
