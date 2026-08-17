@@ -78,7 +78,7 @@
     {
       "id": "storage-fixtures",
       "path": "spec/storage-fixtures.json",
-      "governs": ["normalizeStoredData()", "parseImportedData()", "wipeLogs()", "export file name", "settings profile prefill"],
+      "governs": ["normalizeStoredData()", "parseImportedData()", "wipeLogs()", "persistWith()", "mergePersistedData()", "export file name", "settings profile prefill"],
       "docs": ["docs/data-model.md", "docs/architecture.md"]
     },
     {

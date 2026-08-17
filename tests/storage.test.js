@@ -11,7 +11,11 @@ import {
   wipeLogs,
   exportFileName,
   profilePrefill,
+  applyProfilePrefill,
   patchSettings,
+  mergePersistedData,
+  persistWith,
+  serializeStoredData,
 } from '../src/domain/storage.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -83,6 +87,41 @@ describe('storage spec (spec/storage-fixtures.json)', function () {
     });
   });
 
+  storageSpec.applyPrefillFixtures.forEach(function (fixture) {
+    it('apply prefill: ' + fixture.id, function () {
+      expect(applyProfilePrefill(fixture.prev, fixture.next, fixture.current)).toEqual(fixture.expected);
+    });
+  });
+
+  storageSpec.mergeFixtures.forEach(function (fixture) {
+    it('merge: ' + fixture.id, function () {
+      var out = mergePersistedData(fixture.current, fixture.incoming);
+      expect(out.workouts.length).toBe(fixture.expectedWorkoutCount);
+      expect(out.settings.profile.sex).toBe(fixture.expectedSex);
+      expect(out.settings.calories.goal).toBe(fixture.expectedGoal);
+    });
+  });
+
+  storageSpec.persistFixtures.forEach(function (fixture) {
+    it('persist: ' + fixture.id, function () {
+      var writer = fixture.throws
+        ? function () { throw new Error('quota'); }
+        : function () {};
+      var result = persistWith(writer, 'ft_v5', { workouts: [] });
+      expect(result.ok).toBe(fixture.ok);
+      if (!fixture.ok) expect(result.errorId).toBe(fixture.errorId);
+    });
+  });
+
+  storageSpec.roundtripFixtures.forEach(function (fixture) {
+    it('roundtrip: ' + fixture.id, function () {
+      var original = normalizeStoredData(fixture.input);
+      var result = parseImportedData(serializeStoredData(original));
+      expect(result.ok).toBe(true);
+      expect(result.data).toEqual(original);
+    });
+  });
+
   it('patchSettings updates one branch without dropping logs', function () {
     var data = normalizeStoredData({
       workouts: [{ exercise: 'Squat', date: '01-01-2026', sets: [{ weight: 100, reps: 5 }] }],
@@ -99,5 +138,7 @@ describe('storage spec (spec/storage-fixtures.json)', function () {
     var cals = readFileSync(resolve(root, 'src/components/CaloriePage.jsx'), 'utf8');
     expect(body.indexOf('profilePrefill') !== -1).toBe(true);
     expect(cals.indexOf('normalizeStoredData') !== -1 || cals.indexOf('patchSettings') !== -1).toBe(true);
+    expect(body.indexOf('applyProfilePrefill') !== -1).toBe(true);
+    expect(cals.indexOf('goalRef') !== -1).toBe(true);
   });
 });

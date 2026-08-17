@@ -4,7 +4,10 @@
   "messages": {
     "imported": "Imported backup.",
     "invalidJson": "That file is not valid JSON.",
-    "invalidShape": "This backup is missing workout, body, or calorie data."
+    "invalidShape": "This backup is missing workout, body, or calorie data.",
+    "invalidEntries": "This backup has invalid workout, body, or calorie entries.",
+    "readFailed": "Could not read that file.",
+    "saveFailed": "Could not save. Browser storage may be full."
   },
   "exportFileNameFixtures": [
     { "year": 2026, "month": 8, "day": 17, "expected": "orbius-backup-2026-08-17.json" }
@@ -18,6 +21,24 @@
       "expectedAge": null,
       "expectedGoal": 2200,
       "expectedActivityIndex": 2
+    },
+    {
+      "id": "sex-case-and-negative-height",
+      "input": {
+        "workouts": [],
+        "bodyLogs": [],
+        "bodyComp": [],
+        "calories": [],
+        "settings": {
+          "profile": { "sex": "Female", "height": -10, "age": 28 },
+          "calories": { "goal": 1800, "activityIndex": 1 }
+        }
+      },
+      "expectedSex": "female",
+      "expectedHeight": null,
+      "expectedAge": 28,
+      "expectedGoal": 1800,
+      "expectedActivityIndex": 1
     },
     {
       "id": "keeps-profile-and-clamps-activity",
@@ -39,6 +60,12 @@
     }
   ],
   "importFixtures": [
+    {
+      "id": "empty-workouts-ok",
+      "input": { "workouts": [] },
+      "ok": true,
+      "expectedWorkoutCount": 0
+    },
     {
       "id": "valid-legacy",
       "input": {
@@ -85,6 +112,23 @@
       "input": { "workouts": "nope", "bodyLogs": [], "bodyComp": [], "calories": [] },
       "ok": false,
       "errorId": "invalidShape"
+    },
+    {
+      "id": "junk-workout-entry",
+      "input": { "workouts": [null], "bodyLogs": [], "bodyComp": [], "calories": [] },
+      "ok": false,
+      "errorId": "invalidEntries"
+    },
+    {
+      "id": "workout-missing-sets",
+      "input": {
+        "workouts": [{ "exercise": "Squat", "date": "01-01-2026" }],
+        "bodyLogs": [],
+        "bodyComp": [],
+        "calories": []
+      },
+      "ok": false,
+      "errorId": "invalidEntries"
     }
   ],
   "wipeFixtures": [
@@ -115,6 +159,53 @@
       "id": "empty-profile",
       "settings": { "profile": { "sex": "male", "height": null, "age": null } },
       "expected": { "sex": "male", "height": "", "age": "" }
+    }
+  ],
+  "applyPrefillFixtures": [
+    {
+      "id": "keeps-dirty-height-updates-clean-age",
+      "prev": { "sex": "male", "height": "165", "age": "28" },
+      "next": { "sex": "male", "height": "170", "age": "29" },
+      "current": { "sex": "male", "height": "180", "age": "28" },
+      "expected": { "sex": "male", "height": "180", "age": "29" }
+    }
+  ],
+  "mergeFixtures": [
+    {
+      "id": "omitted-settings-kept",
+      "current": {
+        "workouts": [{ "exercise": "Squat", "date": "01-01-2026", "sets": [{ "weight": 100, "reps": 5 }] }],
+        "bodyLogs": [],
+        "bodyComp": [],
+        "calories": [],
+        "settings": {
+          "profile": { "sex": "female", "height": 165, "age": 28 },
+          "calories": { "goal": 1800, "activityIndex": 1 }
+        }
+      },
+      "incoming": { "workouts": [] },
+      "expectedWorkoutCount": 0,
+      "expectedSex": "female",
+      "expectedGoal": 1800
+    }
+  ],
+  "persistFixtures": [
+    { "id": "writer-ok", "throws": false, "ok": true },
+    { "id": "writer-throws", "throws": true, "ok": false, "errorId": "saveFailed" }
+  ],
+  "roundtripFixtures": [
+    {
+      "id": "logs-and-settings",
+      "input": {
+        "workouts": [{ "exercise": "Squat", "date": "01-01-2026", "sets": [{ "weight": 100, "reps": 5 }] }],
+        "bodyLogs": [{ "weight": 75, "date": "01-01-2026" }],
+        "bodyComp": [{ "date": "01-01-2026", "weight": 75, "bf": 15 }],
+        "calories": [{ "food": "Oats", "calories": 300, "date": "1/1/2026" }],
+        "settings": {
+          "profile": { "sex": "female", "height": 165, "age": 28 },
+          "calories": { "goal": 1800, "activityIndex": 1 }
+        }
+      }
     }
   ]
 }

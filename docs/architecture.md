@@ -76,12 +76,12 @@ Sections (in order), compact layout (`maxWidthPx` 400): height/age and goal/acti
 
 | Section | What it stores |
 |---------|----------------|
-| **Profile** | Sex, height (cm), age — prefill Body Comp log form |
+| **Profile** | Sex, height (cm), age — prefill Body Comp log form (in-progress fields are kept) |
 | **Calories** | Daily goal (kcal) and activity level — seed the Calories page |
-| **Data** | Export JSON, Import JSON, Wipe all logs (confirm; settings stay) |
+| **Data** | Export JSON; Import JSON (confirm replace, with entry counts); Wipe all logs (confirm; settings stay) |
 | **Keyboard** | Shortcut cheatsheet |
 
-Persistence: `data.settings` in `ft_v5`, normalized by `src/domain/storage.js`. Spec: `spec/storage-fixtures.json`.
+Persistence: `data.settings` in `ft_v5`, normalized by `src/domain/storage.js`. Spec: `spec/storage-fixtures.json`. Failed `localStorage` writes keep the previous in-memory data and show a banner under the header (`persistBanner` / `saveFailed`). Sex is case-insensitive (`Female` → `female`); negative height/age become empty.
 
 ---
 
@@ -89,7 +89,7 @@ Persistence: `data.settings` in `ft_v5`, normalized by `src/domain/storage.js`. 
 
 ```
 localStorage["ft_v5"]
-       ↕ loadData / saveData
+       ↕ loadData / persistStoredData
     App state (data)
        ↕ save(d) or read-only
   ┌─────┴─────┬─────────┬──────────┐
@@ -104,12 +104,16 @@ Writable pages receive `save(newData)` from App:
 
 ```javascript
 function save(d) {
-  setData(d);
-  saveData(d);  // localStorage.setItem("ft_v5", JSON.stringify(d))
+  var next = mergePersistedData(data, d);
+  var result = persistStoredData(STORAGE_KEY, next);
+  if (!result.ok) { setPersistError(true); return false; }
+  setPersistError(false);
+  setData(next);
+  return true;
 }
 ```
 
-Always pass the **full** data object with all four arrays.
+Omitted keys (including `settings`) are kept from current state. If the write fails, in-memory state is left unchanged.
 
 ---
 

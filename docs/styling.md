@@ -12,7 +12,7 @@ Orbius uses **CSS Modules** with a shared theme. Static layout and typography li
 | `src/styles/global.css` | Base reset, keyboard navigation classes (`.ft-kb-*`), number-input scroll guard |
 | `src/styles/ui.module.css` | Shared UI: buttons, inputs, cards, collapse, modals, flex/grid utilities |
 | `src/styles/styleHelpers.js` | `cx()`, `btnPrimaryClass`, `inputClass`, `selectClass`, `textareaClass` |
-| `src/App.module.css` | App shell: header (logo + settings gear), segmented main nav (`.navTrack`), main content |
+| `src/App.module.css` | App shell: header (logo + settings gear), persist error banner, segmented main nav (`.navTrack`), main content |
 | `src/components/DashboardPage.module.css` | Dashboard: stat row, PR list, recent workouts |
 | `src/components/BodyCompPage.module.css` | Body comp: metrics, relations, history chips |
 | `src/components/CaloriePage.module.css` | Calories: BMR/TDEE, calendar, macros, food log |
@@ -71,6 +71,8 @@ Tabs use `role="tab"` / `aria-selected`. Focus sync in `App.jsx` moves DOM focus
 **Settings gear** (`.settingsBtn`) sits at the top-right of the header, opposite the Orbius wordmark. It is a 40×40 transparent button with accent color, hover wash, and a green `:focus-visible` ring like inactive nav tabs. Click opens the Settings modal (`page-layout.json` → `app.settings`).
 
 The Settings panel is compact (max 400px): paired fields (height/age, goal/activity), units inside the inputs, Export/Import on one row, and a tight keyboard cheatsheet. Classes live in `App.module.css` (`.settingsPanel`, `.settingsGrid`, `.settingsActionsRow`) so other modals are unchanged.
+
+A persist error banner (`.persistBanner`, `.persistBannerText`, `.persistBannerClose`) sits under the header when `localStorage` cannot be written. Aria-label for dismiss comes from `page-layout.json` → `app.settings.persistError`.
 
 ### Activity level list (Calories)
 

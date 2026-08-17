@@ -7,8 +7,19 @@ import ProgressPage from "./components/ProgressPage.jsx";
 import { useAppNavKeyboard, useDisableNumberInputWheel, useKeyboardLayer, useConfirmDialogKeyboard, ui, cx, btnSecondary, btnDanger, inputClass, selectClass, ACTIVITY } from "./components/shared.jsx";
 import appConfig from "../spec/app-config.json";
 import keyboardSpec from "../spec/keyboard-shortcuts.json";
-import { getAppLayout, groupByRow } from "./domain/pageLayout.js";
-import { normalizeStoredData, patchSettings, wipeLogs, parseImportedData, serializeStoredData, exportFileName, getStorageMessages } from "./domain/storage.js";
+import { getAppLayout, groupByRow, formatTemplateLabel } from "./domain/pageLayout.js";
+import {
+  normalizeStoredData,
+  patchSettings,
+  wipeLogs,
+  parseImportedData,
+  serializeStoredData,
+  exportFileName,
+  getStorageMessages,
+  mergePersistedData,
+  persistStoredData,
+  countLogs,
+} from "./domain/storage.js";
 import Logo from "./components/Logo.jsx";
 import { PageIcon } from "./components/PageIcon.jsx";
 import styles from "./App.module.css";
@@ -18,6 +29,7 @@ const appLayout = getAppLayout();
 const defaultData = appConfig.defaultData;
 const STORAGE_KEY = appConfig.storageKey;
 const storageMessages = getStorageMessages();
+const NUMBER_DRAFT = /^-?\d*\.?\d*$/;
 
 function loadData() {
   try {
@@ -27,16 +39,43 @@ function loadData() {
   }
 }
 
-function saveData(d) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
-  } catch (e) {}
-}
-
 function fieldValue(settings, path) {
   return path.split(".").reduce(function (acc, key) {
     return acc == null ? acc : acc[key];
   }, settings);
+}
+
+function SettingsNumberInput(props) {
+  var field = props.field;
+  var value = props.value;
+  var onCommit = props.onCommit;
+  var [draft, setDraft] = useState(value == null ? "" : String(value));
+  useEffect(function () {
+    setDraft(value == null ? "" : String(value));
+  }, [value]);
+  function commit() {
+    var raw = String(draft).trim();
+    onCommit(raw === "" || raw === "-" || raw === "." || raw === "-." ? null : raw);
+  }
+  return (
+    <div className={styles.settingsField}>
+      <div className={ui.fieldLabel}>{field.label}</div>
+      <div className={styles.settingsInputWrap}>
+        <input
+          type="text"
+          inputMode="decimal"
+          value={draft}
+          onChange={function (e) {
+            var raw = e.target.value;
+            if (raw === "" || NUMBER_DRAFT.test(raw)) setDraft(raw);
+          }}
+          onBlur={commit}
+          className={inputClass({ fullWidth: true })}
+        />
+        {field.unit ? <span className={styles.settingsUnit}>{field.unit}</span> : null}
+      </div>
+    </div>
+  );
 }
 
 export default function App() {
@@ -45,14 +84,18 @@ export default function App() {
   var [progressMounted, setProgressMounted] = useState(false);
   var [showSettings, setShowSettings] = useState(false);
   var [showWipeConfirm, setShowWipeConfirm] = useState(false);
+  var [showImportConfirm, setShowImportConfirm] = useState(false);
+  var [pendingImport, setPendingImport] = useState(null);
   var [settingsMsg, setSettingsMsg] = useState(null);
+  var [persistError, setPersistError] = useState(false);
   var navKb = useAppNavKeyboard(NAV, tab, setTab);
   var navTrackRef = useRef(null);
   var importRef = useRef(null);
   var settingsModal = appLayout.settings.modal;
   var wipeModal = appLayout.settings.wipeModal;
+  var importModal = appLayout.settings.importModal;
   var settings = normalizeStoredData(data).settings;
-  var settingsOpen = showSettings && !showWipeConfirm;
+  var settingsOpen = showSettings && !showWipeConfirm && !showImportConfirm;
   var settingsLayer = useKeyboardLayer(settingsModal.layerId, settingsOpen, function (e) {
     if (e.key === "Escape") {
       e.preventDefault();
@@ -63,6 +106,10 @@ export default function App() {
   var wipeConfirmKb = useConfirmDialogKeyboard(showWipeConfirm, confirmWipe, cancelWipe, wipeModal.layerId, {
     cancel: wipeModal.buttons[0],
     confirm: wipeModal.buttons[1],
+  });
+  var importConfirmKb = useConfirmDialogKeyboard(!!(showImportConfirm && pendingImport), confirmImport, cancelImport, importModal.layerId, {
+    cancel: importModal.buttons[0],
+    confirm: importModal.buttons[1],
   });
   useDisableNumberInputWheel();
 
@@ -82,15 +129,15 @@ export default function App() {
   }, [tab]);
 
   function save(d) {
-    var next = normalizeStoredData({
-      workouts: d.workouts !== undefined ? d.workouts : data.workouts,
-      bodyLogs: d.bodyLogs !== undefined ? d.bodyLogs : data.bodyLogs,
-      bodyComp: d.bodyComp !== undefined ? d.bodyComp : data.bodyComp,
-      calories: d.calories !== undefined ? d.calories : data.calories,
-      settings: d.settings !== undefined ? d.settings : data.settings,
-    });
+    var next = mergePersistedData(data, d);
+    var result = persistStoredData(STORAGE_KEY, next);
+    if (!result.ok) {
+      setPersistError(true);
+      return false;
+    }
+    setPersistError(false);
     setData(next);
-    saveData(next);
+    return true;
   }
 
   function updateSettings(partial) {
@@ -120,8 +167,12 @@ export default function App() {
         setSettingsMsg({ type: "error", text: storageMessages[result.errorId] });
         return;
       }
-      save(result.data);
-      setSettingsMsg({ type: "ok", text: storageMessages.imported });
+      setPendingImport(result.data);
+      setShowImportConfirm(true);
+      setSettingsMsg(null);
+    };
+    reader.onerror = function () {
+      setSettingsMsg({ type: "error", text: storageMessages.readFailed });
     };
     reader.readAsText(file);
   }
@@ -133,6 +184,35 @@ export default function App() {
   function confirmWipe() {
     save(wipeLogs(data));
     setShowWipeConfirm(false);
+  }
+
+  function cancelImport() {
+    setShowImportConfirm(false);
+    setPendingImport(null);
+  }
+
+  function confirmImport() {
+    if (!pendingImport) return;
+    var ok = save(pendingImport);
+    setShowImportConfirm(false);
+    setPendingImport(null);
+    if (ok) setSettingsMsg({ type: "ok", text: storageMessages.imported });
+  }
+
+  function closeSettings() {
+    if (showWipeConfirm || showImportConfirm) return;
+    setShowSettings(false);
+    setSettingsMsg(null);
+  }
+
+  function commitNumberField(field, nextVal) {
+    var patch = {};
+    if (field.path.indexOf("profile.") === 0) patch.profile = {};
+    if (field.path.indexOf("calories.") === 0) patch.calories = {};
+    var key = field.path.split(".")[1];
+    if (patch.profile) patch.profile[key] = nextVal;
+    if (patch.calories) patch.calories[key] = nextVal;
+    updateSettings(patch);
   }
 
   function renderField(field) {
@@ -176,28 +256,12 @@ export default function App() {
       );
     }
     return (
-      <div key={field.id} className={styles.settingsField}>
-        <div className={ui.fieldLabel}>{field.label}</div>
-        <div className={styles.settingsInputWrap}>
-          <input
-            type="number"
-            value={value == null ? "" : value}
-            onChange={function (e) {
-              var raw = e.target.value;
-              var patch = {};
-              if (field.path.indexOf("profile.") === 0) patch.profile = {};
-              if (field.path.indexOf("calories.") === 0) patch.calories = {};
-              var key = field.path.split(".")[1];
-              var nextVal = raw === "" ? null : raw;
-              if (patch.profile) patch.profile[key] = nextVal;
-              if (patch.calories) patch.calories[key] = nextVal;
-              updateSettings(patch);
-            }}
-            className={inputClass({ fullWidth: true })}
-          />
-          {field.unit ? <span className={styles.settingsUnit}>{field.unit}</span> : null}
-        </div>
-      </div>
+      <SettingsNumberInput
+        key={field.id}
+        field={field}
+        value={value}
+        onCommit={function (nextVal) { commitNumberField(field, nextVal); }}
+      />
     );
   }
 
@@ -284,6 +348,19 @@ export default function App() {
           <PageIcon id={appLayout.settings.icon} size={appLayout.settings.iconSizePx} />
         </button>
       </div>
+      {persistError ? (
+        <div className={styles.persistBanner} role="alert">
+          <span className={styles.persistBannerText}>{storageMessages.saveFailed}</span>
+          <button
+            type="button"
+            className={styles.persistBannerClose}
+            aria-label={appLayout.settings.persistError.dismissAriaLabel}
+            onClick={function () { setPersistError(false); }}
+          >
+            ✕
+          </button>
+        </div>
+      ) : null}
       <nav className={styles.nav} aria-label="Main">
         <div ref={navTrackRef} className={styles.navTrack} role="tablist">
           {NAV.map(function (n, i) {
@@ -318,7 +395,7 @@ export default function App() {
         <div
           className={cx(keyboardSpec.cssClasses.modalBackdrop, ui.modalBackdrop)}
           style={{ zIndex: settingsLayer.zIndex }}
-          onClick={function () { if (!showWipeConfirm) { setShowSettings(false); setSettingsMsg(null); } }}
+          onClick={closeSettings}
         >
           <div
             role="dialog"
@@ -330,7 +407,7 @@ export default function App() {
           >
             <div className={styles.settingsHeader}>
               <div className={ui.modalTitle}>{settingsModal.title}</div>
-              <button type="button" onClick={function () { setShowSettings(false); setSettingsMsg(null); }} className={ui.modalClose}>✕</button>
+              <button type="button" onClick={closeSettings} className={ui.modalClose}>✕</button>
             </div>
             {settingsModal.sections.map(renderSection)}
           </div>
@@ -346,6 +423,20 @@ export default function App() {
             <div className={ui.flexEnd}>
               <button type="button" onClick={cancelWipe} onMouseEnter={function () { wipeConfirmKb.setFocusIdx(0); }} className={cx(wipeConfirmKb.btnClass(0), btnSecondary({ modal: true }))}>{wipeModal.buttons[0]}</button>
               <button type="button" onClick={confirmWipe} onMouseEnter={function () { wipeConfirmKb.setFocusIdx(1); }} className={cx(wipeConfirmKb.btnClass(1), btnDanger({ modal: true }))}>{wipeModal.buttons[1]}</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showImportConfirm && pendingImport && (
+        <div className={cx(keyboardSpec.cssClasses.modalBackdrop, ui.modalBackdrop)} style={{ zIndex: importConfirmKb.zIndex }} onClick={importConfirmKb.onBackdropClick}>
+          <div ref={importConfirmKb.dialogRef} tabIndex={-1} className={ui.modalPanelConfirm} onClick={function (ev) { ev.stopPropagation(); }}>
+            <div className={ui.modalTitle}>{importModal.title}</div>
+            <div className={cx(ui.textMutedSm, ui.marginTop8)}>{formatTemplateLabel(importModal.body, countLogs(pendingImport))}</div>
+            <div className="ft-kb-focus-indicator">Focused: <strong>{importConfirmKb.focusLabel}</strong></div>
+            <div className="ft-kb-hint">← → or Tab switch · Enter select · Esc cancel</div>
+            <div className={ui.flexEnd}>
+              <button type="button" onClick={cancelImport} onMouseEnter={function () { importConfirmKb.setFocusIdx(0); }} className={cx(importConfirmKb.btnClass(0), btnSecondary({ modal: true }))}>{importModal.buttons[0]}</button>
+              <button type="button" onClick={confirmImport} onMouseEnter={function () { importConfirmKb.setFocusIdx(1); }} className={cx(importConfirmKb.btnClass(1), btnDanger({ modal: true }))}>{importModal.buttons[1]}</button>
             </div>
           </div>
         </div>

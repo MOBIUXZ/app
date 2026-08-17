@@ -164,7 +164,7 @@ Documented in [architecture.md](./architecture.md). Critical behaviors:
 | Mount | `main.jsx` → `StrictMode` → `KeyboardLayerProvider` → `App` |
 | Global CSS | `import './styles/global.css'` in `main.jsx` only |
 | Navigation | `App.jsx` conditional render by `tab` string (not React Router) |
-| Persistence | `loadData()` / `saveData()` / `save()` in `App.jsx`, key `ft_v5` |
+| Persistence | `loadData()` / `persistStoredData()` via `save()` in `App.jsx`, key `ft_v5` |
 | Progress perf | `progressMounted` — Progress page stays in DOM after first visit |
 
 ---

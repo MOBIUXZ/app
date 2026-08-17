@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, Collapse, btnPrimary, btnSecondary, btnDanger, inputClass, formatDate, useConfirmDialogKeyboard, ui, cx } from "./shared";
 import { computeBodyCompEntry } from "../domain/metrics.js";
 import { syncBodyLogsAfterEdit, removeBodyLogForEntry } from "../domain/bodyCompSync.js";
 import { getPageLayout, getCollapseSpec, getModalSpec, formatTemplateLabel } from "../domain/pageLayout.js";
-import { profilePrefill } from "../domain/storage.js";
+import { profilePrefill, applyProfilePrefill } from "../domain/storage.js";
 import { PageHeading } from "./PageIcon";
 import s from "./BodyCompPage.module.css";
 
@@ -17,10 +17,15 @@ export default function BodyCompPage({ data, save }) {
   var [pendingDeleteIdx, setPendingDeleteIdx] = useState(null);
   var [editIdx, setEditIdx] = useState(null);
   var [editForm, setEditForm] = useState(null);
+  var prevPrefillRef = useRef(prefill);
+  var formRef = useRef({ sex: sex, height: h, age: age });
+  formRef.current = { sex: sex, height: h, age: age };
   useEffect(function () {
-    setH(prefill.height);
-    setAge(prefill.age);
-    setSex(prefill.sex);
+    var next = applyProfilePrefill(prevPrefillRef.current, prefill, formRef.current);
+    prevPrefillRef.current = prefill;
+    setH(next.height);
+    setAge(next.age);
+    setSex(next.sex);
   }, [prefill.sex, prefill.height, prefill.age]);
   var wN = parseFloat(w) || 0, hM = (parseFloat(h) || 0) / 100, bfN = parseFloat(bf) || 0, smmN = parseFloat(smm) || 0, ageN = parseFloat(age) || 0;
   var hasBase = wN > 0 && bfN > 0, fm = hasBase ? wN * (bfN / 100) : null, ffm = hasBase ? wN - fm : null;

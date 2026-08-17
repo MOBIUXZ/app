@@ -15,11 +15,11 @@ Collapsible form for logging a new body composition entry. The first field (**Da
 - **Body Fat %**
 
 ### Optional Fields
-- Height (cm) — prefills from **Settings → Profile**
+- Height (cm) — prefills from **Settings → Profile**. Values you have already edited stay put if Settings changes later.
 - Skeletal Muscle Mass (kg)
 - Waist (cm)
-- Age — prefills from **Settings → Profile**
-- **Sex** — Male / Female pill toggle; prefills from **Settings → Profile** (used for Mifflin-St Jeor BMR)
+- Age — prefills from **Settings → Profile** (same dirty-field rule as height)
+- **Sex** — Male / Female pill toggle; prefills from **Settings → Profile** (used for Mifflin-St Jeor BMR; same dirty-field rule)
 
 ## Live Calculated Metrics
 

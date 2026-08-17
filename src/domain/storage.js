@@ -16,8 +16,16 @@ export function getStorageMessages() {
 
 function asNumberOrNull(value) {
   if (value == null || value === "") return null;
-  var n = typeof value === "number" ? value : parseFloat(value);
-  return isNaN(n) ? null : n;
+  if (typeof value === "string") {
+    var trimmed = value.trim();
+    if (trimmed === "" || trimmed === "-" || trimmed === "." || trimmed === "-.") return null;
+    var parsed = parseFloat(trimmed);
+    return isNaN(parsed) || parsed < 0 ? null : parsed;
+  }
+  if (typeof value === "number") {
+    return isNaN(value) || value < 0 ? null : value;
+  }
+  return null;
 }
 
 function clampActivityIndex(index) {
@@ -33,15 +41,18 @@ function normalizeGoal(value) {
   return n;
 }
 
+function normalizeSex(value) {
+  return String(value == null ? "" : value).trim().toLowerCase() === "female" ? "female" : "male";
+}
+
 export function normalizeSettings(raw) {
   var defaults = getDefaultSettings();
   var src = raw && typeof raw === "object" ? raw : {};
   var profile = src.profile && typeof src.profile === "object" ? src.profile : {};
   var calories = src.calories && typeof src.calories === "object" ? src.calories : {};
-  var sex = profile.sex === "female" ? "female" : "male";
   return {
     profile: {
-      sex: sex,
+      sex: normalizeSex(profile.sex),
       height: asNumberOrNull(profile.height),
       age: asNumberOrNull(profile.age),
     },
@@ -60,6 +71,28 @@ export function normalizeStoredData(raw) {
   });
   out.settings = normalizeSettings(src.settings);
   return out;
+}
+
+export function mergePersistedData(current, incoming) {
+  var src = incoming && typeof incoming === "object" ? incoming : {};
+  var base = current && typeof current === "object" ? current : {};
+  return normalizeStoredData({
+    workouts: src.workouts !== undefined ? src.workouts : base.workouts,
+    bodyLogs: src.bodyLogs !== undefined ? src.bodyLogs : base.bodyLogs,
+    bodyComp: src.bodyComp !== undefined ? src.bodyComp : base.bodyComp,
+    calories: src.calories !== undefined ? src.calories : base.calories,
+    settings: src.settings !== undefined ? src.settings : base.settings,
+  });
+}
+
+export function countLogs(data) {
+  var normalized = normalizeStoredData(data);
+  return {
+    workouts: normalized.workouts.length,
+    bodyLogs: normalized.bodyLogs.length,
+    bodyComp: normalized.bodyComp.length,
+    calories: normalized.calories.length,
+  };
 }
 
 export function patchSettings(data, partial) {
@@ -86,6 +119,66 @@ function hasLogArray(value) {
   return Array.isArray(value);
 }
 
+function isFiniteNumber(value) {
+  if (typeof value === "number") return isFinite(value);
+  if (typeof value === "string" && value.trim() !== "") {
+    var n = parseFloat(value);
+    return !isNaN(n) && isFinite(n);
+  }
+  return false;
+}
+
+function isNonEmptyString(value) {
+  return typeof value === "string" && value.trim() !== "";
+}
+
+function isValidSet(set) {
+  return set && typeof set === "object" && !Array.isArray(set)
+    && isFiniteNumber(set.weight) && isFiniteNumber(set.reps);
+}
+
+function isValidWorkout(entry) {
+  return entry && typeof entry === "object" && !Array.isArray(entry)
+    && isNonEmptyString(entry.exercise)
+    && isNonEmptyString(entry.date)
+    && Array.isArray(entry.sets)
+    && entry.sets.every(isValidSet);
+}
+
+function isValidBodyLog(entry) {
+  return entry && typeof entry === "object" && !Array.isArray(entry)
+    && isFiniteNumber(entry.weight) && isNonEmptyString(entry.date);
+}
+
+function isValidBodyComp(entry) {
+  return entry && typeof entry === "object" && !Array.isArray(entry)
+    && isNonEmptyString(entry.date)
+    && isFiniteNumber(entry.weight)
+    && isFiniteNumber(entry.bf);
+}
+
+function isValidCalorie(entry) {
+  return entry && typeof entry === "object" && !Array.isArray(entry)
+    && isNonEmptyString(entry.food)
+    && isFiniteNumber(entry.calories)
+    && isNonEmptyString(entry.date);
+}
+
+var ENTRY_VALIDATORS = {
+  workouts: isValidWorkout,
+  bodyLogs: isValidBodyLog,
+  bodyComp: isValidBodyComp,
+  calories: isValidCalorie,
+};
+
+function importedEntriesAreValid(parsed) {
+  return DATA_KEYS.every(function (key) {
+    var arr = parsed[key];
+    if (arr == null) return true;
+    return Array.isArray(arr) && arr.every(ENTRY_VALIDATORS[key]);
+  });
+}
+
 export function parseImportedData(textOrObject) {
   var parsed = textOrObject;
   if (typeof textOrObject === "string") {
@@ -107,11 +200,27 @@ export function parseImportedData(textOrObject) {
   if (parsed.settings != null && (typeof parsed.settings !== "object" || Array.isArray(parsed.settings))) {
     return { ok: false, errorId: "invalidShape" };
   }
+  if (!importedEntriesAreValid(parsed)) return { ok: false, errorId: "invalidEntries" };
   return { ok: true, data: normalizeStoredData(parsed) };
 }
 
 export function serializeStoredData(data) {
   return JSON.stringify(normalizeStoredData(data), null, 2);
+}
+
+export function persistWith(writer, key, data) {
+  try {
+    writer(key, JSON.stringify(data));
+    return { ok: true, data: data };
+  } catch (e) {
+    return { ok: false, errorId: "saveFailed" };
+  }
+}
+
+export function persistStoredData(key, data) {
+  return persistWith(function (storageKey, serialized) {
+    localStorage.setItem(storageKey, serialized);
+  }, key, data);
 }
 
 export function exportFileName(date) {
@@ -131,6 +240,20 @@ export function profilePrefill(settings) {
     sex: profile.sex,
     height: profile.height == null ? "" : String(profile.height),
     age: profile.age == null ? "" : String(profile.age),
+  };
+}
+
+export function applyProfilePrefill(prevPrefill, nextPrefill, current) {
+  var prev = prevPrefill || { sex: "", height: "", age: "" };
+  var next = nextPrefill || { sex: "", height: "", age: "" };
+  var form = current || {};
+  function pick(key) {
+    return form[key] === prev[key] ? next[key] : form[key];
+  }
+  return {
+    sex: pick("sex"),
+    height: pick("height"),
+    age: pick("age"),
   };
 }
 

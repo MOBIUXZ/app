@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { computeMacroTotals, computeGoalBarPct, getGoalBarDisplayPct, getGoalBarColor, computeTdee, getTdeeTargets, computeTdeeBreakdown, formatBmrFormula } from "../domain/calories.js";
 import { ACCENT, ORANGE, PINK, ACTIVITY, Card, Collapse, btnPrimary, btnSecondary, inputClass, useKeyboardListNav, ui, cx } from "./shared";
 import { getPageLayout, getThemeColor, formatTemplateLabel, getCollapseSpec } from "../domain/pageLayout.js";
@@ -15,10 +15,23 @@ export default function CaloriePage({ data, save }) {
   var [selDate, setSelDate] = useState(new Date()), [showCal, setShowCal] = useState(false);
   var [editIdx, setEditIdx] = useState(null), [editForm, setEditForm] = useState({ food: "", calories: "", protein: "", carbs: "", fat: "" });
 
+  var goalRef = useRef(goal);
+  var dataRef = useRef(data);
+  var saveRef = useRef(save);
+  goalRef.current = goal;
+  dataRef.current = data;
+  saveRef.current = save;
+
   useEffect(function () {
     setGoal(calorieSettings.goal);
     setActIdx(calorieSettings.activityIndex);
   }, [calorieSettings.goal, calorieSettings.activityIndex]);
+
+  useEffect(function () {
+    return function () {
+      saveRef.current(patchSettings(dataRef.current, { calories: { goal: goalRef.current } }));
+    };
+  }, []);
 
   var calYear = selDate.getFullYear(), calMonth = selDate.getMonth();
   var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];

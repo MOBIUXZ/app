@@ -50,6 +50,13 @@
       "openAction": { "type": "click", "text": "Smart Parser" },
       "waitFor": "Parse & Save",
       "maskSelectors": []
+    },
+    {
+      "id": "settings",
+      "tab": "Dashboard",
+      "openAction": { "type": "click", "text": "Settings" },
+      "waitFor": "Export JSON",
+      "maskSelectors": []
     }
   ]
 }

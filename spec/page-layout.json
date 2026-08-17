@@ -19,7 +19,7 @@
         "id": "settings",
         "title": "Settings",
         "layerId": "settings",
-        "staysMountedUnder": ["wipe-all-logs"],
+        "staysMountedUnder": ["wipe-all-logs", "import-backup"],
         "layout": "compact",
         "maxWidthPx": 400,
         "sections": [
@@ -72,9 +72,20 @@
         "buttons": ["Cancel", "Wipe logs"],
         "body": "This permanently deletes all workouts, body logs, body composition, and calorie entries. Profile and calorie defaults stay.",
         "stacksOver": "settings"
+      },
+      "importModal": {
+        "id": "importBackup",
+        "title": "Replace all data?",
+        "layerId": "import-backup",
+        "buttons": ["Cancel", "Import"],
+        "body": "This replaces everything currently in Orbius with this backup: {workouts} workouts, {bodyLogs} body-weight logs, {bodyComp} body-comp entries, {calories} calorie entries.",
+        "stacksOver": "settings"
+      },
+      "persistError": {
+        "dismissAriaLabel": "Dismiss save error"
       }
     },
-    "shellClasses": ["app", "header", "logo", "logoText", "settingsBtn", "settingsPanel", "settingsHeader", "settingsSection", "settingsSectionTitle", "settingsGrid", "settingsField", "settingsFieldRow", "settingsSexTrack", "settingsInputWrap", "settingsUnit", "settingsActions", "settingsActionsRow", "settingsHint", "settingsFileInput", "settingsRow", "settingsKeys", "settingsAction", "nav", "navTrack", "navBtn", "navBtnActive", "main"]
+    "shellClasses": ["app", "header", "logo", "logoText", "settingsBtn", "persistBanner", "persistBannerText", "persistBannerClose", "settingsPanel", "settingsHeader", "settingsSection", "settingsSectionTitle", "settingsGrid", "settingsField", "settingsFieldRow", "settingsSexTrack", "settingsInputWrap", "settingsUnit", "settingsActions", "settingsActionsRow", "settingsHint", "settingsFileInput", "settingsRow", "settingsKeys", "settingsAction", "nav", "navTrack", "navBtn", "navBtnActive", "main"]
   },
   "pages": {
     "dashboard": {

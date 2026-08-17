@@ -13,10 +13,16 @@ describe('manual QA checklist spec', function () {
   });
 
   it('every visual snapshot has a matching QA section', function () {
-    var snapshotIds = visualSpec.snapshots.map(function (s) { return s.id; });
+    var snapshotIds = visualSpec.snapshots.map(function (s) { return s.id; })
+      .concat((visualSpec.modalSnapshots || []).map(function (s) { return s.id; }));
     qaChecklist.sections.forEach(function (section) {
-      if (!section.visualSnapshot) return;
-      expect(snapshotIds.indexOf(section.visualSnapshot) !== -1 || section.visualSnapshot === 'workout-smart-parser').toBe(true);
+      if (section.visualSnapshot) {
+        expect(snapshotIds.indexOf(section.visualSnapshot) !== -1).toBe(true);
+      }
+      (section.items || []).forEach(function (item) {
+        if (!item.visualSnapshot) return;
+        expect(snapshotIds.indexOf(item.visualSnapshot) !== -1).toBe(true);
+      });
     });
   });
 

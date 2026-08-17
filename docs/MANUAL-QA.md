@@ -14,7 +14,7 @@ npm run test:visual:update   # regenerate baselines after intentional UI changes
 
 Specs: [`spec/visual-regression.json`](../spec/visual-regression.json), [`spec/visual-seed-data.json`](../spec/visual-seed-data.json)
 
-Playwright opens the preview server, seeds `localStorage`, freezes the clock to `frozenNow` in `spec/visual-regression.json` (so Calories “today” does not drift), captures each tab (+ Smart Parser modal), and diffs pixels.
+Playwright opens the preview server, seeds `localStorage`, freezes the clock to `frozenNow` in `spec/visual-regression.json` (so Calories “today” does not drift), captures each tab plus the Smart Parser and Settings modals, and diffs pixels.
 
 **When UI changes intentionally:** update spec if needed → `npm run test:visual:update` → commit new snapshots in `e2e/visual.spec.js-snapshots/`.
 
@@ -49,7 +49,7 @@ Machine-readable checklist: [`spec/manual-qa-checklist.json`](../spec/manual-qa-
 - [ ] Gear icon at the top-right of the header opens **Settings**; Esc closes
 - [ ] Settings Profile (sex / height / age) prefills Body Comp
 - [ ] Settings calorie goal and activity persist on the Calories page
-- [ ] Export JSON / Import JSON / Wipe all logs (confirm; settings stay)
+- [ ] Export JSON / Import JSON (confirm replace with counts) / Wipe all logs (confirm; settings stay)
 - [ ] Five nav tabs; active tab has purple pill
 - [ ] Keys `1`–`5` switch tabs (no modal open)
 - [ ] Dark theme, readable text, accent purple on active UI

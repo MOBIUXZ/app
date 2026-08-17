@@ -17,7 +17,7 @@
         { "id": "settings", "check": "Gear icon at the top-right of the header opens Settings; Esc closes", "visualSnapshot": null },
         { "id": "settings-profile", "check": "Settings Profile sex/height/age prefills Body Comp log form", "visualSnapshot": null },
         { "id": "settings-calories", "check": "Settings calorie goal and activity persist and seed the Calories page", "visualSnapshot": null },
-        { "id": "settings-data", "check": "Export JSON downloads a backup; Import restores it; Wipe all logs asks for confirm and keeps settings", "visualSnapshot": null },
+        { "id": "settings-data", "check": "Export JSON downloads a backup; Import asks to confirm replace; Wipe all logs asks for confirm and keeps settings", "visualSnapshot": "settings" },
         { "id": "nav", "check": "Five nav tabs visible; active tab has purple pill", "visualSnapshot": null },
         { "id": "nav-keys", "check": "Press 1–5 switches tabs (when no modal open)", "visualSnapshot": null },
         { "id": "theme", "check": "Dark background (#0f0f13), readable text, accent purple on active elements", "visualSnapshot": null }

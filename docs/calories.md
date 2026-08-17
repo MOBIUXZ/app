@@ -72,7 +72,7 @@ Collapsible calendar for selecting the logging date:
 
 ## Daily Goal & Progress
 
-- Set a custom daily calorie goal (default: 2200 kcal, from **Settings → Calories**; persists on blur)
+- Set a custom daily calorie goal (default: 2200 kcal, from **Settings → Calories**; persists on blur and when leaving the page)
 - Progress bar with color coding:
   - Green — under 80% of goal
   - Orange — 80–100%

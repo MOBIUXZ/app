@@ -38,7 +38,9 @@ Default when missing or corrupt:
 }
 ```
 
-Load/save: `App.jsx` — `loadData()`, `saveData(d)`, `save(d)` via `normalizeStoredData()` in `src/domain/storage.js`. Page `save()` calls that omit `settings` keep the current settings. Export/import JSON is the full blob (logs + settings). **Wipe all logs** clears the four arrays and leaves settings.
+Load/save: `App.jsx` — `loadData()`, `save(d)` via `mergePersistedData()` + `persistStoredData()` in `src/domain/storage.js`. If `localStorage` write fails, React state is **not** updated and a persist banner shows (`saveFailed`). Page `save()` calls that omit `settings` keep the current settings.
+
+Export JSON is the full blob (logs + settings). **Import JSON** parses and validates entries first, then asks to confirm replace (counts in the dialog). Junk items (`null`, missing `sets` / `weight` / `date`, etc.) are rejected (`invalidEntries`). Empty arrays are valid. File read errors use `readFailed`. **Wipe all logs** clears the four arrays and leaves settings.
 
 ---
 
