@@ -2,7 +2,6 @@
 
 import inbodySpec from "../../spec/inbody-csv-fixtures.json";
 import { computeBodyCompEntry } from "./metrics.js";
-import { syncBodyLogsAfterEdit } from "./bodyCompSync.js";
 
 export function getInbodyMessages() {
   return inbodySpec.messages;
@@ -170,6 +169,7 @@ export function parseInbodyCsv(text, options) {
     : yearFromFileName(options && options.fileName) || new Date().getFullYear();
   var lastMonth = null;
   var scans = [];
+  var skipped = 0;
 
   for (var i = 1; i < lines.length; i++) {
     var cells = splitCsvLine(lines[i], delimiter);
@@ -187,7 +187,10 @@ export function parseInbodyCsv(text, options) {
     var date = parseInbodyDate(rawDate, year);
     var weight = asFiniteNumber(cell("weight"));
     var bf = asFiniteNumber(cell("bf"));
-    if (!date || weight == null || bf == null) continue;
+    if (!date || weight == null || bf == null) {
+      skipped += 1;
+      continue;
+    }
     var extras = {};
     Object.keys(mapped.extraIndex).forEach(function (field) {
       var value = asFiniteNumber(cells[mapped.extraIndex[field]]);
@@ -208,9 +211,16 @@ export function parseInbodyCsv(text, options) {
     });
   }
 
-  if (!scans.length) return { ok: false, errorId: "noRows" };
-  scans.sort(function (a, b) { return a.sortKey - b.sortKey; });
-  return { ok: true, scans: scans };
+  if (!scans.length) return { ok: false, errorId: "noRows", skipped: skipped };
+  var byDate = {};
+  scans.forEach(function (scan) {
+    var prev = byDate[scan.date];
+    if (!prev || scan.sortKey >= prev.sortKey) byDate[scan.date] = scan;
+  });
+  var unique = Object.keys(byDate).map(function (key) { return byDate[key]; });
+  var collapsed = scans.length - unique.length;
+  unique.sort(function (a, b) { return a.sortKey - b.sortKey; });
+  return { ok: true, scans: unique, skipped: skipped, collapsed: collapsed };
 }
 
 export function buildInbodyEntry(scan, profile) {
@@ -250,16 +260,13 @@ export function mergeInbodyIntoLogs(data, incoming) {
   var added = 0;
   var replaced = 0;
   (incoming || []).forEach(function (entry) {
-    var idx = bodyComp.findIndex(function (item) { return item.date === entry.date; });
-    if (idx >= 0) {
-      bodyLogs = syncBodyLogsAfterEdit(bodyLogs, bodyComp[idx], entry);
-      bodyComp[idx] = entry;
-      replaced += 1;
-    } else {
-      bodyComp.push(entry);
-      bodyLogs.push({ weight: entry.weight, date: entry.date });
-      added += 1;
-    }
+    var hadDate = bodyComp.some(function (item) { return item.date === entry.date; });
+    bodyComp = bodyComp.filter(function (item) { return item.date !== entry.date; });
+    bodyLogs = bodyLogs.filter(function (log) { return log.date !== entry.date; });
+    bodyComp.push(entry);
+    if (entry.weight != null) bodyLogs.push({ weight: entry.weight, date: entry.date });
+    if (hadDate) replaced += 1;
+    else added += 1;
   });
   bodyComp.sort(function (a, b) { return dateSortKey(a.date) - dateSortKey(b.date); });
   bodyLogs.sort(function (a, b) { return dateSortKey(a.date) - dateSortKey(b.date); });

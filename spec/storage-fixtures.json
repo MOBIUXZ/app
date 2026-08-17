@@ -199,7 +199,14 @@
       "input": {
         "workouts": [{ "exercise": "Squat", "date": "01-01-2026", "sets": [{ "weight": 100, "reps": 5 }] }],
         "bodyLogs": [{ "weight": 75, "date": "01-01-2026" }],
-        "bodyComp": [{ "date": "01-01-2026", "weight": 75, "bf": 15 }],
+        "bodyComp": [{
+          "date": "01-01-2026",
+          "weight": 75,
+          "bf": 15,
+          "source": "inbody",
+          "BMR_InBody": 1690,
+          "inbody": { "score": 72, "visceral": 7, "tbw": 42.1, "protein": 10.4, "mineral": 3.52 }
+        }],
         "calories": [{ "food": "Oats", "calories": 300, "date": "1/1/2026" }],
         "settings": {
           "profile": { "sex": "female", "height": 165, "age": 28 },

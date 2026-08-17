@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { getDashboardSnapshot } from '../src/domain/dashboard.js';
 import { computeMacroTotals, computeGoalBarPct, getGoalBarColor, computeTdee, computeTdeeBreakdown } from '../src/domain/calories.js';
-import { syncBodyLogsAfterEdit, removeBodyLogForEntry } from '../src/domain/bodyCompSync.js';
+import { syncBodyLogsAfterEdit, removeBodyLogForEntry, preserveMeasuredInbody, upsertBodyCompByDate } from '../src/domain/bodyCompSync.js';
+import { computeBodyCompEntry } from '../src/domain/metrics.js';
 import { isHistoryGroupExpanded, areAllHistoryGroupsExpanded, nextHistoryGroupsAll, filterHistoryWorkouts, sortHistoryWorkouts } from '../src/domain/pageLayout.js';
 import { resolveExercise } from '../src/components/shared.jsx';
 import uiBehavior from '../spec/ui-behavior-fixtures.json';
@@ -62,6 +63,20 @@ describe('calorie behavior (spec/ui-behavior-fixtures.json)', function () {
 describe('body comp sync (spec/ui-behavior-fixtures.json)', function () {
   uiBehavior.bodyCompSync.fixtures.forEach(function (fixture) {
     it(fixture.id, function () {
+      if (fixture.form) {
+        var next = preserveMeasuredInbody(fixture.oldEntry, computeBodyCompEntry(fixture.form));
+        expect(next.source).toBe(fixture.expectedSource);
+        expect(next.BMR_InBody).toBe(fixture.expectedBmrInBody);
+        expect(next.inbody.score).toBe(fixture.expectedScore);
+        expect(next.weight).toBe(fixture.expectedWeight);
+        return;
+      }
+      if (fixture.entry && fixture.bodyComp) {
+        var upserted = upsertBodyCompByDate(fixture.bodyComp, fixture.entry, fixture.replaceIndex);
+        expect(upserted.length).toBe(fixture.expectedCount);
+        expect(upserted[0].weight).toBe(fixture.expectedWeight);
+        return;
+      }
       if (fixture.newEntry === null) {
         expect(removeBodyLogForEntry(fixture.bodyLogs, fixture.oldEntry)).toEqual(fixture.expectedLogs);
       } else {

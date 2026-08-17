@@ -40,7 +40,7 @@ Default when missing or corrupt:
 
 Load/save: `App.jsx` — `loadData()`, `save(d)` via `mergePersistedData()` + `persistStoredData()` in `src/domain/storage.js`. If `localStorage` write fails, React state is **not** updated and a persist banner shows (`saveFailed`). Page `save()` calls that omit `settings` keep the current settings.
 
-Export JSON is the full blob (logs + settings). **Import JSON** parses and validates entries first, then asks to confirm replace (counts in the dialog). Junk items (`null`, missing `sets` / `weight` / `date`, etc.) are rejected (`invalidEntries`). Empty arrays are valid. File read errors use `readFailed`. **Wipe all logs** clears the four arrays and leaves settings.
+Export JSON is the full blob (workouts, body logs, body-comp including nested InBody extras, calories, and settings). **Import JSON** parses and validates entries first, then asks to confirm replace (counts in the dialog). Junk items (`null`, missing `sets` / `weight` / `date`, etc.) are rejected (`invalidEntries`). Empty arrays are valid. File read errors use `readFailed`. **Wipe all logs** clears the four arrays and leaves settings. Body Comp **Clear History** deletes body-comp and body-weight logs only.
 
 ---
 
@@ -114,7 +114,7 @@ interface BodyLogEntry {
 
 **Created when:** user submits Body Comp **Log Entry** (appends `{ weight, date }` to `bodyLogs`).
 
-**Synced when:** Body comp history entry edited or deleted (`syncBodyLogsAfterEdit()` removes old log row by matching date+weight, adds new if weight > 0).
+**Synced when:** Body comp history is logged, edited, or deleted. Same-date rows collapse to one `bodyComp` entry and one `bodyLogs` point (`upsertBodyCompByDate` / `upsertBodyLogByDate`). `syncBodyLogsAfterEdit()` still matches a single old date+weight for the original edit fixtures.
 
 ---
 
@@ -156,7 +156,7 @@ Raw inputs plus **persisted computed fields** (recomputed on save/edit).
 
 InBody import prefers measured `FM` / `BMI` / `SMI` from the CSV over formula recomputes. Mifflin/Katch are still filled from Settings profile height/age/sex when available. Calories TDEE still uses Mifflin then Katch, not InBody BMR.
 
-**Import:** Body Comp → History → Import InBody CSV. Merges by date; does not replace workouts or calories. Progress charts SMM, SMI, FM, BMI, visceral fat, InBody Score, BMR, Water / Protein / Mineral as one category, and segmental lean/fat on a body-shaped grid with a Soft Lean / Fat toggle (`src/domain/bodyTrends.js`). Body Comp History shows a segmental lean/fat map from `inbody.lean*` / `fat*` (`src/domain/bodySegmental.js`). Spec: [`spec/inbody-csv-fixtures.json`](../spec/inbody-csv-fixtures.json).
+**Import:** Body Comp → History → Import InBody CSV. Merges by date (all rows for that date, latest same-day timestamp wins); does not replace workouts or calories. Incomplete CSV rows are skipped and counted in the confirm dialog. Editing an InBody history row keeps `inbody` extras and InBody BMR. Progress charts SMM, SMI, FM, BMI, visceral fat, InBody Score, BMR, Water / Protein / Mineral as one category, and segmental lean/fat on a body-shaped grid with a Soft Lean / Fat toggle (`src/domain/bodyTrends.js`). Body Comp History shows a segmental lean/fat map from `inbody.lean*` / `fat*` (`src/domain/bodySegmental.js`) and chips for score / visceral / water / protein / mineral / InBody BMR when present. Spec: [`spec/inbody-csv-fixtures.json`](../spec/inbody-csv-fixtures.json).
 
 `height_m = height_cm / 100`.
 

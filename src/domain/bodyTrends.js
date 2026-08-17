@@ -18,7 +18,7 @@ function getPath(obj, path) {
   return cur;
 }
 
-function asChartNumber(value) {
+export function asChartNumber(value) {
   if (value == null || value === "" || value === "-") return null;
   var n = typeof value === "number" ? value : parseFloat(String(value).replace(",", "."));
   return isNaN(n) || !isFinite(n) ? null : n;
@@ -31,6 +31,18 @@ export function readBodyCompPath(entry, paths) {
     if (value != null) return value;
   }
   return null;
+}
+
+export function segmentalGapRatio(left, right, relativeTo) {
+  if (left == null || right == null) return 0;
+  var delta = Math.abs(right - left);
+  var leftAbs = Math.abs(left);
+  var rightAbs = Math.abs(right);
+  var base = relativeTo === "min"
+    ? Math.min(leftAbs, rightAbs)
+    : Math.max(leftAbs, rightAbs);
+  if (base === 0) return left === right ? 0 : 1;
+  return delta / base;
 }
 
 export function buildBodyTrendSeries(bodyComp, chart) {
@@ -98,10 +110,8 @@ export function buildSegmentalGridModel(group, seriesById, gridSpec) {
     var left = slots[pair.leftSlot];
     var right = slots[pair.rightSlot];
     if (!left || !right || left.latest == null || right.latest == null) return;
-    var max = Math.max(Math.abs(left.latest), Math.abs(right.latest));
-    if (max === 0) return;
     var delta = Math.abs(right.latest - left.latest);
-    if (delta / max >= threshold) {
+    if (segmentalGapRatio(left.latest, right.latest, gridSpec && gridSpec.imbalanceRelativeTo) >= threshold) {
       gaps.push({
         pairId: pair.id,
         label: pair.label,

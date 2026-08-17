@@ -65,9 +65,9 @@ When sufficient data is entered, two balance checks are shown:
 
 ## History
 
-Shows **all** entries (newest first) with stored metrics displayed as chips:
+Shows **all** entries (newest first) with stored metrics displayed as chips (`spec/page-layout.json` `historyChips`):
 
-BW, BMI, FM, FMI, PBF, FFM, FFMI, SMM, SMI
+BW, BMI, FM, FMI, PBF, FFM, FFMI, SMM, SMI, plus InBody extras when present (BMR, Score, VF, TBW, Pro, Min).
 
 The history toolbar (entry count, **Import InBody CSV**, and **Clear History**) sits below the collapsible **History** header with spacing from the shared collapse body padding. Import is always available, including when history is empty.
 
@@ -76,15 +76,16 @@ The history toolbar (entry count, **Import InBody CSV**, and **Clear History**) 
 - Parser: `src/domain/inbodyCsv.js` ↔ `spec/inbody-csv-fixtures.json`
 - Dates like `25-3` become `DD-MM-YYYY`. The InBody app export uses timestamps (`20260725130008` → `25-07-2026`). Year for `D-M` dates comes from the file name (`InBody-20260817.csv` → 2026); December→January rows increment the year
 - Maps weight, body fat %, skeletal muscle, fat mass, BMI, SMI, and InBody BMR onto `bodyComp` (measured fat mass / BMI / SMI are kept, not recomputed). Extra columns are stored on `entry.inbody`. Progress charts SMM, SMI, fat mass, BMI, visceral fat, InBody Score, BMR, a Water / Protein / Mineral category card, and segmental lean/fat (trunk, arms, legs). Body Comp History shows a latest-scan body map
-- Confirm dialog: adds N new scans and replaces existing dates. **Workouts and calories stay**
-- Same-date scans overwrite that day; `bodyLogs` stay in sync so Dashboard and Progress body-weight charts update
+- Confirm dialog: adds N new scans and replaces existing dates; same-day rows keep the latest timestamp; incomplete rows are counted as skipped. **Workouts and calories stay**
+- Same-date scans overwrite **every** row for that day (not just the first); `bodyLogs` stay unique by date so Dashboard and Progress body-weight charts update
+- Logging a new entry on a date that already exists replaces that day instead of appending a second row; InBody extras stay if the existing row was an import
 
 ### Segmental Analysis
 - Shown at the top of **History** when any imported scan has arm/trunk/leg lean or fat mass
 - Uses the **newest** scan that has those fields
 - **Lean** / **Fat** pill toggle (hidden if only one metric exists)
 - Simple body figure with left/right arm and leg values; trunk is labeled under the figure
-- A left/right pair that differs by **5% or more** of the larger side shows an imbalance hint
+- A left/right pair that differs by **5% or more** of the smaller side shows an imbalance hint
 - Hidden for manual logs and for InBody rows that lack segmental columns
 - Time-series graphs for each region live on **Progress** (one Segmental Analysis card with a Soft Lean Mass / Fat Mass toggle)
 - Spec: `spec/page-layout.json` → `pages.bodyComp.segmentalMap`; series builder: `src/domain/bodySegmental.js`
@@ -97,10 +98,10 @@ The history toolbar (entry count, **Import InBody CSV**, and **Clear History**) 
 ### Edit Entry
 - **✏️** on each history row opens an **inline edit form** for that entry
 - Editable fields: date, body weight, height, body fat %, skeletal muscle mass, waist, age, sex
-- **Save** recalculates all derived metrics (BMI, FFMI, FMI, SMI, BMR, etc.) using the same logic as **Log Entry**
+- **Save** recalculates derived metrics (BMI, FFMI, FMI, SMI, Mifflin/Katch BMR) using the same logic as **Log Entry**. If the row came from InBody CSV, `source`, `inbody` extras, and `BMR_InBody` are kept.
 - **Cancel** returns to the read-only chip view
 - Only one entry can be edited at a time
-- If date or weight changes, the paired **`bodyLogs`** point is updated (old date+weight removed, new point appended) so the Progress body weight chart stays in sync
+- Date is unique: saving onto another existing date replaces that day. Paired **`bodyLogs`** stay one point per date.
 
 ### Delete Entry
 - **🗑** on each history row opens a confirmation dialog before deleting that entry

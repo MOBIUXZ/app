@@ -78,7 +78,7 @@ Sections (in order), compact layout (`maxWidthPx` 400): height/age and goal/acti
 |---------|----------------|
 | **Profile** | Sex, height (cm), age — prefill Body Comp log form (in-progress fields are kept) |
 | **Calories** | Daily goal (kcal) and activity level — seed the Calories page |
-| **Data** | Export JSON; Import JSON (confirm replace, with entry counts); Wipe all logs (confirm; settings stay) |
+| **Data** | Export JSON (includes InBody extras on body-comp); Import JSON (confirm replace, with entry counts); Wipe all logs (confirm; settings stay). Body Comp Clear History is a narrower delete. |
 | **Keyboard** | Shortcut cheatsheet |
 
 Persistence: `data.settings` in `ft_v5`, normalized by `src/domain/storage.js`. Spec: `spec/storage-fixtures.json`. Failed `localStorage` writes keep the previous in-memory data and show a banner under the header (`persistBanner` / `saveFailed`). Sex is case-insensitive (`Female` → `female`); negative height/age become empty.

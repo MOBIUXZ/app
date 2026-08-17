@@ -80,6 +80,41 @@
         "newEntry": null,
         "bodyLogs": [{ "weight": 80, "date": "11-08-2026" }],
         "expectedLogs": []
+      },
+      {
+        "id": "edit-preserves-inbody-extras",
+        "oldEntry": {
+          "date": "10-08-2026",
+          "weight": 75,
+          "bf": 15,
+          "source": "inbody",
+          "BMR_InBody": 1690,
+          "inbody": { "score": 72, "tbw": 42.1 }
+        },
+        "form": {
+          "date": "10-08-2026",
+          "weight": 75.2,
+          "height": 180,
+          "bf": 15,
+          "smm": 35,
+          "age": 30,
+          "sex": "male"
+        },
+        "expectedSource": "inbody",
+        "expectedBmrInBody": 1690,
+        "expectedScore": 72,
+        "expectedWeight": 75.2
+      },
+      {
+        "id": "log-replaces-same-date",
+        "bodyComp": [
+          { "date": "10-08-2026", "weight": 75, "bf": 15, "source": "inbody" },
+          { "date": "10-08-2026", "weight": 75, "bf": 15, "source": "inbody" }
+        ],
+        "entry": { "date": "10-08-2026", "weight": 76, "bf": 16 },
+        "replaceIndex": 0,
+        "expectedCount": 1,
+        "expectedWeight": 76
       }
     ]
   },

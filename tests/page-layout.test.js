@@ -87,6 +87,10 @@ describe('page layout spec (spec/page-layout.json)', function () {
     var importModal = getModalSpec('bodyComp', 'importInbody');
     expect(importModal.layerId).toBe('import-inbody');
     expect(importModal.buttons).toEqual(['Cancel', 'Import']);
+    expect(importModal.body).toContain('{skipped}');
+    expect(getPageLayout('bodyComp').historyChips.map(function (c) { return c.id; })).toEqual([
+      'BW', 'BMI', 'FM', 'FMI', 'PBF', 'FFM', 'FFMI', 'SMM', 'SMI', 'BMR', 'score', 'visceral', 'tbw', 'protein', 'mineral',
+    ]);
     var source = readFileSync(resolve(root, pageLayout.pages.bodyComp.component), 'utf8');
     expect(source.indexOf('slice(0, 10)') === -1).toBe(true);
     expect(source.indexOf('clearHistoryBtn') !== -1).toBe(true);
@@ -94,6 +98,7 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(source.indexOf('historyChrome.importLabel') !== -1).toBe(true);
     var map = getPageLayout('bodyComp').segmentalMap;
     expect(map.segments.map(function (seg) { return seg.id; })).toEqual(['leftArm', 'rightArm', 'trunk', 'leftLeg', 'rightLeg']);
+    expect(map.imbalanceRelativeTo).toBe('min');
     expect(source.indexOf('segmentalMap') !== -1).toBe(true);
     expect(source.indexOf('latestSegmentalSnapshot') !== -1).toBe(true);
   });
@@ -280,6 +285,7 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(progress.compositionTrends.charts.map(function (c) { return c.title; })).toEqual(['Total Body Water (L)', 'Protein (kg)', 'Mineral (kg)']);
     expect(progress.compositionTrends.tooltipValueTemplate).toBe('{value} {unit}');
     expect(progress.segmentalBodyGrid.layout).toBe('bodyGrid');
+    expect(progress.segmentalBodyGrid.imbalanceRelativeTo).toBe('min');
     expect(progress.segmentalBodyGrid.defaultMetric).toBe('lean');
     expect(progress.segmentalBodyGrid.tooltipValueTemplate).toBe('{value} {unit}');
     expect(formatTemplateLabel(progress.segmentalBodyGrid.tooltipValueTemplate, { value: 10.5, unit: progress.segmentalBodyGrid.unit })).toBe('10.5 kg');

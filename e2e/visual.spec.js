@@ -15,6 +15,12 @@ test.describe('visual regression (spec/visual-regression.json)', function () {
     test(snap.id + ' page', async function ({ page }) {
       await page.getByRole('tab', { name: snap.tab, exact: true }).click();
       await expect(page.getByText(snap.waitFor, { exact: false }).first()).toBeVisible({ timeout: 10000 });
+      if (snap.openAction && snap.openAction.type === 'click') {
+        await page.getByRole('button', { name: snap.openAction.text, exact: false }).click();
+        if (snap.waitForAfterOpen) {
+          await expect(page.getByText(snap.waitForAfterOpen, { exact: false }).first()).toBeVisible({ timeout: 10000 });
+        }
+      }
       if (snap.extraWaitMs) {
         await page.waitForTimeout(snap.extraWaitMs);
       }

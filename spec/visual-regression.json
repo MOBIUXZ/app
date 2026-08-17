@@ -25,7 +25,9 @@
       "tab": "Body Comp",
       "pageTitle": "Body Composition",
       "waitFor": "Log Entry",
-      "fullPage": false
+      "fullPage": true,
+      "openAction": { "type": "click", "text": "History" },
+      "waitForAfterOpen": "Segmental Analysis"
     },
     {
       "id": "calories",

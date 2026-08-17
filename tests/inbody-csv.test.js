@@ -38,6 +38,8 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
         return;
       }
       if (fixture.expectedScanCount != null) expect(result.scans.length).toBe(fixture.expectedScanCount);
+      if (fixture.expectedSkipped != null) expect(result.skipped).toBe(fixture.expectedSkipped);
+      if (fixture.expectedCollapsed != null) expect(result.collapsed).toBe(fixture.expectedCollapsed);
       var first = result.scans[0];
       var last = result.scans[result.scans.length - 1];
       if (fixture.expectedFirstDate) expect(first.date).toBe(fixture.expectedFirstDate);
@@ -172,6 +174,9 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
     expect(source.indexOf('import-inbody') !== -1 || source.indexOf('importInbody') !== -1).toBe(true);
     expect(source.indexOf('latestSegmentalSnapshot') !== -1).toBe(true);
     expect(source.indexOf('segmentalMap') !== -1).toBe(true);
+    expect(source.indexOf('historyChips') !== -1).toBe(true);
+    expect(source.indexOf('preserveMeasuredInbody') !== -1).toBe(true);
+    expect(source.indexOf('upsertBodyCompByDate') !== -1).toBe(true);
     expect(source.indexOf('Left Arm') === -1).toBe(true);
   });
 });

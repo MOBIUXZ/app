@@ -341,7 +341,7 @@ One Progress card after Water, Protein & Mineral, with a **Soft Lean Mass / Fat 
 | Soft Lean Mass | Trunk, Left Arm, Right Arm, Left Leg, Right Leg (`inbody.lean*Kg`) |
 | Fat Mass | Trunk, Left Arm, Right Arm, Left Leg, Right Leg (`inbody.fat*Kg`) |
 
-Arms share one Y-axis, legs share one Y-axis, trunk keeps its own (trunk kg is much larger than arms). Latest kg is labeled on each mini-chart. Hovering a point shows **kg** after the value (e.g. `Trunk : 10.5 kg`). A left/right pair that differs by 5% or more of the larger side shows a gap hint. A region is omitted when it has no points. The card is omitted when both metrics are empty. Same footer lazy-mount as the other health charts. The Body Comp History **segmental map** is the latest-scan snapshot; these Progress charts are the history over time.
+Arms share one Y-axis, legs share one Y-axis, trunk keeps its own (trunk kg is much larger than arms). Latest kg is labeled on each mini-chart. Hovering a point shows **kg** after the value (e.g. `Trunk : 10.5 kg`). A left/right pair that differs by 5% or more of the smaller side shows a gap hint. A region is omitted when it has no points. The card is omitted when both metrics are empty. Same footer lazy-mount as the other health charts. The Body Comp History **segmental map** is the latest-scan snapshot; these Progress charts are the history over time.
 
 ## Calorie Intake Trend
 

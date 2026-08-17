@@ -1,17 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, Collapse, btnPrimary, btnSecondary, btnDanger, inputClass, formatDate, useConfirmDialogKeyboard, ui, cx } from "./shared";
 import { computeBodyCompEntry } from "../domain/metrics.js";
-import { syncBodyLogsAfterEdit, removeBodyLogForEntry } from "../domain/bodyCompSync.js";
+import { removeBodyLogForEntry, preserveMeasuredInbody, upsertBodyCompByDate, upsertBodyLogByDate } from "../domain/bodyCompSync.js";
 import { getPageLayout, getCollapseSpec, getModalSpec, formatTemplateLabel, getThemeColor } from "../domain/pageLayout.js";
 import { profilePrefill, applyProfilePrefill, normalizeStoredData } from "../domain/storage.js";
 import { parseInbodyCsv, buildInbodyEntry, mergeInbodyIntoLogs, getInbodyMessages } from "../domain/inbodyCsv.js";
 import { latestSegmentalSnapshot, resolveSegmentalMetric } from "../domain/bodySegmental.js";
+import { readBodyCompPath } from "../domain/bodyTrends.js";
 import { PageHeading } from "./PageIcon";
 import s from "./BodyCompPage.module.css";
 
 var bodyLayout = getPageLayout("bodyComp");
 var inbodyMessages = getInbodyMessages();
 var segmentalMapSpec = bodyLayout.segmentalMap;
+var historyChips = bodyLayout.historyChips || [];
 
 function segmentFill(snapshot, metric, segmentId, color) {
   var values = snapshot && snapshot[metric];
@@ -77,9 +79,6 @@ export default function BodyCompPage({ data, save }) {
   function compIdxFromDisplay(displayIdx) {
     return data.bodyComp.length - 1 - displayIdx;
   }
-  function syncLogsLocal(oldEntry, newEntry) {
-    return syncBodyLogsAfterEdit(data.bodyLogs, oldEntry, newEntry);
-  }
   var historyEntries = data.bodyComp.slice().reverse();
   function deleteEntry(displayIdx) {
     var compIdx = compIdxFromDisplay(displayIdx);
@@ -122,7 +121,7 @@ export default function BodyCompPage({ data, save }) {
       var profile = normalizeStoredData(data).settings.profile;
       var entries = parsed.scans.map(function (scan) { return buildInbodyEntry(scan, profile); });
       var preview = mergeInbodyIntoLogs(data, entries);
-      setPendingInbody({ entries: entries, added: preview.added, replaced: preview.replaced });
+      setPendingInbody({ entries: entries, added: preview.added, replaced: preview.replaced, skipped: parsed.skipped || 0 });
       setInbodyMsg(null);
     };
     reader.onerror = function () {
@@ -184,15 +183,17 @@ export default function BodyCompPage({ data, save }) {
       return;
     }
     var oldEntry = data.bodyComp[editIdx];
-    var updatedEntry = computeBodyCompEntry(editForm);
-    var newBodyComp = data.bodyComp.map(function (entry, i) {
-      return i === editIdx ? updatedEntry : entry;
-    });
+    var updatedEntry = preserveMeasuredInbody(oldEntry, computeBodyCompEntry(editForm));
+    var newBodyComp = upsertBodyCompByDate(data.bodyComp, updatedEntry, editIdx);
+    var logs = data.bodyLogs;
+    if (oldEntry && oldEntry.date !== updatedEntry.date) {
+      logs = logs.filter(function (log) { return log.date !== oldEntry.date; });
+    }
     save({
       workouts: data.workouts,
       calories: data.calories,
       bodyComp: newBodyComp,
-      bodyLogs: syncLogsLocal(oldEntry, updatedEntry),
+      bodyLogs: upsertBodyLogByDate(logs, updatedEntry),
     });
     cancelEdit();
   }
@@ -213,9 +214,18 @@ export default function BodyCompPage({ data, save }) {
   function submit() {
     if (!w || !bf) { setMsg("Weight and Body Fat % are required."); return; }
     if (!logDate.trim()) { setMsg("Date is required."); return; }
-    var entry = computeBodyCompEntry({ date: logDate, weight: w, height: h, bf: bf, smm: smm, waist: waist, age: age, sex: sex });
-    save({ workouts: data.workouts, calories: data.calories, bodyComp: [...data.bodyComp, entry], bodyLogs: [...data.bodyLogs, { weight: entry.weight, date: logDate }] });
-    setW(""); setBf(""); setSmm(""); setWaist(""); setH(prefill.height); setAge(prefill.age); setSex(prefill.sex); setLogDate(formatDate(new Date())); setMsg("Logged!"); setTimeout(function () { setMsg(""); }, 2000);
+    var computed = computeBodyCompEntry({ date: logDate, weight: w, height: h, bf: bf, smm: smm, waist: waist, age: age, sex: sex });
+    var existing = data.bodyComp.find(function (item) { return item.date === logDate.trim(); });
+    var entry = preserveMeasuredInbody(existing, computed);
+    save({
+      workouts: data.workouts,
+      calories: data.calories,
+      bodyComp: upsertBodyCompByDate(data.bodyComp, entry),
+      bodyLogs: upsertBodyLogByDate(data.bodyLogs, entry),
+    });
+    setW(""); setBf(""); setSmm(""); setWaist(""); setH(prefill.height); setAge(prefill.age); setSex(prefill.sex); setLogDate(formatDate(new Date()));
+    setMsg(existing ? "Updated " + logDate + "." : "Logged!");
+    setTimeout(function () { setMsg(""); }, 2000);
   }
   return (
     <div>
@@ -385,13 +395,17 @@ export default function BodyCompPage({ data, save }) {
                     </div>
                   </div>
                   <div className={s.chipRow}>
-                    {[["BW", "kg", ACCENT], ["BMI", "kg/m²", BLUE], ["FM", "kg", PINK], ["FMI", "kg/m²", PINK], ["PBF", "%", PINK], ["FFM", "kg", GREEN], ["FFMI", "kg/m²", ACCENT], ["SMM", "kg", GREEN], ["SMI", "kg/m²", ORANGE]].map(function (r) {
-                      return e[r[0]] != null ? (
-                        <div key={r[0]} className={s.metricChip}>
-                          <div className={s.metricChipLabel}>{r[0]}</div>
-                          <div className={s.metricChipValue} style={{ color: r[2] }}>{Number(e[r[0]]).toFixed(2)}<span className={s.metricChipUnit}>{r[1]}</span></div>
+                    {historyChips.map(function (chip) {
+                      var value = readBodyCompPath(e, chip.paths);
+                      if (value == null) return null;
+                      var digits = chip.digits != null ? chip.digits : 2;
+                      var color = getThemeColor(chip.colorToken);
+                      return (
+                        <div key={chip.id} className={s.metricChip}>
+                          <div className={s.metricChipLabel}>{chip.label}</div>
+                          <div className={s.metricChipValue} style={{ color: color }}>{Number(value).toFixed(digits)}{chip.unit ? <span className={s.metricChipUnit}>{chip.unit}</span> : null}</div>
                         </div>
-                      ) : null;
+                      );
                     })}
                   </div>
                 </>
@@ -433,7 +447,7 @@ export default function BodyCompPage({ data, save }) {
           <div className={cx("ft-kb-modal-backdrop", ui.modalBackdrop)} style={{ zIndex: importConfirmKb.zIndex }} onClick={importConfirmKb.onBackdropClick}>
             <div ref={importConfirmKb.dialogRef} tabIndex={-1} className={ui.modalPanelConfirm} onClick={function (ev) { ev.stopPropagation(); }}>
               <div className={cx(ui.modalTitle, s.confirmTitle)}>{importModal.title}</div>
-              <div className={cx(ui.textMutedSm, s.confirmBody)}>{formatTemplateLabel(importModal.body, { added: pendingInbody.added, replaced: pendingInbody.replaced })}</div>
+              <div className={cx(ui.textMutedSm, s.confirmBody)}>{formatTemplateLabel(importModal.body, { added: pendingInbody.added, replaced: pendingInbody.replaced, skipped: pendingInbody.skipped || 0 })}</div>
               <div className="ft-kb-focus-indicator">Focused: <strong>{importConfirmKb.focusLabel}</strong></div>
               <div className="ft-kb-hint">← → or Tab switch · Enter select · Esc cancel</div>
               <div className={ui.flexEnd}>

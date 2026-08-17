@@ -49,7 +49,7 @@ Machine-readable checklist: [`spec/manual-qa-checklist.json`](../spec/manual-qa-
 - [ ] Gear icon at the top-right of the header opens **Settings**; Esc closes
 - [ ] Settings Profile (sex / height / age) prefills Body Comp
 - [ ] Settings calorie goal and activity persist on the Calories page
-- [ ] Export JSON / Import JSON (confirm replace with counts) / Wipe all logs (confirm; settings stay)
+- [ ] Export JSON includes InBody fields on body-comp; Import JSON confirms replace; Wipe all logs confirms and keeps settings
 - [ ] Five nav tabs; active tab has purple pill
 - [ ] Keys `1`–`5` switch tabs (no modal open)
 - [ ] Dark theme, readable text, accent purple on active UI
@@ -70,8 +70,10 @@ Machine-readable checklist: [`spec/manual-qa-checklist.json`](../spec/manual-qa-
 ### Body Comp
 
 - [ ] Log Entry — live metrics update while typing
-- [ ] History entry shows metric chips
-- [ ] Import InBody CSV asks to confirm and merges by date; workouts stay
+- [ ] History chips include InBody extras (score, visceral, water, protein, mineral, BMR) when present
+- [ ] Import InBody CSV asks to confirm and merges by date; same-day keeps the latest reading; workouts stay
+- [ ] Editing an InBody History row keeps extras and InBody BMR
+- [ ] Logging on a date that already exists replaces that day
 - [ ] After import, History shows a segmental lean/fat body map for the latest scan with arm/trunk/leg values
 
 ### Calories

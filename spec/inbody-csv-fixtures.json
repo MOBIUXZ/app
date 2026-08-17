@@ -113,6 +113,27 @@
       "csv": "Date,Weight(kg),Percent Body Fat(%)\n",
       "ok": false,
       "errorId": "noRows"
+    },
+    {
+      "id": "same-day-keeps-latest",
+      "fileName": "InBody-20260817.csv",
+      "csv": "Date,Weight(kg),Percent Body Fat(%),InBody Score\n20260725130008,59.7,28.8,67\n20260725180000,60.1,29.0,68\n",
+      "ok": true,
+      "expectedScanCount": 1,
+      "expectedCollapsed": 1,
+      "expectedFirstDate": "25-07-2026",
+      "expectedFirstWeight": 60.1,
+      "expectedFirstScore": 68
+    },
+    {
+      "id": "skips-incomplete-rows",
+      "year": 2026,
+      "csv": "Date,Weight(kg),Percent Body Fat(%)\n25-3,69.3,24.8\nbad,-,-\n4-4,67.0,17.9\n",
+      "ok": true,
+      "expectedScanCount": 2,
+      "expectedSkipped": 1,
+      "expectedFirstDate": "25-03-2026",
+      "expectedLastDate": "04-04-2026"
     }
   ],
   "buildFixtures": [
@@ -158,6 +179,27 @@
       "expectedCompCount": 2,
       "expectedLastWeight": 67,
       "expectedFirstWeight": 69.3
+    },
+    {
+      "id": "replaces-all-duplicate-dates",
+      "current": {
+        "bodyComp": [
+          { "date": "25-07-2026", "weight": 59.7, "bf": 28.8 },
+          { "date": "25-07-2026", "weight": 59.8, "bf": 28.9 }
+        ],
+        "bodyLogs": [
+          { "date": "25-07-2026", "weight": 59.7 },
+          { "date": "25-07-2026", "weight": 59.8 }
+        ]
+      },
+      "incoming": [
+        { "date": "25-07-2026", "weight": 60.1, "bf": 29, "BW": 60.1, "PBF": 29 }
+      ],
+      "expectedAdded": 0,
+      "expectedReplaced": 1,
+      "expectedCompCount": 1,
+      "expectedFirstWeight": 60.1,
+      "expectedLastWeight": 60.1
     }
   ],
   "trendFixtures": [
@@ -369,6 +411,46 @@
         "imbalanceCount": 1,
         "imbalancePair": "arms",
         "imbalanceMetric": "lean"
+      }
+    },
+    {
+      "id": "flags-exact-5pct-of-smaller",
+      "entry": {
+        "date": "01-01-2026",
+        "inbody": {
+          "leanLeftArmKg": 100,
+          "leanRightArmKg": 105,
+          "leanTrunkKg": 20,
+          "leanLeftLegKg": 6,
+          "leanRightLegKg": 6
+        }
+      },
+      "expected": {
+        "date": "01-01-2026",
+        "hasLean": true,
+        "hasFat": false,
+        "imbalanceCount": 1,
+        "imbalancePair": "arms",
+        "imbalanceMetric": "lean"
+      }
+    },
+    {
+      "id": "skips-under-5pct-of-smaller",
+      "entry": {
+        "date": "01-01-2026",
+        "inbody": {
+          "leanLeftArmKg": 100,
+          "leanRightArmKg": 104,
+          "leanTrunkKg": 20,
+          "leanLeftLegKg": 6,
+          "leanRightLegKg": 6
+        }
+      },
+      "expected": {
+        "date": "01-01-2026",
+        "hasLean": true,
+        "hasFat": false,
+        "imbalanceCount": 0
       }
     },
     {

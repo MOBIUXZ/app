@@ -32,3 +32,39 @@ export function removeBodyLogForEntry(bodyLogs, entry) {
     return true;
   });
 }
+
+function dateSortKey(date) {
+  var parts = String(date || "").split("-");
+  if (parts.length !== 3) return 0;
+  return Number(parts[2]) * 10000 + Number(parts[1]) * 100 + Number(parts[0]);
+}
+
+export function preserveMeasuredInbody(oldEntry, nextEntry) {
+  var next = Object.assign({}, nextEntry);
+  if (!oldEntry) return next;
+  if (oldEntry.source) next.source = oldEntry.source;
+  if (oldEntry.inbody) next.inbody = oldEntry.inbody;
+  if (oldEntry.BMR_InBody != null) next.BMR_InBody = oldEntry.BMR_InBody;
+  return next;
+}
+
+export function upsertBodyLogByDate(bodyLogs, entry) {
+  var logs = (bodyLogs || []).filter(function (log) { return !entry || log.date !== entry.date; });
+  if (entry) {
+    var w = entry.weight != null ? entry.weight : entry.BW;
+    if (w != null && w > 0) logs.push({ weight: w, date: entry.date });
+  }
+  logs.sort(function (a, b) { return dateSortKey(a.date) - dateSortKey(b.date); });
+  return logs;
+}
+
+export function upsertBodyCompByDate(bodyComp, entry, replaceIndex) {
+  var next = (bodyComp || []).slice();
+  if (replaceIndex != null && replaceIndex >= 0 && replaceIndex < next.length) {
+    next.splice(replaceIndex, 1);
+  }
+  next = next.filter(function (item) { return !entry || item.date !== entry.date; });
+  if (entry) next.push(entry);
+  next.sort(function (a, b) { return dateSortKey(a.date) - dateSortKey(b.date); });
+  return next;
+}

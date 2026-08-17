@@ -42,7 +42,7 @@ Complete inventory of every project file. Line counts approximate (Aug 2026).
 
 ## `src/domain/inbodyCsv.js`
 
-**~270 lines** — `parseInbodyCsv()`, `buildInbodyEntry()`, `mergeInbodyIntoLogs()`. Spec: `spec/inbody-csv-fixtures.json`. Used by Body Comp History import.
+**~270 lines** — `parseInbodyCsv()` (same-day last-timestamp wins; incomplete rows skipped), `buildInbodyEntry()`, `mergeInbodyIntoLogs()` (replaces every row for a date). Spec: `spec/inbody-csv-fixtures.json`. Used by Body Comp History import.
 
 ## `src/domain/bodyTrends.js`
 
@@ -184,7 +184,8 @@ Spec: [workout.md](./workout.md)
 
 **Key functions:**
 - `computeBodyCompEntry(fields)` — all derived metrics
-- `syncBodyLogsAfterEdit(old, new)` — bodyLogs sync
+- `preserveMeasuredInbody(old, next)` — keep InBody extras on edit
+- `upsertBodyCompByDate()` / `upsertBodyLogByDate()` — one row per date
 - `compIdxFromDisplay(displayIdx)` — history is reversed display
 
 **Features:** Log Entry collapse, live metric preview, sex pill toggle, history (all entries, newest first), InBody CSV import (merge by date), segmental lean/fat body map, inline edit, delete, clear-all confirm

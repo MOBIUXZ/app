@@ -1,6 +1,6 @@
 /** @file Body Comp segmental map — spec/inbody-csv-fixtures.json segmentalFixtures + spec/page-layout.json segmentalMap */
 
-import { readBodyCompPath } from "./bodyTrends.js";
+import { readBodyCompPath, segmentalGapRatio } from "./bodyTrends.js";
 
 function dateSortKey(date) {
   var parts = String(date || "").split("-");
@@ -40,10 +40,8 @@ export function buildSegmentalSnapshot(entry, spec) {
       var left = src[pair.left];
       var right = src[pair.right];
       if (left == null || right == null) return;
-      var max = Math.max(Math.abs(left), Math.abs(right));
-      if (max === 0) return;
       var delta = Math.abs(right - left);
-      if (delta / max >= threshold) {
+      if (segmentalGapRatio(left, right, spec.imbalanceRelativeTo) >= threshold) {
         imbalances.push({
           pairId: pair.id,
           label: pair.label,

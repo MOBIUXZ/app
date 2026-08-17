@@ -17,7 +17,7 @@
         { "id": "settings", "check": "Gear icon at the top-right of the header opens Settings; Esc closes", "visualSnapshot": null },
         { "id": "settings-profile", "check": "Settings Profile sex/height/age prefills Body Comp log form", "visualSnapshot": null },
         { "id": "settings-calories", "check": "Settings calorie goal and activity persist and seed the Calories page", "visualSnapshot": null },
-        { "id": "settings-data", "check": "Export JSON downloads a backup; Import asks to confirm replace; Wipe all logs asks for confirm and keeps settings", "visualSnapshot": "settings" },
+        { "id": "settings-data", "check": "Export JSON downloads a backup that includes InBody fields on bodyComp; Import asks to confirm replace; Wipe all logs asks for confirm and keeps settings", "visualSnapshot": "settings" },
         { "id": "nav", "check": "Five nav tabs visible; active tab has purple pill", "visualSnapshot": null },
         { "id": "nav-keys", "check": "Press 1–5 switches tabs (when no modal open)", "visualSnapshot": null },
         { "id": "theme", "check": "Dark background (#0f0f13), readable text, accent purple on active elements", "visualSnapshot": null }
@@ -51,8 +51,10 @@
       "visualSnapshot": "body-comp",
       "items": [
         { "id": "live-metrics", "check": "Log Entry expand — typing weight/BF updates live metrics" },
-        { "id": "history", "check": "History shows saved entry with metric chips" },
-        { "id": "inbody-import", "check": "History Import InBody CSV parses the export, asks to confirm, and merges scans by date without touching workouts" },
+        { "id": "history", "check": "History shows saved entry with metric chips including InBody extras (score, visceral, water, protein, mineral, BMR) when those fields exist" },
+        { "id": "inbody-import", "check": "History Import InBody CSV parses the export, asks to confirm, merges scans by date without touching workouts, keeps the latest same-day reading, and reports skipped incomplete rows" },
+        { "id": "inbody-edit", "check": "Editing an InBody History row keeps score/segmental extras and InBody BMR" },
+        { "id": "same-date-log", "check": "Logging body comp on a date that already exists replaces that day instead of adding a second row" },
         { "id": "segmental-map", "check": "History shows a segmental lean/fat body map for the latest InBody scan that has arm/trunk/leg values; the card stays hidden without those fields" }
       ]
     },
