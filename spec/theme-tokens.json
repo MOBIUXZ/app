@@ -11,6 +11,8 @@
     "--ft-blue": "#60a5fa",
     "--ft-red": "#f87171",
     "--ft-yellow": "#fbbf24",
+    "--ft-cyan": "#22d3ee",
+    "--ft-teal": "#2dd4bf",
     "--ft-bg-base": "#0f0f13",
     "--ft-bg-panel": "#18181f",
     "--ft-bg-panel-alt": "#1f1f2a",

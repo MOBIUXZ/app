@@ -283,6 +283,7 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(getPageSection('progress', 'bodyCharts').title).toBe('📉 Body Weight');
     expect(progress.bodyWeightChart.title).toBe('Body Weight (kg)');
     expect(progress.bodyWeightChart.colorToken).toBe('accent');
+    expect(progress.bodyChartExtras.map(function (c) { return c.colorToken; })).toEqual(['accent']);
     expect(getPageSection('progress', 'fat').title).toBe('📉 Fat Mass & Body Fat %');
     expect(getPageSection('progress', 'muscle').title).toBe('📉 Skeletal Muscle Mass & SMI');
     expect(getPageSection('progress', 'ffm').title).toBe('📉 Fat-Free Mass & FFMI');
@@ -294,25 +295,44 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(progress.bodyChartExtras.map(function (c) { return c.id; })).toEqual(['bmi']);
     expect(progress.fatTrends.charts.map(function (c) { return c.id; })).toEqual(['fm', 'bf', 'fmi']);
     expect(progress.fatTrends.charts.map(function (c) { return c.title; })).toEqual(['Fat Mass (kg)', 'Body Fat %', 'FMI (kg/m²)']);
+    expect(progress.fatTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['pink', 'pink', 'pink']);
     expect(progress.fatTrends.charts.find(function (c) { return c.id === 'fmi'; }).derive).toBe('fmi');
     expect(progress.fatTrends.tooltipValueTemplate).toBe('{value} {unit}');
     expect(progress.muscleTrends.charts.map(function (c) { return c.id; })).toEqual(['smm', 'smmPct', 'smi']);
     expect(progress.muscleTrends.charts.map(function (c) { return c.title; })).toEqual(['Skeletal Muscle Mass (kg)', 'Muscle Mass %', 'SMI (kg/m²)']);
+    expect(progress.muscleTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['green', 'green', 'green']);
     expect(progress.muscleTrends.charts.find(function (c) { return c.id === 'smmPct'; }).derive).toBe('smmPct');
     expect(progress.muscleTrends.tooltipValueTemplate).toBe('{value} {unit}');
     expect(progress.ffmTrends.charts.map(function (c) { return c.id; })).toEqual(['ffm', 'ffmPct', 'ffmi']);
     expect(progress.ffmTrends.charts.map(function (c) { return c.title; })).toEqual(['Fat-Free Mass (kg)', 'Fat-Free Mass %', 'FFMI (kg/m²)']);
+    expect(progress.ffmTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['cyan', 'cyan', 'cyan']);
     expect(progress.ffmTrends.charts.find(function (c) { return c.id === 'ffmPct'; }).derive).toBe('ffmPct');
     expect(progress.ffmTrends.charts.find(function (c) { return c.id === 'ffmi'; }).derive).toBe('ffmi');
     expect(progress.ffmTrends.tooltipValueTemplate).toBe('{value} {unit}');
     expect(progress.visceralTrends.charts.map(function (c) { return c.id; })).toEqual(['visceral']);
     expect(progress.visceralTrends.charts.map(function (c) { return c.title; })).toEqual(['Visceral Fat Level']);
+    expect(progress.visceralTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['orange']);
     expect(progress.bmrTrends.charts.map(function (c) { return c.id; })).toEqual(['bmr']);
     expect(progress.bmrTrends.charts.map(function (c) { return c.title; })).toEqual(['BMR (kcal/d)']);
+    expect(progress.bmrTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['yellow']);
     expect(progress.scoreTrends.charts.map(function (c) { return c.id; })).toEqual(['score']);
     expect(progress.scoreTrends.charts.map(function (c) { return c.title; })).toEqual(['InBody Score']);
+    expect(progress.scoreTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['red']);
     expect(progress.compositionTrends.charts.map(function (c) { return c.id; })).toEqual(['tbw', 'protein', 'mineral']);
     expect(progress.compositionTrends.charts.map(function (c) { return c.title; })).toEqual(['Total Body Water (L)', 'Protein (kg)', 'Mineral (kg)']);
+    expect(progress.compositionTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['blue', 'blue', 'blue']);
+    var stackColors = [
+      progress.bodyWeightChart.colorToken,
+      progress.fatTrends.charts[0].colorToken,
+      progress.muscleTrends.charts[0].colorToken,
+      progress.ffmTrends.charts[0].colorToken,
+      progress.visceralTrends.charts[0].colorToken,
+      progress.compositionTrends.charts[0].colorToken,
+      progress.bmrTrends.charts[0].colorToken,
+      progress.scoreTrends.charts[0].colorToken,
+      progress.segmentalTrendGroups[0].charts[0].colorToken,
+    ];
+    expect(new Set(stackColors).size).toBe(stackColors.length);
     expect(progress.compositionTrends.tooltipValueTemplate).toBe('{value} {unit}');
     expect(progress.segmentalBodyGrid.layout).toBe('bodyGrid');
     expect(progress.segmentalBodyGrid.imbalanceRelativeTo).toBe('min');
@@ -323,6 +343,8 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(progress.segmentalTrendGroups.map(function (g) { return g.toggleLabel; })).toEqual(['Soft Lean Mass', 'Fat Mass']);
     expect(progress.segmentalTrendGroups[0].charts.map(function (c) { return c.id; })).toEqual(['leanLeftArm', 'leanRightArm', 'leanTrunk', 'leanLeftLeg', 'leanRightLeg']);
     expect(progress.segmentalTrendGroups[0].charts.map(function (c) { return c.slot; })).toEqual(['leftArm', 'rightArm', 'trunk', 'leftLeg', 'rightLeg']);
+    expect(progress.segmentalTrendGroups[0].charts.map(function (c) { return c.colorToken; })).toEqual(['teal', 'teal', 'teal', 'teal', 'teal']);
+    expect(progress.segmentalTrendGroups[1].charts.map(function (c) { return c.colorToken; })).toEqual(['teal', 'teal', 'teal', 'teal', 'teal']);
     expect(progress.segmentalTrendGroups[1].charts.map(function (c) { return c.id; })).toEqual(['fatLeftArm', 'fatRightArm', 'fatTrunk', 'fatLeftLeg', 'fatRightLeg']);
     var source = readFileSync(resolve(root, progress.component), 'utf8');
     expect(source.indexOf('visceralTrends') !== -1).toBe(true);

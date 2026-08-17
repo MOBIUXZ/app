@@ -6,7 +6,9 @@
     "orange": "#fb923c",
     "yellow": "#fbbf24",
     "blue": "#60a5fa",
-    "red": "#f87171"
+    "red": "#f87171",
+    "cyan": "#22d3ee",
+    "teal": "#2dd4bf"
   },
   "exerciseCategories": {
     "Powerlifting": ["Squat", "Bench Press", "Deadlift", "Pause Squat", "Pause Bench", "Sumo Deadlift", "Romanian Deadlift", "Good Morning", "Box Squat", "Floor Press"],

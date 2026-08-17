@@ -126,7 +126,7 @@ Omitted keys (including `settings`) are kept from current state. If the write fa
 | Dashboard "Today Cals" | `calories` where `date === today` | `today = new Date().toLocaleDateString()` |
 | CaloriePage BMR | Latest `bodyComp` entry | Prefers `BMR_Mifflin`, falls back `BMR_Katch` |
 | Progress body weight chart | `bodyLogs` | Series label **Body Weight (kg)** above the plot |
-| Progress BMI chart | `bodyComp` `BMI` | Extra on the Body Weight card; hidden when missing |
+| Progress BMI chart | `bodyComp` `BMI` | Extra on the Body Weight card; same color as Body Weight; hidden when missing |
 | Progress fat mass / body fat % / FMI | `bodyComp` `FM`/`fm`, `bf`/`PBF`, and `FMI` (or derived) | One category card; charts stacked; empty series hidden; FMI derived from FM+height or FM×BMI/weight |
 | Progress skeletal muscle / muscle mass % / SMI | `bodyComp` `SMM`/`smm`, `PSMM` (or `SMM / weight × 100`), and `SMI` | One category card; charts stacked; empty series hidden |
 | Progress fat-free mass / fat-free mass % / FFMI | `bodyComp` `FFM`, `PFFM` (or `FFM / weight × 100`), and `FFMI` (or derived) | One category card; charts stacked; empty series hidden |

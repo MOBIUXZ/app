@@ -58,7 +58,7 @@ Complete inventory of every project file. Line counts approximate (Aug 2026).
 
 | File | Lines | Purpose |
 |------|-------|---------|
-| `theme.css` | 50 | All `--ft-*` CSS custom properties (colors, bg, borders, radii, shadows) |
+| `theme.css` | 52 | All `--ft-*` CSS custom properties (colors, bg, borders, radii, shadows) |
 | `global.css` | 100 | Imports theme; html/body reset; number-input rules; `.ft-kb-*` keyboard classes |
 | `styleHelpers.js` | 93 | `cx()`, `btnPrimaryClass/Secondary/Danger()`, `inputClass/selectClass/textareaClass()` |
 | `ui.module.css` | 545 | Shared UI: buttons, inputs, cards, modals, collapse, pill toggles, chart toggles, utilities |

@@ -316,7 +316,7 @@
         "dataKey": "weight"
       },
       "bodyChartExtras": [
-        { "id": "bmi", "title": "BMI (kg/m²)", "colorToken": "blue", "paths": ["BMI"] }
+        { "id": "bmi", "title": "BMI (kg/m²)", "colorToken": "accent", "paths": ["BMI"] }
       ],
       "fatTrends": {
         "tooltipValueTemplate": "{value} {unit}",
@@ -331,15 +331,15 @@
         "charts": [
           { "id": "smm", "title": "Skeletal Muscle Mass (kg)", "unit": "kg", "colorToken": "green", "paths": ["SMM", "smm"] },
           { "id": "smmPct", "title": "Muscle Mass %", "unit": "%", "colorToken": "green", "paths": ["PSMM"], "derive": "smmPct" },
-          { "id": "smi", "title": "SMI (kg/m²)", "unit": "kg/m²", "colorToken": "orange", "paths": ["SMI"] }
+          { "id": "smi", "title": "SMI (kg/m²)", "unit": "kg/m²", "colorToken": "green", "paths": ["SMI"] }
         ]
       },
       "ffmTrends": {
         "tooltipValueTemplate": "{value} {unit}",
         "charts": [
-          { "id": "ffm", "title": "Fat-Free Mass (kg)", "unit": "kg", "colorToken": "green", "paths": ["FFM"], "derive": "ffm" },
-          { "id": "ffmPct", "title": "Fat-Free Mass %", "unit": "%", "colorToken": "green", "paths": ["PFFM"], "derive": "ffmPct" },
-          { "id": "ffmi", "title": "FFMI (kg/m²)", "unit": "kg/m²", "colorToken": "accent", "paths": ["FFMI"], "derive": "ffmi" }
+          { "id": "ffm", "title": "Fat-Free Mass (kg)", "unit": "kg", "colorToken": "cyan", "paths": ["FFM"], "derive": "ffm" },
+          { "id": "ffmPct", "title": "Fat-Free Mass %", "unit": "%", "colorToken": "cyan", "paths": ["PFFM"], "derive": "ffmPct" },
+          { "id": "ffmi", "title": "FFMI (kg/m²)", "unit": "kg/m²", "colorToken": "cyan", "paths": ["FFMI"], "derive": "ffmi" }
         ]
       },
       "visceralTrends": {
@@ -349,20 +349,20 @@
       },
       "bmrTrends": {
         "charts": [
-          { "id": "bmr", "title": "BMR (kcal/d)", "colorToken": "orange", "paths": ["BMR_InBody", "BMR_Mifflin", "BMR_Katch"] }
+          { "id": "bmr", "title": "BMR (kcal/d)", "colorToken": "yellow", "paths": ["BMR_InBody", "BMR_Mifflin", "BMR_Katch"] }
         ]
       },
       "scoreTrends": {
         "charts": [
-          { "id": "score", "title": "InBody Score", "colorToken": "accent", "paths": ["inbody.score"] }
+          { "id": "score", "title": "InBody Score", "colorToken": "red", "paths": ["inbody.score"] }
         ]
       },
       "compositionTrends": {
         "tooltipValueTemplate": "{value} {unit}",
         "charts": [
           { "id": "tbw", "title": "Total Body Water (L)", "unit": "L", "colorToken": "blue", "paths": ["inbody.tbw"] },
-          { "id": "protein", "title": "Protein (kg)", "unit": "kg", "colorToken": "green", "paths": ["inbody.protein"] },
-          { "id": "mineral", "title": "Mineral (kg)", "unit": "kg", "colorToken": "yellow", "paths": ["inbody.mineral"] }
+          { "id": "protein", "title": "Protein (kg)", "unit": "kg", "colorToken": "blue", "paths": ["inbody.protein"] },
+          { "id": "mineral", "title": "Mineral (kg)", "unit": "kg", "colorToken": "blue", "paths": ["inbody.mineral"] }
         ]
       },
       "segmentalBodyGrid": {
@@ -387,11 +387,11 @@
           "metric": "lean",
           "toggleLabel": "Soft Lean Mass",
           "charts": [
-            { "id": "leanLeftArm", "slot": "leftArm", "scaleGroup": "arm", "title": "Left Arm", "colorToken": "blue", "paths": ["inbody.leanLeftArmKg"] },
-            { "id": "leanRightArm", "slot": "rightArm", "scaleGroup": "arm", "title": "Right Arm", "colorToken": "green", "paths": ["inbody.leanRightArmKg"] },
-            { "id": "leanTrunk", "slot": "trunk", "scaleGroup": "trunk", "showDates": true, "title": "Trunk", "colorToken": "accent", "paths": ["inbody.leanTrunkKg"] },
-            { "id": "leanLeftLeg", "slot": "leftLeg", "scaleGroup": "leg", "title": "Left Leg", "colorToken": "orange", "paths": ["inbody.leanLeftLegKg"] },
-            { "id": "leanRightLeg", "slot": "rightLeg", "scaleGroup": "leg", "title": "Right Leg", "colorToken": "yellow", "paths": ["inbody.leanRightLegKg"] }
+            { "id": "leanLeftArm", "slot": "leftArm", "scaleGroup": "arm", "title": "Left Arm", "colorToken": "teal", "paths": ["inbody.leanLeftArmKg"] },
+            { "id": "leanRightArm", "slot": "rightArm", "scaleGroup": "arm", "title": "Right Arm", "colorToken": "teal", "paths": ["inbody.leanRightArmKg"] },
+            { "id": "leanTrunk", "slot": "trunk", "scaleGroup": "trunk", "showDates": true, "title": "Trunk", "colorToken": "teal", "paths": ["inbody.leanTrunkKg"] },
+            { "id": "leanLeftLeg", "slot": "leftLeg", "scaleGroup": "leg", "title": "Left Leg", "colorToken": "teal", "paths": ["inbody.leanLeftLegKg"] },
+            { "id": "leanRightLeg", "slot": "rightLeg", "scaleGroup": "leg", "title": "Right Leg", "colorToken": "teal", "paths": ["inbody.leanRightLegKg"] }
           ]
         },
         {
@@ -399,11 +399,11 @@
           "metric": "fat",
           "toggleLabel": "Fat Mass",
           "charts": [
-            { "id": "fatLeftArm", "slot": "leftArm", "scaleGroup": "arm", "title": "Left Arm", "colorToken": "blue", "paths": ["inbody.fatLeftArmKg"] },
-            { "id": "fatRightArm", "slot": "rightArm", "scaleGroup": "arm", "title": "Right Arm", "colorToken": "green", "paths": ["inbody.fatRightArmKg"] },
-            { "id": "fatTrunk", "slot": "trunk", "scaleGroup": "trunk", "showDates": true, "title": "Trunk", "colorToken": "pink", "paths": ["inbody.fatTrunkKg"] },
-            { "id": "fatLeftLeg", "slot": "leftLeg", "scaleGroup": "leg", "title": "Left Leg", "colorToken": "orange", "paths": ["inbody.fatLeftLegKg"] },
-            { "id": "fatRightLeg", "slot": "rightLeg", "scaleGroup": "leg", "title": "Right Leg", "colorToken": "yellow", "paths": ["inbody.fatRightLegKg"] }
+            { "id": "fatLeftArm", "slot": "leftArm", "scaleGroup": "arm", "title": "Left Arm", "colorToken": "teal", "paths": ["inbody.fatLeftArmKg"] },
+            { "id": "fatRightArm", "slot": "rightArm", "scaleGroup": "arm", "title": "Right Arm", "colorToken": "teal", "paths": ["inbody.fatRightArmKg"] },
+            { "id": "fatTrunk", "slot": "trunk", "scaleGroup": "trunk", "showDates": true, "title": "Trunk", "colorToken": "teal", "paths": ["inbody.fatTrunkKg"] },
+            { "id": "fatLeftLeg", "slot": "leftLeg", "scaleGroup": "leg", "title": "Left Leg", "colorToken": "teal", "paths": ["inbody.fatLeftLegKg"] },
+            { "id": "fatRightLeg", "slot": "rightLeg", "scaleGroup": "leg", "title": "Right Leg", "colorToken": "teal", "paths": ["inbody.fatRightLegKg"] }
           ]
         }
       ],
