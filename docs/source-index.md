@@ -150,7 +150,7 @@ Complete inventory of every project file. Line counts approximate (Aug 2026).
 
 **Major state:** `cat`, `ex`, `sets`, `logDate`, `logTime`, `showCalendarModal`, `calPanel`, `historySortBy`, `historyOrder`, `expandedGroups`, `groupsDefaultExpanded`, `editIdx`, `editForm`, parser texts
 
-**Key functions:** `submit()`, `doParse()`, `calSubmit()`, `calDoParse()`, `saveEdit()`, `delW()`, `startEdit()`, `toggleGroup()`, `clearHistory()`, `parseDateString()`
+**Key functions:** `submit()`, `doParse()`, `calSubmit()`, `calDoParse()`, `saveEdit()`, `delW()`, `startEdit()`, `toggleGroup()`, `clearHistory()`, `parseDateString()`, `sortHistoryWorkouts()`
 
 **Sections:** Hero, Quick actions, Calendar modal (month/year), Smart Parser modal, Log Workout collapse, History collapse, 1RM collapse
 

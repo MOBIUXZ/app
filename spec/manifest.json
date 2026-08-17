@@ -60,7 +60,7 @@
     {
       "id": "ui-behavior-fixtures",
       "path": "spec/ui-behavior-fixtures.json",
-      "governs": ["Dashboard PRs/recent stats", "Calorie macro totals/TDEE/goal bar", "Body comp bodyLogs sync", "Workout History expand/collapse across grouping", "Workout History search by name and date"],
+      "governs": ["Dashboard PRs/recent stats", "Calorie macro totals/TDEE/goal bar", "Body comp bodyLogs sync", "Workout History expand/collapse across grouping", "Workout History search by name and date", "Workout History newest/oldest date sort"],
       "docs": ["docs/dashboard.md", "docs/calories.md", "docs/body-comp.md", "docs/workout.md"]
     },
     {

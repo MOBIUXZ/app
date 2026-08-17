@@ -125,6 +125,27 @@
         }
       ]
     },
+    "sort": {
+      "workouts": [
+        { "exercise": "Squat", "date": "10-04-2026" },
+        { "exercise": "Overhead Press", "date": "16-08-2026" },
+        { "exercise": "Deadlift", "date": "05-01-2026" }
+      ],
+      "fixtures": [
+        {
+          "id": "newest-by-date-parses-dmy",
+          "sortBy": "date",
+          "order": "newest",
+          "expectedDates": ["16-08-2026", "10-04-2026", "05-01-2026"]
+        },
+        {
+          "id": "oldest-by-date-parses-dmy",
+          "sortBy": "date",
+          "order": "oldest",
+          "expectedDates": ["05-01-2026", "10-04-2026", "16-08-2026"]
+        }
+      ]
+    },
     "fixtures": [
       {
         "id": "missing-keys-start-expanded",

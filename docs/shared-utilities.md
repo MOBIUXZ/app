@@ -193,6 +193,8 @@ BW = 65-68KG                     (stores bodyweight context only)
 ### `formatDate(date)`
 Formats dates as `DD-MM-YYYY`.
 
+Workout History **Newest / Oldest** parses those strings with `parseStoredDate()` in `src/domain/pageLayout.js`. Native `new Date("16-08-2026")` is invalid (day 16 is not a US month), so it must not be used for sorting.
+
 ### `restStr(t1, t2)`
 Calculates rest duration between two `MM:SS` timestamps.
 

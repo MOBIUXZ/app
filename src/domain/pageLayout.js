@@ -94,4 +94,34 @@ export function filterHistoryWorkouts(workouts, query) {
   return (workouts || []).filter(function (w) { return matchesHistorySearch(w, query); });
 }
 
+export function parseStoredDate(s) {
+  if (!s) return null;
+  if (s instanceof Date) return isNaN(s.getTime()) ? null : s;
+  if (typeof s !== "string") return null;
+  s = s.trim();
+  var dmy = s.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+  if (dmy) return new Date(parseInt(dmy[3], 10), parseInt(dmy[2], 10) - 1, parseInt(dmy[1], 10));
+  var ymd = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (ymd) return new Date(parseInt(ymd[1], 10), parseInt(ymd[2], 10) - 1, parseInt(ymd[3], 10));
+  var parsed = new Date(s);
+  return isNaN(parsed.getTime()) ? null : parsed;
+}
+
+export function compareStoredDates(a, b, order) {
+  var da = parseStoredDate(a);
+  var db = parseStoredDate(b);
+  var ta = da ? da.getTime() : 0;
+  var tb = db ? db.getTime() : 0;
+  return order === "oldest" ? ta - tb : tb - ta;
+}
+
+export function sortHistoryWorkouts(workouts, sortBy, order) {
+  return (workouts || []).slice().sort(function (a, b) {
+    if (sortBy === "date") return compareStoredDates(a.date, b.date, order);
+    var nameA = String(a.exercise || "");
+    var nameB = String(b.exercise || "");
+    return order === "oldest" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+  });
+}
+
 export { pageLayoutSpec };

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, formatExerciseName, btnPrimary, btnSecondary, btnDanger, inputClass, selectClass, textareaClass, formatDate, useKeyboardListNav, useConfirmDialogKeyboard, handleParserTextareaKeyDown, useParserTextareaKeyboard, useKeyboardLayer, isTypingTarget, ui, cx } from "./shared";
 import { computeOneRM, TRAINING_PERCENTAGES, DEFAULT_ONE_RM_FORMULA, ONE_RM_FORMULAS, collectLoggedSets } from "../domain/oneRm.js";
-import { getPageLayout, getCollapseSpec, getModalSpec, isHistoryGroupExpanded, nextHistoryGroupToggle, nextHistoryGroupsAll, areAllHistoryGroupsExpanded, matchesHistorySearch } from "../domain/pageLayout.js";
+import { getPageLayout, getCollapseSpec, getModalSpec, isHistoryGroupExpanded, nextHistoryGroupToggle, nextHistoryGroupsAll, areAllHistoryGroupsExpanded, matchesHistorySearch, parseStoredDate, sortHistoryWorkouts } from "../domain/pageLayout.js";
 import { PageHeading } from "./PageIcon";
 import s from "./WorkoutPage.module.css";
 
@@ -195,18 +195,8 @@ export default function WorkoutPage({ data, save }) {
   function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
   function firstDay(y, m) { return new Date(y, m, 1).getDay(); }
 
-  // Robust parser for stored date strings (supports DD-MM-YYYY and YYYY-MM-DD)
   function parseDateString(s) {
-    if (!s) return null;
-    if (s instanceof Date) return isNaN(s.getTime()) ? null : s;
-    if (typeof s !== "string") return null;
-    s = s.trim();
-    var dmy = s.match(/^(\d{2})-(\d{2})-(\d{4})$/);
-    if (dmy) return new Date(parseInt(dmy[3], 10), parseInt(dmy[2], 10) - 1, parseInt(dmy[1], 10));
-    var ymd = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (ymd) return new Date(parseInt(ymd[1], 10), parseInt(ymd[2], 10) - 1, parseInt(ymd[3], 10));
-    var parsed = new Date(s);
-    return isNaN(parsed.getTime()) ? null : parsed;
+    return parseStoredDate(s);
   }
 
   function prevMonth() {
@@ -396,13 +386,7 @@ export default function WorkoutPage({ data, save }) {
   var filteredWorkouts = data.workouts.filter(function (w) {
     return matchesHistorySearch(w, searchQuery);
   });
-  var historyItems = filteredWorkouts.slice().sort(function (a, b) {
-    if (historySortBy === "date") {
-      return historyOrder === "newest" ? (new Date(b.date) - new Date(a.date)) : (new Date(a.date) - new Date(b.date));
-    } else {
-      return historyOrder === "newest" ? b.exercise.localeCompare(a.exercise) : a.exercise.localeCompare(b.exercise);
-    }
-  }).map(function (w, i) { return Object.assign({}, w, { _idx: data.workouts.indexOf(w) }); });
+  var historyItems = sortHistoryWorkouts(filteredWorkouts, historySortBy, historyOrder).map(function (w) { return Object.assign({}, w, { _idx: data.workouts.indexOf(w) }); });
   var groupedHistory = [];
   historyItems.forEach(function (w) {
     var last = groupedHistory[groupedHistory.length - 1];

@@ -84,7 +84,7 @@ Stacked control layout inside **Workout History** (sticky header while scrolling
 |-----|----------|
 | Search | Full-width filter on **exercise name** or **date** (`DD-MM-YYYY`; also `10/04/2026`, `2026-04-10`, or a partial like `04-2026`) |
 | Actions | **Expand all / Collapse all** + **Clear History** (left) · workout count + days logged (right) |
-| Sort | **By Date / By Workout** and **Newest / Oldest** pill toggles |
+| Sort | **By Date / By Workout** and **Newest / Oldest** pill toggles. **Newest** is calendar order of stored `DD-MM-YYYY` dates (so `16-08-2026` is after `10-04-2026`), not JavaScript `new Date("16-08-2026")` which is invalid. |
 
 - Controls have **10px horizontal inset** so buttons and stats are not flush with the panel edges
 - Vertical gaps separate search, actions, filters, and the history list

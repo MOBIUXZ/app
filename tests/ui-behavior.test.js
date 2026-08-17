@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { getDashboardSnapshot } from '../src/domain/dashboard.js';
 import { computeMacroTotals, computeGoalBarPct, getGoalBarColor, computeTdee, computeTdeeBreakdown } from '../src/domain/calories.js';
 import { syncBodyLogsAfterEdit, removeBodyLogForEntry } from '../src/domain/bodyCompSync.js';
-import { isHistoryGroupExpanded, areAllHistoryGroupsExpanded, nextHistoryGroupsAll, filterHistoryWorkouts } from '../src/domain/pageLayout.js';
+import { isHistoryGroupExpanded, areAllHistoryGroupsExpanded, nextHistoryGroupsAll, filterHistoryWorkouts, sortHistoryWorkouts } from '../src/domain/pageLayout.js';
 import { resolveExercise } from '../src/components/shared.jsx';
 import uiBehavior from '../spec/ui-behavior-fixtures.json';
 import appConfig from '../spec/app-config.json';
@@ -101,6 +101,13 @@ describe('workout history groups (spec/ui-behavior-fixtures.json)', function () 
     it('search ' + fixture.id, function () {
       var matched = filterHistoryWorkouts(uiBehavior.workoutHistory.search.workouts, fixture.query).map(function (w) { return w.exercise; });
       expect(matched).toEqual(fixture.expectedExercises);
+    });
+  });
+
+  uiBehavior.workoutHistory.sort.fixtures.forEach(function (fixture) {
+    it('sort ' + fixture.id, function () {
+      var sorted = sortHistoryWorkouts(uiBehavior.workoutHistory.sort.workouts, fixture.sortBy, fixture.order).map(function (w) { return w.date; });
+      expect(sorted).toEqual(fixture.expectedDates);
     });
   });
 });

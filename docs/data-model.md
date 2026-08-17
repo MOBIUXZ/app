@@ -176,6 +176,7 @@ interface CalorieEntry {
 | Context | Format | Function |
 |---------|--------|----------|
 | Workout log date | `DD-MM-YYYY` | `formatDate()` in shared.jsx |
+| Workout History sort | `DD-MM-YYYY` calendar order | `parseStoredDate()` / `sortHistoryWorkouts()` — do not use `new Date("16-08-2026")` |
 | Body comp date | `DD-MM-YYYY` | `formatDate()` |
 | Body log date | `DD-MM-YYYY` | same as body comp entry |
 | Calorie entry date | Locale string | `selDate.toLocaleDateString()` |
