@@ -89,7 +89,7 @@ Stacked control layout inside **Workout History** (sticky header while scrolling
 **Newest** is calendar order of stored `DD-MM-YYYY` dates (so `16-08-2026` is after `10-04-2026`), not JavaScript `new Date("16-08-2026")` which is invalid.
 
 - Controls have **10px horizontal inset** so buttons and stats are not flush with the panel edges
-- Vertical gaps separate search, actions, filters, and the history list
+- Vertical gaps separate search, actions, filters, and the history list; stats-to-toolbar gap is **4px**
 - Top spacing comes from shared **`.collapseBody`** padding (`12px`)
 
 ### Grouping

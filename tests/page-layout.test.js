@@ -108,6 +108,8 @@ describe('page layout spec (spec/page-layout.json)', function () {
     var chrome = getPageLayout('workout').historyChrome;
     expect(chrome.previewToggle).toBeUndefined();
     expect(chrome.statsInSearch).toBe(false);
+    expect(chrome.statsOnToolbar).toBe(false);
+    expect(chrome.toolbarGapPx).toBe(4);
     expect(chrome.groupCountStyle).toBe('entries');
     expect(chrome.shortToggleLabels).toBe(true);
     expect(chrome.expandAllStyle).toBe('text');
@@ -118,6 +120,8 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(source.indexOf('historyChrome.clearLabel') !== -1).toBe(true);
     expect(source.indexOf('clearHistoryBtn') !== -1).toBe(true);
     expect(source.indexOf('groupHeaderQuiet') !== -1).toBe(true);
+    var css = readFileSync(resolve(root, pageLayout.pages.workout.cssModule), 'utf8');
+    expect(css.indexOf('gap: ' + chrome.toolbarGapPx + 'px') !== -1).toBe(true);
   });
 
   it('workout history sorts DD-MM-YYYY dates without native Date parsing', function () {

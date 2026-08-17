@@ -101,9 +101,9 @@ Applies to **Log Entry**, **History**, **Log Workout**, calorie log sections, et
 
 ### Workout history controls
 
-**`.historyControls`** in `WorkoutPage.module.css` — stacked layout for search/actions/filter rows:
+**`.historyControls`** in `WorkoutPage.module.css` — stacked layout for search then the filter/action row:
 
-- `flex-direction: column` with `12px` gap between rows
+- `flex-direction: column` with `4px` gap between the stats row and the filter row
 - `padding-inline: 10px` for left/right inset on action and sort buttons
 - Used with **`.historyToolbarSticky`** for scroll-pinned header
 

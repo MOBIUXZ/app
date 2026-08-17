@@ -89,6 +89,8 @@
       },
       "historyChrome": {
         "statsInSearch": false,
+        "statsOnToolbar": false,
+        "toolbarGapPx": 4,
         "groupCountStyle": "entries",
         "shortToggleLabels": true,
         "expandAllStyle": "text",
