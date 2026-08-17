@@ -33,8 +33,8 @@ Complete inventory of every project file. Line counts approximate (Aug 2026).
 | File | Lines | Purpose |
 |------|-------|---------|
 | `main.jsx` | 12 | ReactDOM root, StrictMode, KeyboardLayerProvider, global.css |
-| `App.jsx` | 88 | Tab nav, Logo header, localStorage, progressMounted, page routing |
-| `App.module.css` | 105 | `.app`, `.header`, `.logo`, `.logoText`, `.navTrack`, `.navBtn`, `.navBtnActive`, `.main` |
+| `App.jsx` | 155 | Tab nav, Logo header, settings gear + modal, localStorage, progressMounted, page routing |
+| `App.module.css` | 183 | `.app`, `.header`, `.logo`, `.logoText`, `.settingsBtn`, `.navTrack`, `.navBtn`, `.navBtnActive`, `.main` |
 
 ---
 
@@ -55,7 +55,7 @@ Complete inventory of every project file. Line counts approximate (Aug 2026).
 
 ## `src/components/PageIcon.jsx`
 
-**~45 lines** — Lucide stroke icons for page titles and collapses (`PageIcon`, `PageHeading`). Spec: `spec/page-icons.json` + `pageIcon` / `hero.icon` / collapse `icon` in `page-layout.json`. Domain: `src/domain/pageIcons.js`.
+**~45 lines** — Lucide stroke icons for page titles, collapses, and the header settings gear (`PageIcon`, `PageHeading`). Spec: `spec/page-icons.json` + `pageIcon` / `hero.icon` / collapse `icon` / `app.settings.icon` in `page-layout.json`. Domain: `src/domain/pageIcons.js`.
 
 ---
 

@@ -11,7 +11,28 @@
     "appleTouchIcon": "/icons/icon-180.png",
     "documentTitle": "Orbius — Always in orbit. Always evolving.",
     "cssModule": "src/App.module.css",
-    "shellClasses": ["app", "header", "logo", "logoText", "nav", "navTrack", "navBtn", "navBtnActive", "main"]
+    "settings": {
+      "icon": "settings",
+      "ariaLabel": "Settings",
+      "iconSizePx": 22,
+      "modal": {
+        "id": "settings",
+        "title": "Settings",
+        "layerId": "settings",
+        "sections": [
+          {
+            "id": "keyboard",
+            "title": "Keyboard",
+            "rows": [
+              { "keys": "1–5", "action": "Jump to page" },
+              { "keys": "← →", "action": "Previous / next page" },
+              { "keys": "Esc", "action": "Close popup" }
+            ]
+          }
+        ]
+      }
+    },
+    "shellClasses": ["app", "header", "logo", "logoText", "settingsBtn", "settingsSection", "settingsRow", "settingsKeys", "settingsAction", "nav", "navTrack", "navBtn", "navBtnActive", "main"]
   },
   "pages": {
     "dashboard": {

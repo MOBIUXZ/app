@@ -211,7 +211,7 @@ Orbius uses **CSS Modules** (not Tailwind, not inline-only).
 | Shared UI | `src/styles/ui.module.css` | Buttons, inputs, cards, modals, utilities |
 | Helpers | `src/styles/styleHelpers.js` | `cx()`, `btnPrimaryClass()`, `inputClass()`, etc. |
 | Page-specific | `*.module.css` next to each page component | Layout unique to that page |
-| App shell | `src/App.module.css` | Header, nav pill track |
+| App shell | `src/App.module.css` | Header (logo + settings gear), nav pill track |
 
 Import pattern in JSX:
 

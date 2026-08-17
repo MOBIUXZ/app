@@ -17,6 +17,12 @@ describe('keyboard shortcuts spec', function () {
     expect(keyboardSpec.listNav.selectKey).toBe('Enter');
   });
 
+  it('settings popup closes with Escape', function () {
+    var settings = keyboardSpec.popups.find(function (p) { return p.id === 'settings'; });
+    expect(settings.layerId).toBe('settings');
+    expect(settings.closeKey).toBe('Escape');
+  });
+
   it('parser textarea uses Enter submit and Shift+Enter newline', function () {
     expect(keyboardSpec.parserTextarea.submitKey).toBe('Enter');
     expect(keyboardSpec.parserTextarea.newlineModifier).toBe('Shift');

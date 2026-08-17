@@ -46,6 +46,7 @@ Machine-readable checklist: [`spec/manual-qa-checklist.json`](../spec/manual-qa-
 ### Global shell
 
 - [ ] Header shows **Orbius** with gradient infinity icon
+- [ ] Gear icon at the top-right of the header opens **Settings**; Esc closes
 - [ ] Five nav tabs; active tab has purple pill
 - [ ] Keys `1`–`5` switch tabs (no modal open)
 - [ ] Dark theme, readable text, accent purple on active UI

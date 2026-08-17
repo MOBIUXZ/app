@@ -36,7 +36,8 @@
     { "id": "delete-workout-entry", "layerId": "delete-workout-entry" },
     { "id": "clear-body-comp-history", "layerId": "clear-body-comp-history" },
     { "id": "delete-body-comp-entry", "layerId": "delete-body-comp-entry" },
-    { "id": "set-picker", "layerId": "set-picker", "closeKey": "Escape" }
+    { "id": "set-picker", "layerId": "set-picker", "closeKey": "Escape" },
+    { "id": "settings", "layerId": "settings", "closeKey": "Escape" }
   ],
   "calendarStack": {
     "order": ["calendar-modal", "calendar-day-panel", "calendar-log-panel", "delete-calendar-entry"],

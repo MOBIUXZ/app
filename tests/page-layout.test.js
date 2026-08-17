@@ -32,6 +32,21 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(existsSync(resolve(root, layout.logo.component))).toBe(true);
   });
 
+  it('app header settings gear opens a settings modal', function () {
+    var layout = getAppLayout();
+    expect(layout.settings.icon).toBe('settings');
+    expect(layout.settings.ariaLabel).toBe('Settings');
+    expect(layout.settings.iconSizePx).toBe(22);
+    expect(layout.settings.modal.title).toBe('Settings');
+    expect(layout.settings.modal.layerId).toBe('settings');
+    expect(layout.settings.modal.sections[0].id).toBe('keyboard');
+    expect(layout.shellClasses).toContain('settingsBtn');
+    var source = readFileSync(resolve(root, 'src/App.jsx'), 'utf8');
+    expect(source.indexOf('settingsBtn') !== -1).toBe(true);
+    expect(source.indexOf('appLayout.settings') !== -1).toBe(true);
+    expect(source.indexOf('useKeyboardLayer') !== -1).toBe(true);
+  });
+
   it('document title includes brand tagline', function () {
     var layout = getAppLayout();
     expect(layout.documentTitle).toBe('Orbius — Always in orbit. Always evolving.');

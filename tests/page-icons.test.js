@@ -15,6 +15,7 @@ describe('page icons spec (spec/page-icons.json)', function () {
       'pencil-line',
       'square-plus',
       'history',
+      'settings',
     ]);
   });
 

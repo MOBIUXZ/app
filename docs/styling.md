@@ -12,7 +12,7 @@ Orbius uses **CSS Modules** with a shared theme. Static layout and typography li
 | `src/styles/global.css` | Base reset, keyboard navigation classes (`.ft-kb-*`), number-input scroll guard |
 | `src/styles/ui.module.css` | Shared UI: buttons, inputs, cards, collapse, modals, flex/grid utilities |
 | `src/styles/styleHelpers.js` | `cx()`, `btnPrimaryClass`, `inputClass`, `selectClass`, `textareaClass` |
-| `src/App.module.css` | App shell: header, segmented main nav (`.navTrack`), main content |
+| `src/App.module.css` | App shell: header (logo + settings gear), segmented main nav (`.navTrack`), main content |
 | `src/components/DashboardPage.module.css` | Dashboard: stat row, PR list, recent workouts |
 | `src/components/BodyCompPage.module.css` | Body comp: metrics, relations, history chips |
 | `src/components/CaloriePage.module.css` | Calories: BMR/TDEE, calendar, macros, food log |
@@ -67,6 +67,8 @@ Used on Body Comp (sex), Workout (calendar month/year, history sort/order), and 
 | `.navBtnActive` | Active tab — gradient purple pill, shadow; no focus outline (pill is the indicator) |
 
 Tabs use `role="tab"` / `aria-selected`. Focus sync in `App.jsx` moves DOM focus to the active tab when the page changes via keyboard while focus remains in the nav bar.
+
+**Settings gear** (`.settingsBtn`) sits at the top-right of the header, opposite the Orbius wordmark. It is a 40×40 transparent button with accent color, hover wash, and a green `:focus-visible` ring like inactive nav tabs. Click opens the Settings modal (`page-layout.json` → `app.settings`).
 
 ### Activity level list (Calories)
 

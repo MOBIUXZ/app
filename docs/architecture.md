@@ -13,7 +13,8 @@ index.html
         └── React.StrictMode
             └── KeyboardLayerProvider          (shared.jsx)
                 └── App                        (App.jsx)
-                    ├── header + nav (App.module.css)
+                    ├── header (logo left, settings gear right) + nav (App.module.css)
+                    ├── Settings modal (Esc / backdrop / ✕)
                     └── main content (conditional by tab)
                         ├── DashboardPage      tab === "Dashboard"
                         ├── WorkoutPage        tab === "Workout"
@@ -64,6 +65,12 @@ useEffect(function () {
 - First visit to Progress sets `progressMounted = true` permanently
 - Page stays mounted but hidden — avoids remounting ~N Recharts instances
 - Other tabs unmount normally when switching away
+
+---
+
+## Settings (app shell)
+
+The header gear (`spec/page-layout.json` → `app.settings`) opens an app-level Settings modal. It is not a page modal (`getModalSpec`); copy and layer id come from `app.settings.modal`. Esc, backdrop click, and ✕ close it (`spec/keyboard-shortcuts.json` popup `settings`). The first section lists keyboard shortcuts.
 
 ---
 
