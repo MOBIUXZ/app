@@ -152,6 +152,7 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
     expect(source.indexOf('segmentalBodyGrid') !== -1).toBe(true);
     expect(source.indexOf('resolveSegmentalTrendGroup') !== -1).toBe(true);
     expect(source.indexOf('pillToggleTrack') !== -1).toBe(true);
+    expect(source.indexOf('tooltipValueTemplate') !== -1).toBe(true);
     expect(source.indexOf('Skeletal Muscle') === -1).toBe(true);
     expect(source.indexOf('Visceral Fat') === -1).toBe(true);
     expect(source.indexOf('Left Arm') === -1).toBe(true);

@@ -277,6 +277,8 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(progress.bodyTrendCharts.map(function (c) { return c.id; })).toEqual(['smm', 'smi', 'visceral', 'score', 'bmr', 'tbw', 'protein', 'mineral']);
     expect(progress.segmentalBodyGrid.layout).toBe('bodyGrid');
     expect(progress.segmentalBodyGrid.defaultMetric).toBe('lean');
+    expect(progress.segmentalBodyGrid.tooltipValueTemplate).toBe('{value} {unit}');
+    expect(formatTemplateLabel(progress.segmentalBodyGrid.tooltipValueTemplate, { value: 10.5, unit: progress.segmentalBodyGrid.unit })).toBe('10.5 kg');
     expect(progress.segmentalTrendGroups.map(function (g) { return g.id; })).toEqual(['segmentalLean', 'segmentalFat']);
     expect(progress.segmentalTrendGroups.map(function (g) { return g.toggleLabel; })).toEqual(['Soft Lean Mass', 'Fat Mass']);
     expect(progress.segmentalTrendGroups[0].charts.map(function (c) { return c.id; })).toEqual(['leanLeftArm', 'leanRightArm', 'leanTrunk', 'leanLeftLeg', 'leanRightLeg']);
@@ -289,6 +291,7 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(source.indexOf('segmentalBodyGrid') !== -1).toBe(true);
     expect(source.indexOf('buildSegmentalGridModel') !== -1).toBe(true);
     expect(source.indexOf('resolveSegmentalTrendGroup') !== -1).toBe(true);
+    expect(source.indexOf('tooltipValueTemplate') !== -1).toBe(true);
     expect(source.indexOf('getPageSection') !== -1).toBe(true);
     expect(source.indexOf('getThemeColor') !== -1).toBe(true);
   });

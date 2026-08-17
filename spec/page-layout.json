@@ -301,6 +301,7 @@
         "layout": "bodyGrid",
         "unit": "kg",
         "latestTemplate": "{value} {unit}",
+        "tooltipValueTemplate": "{value} {unit}",
         "chartHeight": 110,
         "trunkChartHeight": 132,
         "imbalanceRatio": 0.05,

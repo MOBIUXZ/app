@@ -45,7 +45,7 @@ function FooterTrendChartList({ charts, seriesById, inView, tickStyle, tooltipSt
   });
 }
 
-function SegmentalMiniChart({ slotModel, domain, height, inView, tickStyle, tooltipStyle, unit, latestTemplate }) {
+function SegmentalMiniChart({ slotModel, domain, height, inView, tickStyle, tooltipStyle, unit, latestTemplate, tooltipValueTemplate }) {
   if (!slotModel || !(slotModel.series || []).length) return null;
   var chart = slotModel.chart;
   var color = getThemeColor(chart.colorToken);
@@ -53,6 +53,9 @@ function SegmentalMiniChart({ slotModel, domain, height, inView, tickStyle, tool
     ? formatTemplateLabel(latestTemplate || "{value} {unit}", { value: Number(slotModel.latest).toFixed(2), unit: unit || "kg" })
     : "";
   var showDates = !!chart.showDates;
+  function formatTooltipValue(value) {
+    return formatTemplateLabel(tooltipValueTemplate || "{value} {unit}", { value: value, unit: unit || "kg" });
+  }
   return (
     <div>
       <div className={s.segCellHead}>
@@ -66,7 +69,7 @@ function SegmentalMiniChart({ slotModel, domain, height, inView, tickStyle, tool
               <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
               <XAxis dataKey="date" tick={showDates ? tickStyle : false} interval="preserveStartEnd" height={showDates ? 22 : 8} />
               <YAxis domain={domain} tick={tickStyle} width={28} />
-              <Tooltip contentStyle={tooltipStyle} />
+              <Tooltip contentStyle={tooltipStyle} formatter={function (value) { return [formatTooltipValue(value), chart.title]; }} />
               <Line type="monotone" dataKey="value" name={chart.title} stroke={color} strokeWidth={2} dot={{ fill: color, r: 2 }} isAnimationActive={false} animationDuration={0} />
             </LineChart>
           </ResponsiveContainer>
@@ -96,6 +99,7 @@ function SegmentalBodyGrid({ group, seriesById, inView, tickStyle, tooltipStyle 
         tooltipStyle={tooltipStyle}
         unit={unit}
         latestTemplate={grid.latestTemplate}
+        tooltipValueTemplate={grid.tooltipValueTemplate}
       />
     );
   }
