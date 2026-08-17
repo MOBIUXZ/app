@@ -59,7 +59,7 @@ Same shortcuts apply to the calendar day panel's Smart Parser import.
 
 ## Log Workout (Manual Entry)
 
-Collapsible manual logging form:
+Collapsible manual logging form. The header is **Manual entry** with a quiet **Quick log** hint (not a button — Smart Parser is the bulk import action).
 
 | Field | Description |
 |-------|-------------|

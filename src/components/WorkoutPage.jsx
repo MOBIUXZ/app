@@ -871,8 +871,8 @@ Bench Press
 
       <Collapse icon={getCollapseSpec("workout", "logWorkout").icon} label={getCollapseSpec("workout", "logWorkout").label} defaultOpen={getCollapseSpec("workout", "logWorkout").defaultOpen}>
         <div className={s.manualLogHeader}>
-          <div className={s.manualLogTitle}>Manual entry</div>
-          <span className={s.dashboardChip}>Quick log</span>
+          <div className={s.manualLogTitle}>{workoutLayout.manualLog.title}</div>
+          <span className={s.quickLogHint}>{workoutLayout.manualLog.badge}</span>
         </div>
         
         <div className={ui.fieldBlock}>

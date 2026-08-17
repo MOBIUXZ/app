@@ -74,6 +74,11 @@
         { "id": "history", "icon": "notebook", "label": "Workout History", "defaultOpen": false },
         { "id": "oneRm", "icon": "square-function", "label": "1RM Calculator", "defaultOpen": false }
       ],
+      "manualLog": {
+        "title": "Manual entry",
+        "badge": "Quick log",
+        "badgeStyle": "hint"
+      },
       "historyGroups": {
         "defaultExpanded": true,
         "expandAllPersistsAcrossGrouping": true

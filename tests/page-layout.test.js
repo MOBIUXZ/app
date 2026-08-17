@@ -77,6 +77,16 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(source.indexOf('formatHeroTodayDate') !== -1).toBe(true);
   });
 
+  it('workout manual log Quick log is a non-button hint', function () {
+    var manualLog = getPageLayout('workout').manualLog;
+    expect(manualLog.title).toBe('Manual entry');
+    expect(manualLog.badge).toBe('Quick log');
+    expect(manualLog.badgeStyle).toBe('hint');
+    var source = readFileSync(resolve(root, pageLayout.pages.workout.component), 'utf8');
+    expect(source.indexOf('quickLogHint') !== -1).toBe(true);
+    expect(source.indexOf('dashboardChip') === -1).toBe(true);
+  });
+
   it('workout history collapse-all persists across By Date and By Workout', function () {
     var groups = getPageLayout('workout').historyGroups;
     expect(groups.defaultExpanded).toBe(true);

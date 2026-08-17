@@ -25,16 +25,6 @@
   font-weight: 800;
 }
 
-.dashboardChip {
-  background: var(--ft-bg-btn);
-  color: var(--ft-text-chip);
-  border: 1px solid var(--ft-border-input);
-  border-radius: var(--ft-radius-pill);
-  padding: 6px 10px;
-  font-size: 12px;
-  font-weight: 700;
-}
-
 .heroStatStrip {
   display: flex;
   margin-top: 16px;
@@ -806,6 +796,13 @@
 
 .manualLogTitle {
   font-weight: 700;
+}
+
+.quickLogHint {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ft-text-dim);
+  letter-spacing: 0.04em;
 }
 
 /* History */
