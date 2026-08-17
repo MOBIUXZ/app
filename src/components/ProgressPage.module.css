@@ -602,7 +602,7 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: var(--ft-border);
+  background: var(--ft-text-faint);
 }
 
 .segFigRow {
@@ -616,21 +616,21 @@
   width: 8px;
   height: 24px;
   border-radius: 5px;
-  background: var(--ft-border);
+  background: var(--ft-text-faint);
 }
 
 .segTorso {
   width: 22px;
   height: 28px;
   border-radius: 7px;
-  background: var(--ft-border);
+  background: var(--ft-text-faint);
 }
 
 .segLeg {
   width: 10px;
   height: 26px;
   border-radius: 5px;
-  background: var(--ft-border);
+  background: var(--ft-text-faint);
 }
 
 .segHint {
