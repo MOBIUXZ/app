@@ -199,6 +199,27 @@
         "importAccept": ".csv,text/csv",
         "listAll": true
       },
+      "segmentalMap": {
+        "title": "🧍 Segmental Analysis",
+        "unit": "kg",
+        "imbalanceRatio": 0.05,
+        "imbalanceTemplate": "{label} · Δ {delta} kg",
+        "metrics": [
+          { "id": "lean", "label": "Lean", "colorToken": "green" },
+          { "id": "fat", "label": "Fat", "colorToken": "pink" }
+        ],
+        "segments": [
+          { "id": "leftArm", "region": "arm", "side": "left", "label": "Left Arm", "leanPath": "inbody.leanLeftArmKg", "fatPath": "inbody.fatLeftArmKg" },
+          { "id": "rightArm", "region": "arm", "side": "right", "label": "Right Arm", "leanPath": "inbody.leanRightArmKg", "fatPath": "inbody.fatRightArmKg" },
+          { "id": "trunk", "region": "trunk", "side": "center", "label": "Trunk", "leanPath": "inbody.leanTrunkKg", "fatPath": "inbody.fatTrunkKg" },
+          { "id": "leftLeg", "region": "leg", "side": "left", "label": "Left Leg", "leanPath": "inbody.leanLeftLegKg", "fatPath": "inbody.fatLeftLegKg" },
+          { "id": "rightLeg", "region": "leg", "side": "right", "label": "Right Leg", "leanPath": "inbody.leanRightLegKg", "fatPath": "inbody.fatRightLegKg" }
+        ],
+        "pairs": [
+          { "id": "arms", "label": "Arms", "left": "leftArm", "right": "rightArm" },
+          { "id": "legs", "label": "Legs", "left": "leftLeg", "right": "rightLeg" }
+        ]
+      },
       "modals": [
         { "id": "clearHistory", "title": "Clear Body Comp History?", "layerId": "clear-body-comp-history", "buttons": ["Cancel", "Clear History"] },
         { "id": "deleteEntry", "title": "Delete this entry?", "layerId": "delete-body-comp-entry", "buttons": ["Cancel", "Delete"], "body": "This will permanently delete the {date} body composition entry and its body weight chart point." },
@@ -258,13 +279,46 @@
         { "id": "isolationLifts", "label": "💪 ISOLATION LIFTS" },
         { "id": "bodyCharts", "title": "📉 Body Weight & Body Fat" },
         { "id": "inbodyTrends", "title": "📉 InBody Trends" },
+        { "id": "segmentalLean", "title": "📉 Segmental Lean" },
+        { "id": "segmentalFat", "title": "📉 Segmental Fat" },
         { "id": "calorieTrend", "title": "🔥 Calorie Intake Trend" }
+      ],
+      "bodyChartExtras": [
+        { "id": "bf", "title": "Body Fat %", "colorToken": "pink", "paths": ["bf", "PBF"] },
+        { "id": "fm", "title": "Body Fat Mass (kg)", "colorToken": "pink", "paths": ["FM", "fm"] },
+        { "id": "bmi", "title": "BMI (kg/m²)", "colorToken": "blue", "paths": ["BMI"] }
       ],
       "bodyTrendCharts": [
         { "id": "smm", "title": "Skeletal Muscle (kg)", "colorToken": "green", "paths": ["SMM", "smm"] },
-        { "id": "fm", "title": "Fat Mass (kg)", "colorToken": "pink", "paths": ["FM"] },
+        { "id": "smi", "title": "SMI (kg/m²)", "colorToken": "orange", "paths": ["SMI"] },
         { "id": "visceral", "title": "Visceral Fat Level", "colorToken": "orange", "paths": ["inbody.visceral"] },
-        { "id": "score", "title": "InBody Score", "colorToken": "accent", "paths": ["inbody.score"] }
+        { "id": "score", "title": "InBody Score", "colorToken": "accent", "paths": ["inbody.score"] },
+        { "id": "bmr", "title": "BMR (kcal/d)", "colorToken": "orange", "paths": ["BMR_InBody", "BMR_Mifflin", "BMR_Katch"] },
+        { "id": "tbw", "title": "Total Body Water (L)", "colorToken": "blue", "paths": ["inbody.tbw"] },
+        { "id": "protein", "title": "Protein (kg)", "colorToken": "green", "paths": ["inbody.protein"] },
+        { "id": "mineral", "title": "Mineral (kg)", "colorToken": "yellow", "paths": ["inbody.mineral"] }
+      ],
+      "segmentalTrendGroups": [
+        {
+          "id": "segmentalLean",
+          "charts": [
+            { "id": "leanTrunk", "title": "Trunk (kg)", "colorToken": "accent", "paths": ["inbody.leanTrunkKg"] },
+            { "id": "leanLeftArm", "title": "Left Arm (kg)", "colorToken": "blue", "paths": ["inbody.leanLeftArmKg"] },
+            { "id": "leanRightArm", "title": "Right Arm (kg)", "colorToken": "green", "paths": ["inbody.leanRightArmKg"] },
+            { "id": "leanLeftLeg", "title": "Left Leg (kg)", "colorToken": "orange", "paths": ["inbody.leanLeftLegKg"] },
+            { "id": "leanRightLeg", "title": "Right Leg (kg)", "colorToken": "yellow", "paths": ["inbody.leanRightLegKg"] }
+          ]
+        },
+        {
+          "id": "segmentalFat",
+          "charts": [
+            { "id": "fatTrunk", "title": "Trunk (kg)", "colorToken": "pink", "paths": ["inbody.fatTrunkKg"] },
+            { "id": "fatLeftArm", "title": "Left Arm (kg)", "colorToken": "blue", "paths": ["inbody.fatLeftArmKg"] },
+            { "id": "fatRightArm", "title": "Right Arm (kg)", "colorToken": "green", "paths": ["inbody.fatRightArmKg"] },
+            { "id": "fatLeftLeg", "title": "Left Leg (kg)", "colorToken": "orange", "paths": ["inbody.fatLeftLegKg"] },
+            { "id": "fatRightLeg", "title": "Right Leg (kg)", "colorToken": "yellow", "paths": ["inbody.fatRightLegKg"] }
+          ]
+        }
       ],
       "chartMetrics": ["weight", "volume", "e1rm", "mean_e1rm"],
       "sessionGraphMetrics": ["weight", "volume", "e1rm"],

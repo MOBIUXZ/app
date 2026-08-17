@@ -4,13 +4,42 @@ import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExercis
 import { estimate1RM, roundE1RM, averageE1RM, computeSessionMetrics } from "../domain/metrics.js";
 import { CHART_CURSOR, computeYDomain, getTrendLineAnim, getFirstPaintDuration, FAILED_SET_COLOR } from "../domain/chartDomain.js";
 import { getPageLayout, getPageSection, getThemeColor } from "../domain/pageLayout.js";
-import { buildAllBodyTrendSeries } from "../domain/bodyTrends.js";
+import { buildAllBodyTrendSeries, flattenTrendGroups } from "../domain/bodyTrends.js";
 import { PageHeading } from "./PageIcon";
 import appConfig from "../../spec/app-config.json";
 import s from "./ProgressPage.module.css";
 
 var progressLayout = getPageLayout("progress");
 var bodyTrendCharts = progressLayout.bodyTrendCharts || [];
+var bodyChartExtras = progressLayout.bodyChartExtras || [];
+var segmentalTrendGroups = progressLayout.segmentalTrendGroups || [];
+var segmentalTrendCharts = flattenTrendGroups(segmentalTrendGroups);
+
+function FooterTrendChartList({ charts, seriesById, inView, tickStyle, tooltipStyle }) {
+  return (charts || []).map(function (chart) {
+    var series = seriesById[chart.id] || [];
+    if (!series.length) return null;
+    var color = getThemeColor(chart.colorToken);
+    return (
+      <div key={chart.id} className={s.bfSection}>
+        <div className={s.bfLabel} style={{ color: color }}>{chart.title}</div>
+        <div className={ui.chartContainer}>
+          {inView ? (
+          <ResponsiveContainer width="100%" height={140}>
+            <LineChart data={series}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
+              <XAxis dataKey="date" tick={tickStyle} interval="preserveStartEnd" />
+              <YAxis tick={tickStyle} width={35} />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Line type="monotone" dataKey="value" name={chart.title} stroke={color} strokeWidth={2} dot={{ fill: color, r: 3 }} isAnimationActive={false} animationDuration={0} />
+            </LineChart>
+          </ResponsiveContainer>
+          ) : <div className={s.chartPlaceholder} aria-hidden="true" />}
+        </div>
+      </div>
+    );
+  });
+}
 
 var TREND_LINE_ANIM = getTrendLineAnim(appConfig);
 var SESSION_GRAPH_ANIM = { animationDuration: appConfig.chartAnimation.sessionGraphMs, animationEasing: appConfig.chartAnimation.easing };
@@ -784,17 +813,21 @@ export default function ProgressPage({ data }) {
     return data.bodyLogs.map(function (l) { return { date: l.date, weight: l.weight }; });
   }, [data.bodyLogs]);
 
-  var bfChart = useMemo(function () {
-    return data.bodyComp.filter(function (e) { return e.bf; }).map(function (e) { return { date: e.date, bf: e.bf }; });
-  }, [data.bodyComp]);
-
   var bodyTrendSeries = useMemo(function () {
     return buildAllBodyTrendSeries(data.bodyComp, bodyTrendCharts);
+  }, [data.bodyComp]);
+
+  var bodyExtraSeries = useMemo(function () {
+    return buildAllBodyTrendSeries(data.bodyComp, bodyChartExtras);
   }, [data.bodyComp]);
 
   var hasInbodyTrends = bodyTrendCharts.some(function (chart) {
     return (bodyTrendSeries[chart.id] || []).length > 0;
   });
+
+  var segmentalTrendSeries = useMemo(function () {
+    return buildAllBodyTrendSeries(data.bodyComp, segmentalTrendCharts);
+  }, [data.bodyComp]);
 
   var calChart = useMemo(function () {
     var calDates = [];
@@ -1056,36 +1089,26 @@ export default function ProgressPage({ data }) {
             </ResponsiveContainer>
             ) : <div className={s.chartPlaceholder} aria-hidden="true" />}
           </div>
-          {bfChart.length > 0 && footerChartsInView && <div className={s.bfSection}><div className={s.bfLabel} style={{ color: PINK }}>Body Fat %</div><div className={ui.chartContainer}><ResponsiveContainer width="100%" height={140}><LineChart data={bfChart}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} /><Line type="monotone" dataKey="bf" stroke={PINK} strokeWidth={2} dot={{ fill: PINK, r: 3 }} isAnimationActive={false} animationDuration={0} /></LineChart></ResponsiveContainer></div></div>}
+          <FooterTrendChartList charts={bodyChartExtras} seriesById={bodyExtraSeries} inView={footerChartsInView} tickStyle={cs} tooltipStyle={tt} />
         </Card>
         {hasInbodyTrends && (
         <Card className={ui.cardChart}>
           <div className={ui.sectionTitleLg}>{getPageSection("progress", "inbodyTrends").title}</div>
-          {bodyTrendCharts.map(function (chart) {
-            var series = bodyTrendSeries[chart.id] || [];
-            if (!series.length) return null;
-            var color = getThemeColor(chart.colorToken);
-            return (
-              <div key={chart.id} className={s.bfSection}>
-                <div className={s.bfLabel} style={{ color: color }}>{chart.title}</div>
-                <div className={ui.chartContainer}>
-                  {footerChartsInView ? (
-                  <ResponsiveContainer width="100%" height={140}>
-                    <LineChart data={series}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
-                      <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
-                      <YAxis tick={cs} width={35} />
-                      <Tooltip contentStyle={tt} />
-                      <Line type="monotone" dataKey="value" name={chart.title} stroke={color} strokeWidth={2} dot={{ fill: color, r: 3 }} isAnimationActive={false} animationDuration={0} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                  ) : <div className={s.chartPlaceholder} aria-hidden="true" />}
-                </div>
-              </div>
-            );
-          })}
+          <FooterTrendChartList charts={bodyTrendCharts} seriesById={bodyTrendSeries} inView={footerChartsInView} tickStyle={cs} tooltipStyle={tt} />
         </Card>
         )}
+        {segmentalTrendGroups.map(function (group) {
+          var hasGroup = (group.charts || []).some(function (chart) {
+            return (segmentalTrendSeries[chart.id] || []).length > 0;
+          });
+          if (!hasGroup) return null;
+          return (
+            <Card key={group.id} className={ui.cardChart}>
+              <div className={ui.sectionTitleLg}>{getPageSection("progress", group.id).title}</div>
+              <FooterTrendChartList charts={group.charts} seriesById={segmentalTrendSeries} inView={footerChartsInView} tickStyle={cs} tooltipStyle={tt} />
+            </Card>
+          );
+        })}
         <Card className={ui.cardChart}>
           <div className={ui.sectionTitleLg}>{getPageSection("progress", "calorieTrend").title}</div>
           <div className={ui.chartContainer}>

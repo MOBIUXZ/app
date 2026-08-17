@@ -2,14 +2,37 @@ import { useState, useEffect, useRef } from "react";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, Collapse, btnPrimary, btnSecondary, btnDanger, inputClass, formatDate, useConfirmDialogKeyboard, ui, cx } from "./shared";
 import { computeBodyCompEntry } from "../domain/metrics.js";
 import { syncBodyLogsAfterEdit, removeBodyLogForEntry } from "../domain/bodyCompSync.js";
-import { getPageLayout, getCollapseSpec, getModalSpec, formatTemplateLabel } from "../domain/pageLayout.js";
+import { getPageLayout, getCollapseSpec, getModalSpec, formatTemplateLabel, getThemeColor } from "../domain/pageLayout.js";
 import { profilePrefill, applyProfilePrefill, normalizeStoredData } from "../domain/storage.js";
 import { parseInbodyCsv, buildInbodyEntry, mergeInbodyIntoLogs, getInbodyMessages } from "../domain/inbodyCsv.js";
+import { latestSegmentalSnapshot, resolveSegmentalMetric } from "../domain/bodySegmental.js";
 import { PageHeading } from "./PageIcon";
 import s from "./BodyCompPage.module.css";
 
 var bodyLayout = getPageLayout("bodyComp");
 var inbodyMessages = getInbodyMessages();
+var segmentalMapSpec = bodyLayout.segmentalMap;
+
+function segmentFill(snapshot, metric, segmentId, color) {
+  var values = snapshot && snapshot[metric];
+  if (!values || values[segmentId] == null) return { background: "var(--ft-border)" };
+  return { background: color };
+}
+
+function SegmentalLabel({ spec, snapshot, metric, segmentId, color, align }) {
+  var seg = (spec.segments || []).find(function (item) { return item.id === segmentId; });
+  if (!seg) return null;
+  var val = snapshot[metric] ? snapshot[metric][seg.id] : null;
+  return (
+    <div className={align === "right" ? cx(s.segmentalLabel, s.segmentalLabelRight) : s.segmentalLabel}>
+      <div className={s.segmentalLabelName}>{seg.label}</div>
+      <div className={s.segmentalLabelValue} style={{ color: val != null ? color : "var(--ft-text-faint)" }}>
+        {val != null ? Number(val).toFixed(2) : "—"}
+        {val != null ? <span className={s.metricChipUnit}>{spec.unit}</span> : null}
+      </div>
+    </div>
+  );
+}
 
 export default function BodyCompPage({ data, save }) {
   var prefill = profilePrefill(data.settings);
@@ -21,6 +44,7 @@ export default function BodyCompPage({ data, save }) {
   var [inbodyMsg, setInbodyMsg] = useState(null);
   var [editIdx, setEditIdx] = useState(null);
   var [editForm, setEditForm] = useState(null);
+  var [segmentalMetric, setSegmentalMetric] = useState("lean");
   var importRef = useRef(null);
   var prevPrefillRef = useRef(prefill);
   var formRef = useRef({ sex: sex, height: h, age: age });
@@ -178,6 +202,14 @@ export default function BodyCompPage({ data, save }) {
   var importModal = getModalSpec("bodyComp", "importInbody");
   var importConfirmKb = useConfirmDialogKeyboard(!!pendingInbody, confirmInbodyImport, cancelInbodyImport, importModal.layerId, { cancel: importModal.buttons[0], confirm: importModal.buttons[1] });
   var pendingDeleteEntry = pendingDeleteIdx != null ? historyEntries[pendingDeleteIdx] : null;
+  var segmentalSnap = latestSegmentalSnapshot(data.bodyComp, segmentalMapSpec);
+  var activeSegMetric = resolveSegmentalMetric(segmentalSnap, segmentalMetric);
+  var activeSegMetricSpec = (segmentalMapSpec.metrics || []).find(function (m) { return m.id === activeSegMetric; }) || {};
+  var activeSegColor = getThemeColor(activeSegMetricSpec.colorToken);
+  var visibleSegMetrics = (segmentalMapSpec.metrics || []).filter(function (m) {
+    return (m.id === "lean" && segmentalSnap && segmentalSnap.hasLean) || (m.id === "fat" && segmentalSnap && segmentalSnap.hasFat);
+  });
+  var activeImbalances = ((segmentalSnap && segmentalSnap.imbalances) || []).filter(function (item) { return item.metric === activeSegMetric; });
   function submit() {
     if (!w || !bf) { setMsg("Weight and Body Fat % are required."); return; }
     if (!logDate.trim()) { setMsg("Date is required."); return; }
@@ -238,6 +270,65 @@ export default function BodyCompPage({ data, save }) {
         </div>
         <input ref={importRef} type="file" accept={bodyLayout.historyChrome.importAccept} className={s.fileInputHidden} onChange={onInbodyFile} />
         {inbodyMsg ? <div className={cx(inbodyMsg.type === "error" ? ui.errorMsg : ui.successMsg, ui.marginTop8)}>{inbodyMsg.text}</div> : null}
+        {segmentalSnap ? (
+          <div className={s.segmentalBlock}>
+            <div className={s.segmentalHeader}>
+              <div>
+                <div className={s.segmentalTitle}>{segmentalMapSpec.title}</div>
+                <div className={s.segmentalDate}>{segmentalSnap.date}</div>
+              </div>
+              {visibleSegMetrics.length > 1 ? (
+                <div className={cx(ui.pillToggleTrack, s.segmentalToggle)} role="group" aria-label={segmentalMapSpec.title}>
+                  {visibleSegMetrics.map(function (m) {
+                    return (
+                      <button
+                        key={m.id}
+                        type="button"
+                        aria-pressed={activeSegMetric === m.id}
+                        onClick={function () { setSegmentalMetric(m.id); }}
+                        className={activeSegMetric === m.id ? ui.pillToggleBtnActive : ui.pillToggleBtn}
+                      >
+                        {m.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </div>
+            <div className={s.segmentalLayout}>
+              <SegmentalLabel spec={segmentalMapSpec} snapshot={segmentalSnap} metric={activeSegMetric} segmentId="leftArm" color={activeSegColor} />
+              <div className={s.segmentalFigure}>
+                <div className={s.segmentalHead} />
+                <div className={s.segmentalRow}>
+                  <div className={s.segmentalArm} style={segmentFill(segmentalSnap, activeSegMetric, "leftArm", activeSegColor)} />
+                  <div className={s.segmentalTorso} style={segmentFill(segmentalSnap, activeSegMetric, "trunk", activeSegColor)} />
+                  <div className={s.segmentalArm} style={segmentFill(segmentalSnap, activeSegMetric, "rightArm", activeSegColor)} />
+                </div>
+                <div className={s.segmentalRow}>
+                  <div className={s.segmentalLeg} style={segmentFill(segmentalSnap, activeSegMetric, "leftLeg", activeSegColor)} />
+                  <div className={s.segmentalLeg} style={segmentFill(segmentalSnap, activeSegMetric, "rightLeg", activeSegColor)} />
+                </div>
+                <div className={s.segmentalTrunkValue} style={{ color: activeSegColor }}>
+                  {(segmentalMapSpec.segments.find(function (seg) { return seg.id === "trunk"; }) || {}).label}
+                  {" "}
+                  {segmentalSnap[activeSegMetric] && segmentalSnap[activeSegMetric].trunk != null
+                    ? Number(segmentalSnap[activeSegMetric].trunk).toFixed(2) + " " + segmentalMapSpec.unit
+                    : "—"}
+                </div>
+              </div>
+              <SegmentalLabel spec={segmentalMapSpec} snapshot={segmentalSnap} metric={activeSegMetric} segmentId="rightArm" color={activeSegColor} align="right" />
+              <SegmentalLabel spec={segmentalMapSpec} snapshot={segmentalSnap} metric={activeSegMetric} segmentId="leftLeg" color={activeSegColor} />
+              <SegmentalLabel spec={segmentalMapSpec} snapshot={segmentalSnap} metric={activeSegMetric} segmentId="rightLeg" color={activeSegColor} align="right" />
+            </div>
+            {activeImbalances.map(function (item) {
+              return (
+                <div key={item.pairId} className={s.segmentalHint}>
+                  {formatTemplateLabel(segmentalMapSpec.imbalanceTemplate, { label: item.label, delta: item.delta.toFixed(2) })}
+                </div>
+              );
+            })}
+          </div>
+        ) : null}
         {historyEntries.length === 0 ? <div className={ui.emptyStateLg}><div className={ui.emptyIconLg}>📏</div><div>No entries yet.</div><div className={s.emptySub}>Track your body composition over time!</div></div> : (
         <div>
         {historyEntries.map(function (e, i) {

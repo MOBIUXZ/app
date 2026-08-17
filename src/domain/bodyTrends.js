@@ -49,3 +49,11 @@ export function buildAllBodyTrendSeries(bodyComp, charts) {
   });
   return out;
 }
+
+export function flattenTrendGroups(groups) {
+  var charts = [];
+  (groups || []).forEach(function (group) {
+    (group.charts || []).forEach(function (chart) { charts.push(chart); });
+  });
+  return charts;
+}

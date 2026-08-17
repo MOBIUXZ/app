@@ -92,7 +92,7 @@ Constants that appear in multiple places (aliases, categories, storage key) **mu
 | Chart domain & animation | `spec/chart-domain.json`, `app-config` | `chart-domain` |
 | Keyboard shortcuts | `spec/keyboard-shortcuts.json` | `keyboard-shortcuts` |
 | Storage / settings | `spec/storage-fixtures.json`, `app-config`, `data-model.schema` | `storage` |
-| InBody CSV import & Progress trends | `spec/inbody-csv-fixtures.json` | `inbody-csv` |
+| InBody CSV, Progress trends, segmental map | `spec/inbody-csv-fixtures.json` | `inbody-csv` |
 | Page layout & titles | `spec/page-layout.json` | `page-layout` |
 | Page title icons | `spec/page-icons.json` | `page-icons` |
 | CSS module classes | `spec/css-modules.json` | `css-modules` |

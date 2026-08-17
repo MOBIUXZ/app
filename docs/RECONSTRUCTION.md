@@ -293,6 +293,7 @@ After rebuild, confirm **all** of the following:
 - [ ] Entry saves to `bodyComp` and appends matching `bodyLogs` row
 - [ ] Edit/delete syncs `bodyLogs`
 - [ ] Import InBody CSV merges scans by date (workouts stay)
+- [ ] History segmental map appears for InBody scans with arm/trunk/leg lean or fat
 
 ### Calories
 - [ ] BMR from latest body comp entry
@@ -305,7 +306,7 @@ After rebuild, confirm **all** of the following:
 - [ ] Combined compound overlay (when ≥2 compounds logged)
 - [ ] Metric toggles morph 600ms; first scroll-in is instant
 - [ ] Click chart point → Workout Details → Session Performance graph
-- [ ] Footer: body weight, body fat (if data), InBody trends (SMM / FM / visceral / score when present), 7-day calories
+- [ ] Footer: body weight, body fat % / fat mass / BMI (if data), InBody trends (SMM / SMI / visceral / score / BMR / TBW / protein / mineral when present), segmental lean/fat by region when present, 7-day calories
 
 ### Keyboard
 - [ ] `1`–`5` switches tabs (when no popup open)

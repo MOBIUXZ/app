@@ -75,9 +75,19 @@ The history toolbar (entry count, **Import InBody CSV**, and **Clear History**) 
 - Button in History; accepts `.csv` from the InBody phone export
 - Parser: `src/domain/inbodyCsv.js` ↔ `spec/inbody-csv-fixtures.json`
 - Dates like `25-3` become `DD-MM-YYYY`. The InBody app export uses timestamps (`20260725130008` → `25-07-2026`). Year for `D-M` dates comes from the file name (`InBody-20260817.csv` → 2026); December→January rows increment the year
-- Maps weight, body fat %, skeletal muscle, fat mass, BMI, SMI, and InBody BMR onto `bodyComp` (measured fat mass / BMI / SMI are kept, not recomputed). Extra columns are stored on `entry.inbody`. Progress charts SMM, fat mass, visceral fat, and InBody Score from those fields
+- Maps weight, body fat %, skeletal muscle, fat mass, BMI, SMI, and InBody BMR onto `bodyComp` (measured fat mass / BMI / SMI are kept, not recomputed). Extra columns are stored on `entry.inbody`. Progress charts SMM, SMI, fat mass, BMI, visceral fat, InBody Score, BMR, total body water, protein, mineral, and segmental lean/fat (trunk, arms, legs). Body Comp History shows a latest-scan body map
 - Confirm dialog: adds N new scans and replaces existing dates. **Workouts and calories stay**
 - Same-date scans overwrite that day; `bodyLogs` stay in sync so Dashboard and Progress body-weight charts update
+
+### Segmental Analysis
+- Shown at the top of **History** when any imported scan has arm/trunk/leg lean or fat mass
+- Uses the **newest** scan that has those fields
+- **Lean** / **Fat** pill toggle (hidden if only one metric exists)
+- Simple body figure with left/right arm and leg values; trunk is labeled under the figure
+- A left/right pair that differs by **5% or more** of the larger side shows an imbalance hint
+- Hidden for manual logs and for InBody rows that lack segmental columns
+- Time-series graphs for each region live on **Progress** (Segmental Lean and Segmental Fat cards)
+- Spec: `spec/page-layout.json` → `pages.bodyComp.segmentalMap`; series builder: `src/domain/bodySegmental.js`
 
 ### Clear History
 - **Clear History** — quiet red pill (no hard border) that deletes all `bodyComp` and `bodyLogs` data when entries exist

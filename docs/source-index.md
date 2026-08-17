@@ -46,7 +46,11 @@ Complete inventory of every project file. Line counts approximate (Aug 2026).
 
 ## `src/domain/bodyTrends.js`
 
-**~50 lines** — `buildAllBodyTrendSeries()` maps `bodyComp` onto Progress InBody trend charts (SMM, FM, visceral, score). Spec: `spec/inbody-csv-fixtures.json` `trendFixtures` + `spec/page-layout.json` `bodyTrendCharts`.
+**~60 lines** — `buildAllBodyTrendSeries()` maps `bodyComp` onto Progress InBody and segmental trend charts (including BMR). Spec: `spec/inbody-csv-fixtures.json` `trendFixtures` + `spec/page-layout.json` `bodyTrendCharts` / `segmentalTrendGroups`.
+
+## `src/domain/bodySegmental.js`
+
+**~70 lines** — `buildSegmentalSnapshot()`, `latestSegmentalSnapshot()`. Maps stored `inbody.lean*` / `fat*` fields onto the Body Comp segmental figure. Spec: `spec/inbody-csv-fixtures.json` `segmentalFixtures` + `spec/page-layout.json` `segmentalMap`.
 
 ---
 
@@ -174,7 +178,7 @@ Spec: [workout.md](./workout.md)
 
 ## `src/components/BodyCompPage.jsx`
 
-**~306 lines** | CSS: `BodyCompPage.module.css` (~170 lines)
+**~450 lines** | CSS: `BodyCompPage.module.css` (~350 lines)
 
 **Props:** `data`, `save`
 
@@ -183,7 +187,7 @@ Spec: [workout.md](./workout.md)
 - `syncBodyLogsAfterEdit(old, new)` — bodyLogs sync
 - `compIdxFromDisplay(displayIdx)` — history is reversed display
 
-**Features:** Log Entry collapse, live metric preview, sex pill toggle, history (all entries, newest first), InBody CSV import (merge by date), inline edit, delete, clear-all confirm
+**Features:** Log Entry collapse, live metric preview, sex pill toggle, history (all entries, newest first), InBody CSV import (merge by date), segmental lean/fat body map, inline edit, delete, clear-all confirm
 
 Spec: [body-comp.md](./body-comp.md)
 

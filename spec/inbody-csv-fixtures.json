@@ -1,5 +1,5 @@
 {
-  "description": "InBody CSV parse, date year, measured-field mapping, merge-by-date into bodyComp/bodyLogs, and Progress body-trend series",
+  "description": "InBody CSV parse, date year, measured-field mapping, merge-by-date into bodyComp/bodyLogs, Progress body-trend series, and Body Comp segmental map",
   "messages": {
     "imported": "Imported InBody scans.",
     "invalidCsv": "That file is not a valid InBody CSV.",
@@ -168,13 +168,19 @@
           "date": "04-04-2026",
           "SMM": 32,
           "FM": 12,
-          "inbody": { "score": 87, "visceral": 4 }
+          "BMR_InBody": 1542,
+          "BMI": 23.6,
+          "SMI": 8,
+          "inbody": { "score": 87, "visceral": 4, "tbw": 32, "protein": 8.8, "mineral": 2.8 }
         },
         {
           "date": "25-03-2026",
           "smm": 32.9,
           "FM": 17.2,
-          "inbody": { "score": 67, "visceral": 7 }
+          "BMR_Mifflin": 1567,
+          "BMI": 24.4,
+          "SMI": 8.6,
+          "inbody": { "score": 67, "visceral": 7, "tbw": 31.3, "protein": 8.5, "mineral": 2.71 }
         },
         {
           "date": "01-01-2026",
@@ -187,10 +193,6 @@
           { "date": "25-03-2026", "value": 32.9 },
           { "date": "04-04-2026", "value": 32 }
         ],
-        "fm": [
-          { "date": "25-03-2026", "value": 17.2 },
-          { "date": "04-04-2026", "value": 12 }
-        ],
         "visceral": [
           { "date": "25-03-2026", "value": 7 },
           { "date": "04-04-2026", "value": 4 }
@@ -198,8 +200,189 @@
         "score": [
           { "date": "25-03-2026", "value": 67 },
           { "date": "04-04-2026", "value": 87 }
+        ],
+        "bmr": [
+          { "date": "25-03-2026", "value": 1567 },
+          { "date": "04-04-2026", "value": 1542 }
+        ],
+        "smi": [
+          { "date": "25-03-2026", "value": 8.6 },
+          { "date": "04-04-2026", "value": 8 }
+        ],
+        "tbw": [
+          { "date": "25-03-2026", "value": 31.3 },
+          { "date": "04-04-2026", "value": 32 }
+        ],
+        "protein": [
+          { "date": "25-03-2026", "value": 8.5 },
+          { "date": "04-04-2026", "value": 8.8 }
+        ],
+        "mineral": [
+          { "date": "25-03-2026", "value": 2.71 },
+          { "date": "04-04-2026", "value": 2.8 }
+        ]
+      },
+      "expectedExtras": {
+        "bf": [
+          { "date": "01-01-2026", "value": 20 }
+        ],
+        "fm": [
+          { "date": "25-03-2026", "value": 17.2 },
+          { "date": "04-04-2026", "value": 12 }
+        ],
+        "bmi": [
+          { "date": "25-03-2026", "value": 24.4 },
+          { "date": "04-04-2026", "value": 23.6 }
         ]
       }
+    },
+    {
+      "id": "maps-segmental-lean-and-fat",
+      "bodyComp": [
+        {
+          "date": "25-07-2026",
+          "inbody": {
+            "leanTrunkKg": 21.8,
+            "leanLeftArmKg": 2.59,
+            "leanRightArmKg": 2.64,
+            "leanLeftLegKg": 5.9,
+            "leanRightLegKg": 5.78,
+            "fatTrunkKg": 9.7,
+            "fatLeftArmKg": 1,
+            "fatRightArmKg": 0.9,
+            "fatLeftLegKg": 2.2,
+            "fatRightLegKg": 2.2
+          }
+        },
+        {
+          "date": "27-06-2026",
+          "inbody": {
+            "leanTrunkKg": 21.3,
+            "leanLeftArmKg": 2.5,
+            "leanRightArmKg": 2.54,
+            "leanLeftLegKg": 5.88,
+            "leanRightLegKg": 5.73,
+            "fatTrunkKg": 10.5,
+            "fatLeftArmKg": 1.1,
+            "fatRightArmKg": 1.1,
+            "fatLeftLegKg": 2.4,
+            "fatRightLegKg": 2.4
+          }
+        },
+        {
+          "date": "01-01-2026",
+          "SMM": 35
+        }
+      ],
+      "useSegmentalCharts": true,
+      "expected": {
+        "leanTrunk": [
+          { "date": "27-06-2026", "value": 21.3 },
+          { "date": "25-07-2026", "value": 21.8 }
+        ],
+        "leanLeftArm": [
+          { "date": "27-06-2026", "value": 2.5 },
+          { "date": "25-07-2026", "value": 2.59 }
+        ],
+        "leanRightArm": [
+          { "date": "27-06-2026", "value": 2.54 },
+          { "date": "25-07-2026", "value": 2.64 }
+        ],
+        "leanLeftLeg": [
+          { "date": "27-06-2026", "value": 5.88 },
+          { "date": "25-07-2026", "value": 5.9 }
+        ],
+        "leanRightLeg": [
+          { "date": "27-06-2026", "value": 5.73 },
+          { "date": "25-07-2026", "value": 5.78 }
+        ],
+        "fatTrunk": [
+          { "date": "27-06-2026", "value": 10.5 },
+          { "date": "25-07-2026", "value": 9.7 }
+        ],
+        "fatLeftArm": [
+          { "date": "27-06-2026", "value": 1.1 },
+          { "date": "25-07-2026", "value": 1 }
+        ],
+        "fatRightArm": [
+          { "date": "27-06-2026", "value": 1.1 },
+          { "date": "25-07-2026", "value": 0.9 }
+        ],
+        "fatLeftLeg": [
+          { "date": "27-06-2026", "value": 2.4 },
+          { "date": "25-07-2026", "value": 2.2 }
+        ],
+        "fatRightLeg": [
+          { "date": "27-06-2026", "value": 2.4 },
+          { "date": "25-07-2026", "value": 2.2 }
+        ]
+      }
+    }
+  ],
+  "segmentalFixtures": [
+    {
+      "id": "maps-five-segments",
+      "entry": {
+        "date": "25-07-2026",
+        "inbody": {
+          "leanRightArmKg": 2.64,
+          "leanLeftArmKg": 2.59,
+          "leanTrunkKg": 21.8,
+          "leanRightLegKg": 5.78,
+          "leanLeftLegKg": 5.9,
+          "fatRightArmKg": 0.9,
+          "fatLeftArmKg": 1,
+          "fatTrunkKg": 9.7,
+          "fatRightLegKg": 2.2,
+          "fatLeftLegKg": 2.2
+        }
+      },
+      "expected": {
+        "date": "25-07-2026",
+        "hasLean": true,
+        "hasFat": true,
+        "lean": { "leftArm": 2.59, "rightArm": 2.64, "trunk": 21.8, "leftLeg": 5.9, "rightLeg": 5.78 },
+        "fat": { "leftArm": 1, "rightArm": 0.9, "trunk": 9.7, "leftLeg": 2.2, "rightLeg": 2.2 },
+        "imbalanceCount": 1,
+        "imbalancePair": "arms",
+        "imbalanceMetric": "fat"
+      }
+    },
+    {
+      "id": "flags-arm-imbalance",
+      "entry": {
+        "date": "01-01-2026",
+        "inbody": {
+          "leanLeftArmKg": 2,
+          "leanRightArmKg": 3,
+          "leanTrunkKg": 20,
+          "leanLeftLegKg": 6,
+          "leanRightLegKg": 6
+        }
+      },
+      "expected": {
+        "date": "01-01-2026",
+        "hasLean": true,
+        "hasFat": false,
+        "imbalanceCount": 1,
+        "imbalancePair": "arms",
+        "imbalanceMetric": "lean"
+      }
+    },
+    {
+      "id": "skips-manual-entry",
+      "entry": { "date": "01-01-2026", "SMM": 35 },
+      "expected": null
+    }
+  ],
+  "latestSegmentalFixtures": [
+    {
+      "id": "picks-latest-with-segments",
+      "bodyComp": [
+        { "date": "10-08-2026", "SMM": 35 },
+        { "date": "01-08-2026", "inbody": { "leanTrunkKg": 21 } }
+      ],
+      "expectedDate": "01-08-2026"
     }
   ]
 }

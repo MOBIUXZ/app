@@ -52,7 +52,8 @@
       "items": [
         { "id": "live-metrics", "check": "Log Entry expand — typing weight/BF updates live metrics" },
         { "id": "history", "check": "History shows saved entry with metric chips" },
-        { "id": "inbody-import", "check": "History Import InBody CSV parses the export, asks to confirm, and merges scans by date without touching workouts" }
+        { "id": "inbody-import", "check": "History Import InBody CSV parses the export, asks to confirm, and merges scans by date without touching workouts" },
+        { "id": "segmental-map", "check": "History shows a segmental lean/fat body map for the latest InBody scan that has arm/trunk/leg values; the card stays hidden without those fields" }
       ]
     },
     {
@@ -72,8 +73,9 @@
       "items": [
         { "id": "compound-charts", "check": "Compound lift charts render with data points" },
         { "id": "metric-toggle", "check": "Toggle Max Weight / Volume / e1RM — line morphs smoothly (~600ms)" },
-        { "id": "body-chart", "check": "Body Weight chart shows trend" },
-        { "id": "inbody-trends", "check": "InBody Trends card shows skeletal muscle, fat mass, visceral fat, and score when those fields exist; empty series stay hidden" },
+        { "id": "body-chart", "check": "Body Weight chart shows trend; Body Fat %, Body Fat Mass, and BMI charts appear when those fields exist" },
+        { "id": "inbody-trends", "check": "InBody Trends card shows SMM, SMI, visceral, score, BMR, total body water, protein, and mineral when those fields exist; empty series stay hidden" },
+        { "id": "segmental-trends", "check": "Progress shows Segmental Lean and Segmental Fat charts for trunk, left/right arm, and left/right leg when InBody segmental fields exist; empty series stay hidden" },
         { "id": "detail-modal", "check": "Click chart point → Workout Details panel opens" }
       ]
     },

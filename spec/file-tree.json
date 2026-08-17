@@ -49,6 +49,7 @@
     "src/domain/storage.js",
     "src/domain/inbodyCsv.js",
     "src/domain/bodyTrends.js",
+    "src/domain/bodySegmental.js",
     "src/domain/pageLayout.js",
     "src/domain/pageIcons.js",
     "src/components/Logo.jsx",

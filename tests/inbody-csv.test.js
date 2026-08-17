@@ -10,7 +10,8 @@ import {
   buildInbodyEntry,
   mergeInbodyIntoLogs,
 } from '../src/domain/inbodyCsv.js';
-import { buildAllBodyTrendSeries } from '../src/domain/bodyTrends.js';
+import { buildAllBodyTrendSeries, flattenTrendGroups } from '../src/domain/bodyTrends.js';
+import { buildSegmentalSnapshot, latestSegmentalSnapshot } from '../src/domain/bodySegmental.js';
 import { getPageLayout } from '../src/domain/pageLayout.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -78,9 +79,42 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
 
   inbodySpec.trendFixtures.forEach(function (fixture) {
     it('trend series: ' + fixture.id, function () {
-      var charts = getPageLayout('progress').bodyTrendCharts;
+      var progress = getPageLayout('progress');
+      var charts = fixture.useSegmentalCharts
+        ? flattenTrendGroups(progress.segmentalTrendGroups)
+        : progress.bodyTrendCharts;
       var series = buildAllBodyTrendSeries(fixture.bodyComp, charts);
       expect(series).toEqual(fixture.expected);
+      if (fixture.expectedExtras) {
+        expect(buildAllBodyTrendSeries(fixture.bodyComp, progress.bodyChartExtras)).toEqual(fixture.expectedExtras);
+      }
+    });
+  });
+
+  inbodySpec.segmentalFixtures.forEach(function (fixture) {
+    it('segmental map: ' + fixture.id, function () {
+      var spec = getPageLayout('bodyComp').segmentalMap;
+      var snap = buildSegmentalSnapshot(fixture.entry, spec);
+      if (fixture.expected === null) {
+        expect(snap).toBe(null);
+        return;
+      }
+      expect(snap.date).toBe(fixture.expected.date);
+      expect(snap.hasLean).toBe(fixture.expected.hasLean);
+      expect(snap.hasFat).toBe(fixture.expected.hasFat);
+      expect(snap.imbalances.length).toBe(fixture.expected.imbalanceCount);
+      if (fixture.expected.lean) expect(snap.lean).toEqual(fixture.expected.lean);
+      if (fixture.expected.fat) expect(snap.fat).toEqual(fixture.expected.fat);
+      if (fixture.expected.imbalancePair) expect(snap.imbalances[0].pairId).toBe(fixture.expected.imbalancePair);
+      if (fixture.expected.imbalanceMetric) expect(snap.imbalances[0].metric).toBe(fixture.expected.imbalanceMetric);
+    });
+  });
+
+  inbodySpec.latestSegmentalFixtures.forEach(function (fixture) {
+    it('latest segmental: ' + fixture.id, function () {
+      var spec = getPageLayout('bodyComp').segmentalMap;
+      var snap = latestSegmentalSnapshot(fixture.bodyComp, spec);
+      expect(snap.date).toBe(fixture.expectedDate);
     });
   });
 
@@ -88,9 +122,15 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
     var source = readFileSync(resolve(root, 'src/components/ProgressPage.jsx'), 'utf8');
     expect(source.indexOf('buildAllBodyTrendSeries') !== -1).toBe(true);
     expect(source.indexOf('bodyTrendCharts') !== -1).toBe(true);
+    expect(source.indexOf('bodyChartExtras') !== -1).toBe(true);
     expect(source.indexOf('inbodyTrends') !== -1).toBe(true);
+    expect(source.indexOf('segmentalTrendGroups') !== -1).toBe(true);
     expect(source.indexOf('Skeletal Muscle') === -1).toBe(true);
     expect(source.indexOf('Visceral Fat') === -1).toBe(true);
+    expect(source.indexOf('Left Arm') === -1).toBe(true);
+    expect(source.indexOf('Body Fat Mass') === -1).toBe(true);
+    expect(source.indexOf('BMI (kg') === -1).toBe(true);
+    expect(source.indexOf('Total Body Water') === -1).toBe(true);
   });
 
   it('Body Comp page wires the InBody import helpers', function () {
@@ -98,5 +138,8 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
     expect(source.indexOf('parseInbodyCsv') !== -1).toBe(true);
     expect(source.indexOf('mergeInbodyIntoLogs') !== -1).toBe(true);
     expect(source.indexOf('import-inbody') !== -1 || source.indexOf('importInbody') !== -1).toBe(true);
+    expect(source.indexOf('latestSegmentalSnapshot') !== -1).toBe(true);
+    expect(source.indexOf('segmentalMap') !== -1).toBe(true);
+    expect(source.indexOf('Left Arm') === -1).toBe(true);
   });
 });
