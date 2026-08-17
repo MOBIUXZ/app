@@ -78,8 +78,8 @@
     {
       "id": "inbody-csv",
       "path": "spec/inbody-csv-fixtures.json",
-      "governs": ["parseInbodyCsv()", "buildInbodyEntry()", "mergeInbodyIntoLogs()", "InBody CSV column map"],
-      "docs": ["docs/body-comp.md", "docs/data-model.md"]
+      "governs": ["parseInbodyCsv()", "buildInbodyEntry()", "mergeInbodyIntoLogs()", "buildAllBodyTrendSeries()", "InBody CSV column map"],
+      "docs": ["docs/body-comp.md", "docs/data-model.md", "docs/progress.md"]
     },
     {
       "id": "storage-fixtures",

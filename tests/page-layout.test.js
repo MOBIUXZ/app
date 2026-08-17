@@ -3,7 +3,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pageLayout from '../spec/page-layout.json';
-import { getPageLayout, getAppLayout, getModalSpec, formatTemplateLabel, formatHeroTodayDate, groupByRow } from '../src/domain/pageLayout.js';
+import { getPageLayout, getPageSection, getAppLayout, getModalSpec, formatTemplateLabel, formatHeroTodayDate, groupByRow } from '../src/domain/pageLayout.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -260,6 +260,19 @@ describe('page layout spec (spec/page-layout.json)', function () {
     var source = readFileSync(resolve(root, pageLayout.pages.workout.component), 'utf8');
     expect(source.indexOf('parserIcon') === -1).toBe(true);
     expect(source.indexOf('getModalSpec("workout", "smartParser").title') !== -1).toBe(true);
+  });
+
+  it('progress InBody trend charts are spec-driven', function () {
+    var progress = getPageLayout('progress');
+    expect(progress.sections.map(function (s) { return s.id; })).toEqual([
+      'compoundLifts', 'combinedCompound', 'isolationLifts', 'bodyCharts', 'inbodyTrends', 'calorieTrend',
+    ]);
+    expect(getPageSection('progress', 'inbodyTrends').title).toBe('📉 InBody Trends');
+    expect(progress.bodyTrendCharts.map(function (c) { return c.id; })).toEqual(['smm', 'fm', 'visceral', 'score']);
+    var source = readFileSync(resolve(root, progress.component), 'utf8');
+    expect(source.indexOf('bodyTrendCharts') !== -1).toBe(true);
+    expect(source.indexOf('getPageSection') !== -1).toBe(true);
+    expect(source.indexOf('getThemeColor') !== -1).toBe(true);
   });
 
   it('template labels interpolate variables', function () {

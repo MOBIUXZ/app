@@ -127,6 +127,7 @@ Omitted keys (including `settings`) are kept from current state. If the write fa
 | CaloriePage BMR | Latest `bodyComp` entry | Prefers `BMR_Mifflin`, falls back `BMR_Katch` |
 | Progress body weight chart | `bodyLogs` | |
 | Progress body fat chart | `bodyComp` where `bf` exists | |
+| Progress InBody trends | `bodyComp` SMM/FM + `inbody.visceral` / `inbody.score` | Card hidden if every series is empty |
 | Body Comp InBody import | InBody CSV → `bodyComp` + `bodyLogs` | Merge by date; workouts/calories unchanged |
 | Progress calorie chart | `calories` last 7 days | |
 | Progress exercise charts | `workouts` via `workoutsByExercise` | Normalized with `resolveExercise()` |
@@ -177,7 +178,7 @@ State is local to `WorkoutPage` — not lifted to App except via `save()`.
 1. COMPOUND LIFTS label + one `MemoExerciseChart` per logged compound (order from `COMPOUND_LIFTS` filter)
 2. Combined Compound Lifts card (if ≥2 compounds)
 3. ISOLATION LIFTS label + charts for non-compound exercises
-4. Footer: Body Weight & BF card, Calorie Intake Trend card
+4. Footer: Body Weight & BF card, InBody Trends card (if any series), Calorie Intake Trend card
 
 ### Modal layers (keyboard)
 

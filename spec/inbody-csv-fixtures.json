@@ -1,5 +1,5 @@
 {
-  "description": "InBody CSV parse, date year, measured-field mapping, and merge-by-date into bodyComp/bodyLogs",
+  "description": "InBody CSV parse, date year, measured-field mapping, merge-by-date into bodyComp/bodyLogs, and Progress body-trend series",
   "messages": {
     "imported": "Imported InBody scans.",
     "invalidCsv": "That file is not a valid InBody CSV.",
@@ -158,6 +158,48 @@
       "expectedCompCount": 2,
       "expectedLastWeight": 67,
       "expectedFirstWeight": 69.3
+    }
+  ],
+  "trendFixtures": [
+    {
+      "id": "maps-smm-fm-visceral-score-skips-empty",
+      "bodyComp": [
+        {
+          "date": "04-04-2026",
+          "SMM": 32,
+          "FM": 12,
+          "inbody": { "score": 87, "visceral": 4 }
+        },
+        {
+          "date": "25-03-2026",
+          "smm": 32.9,
+          "FM": 17.2,
+          "inbody": { "score": 67, "visceral": 7 }
+        },
+        {
+          "date": "01-01-2026",
+          "bf": 20,
+          "inbody": { "score": "-", "visceral": null }
+        }
+      ],
+      "expected": {
+        "smm": [
+          { "date": "25-03-2026", "value": 32.9 },
+          { "date": "04-04-2026", "value": 32 }
+        ],
+        "fm": [
+          { "date": "25-03-2026", "value": 17.2 },
+          { "date": "04-04-2026", "value": 12 }
+        ],
+        "visceral": [
+          { "date": "25-03-2026", "value": 7 },
+          { "date": "04-04-2026", "value": 4 }
+        ],
+        "score": [
+          { "date": "25-03-2026", "value": 67 },
+          { "date": "04-04-2026", "value": 87 }
+        ]
+      }
     }
   ]
 }

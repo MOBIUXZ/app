@@ -3,12 +3,14 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianG
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExerciseName, isNoSplitLift, isCompoundLift, COMPOUND_LIFTS, getExerciseChartColor, useKeyboardLayer, ui, cx } from "./shared";
 import { estimate1RM, roundE1RM, averageE1RM, computeSessionMetrics } from "../domain/metrics.js";
 import { CHART_CURSOR, computeYDomain, getTrendLineAnim, getFirstPaintDuration, FAILED_SET_COLOR } from "../domain/chartDomain.js";
-import { getPageLayout } from "../domain/pageLayout.js";
+import { getPageLayout, getPageSection, getThemeColor } from "../domain/pageLayout.js";
+import { buildAllBodyTrendSeries } from "../domain/bodyTrends.js";
 import { PageHeading } from "./PageIcon";
 import appConfig from "../../spec/app-config.json";
 import s from "./ProgressPage.module.css";
 
 var progressLayout = getPageLayout("progress");
+var bodyTrendCharts = progressLayout.bodyTrendCharts || [];
 
 var TREND_LINE_ANIM = getTrendLineAnim(appConfig);
 var SESSION_GRAPH_ANIM = { animationDuration: appConfig.chartAnimation.sessionGraphMs, animationEasing: appConfig.chartAnimation.easing };
@@ -786,6 +788,14 @@ export default function ProgressPage({ data }) {
     return data.bodyComp.filter(function (e) { return e.bf; }).map(function (e) { return { date: e.date, bf: e.bf }; });
   }, [data.bodyComp]);
 
+  var bodyTrendSeries = useMemo(function () {
+    return buildAllBodyTrendSeries(data.bodyComp, bodyTrendCharts);
+  }, [data.bodyComp]);
+
+  var hasInbodyTrends = bodyTrendCharts.some(function (chart) {
+    return (bodyTrendSeries[chart.id] || []).length > 0;
+  });
+
   var calChart = useMemo(function () {
     var calDates = [];
     for (var i = 6; i >= 0; i--) {
@@ -904,7 +914,7 @@ export default function ProgressPage({ data }) {
     <div>
       <PageHeading className={s.pageTitle} title={progressLayout.pageTitle} icon={progressLayout.pageIcon} />
       {allEx.length === 0 ? <Card><div className={s.emptyChart}>No workouts logged yet.</div></Card> : <div>
-        {compounds.length > 0 && <div className={s.sectionLabel}>{progressLayout.sections[0].label}</div>}
+        {compounds.length > 0 && <div className={s.sectionLabel}>{getPageSection("progress", "compoundLifts").label}</div>}
         {compounds.map(function (ex, i) {
           return (
             <MemoExerciseChart
@@ -920,7 +930,7 @@ export default function ProgressPage({ data }) {
         })}
         {compounds.length > 1 && (
             <Card className={ui.cardChartMb}>
-              <div className={ui.sectionTitleLg}>{progressLayout.sections[1].title}</div>
+              <div className={ui.sectionTitleLg}>{getPageSection("progress", "combinedCompound").title}</div>
               <div className={ui.chartToggleRow}>
                 {["weight", "volume", "e1rm", "mean_e1rm"].map(function (m) {
                   return (
@@ -1015,7 +1025,7 @@ export default function ProgressPage({ data }) {
             )}
           </div>
         )}
-        {(isolations.length > 0) && <div className={s.sectionLabelSpaced}>{progressLayout.sections[2].label}</div>}
+        {(isolations.length > 0) && <div className={s.sectionLabelSpaced}>{getPageSection("progress", "isolationLifts").label}</div>}
         {isolations.map(function (ex, i) {
           return (
             <MemoExerciseChart
@@ -1029,9 +1039,10 @@ export default function ProgressPage({ data }) {
             />
           );
         })}
-        <div ref={footerChartsRef}>
+      </div>}
+      <div ref={footerChartsRef}>
         <Card className={ui.cardChart}>
-          <div className={ui.sectionTitleLg}>{progressLayout.sections[3].title}</div>
+          <div className={ui.sectionTitleLg}>{getPageSection("progress", "bodyCharts").title}</div>
           <div className={ui.chartContainer}>
             {footerChartsInView ? (
             <ResponsiveContainer width="100%" height={160}>
@@ -1047,8 +1058,36 @@ export default function ProgressPage({ data }) {
           </div>
           {bfChart.length > 0 && footerChartsInView && <div className={s.bfSection}><div className={s.bfLabel} style={{ color: PINK }}>Body Fat %</div><div className={ui.chartContainer}><ResponsiveContainer width="100%" height={140}><LineChart data={bfChart}><CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" /><XAxis dataKey="date" tick={cs} interval="preserveStartEnd" /><YAxis tick={cs} width={35} /><Tooltip contentStyle={tt} /><Line type="monotone" dataKey="bf" stroke={PINK} strokeWidth={2} dot={{ fill: PINK, r: 3 }} isAnimationActive={false} animationDuration={0} /></LineChart></ResponsiveContainer></div></div>}
         </Card>
+        {hasInbodyTrends && (
         <Card className={ui.cardChart}>
-          <div className={ui.sectionTitleLg}>{progressLayout.sections[4].title}</div>
+          <div className={ui.sectionTitleLg}>{getPageSection("progress", "inbodyTrends").title}</div>
+          {bodyTrendCharts.map(function (chart) {
+            var series = bodyTrendSeries[chart.id] || [];
+            if (!series.length) return null;
+            var color = getThemeColor(chart.colorToken);
+            return (
+              <div key={chart.id} className={s.bfSection}>
+                <div className={s.bfLabel} style={{ color: color }}>{chart.title}</div>
+                <div className={ui.chartContainer}>
+                  {footerChartsInView ? (
+                  <ResponsiveContainer width="100%" height={140}>
+                    <LineChart data={series}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
+                      <XAxis dataKey="date" tick={cs} interval="preserveStartEnd" />
+                      <YAxis tick={cs} width={35} />
+                      <Tooltip contentStyle={tt} />
+                      <Line type="monotone" dataKey="value" name={chart.title} stroke={color} strokeWidth={2} dot={{ fill: color, r: 3 }} isAnimationActive={false} animationDuration={0} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                  ) : <div className={s.chartPlaceholder} aria-hidden="true" />}
+                </div>
+              </div>
+            );
+          })}
+        </Card>
+        )}
+        <Card className={ui.cardChart}>
+          <div className={ui.sectionTitleLg}>{getPageSection("progress", "calorieTrend").title}</div>
           <div className={ui.chartContainer}>
             {footerChartsInView ? (
             <ResponsiveContainer width="100%" height={160}>
@@ -1063,8 +1102,7 @@ export default function ProgressPage({ data }) {
             ) : <div className={s.chartPlaceholder} aria-hidden="true" />}
           </div>
         </Card>
-        </div>
-      </div>}
+      </div>
     </div>
   );
 }

@@ -73,6 +73,7 @@
         { "id": "compound-charts", "check": "Compound lift charts render with data points" },
         { "id": "metric-toggle", "check": "Toggle Max Weight / Volume / e1RM — line morphs smoothly (~600ms)" },
         { "id": "body-chart", "check": "Body Weight chart shows trend" },
+        { "id": "inbody-trends", "check": "InBody Trends card shows skeletal muscle, fat mass, visceral fat, and score when those fields exist; empty series stay hidden" },
         { "id": "detail-modal", "check": "Click chart point → Workout Details panel opens" }
       ]
     },

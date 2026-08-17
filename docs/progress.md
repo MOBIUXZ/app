@@ -8,7 +8,7 @@ The Progress tab is the heaviest page (one Recharts instance per logged exercise
 
 | Technique | What it does |
 |-----------|----------------|
-| **Lazy chart mount** | Per-exercise charts and footer charts (body weight, body fat, calories) mount Recharts only when scrolled near the viewport (`useInView` + Intersection Observer). Off-screen cards show a `.chartPlaceholder` until then |
+| **Lazy chart mount** | Per-exercise charts and footer charts (body weight, body fat, InBody trends, calories) mount Recharts only when scrolled near the viewport (`useInView` + Intersection Observer). Off-screen cards show a `.chartPlaceholder` until then |
 | **Instant first paint** | Exercise and combined-compound lines use `animationDuration={0}` on the first render after lazy mount — no line-draw animation while scrolling |
 | **Metric-toggle morph** | Switching Max Weight / Volume / Best e1RM / Mean e1RM morphs the line over **600ms ease-in-out** (same feel as Session Performance graphs). Footer health charts do **not** morph |
 | **Memoized data** | Workouts are normalized once; `workoutsByExercise` indexes sessions by exercise; chart points and combined-compound series use `useMemo` |
@@ -23,7 +23,7 @@ When you change a **metric toggle**, the active line morphs smoothly between val
 |------------|------------------|---------------|
 | Per-exercise (combined & split) | Instant | 600ms morph |
 | Combined Compound Lifts | Instant | 600ms morph (all visible lift lines) |
-| Body weight / body fat / calories | Instant | N/A (no metric toggles) |
+| Body weight / body fat / InBody trends / calories | Instant | N/A (no metric toggles) |
 | Session Performance popup | 600ms draw on open | 600ms morph |
 
 **How it works (maintainers):** `withTrendPlotValue()` copies the active metric into a stable `plotValue` field; Recharts `<Line dataKey="plotValue" animationId={metric}>` interpolates between toggles. `useTrendChartAnimation(chartReady)` sets `animationDuration={0}` on first paint, then `600` on subsequent updates. Y-axis domain rescales per metric via `sessionChartYDomain()` (same helper as session graphs). Tooltips stay non-animated for snappy hover.
@@ -169,7 +169,7 @@ Sessions where left and right match, or where sets are logged without side info 
 - **X-axis:** calendar dates (`Mon D` format), equal spacing per logged session (one point per calendar date)
 - **First appearance:** exercise and combined-compound charts render instantly when scrolled into view (no line-draw animation)
 - **Metric toggles:** line morphs over 600ms when switching Max Weight / Volume / Best e1RM / Mean e1RM (combined view, split L/R charts, and combined compound overlay)
-- **Footer charts** (body weight, body fat, calories) always render without line animation
+- **Footer charts** (body weight, body fat, InBody trends, calories) always render without line animation
 - **Off-screen** exercise charts show a placeholder until scrolled into view (see [Performance](#performance))
 - **Hover:** dashed vertical cursor + tooltip on combined exercise charts and combined compound chart; split view uses the docked imbalance panel instead
 
@@ -303,6 +303,19 @@ Per-workout popup chart for that single logged session:
 - **Body Weight** line from `bodyLogs` entries
 - **Body Fat %** line (when BF data exists in `bodyComp`)
 - Lazy-mounted with footer `useInView` (240px root margin); `isAnimationActive={false}` — instant render, no metric toggles
+
+## InBody Trends
+
+Card on Progress between body charts and calories. Series come from `bodyComp` via `buildAllBodyTrendSeries()` (`src/domain/bodyTrends.js`). Chart titles, colors, and field paths live in `spec/page-layout.json` → `pages.progress.bodyTrendCharts`.
+
+| Chart | Source | Hidden when |
+|-------|--------|-------------|
+| Skeletal Muscle (kg) | `SMM` or `smm` | no points |
+| Fat Mass (kg) | `FM` | no points |
+| Visceral Fat Level | `inbody.visceral` | no points |
+| InBody Score | `inbody.score` | no points |
+
+The whole card is omitted when every series is empty. Manual logs with SMM/FM still chart those two; visceral and score appear after InBody CSV import. Lazy-mounted with the same footer `useInView`; `isAnimationActive={false}`.
 
 ## Calorie Intake Trend
 

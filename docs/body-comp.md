@@ -75,7 +75,7 @@ The history toolbar (entry count, **Import InBody CSV**, and **Clear History**) 
 - Button in History; accepts `.csv` from the InBody phone export
 - Parser: `src/domain/inbodyCsv.js` ↔ `spec/inbody-csv-fixtures.json`
 - Dates like `25-3` become `DD-MM-YYYY`. The InBody app export uses timestamps (`20260725130008` → `25-07-2026`). Year for `D-M` dates comes from the file name (`InBody-20260817.csv` → 2026); December→January rows increment the year
-- Maps weight, body fat %, skeletal muscle, fat mass, BMI, SMI, and InBody BMR onto `bodyComp` (measured fat mass / BMI / SMI are kept, not recomputed). Extra columns are stored on `entry.inbody` for later graphs
+- Maps weight, body fat %, skeletal muscle, fat mass, BMI, SMI, and InBody BMR onto `bodyComp` (measured fat mass / BMI / SMI are kept, not recomputed). Extra columns are stored on `entry.inbody`. Progress charts SMM, fat mass, visceral fat, and InBody Score from those fields
 - Confirm dialog: adds N new scans and replaces existing dates. **Workouts and calories stay**
 - Same-date scans overwrite that day; `bodyLogs` stay in sync so Dashboard and Progress body-weight charts update
 

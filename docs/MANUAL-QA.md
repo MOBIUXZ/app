@@ -84,6 +84,7 @@ Machine-readable checklist: [`spec/manual-qa-checklist.json`](../spec/manual-qa-
 - [ ] Compound lift charts render
 - [ ] Metric toggle morphs smoothly (~600ms)
 - [ ] Body weight chart visible
+- [ ] InBody Trends: skeletal muscle, fat mass, visceral, score when those fields exist; empty series stay hidden
 - [ ] Chart click → Workout Details panel
 
 ### Persistence

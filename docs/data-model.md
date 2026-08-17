@@ -156,7 +156,7 @@ Raw inputs plus **persisted computed fields** (recomputed on save/edit).
 
 InBody import prefers measured `FM` / `BMI` / `SMI` from the CSV over formula recomputes. Mifflin/Katch are still filled from Settings profile height/age/sex when available. Calories TDEE still uses Mifflin then Katch, not InBody BMR.
 
-**Import:** Body Comp → History → Import InBody CSV. Merges by date; does not replace workouts or calories. Spec: [`spec/inbody-csv-fixtures.json`](../spec/inbody-csv-fixtures.json).
+**Import:** Body Comp → History → Import InBody CSV. Merges by date; does not replace workouts or calories. Progress charts SMM, FM, visceral fat, and InBody Score from stored fields (`src/domain/bodyTrends.js`). Spec: [`spec/inbody-csv-fixtures.json`](../spec/inbody-csv-fixtures.json).
 
 `height_m = height_cm / 100`.
 

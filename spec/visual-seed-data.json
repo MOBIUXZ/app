@@ -52,7 +52,8 @@
         "SMM": 35,
         "SMI": 10.8,
         "BMR_Mifflin": 1725,
-        "BMR_Katch": 1747
+        "BMR_Katch": 1747,
+        "inbody": { "score": 72, "visceral": 7 }
       }
     ],
     "calories": [

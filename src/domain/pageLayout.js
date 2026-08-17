@@ -24,6 +24,12 @@ export function getPageLayout(pageId) {
   return pageLayoutSpec.pages[pageId] || null;
 }
 
+export function getPageSection(pageId, sectionId) {
+  var page = getPageLayout(pageId);
+  if (!page || !page.sections) return null;
+  return page.sections.find(function (s) { return s.id === sectionId; }) || null;
+}
+
 export function getThemeColor(token) {
   if (!token) return undefined;
   return catalog.themeColors[token] || catalog.themeColors.accent;

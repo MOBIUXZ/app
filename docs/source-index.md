@@ -42,7 +42,11 @@ Complete inventory of every project file. Line counts approximate (Aug 2026).
 
 ## `src/domain/inbodyCsv.js`
 
-**~240 lines** — `parseInbodyCsv()`, `buildInbodyEntry()`, `mergeInbodyIntoLogs()`. Spec: `spec/inbody-csv-fixtures.json`. Used by Body Comp History import.
+**~270 lines** — `parseInbodyCsv()`, `buildInbodyEntry()`, `mergeInbodyIntoLogs()`. Spec: `spec/inbody-csv-fixtures.json`. Used by Body Comp History import.
+
+## `src/domain/bodyTrends.js`
+
+**~50 lines** — `buildAllBodyTrendSeries()` maps `bodyComp` onto Progress InBody trend charts (SMM, FM, visceral, score). Spec: `spec/inbody-csv-fixtures.json` `trendFixtures` + `spec/page-layout.json` `bodyTrendCharts`.
 
 ---
 
@@ -201,7 +205,7 @@ Spec: [calories.md](./calories.md)
 
 ## `src/components/ProgressPage.jsx`
 
-**~1066 lines** | CSS: `ProgressPage.module.css` (~454 lines)
+**~1109 lines** | CSS: `ProgressPage.module.css` (~454 lines)
 
 **Props:** `data` (read-only)
 

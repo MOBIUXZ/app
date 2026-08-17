@@ -10,6 +10,8 @@ import {
   buildInbodyEntry,
   mergeInbodyIntoLogs,
 } from '../src/domain/inbodyCsv.js';
+import { buildAllBodyTrendSeries } from '../src/domain/bodyTrends.js';
+import { getPageLayout } from '../src/domain/pageLayout.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -72,6 +74,23 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
       expect(out.bodyComp[out.bodyComp.length - 1].weight).toBe(fixture.expectedLastWeight);
       expect(out.bodyLogs[out.bodyLogs.length - 1].weight).toBe(fixture.expectedLastWeight);
     });
+  });
+
+  inbodySpec.trendFixtures.forEach(function (fixture) {
+    it('trend series: ' + fixture.id, function () {
+      var charts = getPageLayout('progress').bodyTrendCharts;
+      var series = buildAllBodyTrendSeries(fixture.bodyComp, charts);
+      expect(series).toEqual(fixture.expected);
+    });
+  });
+
+  it('Progress page wires InBody trend charts from the layout spec', function () {
+    var source = readFileSync(resolve(root, 'src/components/ProgressPage.jsx'), 'utf8');
+    expect(source.indexOf('buildAllBodyTrendSeries') !== -1).toBe(true);
+    expect(source.indexOf('bodyTrendCharts') !== -1).toBe(true);
+    expect(source.indexOf('inbodyTrends') !== -1).toBe(true);
+    expect(source.indexOf('Skeletal Muscle') === -1).toBe(true);
+    expect(source.indexOf('Visceral Fat') === -1).toBe(true);
   });
 
   it('Body Comp page wires the InBody import helpers', function () {
