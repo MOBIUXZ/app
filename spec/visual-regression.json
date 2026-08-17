@@ -3,6 +3,7 @@
   "maxDiffPixelRatio": 0.02,
   "animations": "disabled",
   "baseUrl": "http://localhost:4173",
+  "frozenNow": "2026-08-17T12:00:00.000Z",
   "seedSpec": "spec/visual-seed-data.json",
   "snapshots": [
     {

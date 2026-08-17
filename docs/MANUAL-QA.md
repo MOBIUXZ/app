@@ -14,7 +14,7 @@ npm run test:visual:update   # regenerate baselines after intentional UI changes
 
 Specs: [`spec/visual-regression.json`](../spec/visual-regression.json), [`spec/visual-seed-data.json`](../spec/visual-seed-data.json)
 
-Playwright opens the preview server, seeds `localStorage`, captures each tab (+ Smart Parser modal), and diffs pixels.
+Playwright opens the preview server, seeds `localStorage`, freezes the clock to `frozenNow` in `spec/visual-regression.json` (so Calories “today” does not drift), captures each tab (+ Smart Parser modal), and diffs pixels.
 
 **When UI changes intentionally:** update spec if needed → `npm run test:visual:update` → commit new snapshots in `e2e/visual.spec.js-snapshots/`.
 

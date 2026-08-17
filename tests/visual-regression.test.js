@@ -41,4 +41,9 @@ describe('visual regression spec', function () {
     expect(existsSync(resolve(root, 'e2e/visual.spec.js'))).toBe(true);
     expect(existsSync(resolve(root, 'playwright.config.js'))).toBe(true);
   });
+
+  it('freezes the clock so calories dates stay deterministic', function () {
+    expect(visualSpec.frozenNow).toBeTruthy();
+    expect(isNaN(new Date(visualSpec.frozenNow).getTime())).toBe(false);
+  });
 });

@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test';
-import { seedLocalStorage, loadVisualSpec } from './helpers/seed.mjs';
+import { seedLocalStorage, loadVisualSpec, frozenNowDate } from './helpers/seed.mjs';
 
 var visualSpec = loadVisualSpec();
 
 test.describe('visual regression (spec/visual-regression.json)', function () {
   test.beforeEach(async function ({ page }) {
+    await page.clock.setFixedTime(frozenNowDate());
     await seedLocalStorage(page);
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
