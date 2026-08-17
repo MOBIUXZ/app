@@ -69,4 +69,29 @@ export function areAllHistoryGroupsExpanded(groupKeys, expandedGroups, defaultEx
   });
 }
 
+function normalizeHistoryDateQuery(value) {
+  return String(value || "").trim().toLowerCase().replace(/[./\s]+/g, "-");
+}
+
+export function matchesHistorySearch(workout, query) {
+  var raw = String(query || "").trim().toLowerCase();
+  if (!raw) return true;
+  var exercise = String(workout && workout.exercise || "").toLowerCase();
+  if (exercise.indexOf(raw) !== -1) return true;
+
+  var dateStored = String(workout && workout.date || "").toLowerCase();
+  var dateNorm = dateStored.replace(/[./]/g, "-");
+  var queryDate = normalizeHistoryDateQuery(raw);
+  if (dateNorm.indexOf(queryDate) !== -1) return true;
+
+  var iso = queryDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (iso && dateNorm.indexOf(iso[3] + "-" + iso[2] + "-" + iso[1]) !== -1) return true;
+
+  return false;
+}
+
+export function filterHistoryWorkouts(workouts, query) {
+  return (workouts || []).filter(function (w) { return matchesHistorySearch(w, query); });
+}
+
 export { pageLayoutSpec };

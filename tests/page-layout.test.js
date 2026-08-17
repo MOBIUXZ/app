@@ -75,6 +75,14 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(source.indexOf('nextHistoryGroupsAll') !== -1).toBe(true);
   });
 
+  it('workout history search matches exercise name and date', function () {
+    var search = getPageLayout('workout').historySearch;
+    expect(search.matchFields).toEqual(['exercise', 'date']);
+    var source = readFileSync(resolve(root, pageLayout.pages.workout.component), 'utf8');
+    expect(source.indexOf('matchesHistorySearch') !== -1).toBe(true);
+    expect(source.indexOf('historySearch.placeholder') !== -1).toBe(true);
+  });
+
   it('calories page spec includes TDEE breakdown rows', function () {
     var breakdown = getPageLayout('calories').tdeeBreakdown;
     expect(breakdown.layout).toEqual(['formula', 'bar', 'legend', 'equation']);

@@ -69,6 +69,10 @@
         "defaultExpanded": true,
         "expandAllPersistsAcrossGrouping": true
       },
+      "historySearch": {
+        "placeholder": "Search by workout or date...",
+        "matchFields": ["exercise", "date"]
+      },
       "modals": [
         { "id": "calendarModal", "title": "📅 Workout Calendar", "layerId": "calendar-modal", "monthMaxWidthPx": 389, "yearMaxWidthPx": 680 },
         { "id": "calendarDay", "title": "Day detail", "layerId": "calendar-day-panel", "staysMountedUnder": "calendarLog" },

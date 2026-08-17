@@ -82,7 +82,7 @@ Stacked control layout inside **Workout History** (sticky header while scrolling
 
 | Row | Contents |
 |-----|----------|
-| Search | Full-width exercise name filter |
+| Search | Full-width filter on **exercise name** or **date** (`DD-MM-YYYY`; also `10/04/2026`, `2026-04-10`, or a partial like `04-2026`) |
 | Actions | **Expand all / Collapse all** + **Clear History** (left) · workout count + days logged (right) |
 | Sort | **By Date / By Workout** and **Newest / Oldest** pill toggles |
 

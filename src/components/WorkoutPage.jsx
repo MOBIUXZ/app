@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, EXERCISE_CATEGORIES, Collapse, parseWorkoutText, resolveExercise, formatExerciseName, btnPrimary, btnSecondary, btnDanger, inputClass, selectClass, textareaClass, formatDate, useKeyboardListNav, useConfirmDialogKeyboard, handleParserTextareaKeyDown, useParserTextareaKeyboard, useKeyboardLayer, isTypingTarget, ui, cx } from "./shared";
 import { computeOneRM, TRAINING_PERCENTAGES, DEFAULT_ONE_RM_FORMULA, ONE_RM_FORMULAS, collectLoggedSets } from "../domain/oneRm.js";
-import { getPageLayout, getCollapseSpec, getModalSpec, isHistoryGroupExpanded, nextHistoryGroupToggle, nextHistoryGroupsAll, areAllHistoryGroupsExpanded } from "../domain/pageLayout.js";
+import { getPageLayout, getCollapseSpec, getModalSpec, isHistoryGroupExpanded, nextHistoryGroupToggle, nextHistoryGroupsAll, areAllHistoryGroupsExpanded, matchesHistorySearch } from "../domain/pageLayout.js";
 import { PageHeading } from "./PageIcon";
 import s from "./WorkoutPage.module.css";
 
@@ -394,8 +394,7 @@ export default function WorkoutPage({ data, save }) {
   };
   var heroMetrics = workoutLayout.hero.statMetrics;
   var filteredWorkouts = data.workouts.filter(function (w) {
-    if (!searchQuery) return true;
-    return w.exercise.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesHistorySearch(w, searchQuery);
   });
   var historyItems = filteredWorkouts.slice().sort(function (a, b) {
     if (historySortBy === "date") {
@@ -935,7 +934,7 @@ Bench Press
       <Collapse icon={getCollapseSpec("workout", "history").icon} label={getCollapseSpec("workout", "history").label} defaultOpen={getCollapseSpec("workout", "history").defaultOpen}>
         <div className={ui.marginBottom12}>
           <div className={ui.historyToolbarSticky}>
-            <input value={searchQuery} onChange={function (e) { setSearchQuery(e.target.value); }} placeholder="Search by workout name..." className={cx(inputClass({ fullWidth: true }), ui.marginBottom12)} />
+            <input value={searchQuery} onChange={function (e) { setSearchQuery(e.target.value); }} placeholder={workoutLayout.historySearch.placeholder} className={cx(inputClass({ fullWidth: true }), ui.marginBottom12)} />
             <div className={s.historyControls}>
               <div className={s.historyActionsRow}>
                 <div className={ui.flexRow}>

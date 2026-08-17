@@ -85,6 +85,46 @@
   },
   "workoutHistory": {
     "defaultExpanded": true,
+    "search": {
+      "placeholder": "Search by workout or date...",
+      "workouts": [
+        { "exercise": "Deadlift", "date": "10-04-2026" },
+        { "exercise": "Squat", "date": "09-04-2026" },
+        { "exercise": "Bench Press", "date": "12-02-2026" }
+      ],
+      "fixtures": [
+        {
+          "id": "empty-query-returns-all",
+          "query": "",
+          "expectedExercises": ["Deadlift", "Squat", "Bench Press"]
+        },
+        {
+          "id": "name-substring",
+          "query": "dead",
+          "expectedExercises": ["Deadlift"]
+        },
+        {
+          "id": "date-full-dmy",
+          "query": "10-04-2026",
+          "expectedExercises": ["Deadlift"]
+        },
+        {
+          "id": "date-slash-separators",
+          "query": "10/04/2026",
+          "expectedExercises": ["Deadlift"]
+        },
+        {
+          "id": "date-iso",
+          "query": "2026-04-10",
+          "expectedExercises": ["Deadlift"]
+        },
+        {
+          "id": "date-partial-month-year",
+          "query": "04-2026",
+          "expectedExercises": ["Deadlift", "Squat"]
+        }
+      ]
+    },
     "fixtures": [
       {
         "id": "missing-keys-start-expanded",
