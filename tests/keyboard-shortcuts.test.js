@@ -25,6 +25,14 @@ describe('keyboard shortcuts spec', function () {
   it('css classes are defined for keyboard feedback', function () {
     expect(keyboardSpec.cssClasses.listFocus).toBe('ft-kb-focus');
     expect(keyboardSpec.cssClasses.activate).toBe('ft-kb-activate');
+    expect(keyboardSpec.cssClasses.btnFocus).toBe('ft-kb-btn-focus');
+    expect(keyboardSpec.cssClasses.btnFocusCancel).toBe('ft-kb-btn-focus-cancel');
+    expect(keyboardSpec.cssClasses.btnFocusConfirm).toBe('ft-kb-btn-focus-confirm');
+  });
+
+  it('confirm dialog uses filled button focus', function () {
+    expect(keyboardSpec.confirmDialog.focusStyle).toBe('filled');
+    expect(keyboardSpec.confirmDialog.defaultFocus).toBe('cancel');
   });
 
   it('calendar log/parse stacks over a mounted day panel', function () {

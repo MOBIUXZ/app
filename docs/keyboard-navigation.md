@@ -57,7 +57,7 @@ Hovering an item with the mouse updates keyboard focus on most lists (Dashboard 
 |-------|--------|
 | **List focus** | Purple border + glow (`.ft-kb-focus`) — overridden to **green outline only** on Calories activity list |
 | **Main nav (inactive tab)** | Green `:focus-visible` ring; active tab uses pill fill only |
-| **Button focus (dialogs)** | Pulsing purple ring (`.ft-kb-btn-focus`) |
+| **Button focus (dialogs)** | Filled selected state — accent Cancel (`.ft-kb-btn-focus-cancel`), red confirm/delete (`.ft-kb-btn-focus-confirm`) |
 | **Activate (Enter)** | Green pulse (`.ft-kb-activate`) — dialogs/lists; not used on main nav tab clicks |
 | **Dialog focus indicator** | Pill showing **Focused: Cancel** / **Clear History** |
 | **Popup backdrop** | Subtle fade-in (`.ft-kb-modal-backdrop`) |
@@ -81,6 +81,7 @@ Hovering an item with the mouse updates keyboard focus on most lists (Dashboard 
 
 - Opens with focus on **Cancel** (safe default).
 - **← →** or **Tab** moves between Cancel and Clear History.
+- The focused button fills like a selected pill (accent for Cancel, red for Clear History / Delete).
 - **Enter** activates the **currently focused** button (green pulse).
 - A **Focused: …** pill shows the active target at all times.
 
@@ -99,4 +100,4 @@ Same two-button confirm pattern as Clear History, with **Cancel** / **Delete**. 
 | `useKeyboardListNav()` | Arrow/Enter list control |
 | `useConfirmDialogKeyboard()` | Two-button confirm with focus indicator |
 
-CSS in `src/styles/global.css`: `.ft-kb-focus`, `.ft-kb-btn-focus`, `.ft-kb-activate`, `.ft-kb-focus-indicator`, `.ft-kb-modal-backdrop`.
+CSS in `src/styles/global.css`: `.ft-kb-focus`, `.ft-kb-btn-focus`, `.ft-kb-btn-focus-cancel`, `.ft-kb-btn-focus-confirm`, `.ft-kb-activate`, `.ft-kb-focus-indicator`, `.ft-kb-modal-backdrop`.

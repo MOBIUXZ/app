@@ -111,7 +111,7 @@ Stacked control layout inside **Workout History** (sticky header while scrolling
 ### Bulk Actions
 - **Clear History** — quiet red pill (no hard border) that deletes all workouts (with confirmation)
   - `←` `→` / Tab switch buttons · Enter selects focused · Esc cancel
-  - Focus indicator shows **Cancel** or **Clear History**
+  - Focused button fills like a selected pill (accent Cancel, red Clear History); the pill also names the focused action
 
 ## 1RM Calculator
 

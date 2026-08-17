@@ -4,6 +4,7 @@ import ui from "../styles/ui.module.css";
 import { cx, btnPrimaryClass, btnSecondaryClass, btnDangerClass, inputClass, selectClass, textareaClass } from "../styles/styleHelpers.js";
 import exerciseAliasesSpec from "../../spec/exercise-aliases.json";
 import catalog from "../../spec/exercise-catalog.json";
+import keyboardSpec from "../../spec/keyboard-shortcuts.json";
 
 export { ui, cx, btnPrimaryClass, btnSecondaryClass, btnDangerClass, inputClass, selectClass, textareaClass };
 export { btnPrimaryClass as btnPrimary, btnSecondaryClass as btnSecondary, btnDangerClass as btnDanger, inputClass as inp };
@@ -669,8 +670,12 @@ export function useConfirmDialogKeyboard(open, onConfirm, onCancel, layerId, lab
 
   function btnClass(idx) {
     var classes = [];
-    if (idx === focusIdx) classes.push("ft-kb-btn-focus");
-    if (idx === activatedIdx) classes.push("ft-kb-activate");
+    var kb = keyboardSpec.cssClasses;
+    if (idx === focusIdx) {
+      classes.push(kb.btnFocus);
+      classes.push(idx === 0 ? kb.btnFocusCancel : kb.btnFocusConfirm);
+    }
+    if (idx === activatedIdx) classes.push(kb.activate);
     return classes.join(" ");
   }
 

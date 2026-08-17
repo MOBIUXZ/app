@@ -139,7 +139,7 @@ Keep inline `style` for:
 
 ### Keyboard classes
 
-Global classes in `global.css` (not modules): `.ft-kb-focus`, `.ft-kb-modal-backdrop`, `.ft-kb-focus-indicator`, etc.
+Global classes in `global.css` (not modules): `.ft-kb-focus`, `.ft-kb-modal-backdrop`, `.ft-kb-focus-indicator`, `.ft-kb-btn-focus-cancel` / `.ft-kb-btn-focus-confirm` (filled dialog selection), etc.
 
 ## Adding new UI
 

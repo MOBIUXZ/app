@@ -22,7 +22,8 @@
   },
   "confirmDialog": {
     "switchKeys": ["ArrowLeft", "ArrowRight", "Tab"],
-    "defaultFocus": "cancel"
+    "defaultFocus": "cancel",
+    "focusStyle": "filled"
   },
   "popups": [
     { "id": "smart-parser", "layerId": "smart-parser", "closeKey": "Escape" },
@@ -43,6 +44,8 @@
   "cssClasses": {
     "listFocus": "ft-kb-focus",
     "btnFocus": "ft-kb-btn-focus",
+    "btnFocusCancel": "ft-kb-btn-focus-cancel",
+    "btnFocusConfirm": "ft-kb-btn-focus-confirm",
     "activate": "ft-kb-activate",
     "focusIndicator": "ft-kb-focus-indicator",
     "modalBackdrop": "ft-kb-modal-backdrop"

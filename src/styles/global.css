@@ -61,22 +61,24 @@ input[type="number"] {
   animation: ft-kb-activate 0.45s ease-out;
 }
 
-@keyframes ft-kb-btn-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.35);
-  }
-  50% {
-    box-shadow: 0 0 0 5px rgba(167, 139, 250, 0.55);
-  }
-}
-
 .ft-kb-btn-focus {
-  outline: 2px solid var(--ft-accent) !important;
-  outline-offset: 2px !important;
-  animation: ft-kb-btn-pulse 1.6s ease-in-out infinite;
+  outline: none !important;
   position: relative;
   z-index: 1;
+}
+
+.ft-kb-btn-focus-cancel {
+  background: var(--ft-accent) !important;
+  color: var(--ft-text-dark) !important;
+  border-color: transparent !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.ft-kb-btn-focus-confirm {
+  background: var(--ft-red) !important;
+  color: var(--ft-text-dark) !important;
+  border-color: transparent !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
 }
 
 .ft-kb-focus-indicator {

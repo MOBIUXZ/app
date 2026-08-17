@@ -19,17 +19,28 @@
     "ft-kb-nav-focus",
     "ft-kb-nav-activate",
     "ft-kb-btn-focus",
+    "ft-kb-btn-focus-cancel",
+    "ft-kb-btn-focus-confirm",
     "ft-kb-focus-indicator",
     "ft-kb-hint",
     "ft-kb-modal-backdrop"
   ],
   "animations": {
     "activateDurationMs": 450,
-    "btnPulseDurationMs": 1600,
     "backdropInDurationMs": 200
   },
   "keyboardClassTokens": {
     "ft-kb-focus": { "outlineColor": "var(--ft-accent)", "outlineWidth": "2px" },
-    "ft-kb-activate": { "borderColor": "var(--ft-green)" }
+    "ft-kb-activate": { "borderColor": "var(--ft-green)" },
+    "ft-kb-btn-focus-cancel": {
+      "background": "var(--ft-accent)",
+      "color": "var(--ft-text-dark)",
+      "boxShadow": "0 1px 4px rgba(0, 0, 0, 0.25)"
+    },
+    "ft-kb-btn-focus-confirm": {
+      "background": "var(--ft-red)",
+      "color": "var(--ft-text-dark)",
+      "boxShadow": "0 1px 4px rgba(0, 0, 0, 0.25)"
+    }
   }
 }

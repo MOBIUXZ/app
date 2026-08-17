@@ -35,4 +35,17 @@ describe('global styles (spec/global-styles.json)', function () {
   it('uses theme tokens for body background', function () {
     expect(globalCss).toContain(globalStyles.base.bodyBackground);
   });
+
+  it('applies keyboard class tokens in global.css', function () {
+    Object.keys(globalStyles.keyboardClassTokens).forEach(function (cls) {
+      expect(globalCss).toContain('.' + cls);
+      Object.values(globalStyles.keyboardClassTokens[cls]).forEach(function (val) {
+        expect(globalCss).toContain(val);
+      });
+    });
+  });
+
+  it('confirm dialog focus does not use a pulsing ring', function () {
+    expect(globalCss).not.toContain('ft-kb-btn-pulse');
+  });
 });
