@@ -278,8 +278,11 @@ describe('page layout spec (spec/page-layout.json)', function () {
   it('progress InBody trend charts are spec-driven', function () {
     var progress = getPageLayout('progress');
     expect(progress.sections.map(function (s) { return s.id; })).toEqual([
-      'compoundLifts', 'combinedCompound', 'isolationLifts', 'bodyCharts', 'fat', 'muscle', 'ffm', 'segmental', 'visceral', 'composition', 'bmr', 'inbodyScore', 'calorieTrend',
+      'compoundLifts', 'combinedCompound', 'isolationLifts', 'bodySection', 'bodyCharts', 'fat', 'muscle', 'ffm', 'segmental', 'visceral', 'composition', 'bmr', 'inbodyScore', 'calorieTrend',
     ]);
+    expect(getPageSection('progress', 'compoundLifts').label).toBe('🏋️ COMPOUND LIFTS');
+    expect(getPageSection('progress', 'isolationLifts').label).toBe('💪 ISOLATION LIFTS');
+    expect(getPageSection('progress', 'bodySection').label).toBe('📉 BODY');
     expect(getPageSection('progress', 'bodyCharts').title).toBe('📉 Body Weight');
     expect(progress.bodyWeightChart.title).toBe('Body Weight (kg)');
     expect(progress.bodyWeightChart.colorToken).toBe('accent');
@@ -361,6 +364,9 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(source.indexOf('fatTrends') !== -1).toBe(true);
     expect(source.indexOf('muscleTrends') !== -1).toBe(true);
     expect(source.indexOf('ffmTrends') !== -1).toBe(true);
+    expect(source.indexOf('sectionLabelSpaced') !== -1).toBe(true);
+    expect(source.indexOf('sectionLabelBody') !== -1).toBe(true);
+    expect(source.indexOf('bodySection') !== -1).toBe(true);
     expect(source.indexOf('getPageSection') !== -1).toBe(true);
     expect(source.indexOf('getThemeColor') !== -1).toBe(true);
   });

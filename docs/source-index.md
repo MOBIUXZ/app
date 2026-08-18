@@ -265,7 +265,7 @@ Key class groups:
 
 | Group | Classes |
 |-------|---------|
-| Layout | `pageTitle`, `sectionLabel`, `exerciseCard`, `exerciseHeader` |
+| Layout | `pageTitle`, `sectionLabel`, `sectionLabelBody`, `exerciseCard`, `exerciseHeader` |
 | Stats | `prBlock`, `statStrip`, `miniStat*` |
 | Charts | `chartPlaceholder`, `splitRow`, `splitCol`, `splitLabel`, `segHeader`, `segGrid`, `segFigure` |
 | Toggles | `splitToggleGroup`, `compoundMetricToggleActive`, `compoundLegendRow` |

@@ -297,6 +297,7 @@
         { "id": "compoundLifts", "label": "🏋️ COMPOUND LIFTS" },
         { "id": "combinedCompound", "title": "📊 Combined Compound Lifts" },
         { "id": "isolationLifts", "label": "💪 ISOLATION LIFTS" },
+        { "id": "bodySection", "label": "📉 BODY" },
         { "id": "bodyCharts", "title": "📉 Body Weight" },
         { "id": "fat", "title": "📉 Fat Mass & Body Fat %" },
         { "id": "muscle", "title": "📉 Skeletal Muscle Mass & SMI" },

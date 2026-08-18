@@ -86,6 +86,7 @@ Machine-readable checklist: [`spec/manual-qa-checklist.json`](../spec/manual-qa-
 
 - [ ] Compound lift charts render
 - [ ] Metric toggle morphs smoothly (~600ms)
+- [ ] BODY section label appears after workout charts, with extra space and a divider, before Body Weight
 - [ ] Body weight chart visible with a Body Weight (kg) label above the plot; BMI when that field exists
 - [ ] One Fat Mass & Body Fat % card with Fat Mass, Body Fat %, and FMI stacked when those fields exist; empty series hidden
 - [ ] One Skeletal Muscle Mass & SMI card with Skeletal Muscle Mass, Muscle Mass %, and SMI stacked when those fields exist; empty series hidden

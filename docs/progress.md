@@ -33,7 +33,7 @@ When you change a **metric toggle**, the active line morphs smoothly between val
 
 ## Exercise Charts
 
-Every logged exercise gets its own chart card, grouped into two sections.
+Every logged exercise gets its own chart card, grouped into two sections. After the last lift card, a **BODY** label (same uppercase accent style as COMPOUND / ISOLATION LIFTS) plus extra space and a hairline divider mark the start of body and calorie charts.
 
 ### Compound Lifts
 
@@ -300,6 +300,8 @@ Per-workout popup chart for that single logged session:
 
 
 ## Body Weight Chart
+
+Body charts start after a **BODY** group label (`spec/page-layout.json` → `pages.progress.sections` `bodySection`). The label uses the same uppercase accent style as COMPOUND / ISOLATION LIFTS, with extra top space and a hairline so the lift region and body region read as separate.
 
 - **Body Weight** line from `bodyLogs` entries
 - Series label **Body Weight (kg)** sits above the plot (same style as BMI), from `spec/page-layout.json` → `pages.progress.bodyWeightChart`

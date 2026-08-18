@@ -165,6 +165,13 @@
   margin: 16px 0 10px;
 }
 
+.sectionLabelBody {
+  composes: sectionLabel;
+  margin: 28px 0 12px;
+  padding-top: 18px;
+  border-top: 1px solid var(--ft-border);
+}
+
 .splitToggleGroup {
   margin-left: auto;
   display: flex;

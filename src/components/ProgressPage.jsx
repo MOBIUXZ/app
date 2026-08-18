@@ -1256,6 +1256,7 @@ export default function ProgressPage({ data }) {
         })}
       </div>}
       <div ref={footerChartsRef}>
+        <div className={s.sectionLabelBody}>{getPageSection("progress", "bodySection").label}</div>
         <Card className={ui.cardChart}>
           <div className={ui.sectionTitleLg}>{getPageSection("progress", "bodyCharts").title}</div>
           <div className={s.bfSection}>

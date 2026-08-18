@@ -186,7 +186,7 @@ State is local to `WorkoutPage` — not lifted to App except via `save()`.
 1. COMPOUND LIFTS label + one `MemoExerciseChart` per logged compound (order from `COMPOUND_LIFTS` filter)
 2. Combined Compound Lifts card (if ≥2 compounds)
 3. ISOLATION LIFTS label + charts for non-compound exercises
-4. Footer: Body Weight card, Fat / Muscle / FFM stacked cards, Segmental Analysis card with Soft Lean / Fat toggle (if any series), Visceral Fat Level card (if any series), Water / Protein / Mineral card (if any series), BMR card (if any series), InBody Score card (if any series), Calorie Intake Trend card
+4. BODY label (extra space + hairline) then footer: Body Weight card, Fat / Muscle / FFM stacked cards, Segmental Analysis card with Soft Lean / Fat toggle (if any series), Visceral Fat Level card (if any series), Water / Protein / Mineral card (if any series), BMR card (if any series), InBody Score card (if any series), Calorie Intake Trend card
 
 ### Modal layers (keyboard)
 

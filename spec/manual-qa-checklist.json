@@ -75,6 +75,7 @@
       "items": [
         { "id": "compound-charts", "check": "Compound lift charts render with data points" },
         { "id": "metric-toggle", "check": "Toggle Max Weight / Volume / e1RM — line morphs smoothly (~600ms)" },
+        { "id": "body-section", "check": "Progress shows a BODY section label with extra space and a divider after workout charts, before Body Weight" },
         { "id": "body-chart", "check": "Body Weight chart shows a Body Weight (kg) label above the plot, matching BMI; BMI appears when that field exists" },
         { "id": "fat-trends", "check": "Progress shows one Fat Mass & Body Fat % card with Fat Mass, Body Fat %, and FMI stacked when those fields exist; empty series stay hidden" },
         { "id": "muscle-trends", "check": "Progress shows one Skeletal Muscle Mass & SMI card with Skeletal Muscle Mass, Muscle Mass %, and SMI stacked when those fields exist; empty series stay hidden" },
