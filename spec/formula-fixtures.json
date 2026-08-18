@@ -93,6 +93,12 @@
     { "id": "prefers-stored", "entry": { "FFMI": 9, "FFM": 68, "height": 200 }, "expected": 9 },
     { "id": "missing", "entry": { "FFM": 68 }, "expected": null }
   ],
+  "deriveSmmFmRatio": [
+    { "id": "from-smm-fm", "entry": { "SMM": 23.8, "FM": 17.2 }, "expected": 1.38372093 },
+    { "id": "from-aliases", "entry": { "smm": 24, "fm": 16.5 }, "expected": 1.45454545 },
+    { "id": "zero-fm", "entry": { "SMM": 24, "FM": 0 }, "expected": null },
+    { "id": "missing-fm", "entry": { "SMM": 24 }, "expected": null }
+  ],
   "sessionMetrics": [
     {
       "id": "bilateral-sets",

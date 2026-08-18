@@ -342,12 +342,13 @@ One Progress card after Skeletal Muscle Mass & SMI. Fat-Free Mass, Fat-Free Mass
 
 ## Muscle Mass & Fat Mass
 
-One Progress card after Segmental Analysis and just above Visceral Fat Level. Skeletal Muscle Mass and Fat Mass overlay on one chart (crimson muscle, yellow fat) with a shared Y-axis. An empty series is omitted; the card is hidden when both are empty. Titles, colors, units, and field paths live in `spec/page-layout.json` → `pages.progress.massOverlayTrends`. Series: `buildAllBodyTrendSeries()` + `buildOverlayTrendModel()` in `src/domain/bodyTrends.js`.
+One Progress card after Segmental Analysis and just above Visceral Fat Level. A Muscle & Fat / Muscle : Fat Ratio pill switches views (the pill is hidden when only one view has data). Default view overlays Skeletal Muscle Mass and Fat Mass on one chart (crimson muscle, yellow fat) with a shared Y-axis. The ratio view plots `SMM / FM` on an accent line. An empty series is omitted; the card is hidden when overlay and ratio are both empty. Titles, colors, units, and field paths live in `spec/page-layout.json` → `pages.progress.massOverlayTrends`. Series: `buildAllBodyTrendSeries()` + `flattenMassOverlayCharts()` + `buildOverlayTrendModel()` in `src/domain/bodyTrends.js`. Ratio uses `deriveSmmFmRatio()` in `src/domain/metrics.js`.
 
 | Line | Source | Unit |
 |------|--------|------|
 | Muscle Mass (kg) | `SMM` / `smm` | kg |
 | Fat Mass (kg) | `FM` / `fm` | kg |
+| Muscle Mass : Fat Mass | derived `SMM / FM` | — |
 
 ## Visceral Fat Level
 

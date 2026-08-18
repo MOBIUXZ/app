@@ -4,7 +4,7 @@ import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExercis
 import { estimate1RM, roundE1RM, averageE1RM, computeSessionMetrics } from "../domain/metrics.js";
 import { CHART_CURSOR, computeYDomain, getTrendLineAnim, getFirstPaintDuration, FAILED_SET_COLOR } from "../domain/chartDomain.js";
 import { getPageLayout, getPageSection, getThemeColor, formatTemplateLabel } from "../domain/pageLayout.js";
-import { buildAllBodyTrendSeries, flattenTrendGroups, buildSegmentalGridModel, buildMergedSegmentalGridModel, buildOverlayTrendModel, visibleSegmentalViews, resolveSegmentalView } from "../domain/bodyTrends.js";
+import { buildAllBodyTrendSeries, flattenTrendGroups, buildSegmentalGridModel, buildMergedSegmentalGridModel, buildOverlayTrendModel, flattenMassOverlayCharts, visibleMassOverlayViews, resolveMassOverlayView, massOverlayChartsForView, visibleSegmentalViews, resolveSegmentalView } from "../domain/bodyTrends.js";
 import { PageHeading } from "./PageIcon";
 import appConfig from "../../spec/app-config.json";
 import s from "./ProgressPage.module.css";
@@ -33,7 +33,7 @@ var muscleCharts = muscleTrends.charts || [];
 var ffmTrends = progressLayout.ffmTrends || {};
 var ffmCharts = ffmTrends.charts || [];
 var massOverlayTrends = progressLayout.massOverlayTrends || {};
-var massOverlayCharts = massOverlayTrends.charts || [];
+var massOverlayCharts = flattenMassOverlayCharts(massOverlayTrends);
 
 function FooterTrendChartList({ charts, seriesById, inView, tickStyle, tooltipStyle, tooltipValueTemplate }) {
   return (charts || []).map(function (chart) {
@@ -66,22 +66,26 @@ function FooterTrendChartList({ charts, seriesById, inView, tickStyle, tooltipSt
   });
 }
 
-function FooterOverlayTrendChart({ spec, seriesById, inView, tickStyle, tooltipStyle }) {
-  var model = buildOverlayTrendModel(spec && spec.charts, seriesById);
+function FooterOverlayTrendChart({ spec, charts, seriesById, inView, tickStyle, tooltipStyle }) {
+  var model = buildOverlayTrendModel(charts || (spec && spec.charts), seriesById);
   if (!model.overlays.length) return null;
   var height = (spec && spec.chartHeight) || 160;
   function formatTooltipValue(value, overlay) {
+    var template = overlay.tooltipValueTemplate || spec.tooltipValueTemplate;
     var unit = overlay.unit;
-    if (!unit) return value;
-    return formatTemplateLabel(spec.tooltipValueTemplate || "{value} {unit}", { value: value, unit: unit });
+    if (!unit) {
+      return template ? formatTemplateLabel(template, { value: value, unit: unit || "" }) : value;
+    }
+    return formatTemplateLabel(template || "{value} {unit}", { value: value, unit: unit });
   }
   return (
     <div className={s.bfSection}>
       <div className={cx(ui.flexRowWrap, ui.gap6)}>
         {model.overlays.map(function (overlay) {
           var color = getThemeColor(overlay.colorToken);
+          var latestTemplate = overlay.latestTemplate || spec.latestTemplate || "{value} {unit}";
           var latest = overlay.latest != null
-            ? formatTemplateLabel(spec.latestTemplate || "{value} {unit}", { value: Number(overlay.latest).toFixed(2), unit: overlay.unit || "kg" })
+            ? formatTemplateLabel(latestTemplate, { value: Number(overlay.latest).toFixed(2), unit: overlay.unit || "kg" })
             : "";
           return (
             <div key={overlay.dataKey} className={s.bfLabel} style={{ color: color }}>
@@ -1013,6 +1017,7 @@ export default function ProgressPage({ data }) {
   var [selectedDate, setSelectedDate] = useState(null);
   var [sessionGraphIdx, setSessionGraphIdx] = useState(null);
   var [segmentalGroupId, setSegmentalGroupId] = useState(defaultSegmentalGroupId);
+  var [massOverlayViewId, setMassOverlayViewId] = useState(massOverlayTrends.defaultView || "overlay");
   var [footerChartsRef, footerChartsInView] = useInView("240px");
 
   var normalizedWorkouts = useMemo(function () {
@@ -1100,9 +1105,11 @@ export default function ProgressPage({ data }) {
   var massOverlaySeries = useMemo(function () {
     return buildAllBodyTrendSeries(data.bodyComp, massOverlayCharts);
   }, [data.bodyComp]);
-  var hasMassOverlay = massOverlayCharts.some(function (chart) {
-    return (massOverlaySeries[chart.id] || []).length > 0;
-  });
+  var visibleMassViews = useMemo(function () {
+    return visibleMassOverlayViews(massOverlayTrends, massOverlaySeries);
+  }, [massOverlaySeries]);
+  var activeMassView = resolveMassOverlayView(massOverlayTrends, massOverlaySeries, massOverlayViewId);
+  var hasMassOverlay = !!activeMassView;
 
   var segmentalTrendSeries = useMemo(function () {
     return buildAllBodyTrendSeries(data.bodyComp, segmentalTrendCharts);
@@ -1434,9 +1441,18 @@ export default function ProgressPage({ data }) {
         ) : null}
         {hasMassOverlay && (
         <Card className={ui.cardChart}>
-          <div className={ui.sectionTitleLg}>{getPageSection("progress", "massOverlay").title}</div>
+          <div className={s.segHeader}>
+            <div className={ui.sectionTitleLg}>{getPageSection("progress", "massOverlay").title}</div>
+            <MetricPillToggle
+              label={getPageSection("progress", "massOverlay").title}
+              items={visibleMassViews}
+              activeId={activeMassView.id}
+              onSelect={setMassOverlayViewId}
+            />
+          </div>
           <FooterOverlayTrendChart
             spec={massOverlayTrends}
+            charts={massOverlayChartsForView(massOverlayTrends, activeMassView)}
             seriesById={massOverlaySeries}
             inView={footerChartsInView}
             tickStyle={cs}

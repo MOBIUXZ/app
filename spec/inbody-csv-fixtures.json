@@ -712,5 +712,27 @@
       ],
       "expectedDomain": [20, 27]
     }
+  ],
+  "massOverlayViewFixtures": [
+    {
+      "id": "includes-ratio-when-both-masses-have-points",
+      "requestedId": "ratio",
+      "seriesById": {
+        "overlaySmm": [{ "date": "01-01-2026", "value": 24 }],
+        "overlayFm": [{ "date": "01-01-2026", "value": 16 }],
+        "smmFmRatio": [{ "date": "01-01-2026", "value": 1.5 }]
+      },
+      "expectedId": "ratio",
+      "expectedVisibleIds": ["overlay", "ratio"]
+    },
+    {
+      "id": "hides-ratio-when-missing",
+      "requestedId": "ratio",
+      "seriesById": {
+        "overlaySmm": [{ "date": "01-01-2026", "value": 24 }]
+      },
+      "expectedId": "overlay",
+      "expectedVisibleIds": ["overlay"]
+    }
   ]
 }

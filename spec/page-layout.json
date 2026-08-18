@@ -348,10 +348,25 @@
         "chartHeight": 160,
         "tooltipValueTemplate": "{value} {unit}",
         "latestTemplate": "{value} {unit}",
+        "defaultView": "overlay",
+        "views": [
+          { "id": "overlay", "toggleLabel": "Muscle & Fat", "chartIds": ["overlaySmm", "overlayFm"] },
+          { "id": "ratio", "toggleLabel": "Muscle : Fat Ratio", "chartIds": ["smmFmRatio"] }
+        ],
         "charts": [
           { "id": "overlaySmm", "dataKey": "smm", "title": "Muscle Mass (kg)", "unit": "kg", "colorToken": "crimson", "paths": ["SMM", "smm"] },
           { "id": "overlayFm", "dataKey": "fm", "title": "Fat Mass (kg)", "unit": "kg", "colorToken": "yellow", "paths": ["FM", "fm"] }
-        ]
+        ],
+        "ratioChart": {
+          "id": "smmFmRatio",
+          "dataKey": "value",
+          "title": "Muscle Mass : Fat Mass",
+          "unit": "",
+          "latestTemplate": "{value}",
+          "tooltipValueTemplate": "{value}",
+          "colorToken": "accent",
+          "derive": "smmFmRatio"
+        }
       },
       "visceralTrends": {
         "charts": [

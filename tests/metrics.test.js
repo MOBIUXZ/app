@@ -9,6 +9,7 @@ import {
   deriveFfm,
   deriveFfmPct,
   deriveFfmi,
+  deriveSmmFmRatio,
 } from '../src/domain/metrics.js';
 import formulaFixtures from '../spec/formula-fixtures.json';
 
@@ -107,5 +108,11 @@ describe('deriveFfmPct (spec/formula-fixtures.json)', function () {
 describe('deriveFfmi (spec/formula-fixtures.json)', function () {
   formulaFixtures.deriveFfmi.forEach(function (fixture) {
     it(fixture.id, function () { assertDeriveFixture(deriveFfmi, fixture); });
+  });
+});
+
+describe('deriveSmmFmRatio (spec/formula-fixtures.json)', function () {
+  formulaFixtures.deriveSmmFmRatio.forEach(function (fixture) {
+    it(fixture.id, function () { assertDeriveFixture(deriveSmmFmRatio, fixture); });
   });
 });

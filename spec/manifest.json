@@ -42,7 +42,7 @@
     {
       "id": "formula-fixtures",
       "path": "spec/formula-fixtures.json",
-      "governs": ["estimate1RM", "computeSessionMetrics", "computeBodyCompEntry", "deriveFmi", "deriveSmmPct", "deriveFfm", "deriveFfmPct", "deriveFfmi"],
+      "governs": ["estimate1RM", "computeSessionMetrics", "computeBodyCompEntry", "deriveFmi", "deriveSmmPct", "deriveFfm", "deriveFfmPct", "deriveFfmi", "deriveSmmFmRatio"],
       "docs": ["docs/data-model.md", "docs/progress.md", "docs/body-comp.md"]
     },
     {
@@ -78,7 +78,7 @@
     {
       "id": "inbody-csv",
       "path": "spec/inbody-csv-fixtures.json",
-      "governs": ["parseInbodyCsv()", "buildInbodyEntry()", "mergeInbodyIntoLogs()", "buildAllBodyTrendSeries()", "flattenTrendGroups()", "buildSegmentalGridModel()", "buildMergedSegmentalGridModel()", "buildOverlayTrendModel()", "resolveSegmentalTrendGroup()", "visibleSegmentalViews()", "resolveSegmentalView()", "buildSegmentalSnapshot()", "InBody CSV column map"],
+      "governs": ["parseInbodyCsv()", "buildInbodyEntry()", "mergeInbodyIntoLogs()", "buildAllBodyTrendSeries()", "flattenTrendGroups()", "buildSegmentalGridModel()", "buildMergedSegmentalGridModel()", "buildOverlayTrendModel()", "flattenMassOverlayCharts()", "visibleMassOverlayViews()", "resolveMassOverlayView()", "massOverlayChartsForView()", "resolveSegmentalTrendGroup()", "visibleSegmentalViews()", "resolveSegmentalView()", "buildSegmentalSnapshot()", "InBody CSV column map"],
       "docs": ["docs/body-comp.md", "docs/data-model.md", "docs/progress.md"]
     },
     {

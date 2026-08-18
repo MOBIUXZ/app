@@ -317,6 +317,12 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(progress.massOverlayTrends.charts.map(function (c) { return c.dataKey; })).toEqual(['smm', 'fm']);
     expect(progress.massOverlayTrends.charts.map(function (c) { return c.title; })).toEqual(['Muscle Mass (kg)', 'Fat Mass (kg)']);
     expect(progress.massOverlayTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['crimson', 'yellow']);
+    expect(progress.massOverlayTrends.defaultView).toBe('overlay');
+    expect(progress.massOverlayTrends.views.map(function (v) { return v.id; })).toEqual(['overlay', 'ratio']);
+    expect(progress.massOverlayTrends.views.map(function (v) { return v.toggleLabel; })).toEqual(['Muscle & Fat', 'Muscle : Fat Ratio']);
+    expect(progress.massOverlayTrends.ratioChart.id).toBe('smmFmRatio');
+    expect(progress.massOverlayTrends.ratioChart.derive).toBe('smmFmRatio');
+    expect(progress.massOverlayTrends.ratioChart.colorToken).toBe('accent');
     expect(progress.massOverlayTrends.tooltipValueTemplate).toBe('{value} {unit}');
     expect(progress.visceralTrends.charts.map(function (c) { return c.id; })).toEqual(['visceral']);
     expect(progress.visceralTrends.charts.map(function (c) { return c.title; })).toEqual(['Visceral Fat Level']);
@@ -373,6 +379,9 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(source.indexOf('ffmTrends') !== -1).toBe(true);
     expect(source.indexOf('massOverlayTrends') !== -1).toBe(true);
     expect(source.indexOf('buildOverlayTrendModel') !== -1).toBe(true);
+    expect(source.indexOf('visibleMassOverlayViews') !== -1).toBe(true);
+    expect(source.indexOf('resolveMassOverlayView') !== -1).toBe(true);
+    expect(source.indexOf('massOverlayChartsForView') !== -1).toBe(true);
     expect(source.indexOf('sectionLabelSpaced') !== -1).toBe(true);
     expect(source.indexOf('sectionLabelBody') !== -1).toBe(true);
     expect(source.indexOf('bodySection') !== -1).toBe(true);

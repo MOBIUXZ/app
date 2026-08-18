@@ -10,7 +10,7 @@ import {
   buildInbodyEntry,
   mergeInbodyIntoLogs,
 } from '../src/domain/inbodyCsv.js';
-import { buildAllBodyTrendSeries, flattenTrendGroups, buildSegmentalGridModel, buildMergedSegmentalGridModel, buildOverlayTrendModel, resolveSegmentalTrendGroup, visibleSegmentalTrendGroups, visibleSegmentalViews, resolveSegmentalView } from '../src/domain/bodyTrends.js';
+import { buildAllBodyTrendSeries, flattenTrendGroups, buildSegmentalGridModel, buildMergedSegmentalGridModel, buildOverlayTrendModel, flattenMassOverlayCharts, visibleMassOverlayViews, resolveMassOverlayView, resolveSegmentalTrendGroup, visibleSegmentalTrendGroups, visibleSegmentalViews, resolveSegmentalView } from '../src/domain/bodyTrends.js';
 import { buildSegmentalSnapshot, latestSegmentalSnapshot } from '../src/domain/bodySegmental.js';
 import { getPageLayout } from '../src/domain/pageLayout.js';
 
@@ -204,6 +204,21 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
     });
   });
 
+  it('flattenMassOverlayCharts includes overlay and ratio charts', function () {
+    var progress = getPageLayout('progress');
+    expect(flattenMassOverlayCharts(progress.massOverlayTrends).map(function (chart) { return chart.id; })).toEqual(['overlaySmm', 'overlayFm', 'smmFmRatio']);
+  });
+
+  inbodySpec.massOverlayViewFixtures.forEach(function (fixture) {
+    it('mass overlay view: ' + fixture.id, function () {
+      var progress = getPageLayout('progress');
+      var views = visibleMassOverlayViews(progress.massOverlayTrends, fixture.seriesById);
+      var active = resolveMassOverlayView(progress.massOverlayTrends, fixture.seriesById, fixture.requestedId);
+      expect(views.map(function (view) { return view.id; })).toEqual(fixture.expectedVisibleIds);
+      expect(active && active.id).toBe(fixture.expectedId);
+    });
+  });
+
   it('Progress page wires InBody trend charts from the layout spec', function () {
     var source = readFileSync(resolve(root, 'src/components/ProgressPage.jsx'), 'utf8');
     expect(source.indexOf('buildAllBodyTrendSeries') !== -1).toBe(true);
@@ -225,6 +240,9 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
     expect(source.indexOf('ffmTrends') !== -1).toBe(true);
     expect(source.indexOf('massOverlayTrends') !== -1).toBe(true);
     expect(source.indexOf('buildOverlayTrendModel') !== -1).toBe(true);
+    expect(source.indexOf('visibleMassOverlayViews') !== -1).toBe(true);
+    expect(source.indexOf('resolveMassOverlayView') !== -1).toBe(true);
+    expect(source.indexOf('massOverlayChartsForView') !== -1).toBe(true);
     expect(source.indexOf('Skeletal Muscle') === -1).toBe(true);
     expect(source.indexOf('Visceral Fat') === -1).toBe(true);
     expect(source.indexOf('Left Arm') === -1).toBe(true);

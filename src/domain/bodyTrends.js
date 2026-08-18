@@ -1,7 +1,7 @@
 /** @file Progress body-trend series — spec/inbody-csv-fixtures.json trendFixtures + spec/page-layout.json visceralTrends / bmrTrends / scoreTrends / segmentalBodyGrid */
 
 import { computeYDomain } from "./chartDomain.js";
-import { deriveFmi, deriveSmmPct, deriveFfm, deriveFfmPct, deriveFfmi } from "./metrics.js";
+import { deriveFmi, deriveSmmPct, deriveFfm, deriveFfmPct, deriveFfmi, deriveSmmFmRatio } from "./metrics.js";
 
 function dateSortKey(date) {
   var parts = String(date || "").split("-");
@@ -40,6 +40,7 @@ var chartDerives = {
   ffm: deriveFfm,
   ffmPct: deriveFfmPct,
   ffmi: deriveFfmi,
+  smmFmRatio: deriveSmmFmRatio,
 };
 
 export function readBodyCompChartValue(entry, chart) {
@@ -86,6 +87,33 @@ export function flattenTrendGroups(groups) {
     (group.charts || []).forEach(function (chart) { charts.push(chart); });
   });
   return charts;
+}
+
+export function flattenMassOverlayCharts(spec) {
+  var charts = spec && spec.charts ? spec.charts.slice() : [];
+  if (spec && spec.ratioChart) charts.push(spec.ratioChart);
+  return charts;
+}
+
+export function massOverlayChartsForView(spec, view) {
+  var byId = {};
+  flattenMassOverlayCharts(spec).forEach(function (chart) { byId[chart.id] = chart; });
+  return (view && view.chartIds ? view.chartIds : []).map(function (id) { return byId[id]; }).filter(Boolean);
+}
+
+export function visibleMassOverlayViews(spec, seriesById) {
+  return ((spec && spec.views) || []).filter(function (view) {
+    return (view.chartIds || []).some(function (id) {
+      return ((seriesById && seriesById[id]) || []).length > 0;
+    });
+  });
+}
+
+export function resolveMassOverlayView(spec, seriesById, requestedId) {
+  var visible = visibleMassOverlayViews(spec, seriesById);
+  if (!visible.length) return null;
+  var match = visible.find(function (view) { return view.id === requestedId; });
+  return match || visible[0];
 }
 
 export function latestSeriesValue(series) {
@@ -289,6 +317,8 @@ export function buildOverlayTrendModel(charts, seriesById) {
       name: chart.title,
       colorToken: chart.colorToken,
       unit: chart.unit,
+      latestTemplate: chart.latestTemplate,
+      tooltipValueTemplate: chart.tooltipValueTemplate,
       latest: latestSeriesValue(series),
     });
     seriesMap[dataKey] = series;

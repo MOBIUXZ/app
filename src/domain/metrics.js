@@ -146,6 +146,15 @@ export function deriveFfmi(entry) {
   return null;
 }
 
+/** Skeletal muscle mass / fat mass from InBody SMM and FM (or smm / fm aliases). */
+export function deriveSmmFmRatio(entry) {
+  if (!entry) return null;
+  var smm = asMetricNumber(entry.SMM != null ? entry.SMM : entry.smm);
+  var fm = asMetricNumber(entry.FM != null ? entry.FM : entry.fm);
+  if (smm == null || fm == null || fm === 0) return null;
+  return smm / fm;
+}
+
 export function computeBodyCompEntry(fields) {
   var wN = parseFloat(fields.weight) || 0;
   var hM = (parseFloat(fields.height) || 0) / 100;
