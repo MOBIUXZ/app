@@ -1,5 +1,5 @@
 {
-  "description": "InBody CSV parse, date year, measured-field mapping, merge-by-date into bodyComp/bodyLogs, Progress body-trend series, Body Comp segmental map, and Progress body-grid model",
+  "description": "InBody CSV parse, date year, measured-field mapping, merge-by-date into bodyComp/bodyLogs, Progress body-trend series, Body Comp segmental map, Progress body-grid model, and Soft Lean / Fat merged overlay view",
   "messages": {
     "imported": "Imported InBody scans.",
     "invalidCsv": "That file is not a valid InBody CSV.",
@@ -605,6 +605,76 @@
       },
       "expectedId": "segmentalLean",
       "expectedVisibleIds": ["segmentalLean"]
+    }
+  ],
+  "gridViewFixtures": [
+    {
+      "id": "includes-merged-when-both-have-points",
+      "requestedId": "segmentalMerged",
+      "seriesById": {
+        "leanTrunk": [{ "date": "01-01-2026", "value": 21 }],
+        "fatTrunk": [{ "date": "01-01-2026", "value": 9 }]
+      },
+      "expectedId": "segmentalMerged",
+      "expectedMerged": true,
+      "expectedVisibleIds": ["segmentalLean", "segmentalFat", "segmentalMerged"]
+    },
+    {
+      "id": "hides-merged-when-one-metric",
+      "requestedId": "segmentalMerged",
+      "seriesById": {
+        "leanTrunk": [{ "date": "01-01-2026", "value": 21 }]
+      },
+      "expectedId": "segmentalLean",
+      "expectedMerged": false,
+      "expectedVisibleIds": ["segmentalLean"]
+    }
+  ],
+  "gridMergeFixtures": [
+    {
+      "id": "overlay-both-metrics-shared-domain",
+      "seriesById": {
+        "leanLeftArm": [
+          { "date": "01-01-2026", "value": 2 },
+          { "date": "01-02-2026", "value": 2.2 }
+        ],
+        "leanRightArm": [
+          { "date": "01-01-2026", "value": 2.1 },
+          { "date": "01-02-2026", "value": 2.8 }
+        ],
+        "leanTrunk": [{ "date": "01-01-2026", "value": 21 }],
+        "leanLeftLeg": [{ "date": "01-01-2026", "value": 8 }],
+        "leanRightLeg": [{ "date": "01-01-2026", "value": 8.1 }],
+        "fatLeftArm": [
+          { "date": "01-01-2026", "value": 1 },
+          { "date": "01-02-2026", "value": 1.1 }
+        ],
+        "fatRightArm": [
+          { "date": "01-01-2026", "value": 0.9 },
+          { "date": "01-02-2026", "value": 1 }
+        ],
+        "fatTrunk": [{ "date": "01-01-2026", "value": 9 }],
+        "fatLeftLeg": [{ "date": "01-01-2026", "value": 2.2 }],
+        "fatRightLeg": [{ "date": "01-01-2026", "value": 2.3 }]
+      },
+      "expectedOverlayKeys": {
+        "leftArm": ["lean", "fat"]
+      },
+      "expectedMergedLeftArm": [
+        { "date": "01-01-2026", "lean": 2, "fat": 1 },
+        { "date": "01-02-2026", "lean": 2.2, "fat": 1.1 }
+      ],
+      "expectedLatest": {
+        "leftArm": { "lean": 2.2, "fat": 1.1 },
+        "rightArm": { "lean": 2.8, "fat": 1 },
+        "trunk": { "lean": 21, "fat": 9 }
+      },
+      "expectedDomains": {
+        "arm": [0, 4],
+        "trunk": [6, 24],
+        "leg": [1, 10]
+      },
+      "expectedGapPairIds": ["lean-arms", "fat-arms"]
     }
   ]
 }

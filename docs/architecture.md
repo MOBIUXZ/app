@@ -134,7 +134,7 @@ Omitted keys (including `settings`) are kept from current state. If the write fa
 | Progress water/protein/mineral | `inbody.tbw` / `protein` / `mineral` | One category card; charts stacked; empty series hidden |
 | Progress BMR | `BMR_InBody`, else Mifflin, else Katch | Own card just above InBody Score; hidden when missing |
 | Progress InBody Score | `inbody.score` | Own card after BMR; hidden when missing |
-| Progress segmental lean/fat charts | `inbody.lean*` / `fat*` per region | One body-grid card with Soft Lean / Fat toggle; arms share a Y-axis, legs share a Y-axis; card hidden if empty |
+| Progress segmental lean/fat charts | `inbody.lean*` / `fat*` per region | One body-grid card with Soft Lean / Fat / Merged overlay toggle; arms share a Y-axis, legs share a Y-axis; card hidden if empty |
 | Body Comp segmental map | Latest `bodyComp` entry with `inbody` lean/fat segments | Hidden when those fields are missing |
 | Body Comp InBody import | InBody CSV → `bodyComp` + `bodyLogs` | Merge by date; workouts/calories unchanged |
 | Progress calorie chart | `calories` last 7 days | |
@@ -186,7 +186,7 @@ State is local to `WorkoutPage` — not lifted to App except via `save()`.
 1. COMPOUND LIFTS label + one `MemoExerciseChart` per logged compound (order from `COMPOUND_LIFTS` filter)
 2. Combined Compound Lifts card (if ≥2 compounds)
 3. ISOLATION LIFTS label + charts for non-compound exercises
-4. BODY label (extra space + hairline) then footer: Body Weight card, Fat / Muscle / FFM stacked cards, Segmental Analysis card with Soft Lean / Fat toggle (if any series), Visceral Fat Level card (if any series), Water / Protein / Mineral card (if any series), BMR card (if any series), InBody Score card (if any series), Calorie Intake Trend card
+4. BODY label (extra space + hairline) then footer: Body Weight card, Fat / Muscle / FFM stacked cards, Segmental Analysis card with Soft Lean / Fat / Merged toggle (if any series), Visceral Fat Level card (if any series), Water / Protein / Mineral card (if any series), BMR card (if any series), InBody Score card (if any series), Calorie Intake Trend card
 
 ### Modal layers (keyboard)
 

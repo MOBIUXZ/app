@@ -4,7 +4,7 @@ import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExercis
 import { estimate1RM, roundE1RM, averageE1RM, computeSessionMetrics } from "../domain/metrics.js";
 import { CHART_CURSOR, computeYDomain, getTrendLineAnim, getFirstPaintDuration, FAILED_SET_COLOR } from "../domain/chartDomain.js";
 import { getPageLayout, getPageSection, getThemeColor, formatTemplateLabel } from "../domain/pageLayout.js";
-import { buildAllBodyTrendSeries, flattenTrendGroups, buildSegmentalGridModel, resolveSegmentalTrendGroup, visibleSegmentalTrendGroups } from "../domain/bodyTrends.js";
+import { buildAllBodyTrendSeries, flattenTrendGroups, buildSegmentalGridModel, buildMergedSegmentalGridModel, visibleSegmentalViews, resolveSegmentalView } from "../domain/bodyTrends.js";
 import { PageHeading } from "./PageIcon";
 import appConfig from "../../spec/app-config.json";
 import s from "./ProgressPage.module.css";
@@ -89,10 +89,17 @@ function MetricPillToggle({ label, items, activeId, onSelect }) {
 function SegmentalMiniChart({ slotModel, domain, height, inView, tickStyle, tooltipStyle, unit, latestTemplate, tooltipValueTemplate }) {
   if (!slotModel || !(slotModel.series || []).length) return null;
   var chart = slotModel.chart;
-  var color = getThemeColor(chart.colorToken);
-  var latestLabel = slotModel.latest != null
-    ? formatTemplateLabel(latestTemplate || "{value} {unit}", { value: Number(slotModel.latest).toFixed(2), unit: unit || "kg" })
-    : "";
+  var overlays = (slotModel.overlays && slotModel.overlays.length)
+    ? slotModel.overlays
+    : [{ dataKey: "value", name: chart.title, colorToken: chart.colorToken, latest: slotModel.latest }];
+  var titleColor = overlays.length === 1 ? getThemeColor(overlays[0].colorToken) : undefined;
+  var latestNodes = overlays.filter(function (overlay) { return overlay.latest != null; }).map(function (overlay) {
+    return (
+      <span key={overlay.dataKey} style={{ color: getThemeColor(overlay.colorToken) }}>
+        {formatTemplateLabel(latestTemplate || "{value} {unit}", { value: Number(overlay.latest).toFixed(2), unit: unit || "kg" })}
+      </span>
+    );
+  });
   var showDates = !!chart.showDates;
   function formatTooltipValue(value) {
     return formatTemplateLabel(tooltipValueTemplate || "{value} {unit}", { value: value, unit: unit || "kg" });
@@ -100,8 +107,12 @@ function SegmentalMiniChart({ slotModel, domain, height, inView, tickStyle, tool
   return (
     <div>
       <div className={s.segCellHead}>
-        <div className={s.segCellTitle} style={{ color: color }}>{chart.title}</div>
-        {latestLabel ? <div className={s.segCellLatest}>{latestLabel}</div> : null}
+        <div className={s.segCellTitle} style={titleColor ? { color: titleColor } : undefined}>{chart.title}</div>
+        {latestNodes.length ? (
+          <div className={latestNodes.length > 1 ? cx(s.segCellLatest, s.segCellLatestRow) : s.segCellLatest}>
+            {latestNodes}
+          </div>
+        ) : null}
       </div>
       <div className={ui.chartContainer}>
         {inView ? (
@@ -110,8 +121,24 @@ function SegmentalMiniChart({ slotModel, domain, height, inView, tickStyle, tool
               <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
               <XAxis dataKey="date" tick={showDates ? tickStyle : false} interval="preserveStartEnd" height={showDates ? 22 : 8} />
               <YAxis domain={domain} tick={tickStyle} width={28} />
-              <Tooltip contentStyle={tooltipStyle} formatter={function (value) { return [formatTooltipValue(value), chart.title]; }} />
-              <Line type="monotone" dataKey="value" name={chart.title} stroke={color} strokeWidth={2} dot={{ fill: color, r: 2 }} isAnimationActive={false} animationDuration={0} />
+              <Tooltip contentStyle={tooltipStyle} formatter={function (value, name) { return [formatTooltipValue(value), name]; }} />
+              {overlays.map(function (overlay) {
+                var color = getThemeColor(overlay.colorToken);
+                return (
+                  <Line
+                    key={overlay.dataKey}
+                    type="monotone"
+                    dataKey={overlay.dataKey}
+                    name={overlay.name}
+                    stroke={color}
+                    strokeWidth={2}
+                    dot={{ fill: color, r: 2 }}
+                    connectNulls={false}
+                    isAnimationActive={false}
+                    animationDuration={0}
+                  />
+                );
+              })}
             </LineChart>
           </ResponsiveContainer>
         ) : <div className={s.chartPlaceholder} style={{ minHeight: height }} aria-hidden="true" />}
@@ -120,12 +147,15 @@ function SegmentalMiniChart({ slotModel, domain, height, inView, tickStyle, tool
   );
 }
 
-function SegmentalBodyGrid({ group, seriesById, inView, tickStyle, tooltipStyle }) {
+function SegmentalBodyGrid({ group, merged, seriesById, inView, tickStyle, tooltipStyle }) {
   var grid = segmentalBodyGrid;
-  var model = buildSegmentalGridModel(group, seriesById, grid);
+  var model = merged
+    ? buildMergedSegmentalGridModel(segmentalTrendGroups, seriesById, grid)
+    : buildSegmentalGridModel(group, seriesById, grid);
   var unit = grid.unit || "kg";
   var limbHeight = grid.chartHeight || 110;
   var trunkHeight = grid.trunkChartHeight || 132;
+  var gapTemplate = merged && grid.mergedImbalanceTemplate ? grid.mergedImbalanceTemplate : grid.imbalanceTemplate;
   function renderSlot(slotId, height) {
     var item = model.slots[slotId];
     if (!item || !(item.series || []).length) return null;
@@ -168,7 +198,7 @@ function SegmentalBodyGrid({ group, seriesById, inView, tickStyle, tooltipStyle 
       {model.gaps.map(function (item) {
         return (
           <div key={item.pairId} className={s.segHint}>
-            {formatTemplateLabel(grid.imbalanceTemplate, { label: item.label, delta: item.delta.toFixed(2) })}
+            {formatTemplateLabel(gapTemplate, { label: item.label, delta: item.delta.toFixed(2), group: item.group })}
           </div>
         );
       })}
@@ -1006,10 +1036,10 @@ export default function ProgressPage({ data }) {
     return buildAllBodyTrendSeries(data.bodyComp, segmentalTrendCharts);
   }, [data.bodyComp]);
 
-  var visibleSegGroups = useMemo(function () {
-    return visibleSegmentalTrendGroups(segmentalTrendGroups, segmentalTrendSeries);
+  var visibleSegViews = useMemo(function () {
+    return visibleSegmentalViews(segmentalTrendGroups, segmentalTrendSeries, segmentalBodyGrid.mergeView);
   }, [segmentalTrendSeries]);
-  var activeSegGroup = resolveSegmentalTrendGroup(segmentalTrendGroups, segmentalTrendSeries, segmentalGroupId);
+  var activeSegView = resolveSegmentalView(segmentalTrendGroups, segmentalTrendSeries, segmentalGroupId, segmentalBodyGrid.mergeView);
 
   var calChart = useMemo(function () {
     var calDates = [];
@@ -1316,18 +1346,18 @@ export default function ProgressPage({ data }) {
           />
         </Card>
         )}
-        {activeSegGroup ? (
+        {activeSegView ? (
         <Card className={ui.cardChart}>
           <div className={s.segHeader}>
             <div className={ui.sectionTitleLg}>{getPageSection("progress", "segmental").title}</div>
             <MetricPillToggle
               label={getPageSection("progress", "segmental").title}
-              items={visibleSegGroups}
-              activeId={activeSegGroup.id}
+              items={visibleSegViews}
+              activeId={activeSegView.id}
               onSelect={setSegmentalGroupId}
             />
           </div>
-          <SegmentalBodyGrid group={activeSegGroup} seriesById={segmentalTrendSeries} inView={footerChartsInView} tickStyle={cs} tooltipStyle={tt} />
+          <SegmentalBodyGrid group={activeSegView.group} merged={activeSegView.merged} seriesById={segmentalTrendSeries} inView={footerChartsInView} tickStyle={cs} tooltipStyle={tt} />
         </Card>
         ) : null}
         {hasVisceralTrends && (

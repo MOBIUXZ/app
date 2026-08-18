@@ -24,7 +24,7 @@ When you change a **metric toggle**, the active line morphs smoothly between val
 | Per-exercise (combined & split) | Instant | 600ms morph |
 | Combined Compound Lifts | Instant | 600ms morph (all visible lift lines) |
 | Body weight / body fat / Visceral Fat / Water, Protein & Mineral / BMR / InBody Score / calories | Instant | N/A (no metric toggles) |
-| Segmental Analysis | Instant | Instant Soft Lean / Fat pill (swaps the grid; no line morph) |
+| Segmental Analysis | Instant | Instant Soft Lean / Fat / Merged pill (swaps the grid; no line morph) |
 | Session Performance popup | 600ms draw on open | 600ms morph |
 
 **How it works (maintainers):** `withTrendPlotValue()` copies the active metric into a stable `plotValue` field; Recharts `<Line dataKey="plotValue" animationId={metric}>` interpolates between toggles. `useTrendChartAnimation(chartReady)` sets `animationDuration={0}` on first paint, then `600` on subsequent updates. Y-axis domain rescales per metric via `sessionChartYDomain()` (same helper as session graphs). Tooltips stay non-animated for snappy hover.
@@ -376,14 +376,15 @@ One Progress card after BMR. InBody Score is its own stack. The card is omitted 
 
 ## Segmental Analysis
 
-One Progress card after Fat-Free Mass & FFMI, with a **Soft Lean Mass / Fat Mass** pill toggle (same pattern as the Body Comp History map). The unused metric is hidden; if only one metric has points, the toggle is omitted. Each metric is a **body-shaped grid**: left/right arm beside a figure, trunk full-width in the middle, left/right leg below. Layout, titles, colors, CSV paths, and shared Y-axis groups live in `spec/page-layout.json` → `pages.progress.segmentalTrendGroups` + `segmentalBodyGrid`. View model: `buildSegmentalGridModel()` / `resolveSegmentalTrendGroup()` in `src/domain/bodyTrends.js`.
+One Progress card after Fat-Free Mass & FFMI, with a **Soft Lean Mass / Fat Mass / Merged** pill toggle (same pattern as the Body Comp History map). The unused metric is hidden; if only one metric has points, the toggle is omitted. **Merged** appears only when both metrics have points and overlays Soft Lean (crimson) and Fat (yellow) on each region chart. Each metric is a **body-shaped grid**: left/right arm beside a figure, trunk full-width in the middle, left/right leg below. Layout, titles, colors, CSV paths, shared Y-axis groups, and the merged pill live in `spec/page-layout.json` → `pages.progress.segmentalTrendGroups` + `segmentalBodyGrid`. View model: `buildSegmentalGridModel()` / `buildMergedSegmentalGridModel()` / `resolveSegmentalView()` in `src/domain/bodyTrends.js`.
 
 | Toggle | Regions |
 |--------|---------|
 | Soft Lean Mass | Trunk, Left Arm, Right Arm, Left Leg, Right Leg (`inbody.lean*Kg`) |
 | Fat Mass | Trunk, Left Arm, Right Arm, Left Leg, Right Leg (`inbody.fat*Kg`) |
+| Merged | Same five regions, Soft Lean and Fat lines overlapping (crimson + yellow) |
 
-Arms share one Y-axis, legs share one Y-axis, trunk keeps its own (trunk kg is much larger than arms). Soft Lean Mass region charts use the crimson `colorToken`; Fat Mass region charts use yellow. Latest kg is labeled on each mini-chart. Hovering a point shows **kg** after the value (e.g. `Trunk : 10.5 kg`). A left/right pair that differs by 5% or more of the smaller side shows a gap hint. A region is omitted when it has no points. The card is omitted when both metrics are empty. Same footer lazy-mount as the other health charts. The Body Comp History **segmental map** is the latest-scan snapshot; these Progress charts are the history over time.
+Arms share one Y-axis, legs share one Y-axis, trunk keeps its own (trunk kg is much larger than arms). In Merged, each scale group includes both Soft Lean and Fat values so the two lines share an axis. Soft Lean Mass region charts use the crimson `colorToken`; Fat Mass region charts use yellow. Latest kg is labeled on each mini-chart (both values in Merged). Hovering a point shows **kg** after the value (e.g. `Trunk : 10.5 kg`). A left/right pair that differs by 5% or more of the smaller side shows a gap hint. A region is omitted when it has no points. The card is omitted when both metrics are empty. Same footer lazy-mount as the other health charts. The Body Comp History **segmental map** is the latest-scan snapshot; these Progress charts are the history over time.
 
 ## Calorie Intake Trend
 

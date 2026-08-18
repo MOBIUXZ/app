@@ -1,4 +1,4 @@
-/** @file Progress body-trend series — spec/inbody-csv-fixtures.json trendFixtures + spec/page-layout.json visceralTrends / bmrTrends / scoreTrends */
+/** @file Progress body-trend series — spec/inbody-csv-fixtures.json trendFixtures + spec/page-layout.json visceralTrends / bmrTrends / scoreTrends / segmentalBodyGrid */
 
 import { computeYDomain } from "./chartDomain.js";
 import { deriveFmi, deriveSmmPct, deriveFfm, deriveFfmPct, deriveFfmi } from "./metrics.js";
@@ -157,4 +157,121 @@ export function resolveSegmentalTrendGroup(groups, seriesById, requestedId) {
   if (!visible.length) return null;
   var found = visible.find(function (group) { return group.id === requestedId; });
   return found || visible[0];
+}
+
+export function mergeSeriesByDate(seriesMap) {
+  var byDate = {};
+  Object.keys(seriesMap || {}).forEach(function (key) {
+    (seriesMap[key] || []).forEach(function (point) {
+      if (!point || point.date == null) return;
+      if (!byDate[point.date]) byDate[point.date] = { date: point.date };
+      byDate[point.date][key] = point.value;
+    });
+  });
+  return Object.keys(byDate).map(function (date) { return byDate[date]; }).sort(function (a, b) {
+    return dateSortKey(a.date) - dateSortKey(b.date);
+  });
+}
+
+export function visibleSegmentalViews(groups, seriesById, mergeView) {
+  var visible = visibleSegmentalTrendGroups(groups, seriesById);
+  var items = visible.map(function (group) {
+    return { id: group.id, toggleLabel: group.toggleLabel, merged: false, group: group };
+  });
+  if (mergeView && mergeView.id && visible.length >= 2) {
+    items.push({
+      id: mergeView.id,
+      toggleLabel: mergeView.toggleLabel,
+      merged: true,
+    });
+  }
+  return items;
+}
+
+export function resolveSegmentalView(groups, seriesById, requestedId, mergeView) {
+  var views = visibleSegmentalViews(groups, seriesById, mergeView);
+  if (!views.length) return null;
+  var found = views.find(function (view) { return view.id === requestedId; });
+  return found || views[0];
+}
+
+export function buildMergedSegmentalGridModel(groups, seriesById, gridSpec) {
+  var visible = visibleSegmentalTrendGroups(groups, seriesById);
+  var overlaysBySlot = {};
+  visible.forEach(function (group) {
+    (group.charts || []).forEach(function (chart) {
+      var series = (seriesById && seriesById[chart.id]) || [];
+      if (!chart.slot || !series.length) return;
+      if (!overlaysBySlot[chart.slot]) overlaysBySlot[chart.slot] = [];
+      overlaysBySlot[chart.slot].push({
+        dataKey: group.metric,
+        name: group.toggleLabel,
+        colorToken: chart.colorToken,
+        latest: latestSeriesValue(series),
+        series: series,
+        showDates: !!chart.showDates,
+        scaleGroup: chart.scaleGroup,
+        title: chart.title,
+      });
+    });
+  });
+  var slots = {};
+  var scaleSeries = {};
+  Object.keys(overlaysBySlot).forEach(function (slot) {
+    var overlays = overlaysBySlot[slot];
+    var seriesMap = {};
+    overlays.forEach(function (overlay) { seriesMap[overlay.dataKey] = overlay.series; });
+    var base = overlays[0];
+    var scale = base.scaleGroup || slot;
+    slots[slot] = {
+      chart: {
+        title: base.title,
+        slot: slot,
+        scaleGroup: scale,
+        showDates: overlays.some(function (overlay) { return overlay.showDates; }),
+      },
+      series: mergeSeriesByDate(seriesMap),
+      overlays: overlays.map(function (overlay) {
+        return {
+          dataKey: overlay.dataKey,
+          name: overlay.name,
+          colorToken: overlay.colorToken,
+          latest: overlay.latest,
+        };
+      }),
+    };
+    if (!scaleSeries[scale]) scaleSeries[scale] = [];
+    overlays.forEach(function (overlay) { scaleSeries[scale].push(overlay.series); });
+  });
+  var domains = {};
+  Object.keys(scaleSeries).forEach(function (scale) {
+    domains[scale] = sharedYDomain(scaleSeries[scale]);
+  });
+  var threshold = gridSpec && gridSpec.imbalanceRatio != null ? gridSpec.imbalanceRatio : 0.05;
+  var gaps = [];
+  visible.forEach(function (group) {
+    var latestBySlot = {};
+    (group.charts || []).forEach(function (chart) {
+      var series = (seriesById && seriesById[chart.id]) || [];
+      if (!chart.slot || !series.length) return;
+      latestBySlot[chart.slot] = latestSeriesValue(series);
+    });
+    ((gridSpec && gridSpec.pairs) || []).forEach(function (pair) {
+      var left = latestBySlot[pair.leftSlot];
+      var right = latestBySlot[pair.rightSlot];
+      if (left == null || right == null) return;
+      var delta = Math.abs(right - left);
+      if (segmentalGapRatio(left, right, gridSpec && gridSpec.imbalanceRelativeTo) >= threshold) {
+        gaps.push({
+          pairId: group.metric + "-" + pair.id,
+          label: pair.label,
+          group: group.toggleLabel,
+          delta: delta,
+          left: left,
+          right: right,
+        });
+      }
+    });
+  });
+  return { slots: slots, domains: domains, gaps: gaps };
 }

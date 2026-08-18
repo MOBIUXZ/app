@@ -595,6 +595,13 @@
   color: var(--ft-text);
 }
 
+.segCellLatestRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .segFigure {
   grid-area: fig;
   display: flex;

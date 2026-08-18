@@ -306,7 +306,7 @@ After rebuild, confirm **all** of the following:
 - [ ] Combined compound overlay (when ≥2 compounds logged)
 - [ ] Metric toggles morph 600ms; first scroll-in is instant
 - [ ] Click chart point → Workout Details → Session Performance graph
-- [ ] Footer: BODY section label, then body weight + BMI (if data), Fat Mass & Body Fat % stacked category when present, Skeletal Muscle Mass & SMI stacked category when present, Fat-Free Mass & FFMI stacked category when present, Segmental Analysis body-grid with Soft Lean / Fat toggle when present, Visceral Fat Level when present, Water / Protein / Mineral category when present, BMR when present, InBody Score when present, 7-day calories
+- [ ] Footer: BODY section label, then body weight + BMI (if data), Fat Mass & Body Fat % stacked category when present, Skeletal Muscle Mass & SMI stacked category when present, Fat-Free Mass & FFMI stacked category when present, Segmental Analysis body-grid with Soft Lean / Fat / Merged toggle when present, Visceral Fat Level when present, Water / Protein / Mineral category when present, BMR when present, InBody Score when present, 7-day calories
 
 ### Keyboard
 - [ ] `1`–`5` switches tabs (when no popup open)

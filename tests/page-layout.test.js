@@ -339,6 +339,8 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(progress.segmentalBodyGrid.layout).toBe('bodyGrid');
     expect(progress.segmentalBodyGrid.imbalanceRelativeTo).toBe('min');
     expect(progress.segmentalBodyGrid.defaultMetric).toBe('lean');
+    expect(progress.segmentalBodyGrid.mergeView.id).toBe('segmentalMerged');
+    expect(progress.segmentalBodyGrid.mergeView.toggleLabel).toBe('Merged');
     expect(progress.segmentalBodyGrid.tooltipValueTemplate).toBe('{value} {unit}');
     expect(formatTemplateLabel(progress.segmentalBodyGrid.tooltipValueTemplate, { value: 10.5, unit: progress.segmentalBodyGrid.unit })).toBe('10.5 kg');
     expect(progress.segmentalTrendGroups.map(function (g) { return g.id; })).toEqual(['segmentalLean', 'segmentalFat']);
@@ -356,7 +358,8 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(source.indexOf('segmentalTrendGroups') !== -1).toBe(true);
     expect(source.indexOf('segmentalBodyGrid') !== -1).toBe(true);
     expect(source.indexOf('buildSegmentalGridModel') !== -1).toBe(true);
-    expect(source.indexOf('resolveSegmentalTrendGroup') !== -1).toBe(true);
+    expect(source.indexOf('buildMergedSegmentalGridModel') !== -1).toBe(true);
+    expect(source.indexOf('resolveSegmentalView') !== -1).toBe(true);
     expect(source.indexOf('tooltipValueTemplate') !== -1).toBe(true);
     expect(source.indexOf('compositionTrends') !== -1).toBe(true);
     expect(source.indexOf('scoreTrends') !== -1).toBe(true);

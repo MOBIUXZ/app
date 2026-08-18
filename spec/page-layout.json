@@ -376,7 +376,12 @@
         "imbalanceRatio": 0.05,
         "imbalanceRelativeTo": "min",
         "imbalanceTemplate": "{label} · Δ {delta} kg",
+        "mergedImbalanceTemplate": "{group} · {label} · Δ {delta} kg",
         "defaultMetric": "lean",
+        "mergeView": {
+          "id": "segmentalMerged",
+          "toggleLabel": "Merged"
+        },
         "pairs": [
           { "id": "arms", "label": "Arms", "leftSlot": "leftArm", "rightSlot": "rightArm" },
           { "id": "legs", "label": "Legs", "leftSlot": "leftLeg", "rightSlot": "rightLeg" }

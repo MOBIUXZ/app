@@ -10,7 +10,7 @@ import {
   buildInbodyEntry,
   mergeInbodyIntoLogs,
 } from '../src/domain/inbodyCsv.js';
-import { buildAllBodyTrendSeries, flattenTrendGroups, buildSegmentalGridModel, resolveSegmentalTrendGroup, visibleSegmentalTrendGroups } from '../src/domain/bodyTrends.js';
+import { buildAllBodyTrendSeries, flattenTrendGroups, buildSegmentalGridModel, buildMergedSegmentalGridModel, resolveSegmentalTrendGroup, visibleSegmentalTrendGroups, visibleSegmentalViews, resolveSegmentalView } from '../src/domain/bodyTrends.js';
 import { buildSegmentalSnapshot, latestSegmentalSnapshot } from '../src/domain/bodySegmental.js';
 import { getPageLayout } from '../src/domain/pageLayout.js';
 
@@ -165,6 +165,35 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
     });
   });
 
+  inbodySpec.gridViewFixtures.forEach(function (fixture) {
+    it('segmental view: ' + fixture.id, function () {
+      var progress = getPageLayout('progress');
+      var views = visibleSegmentalViews(progress.segmentalTrendGroups, fixture.seriesById, progress.segmentalBodyGrid.mergeView);
+      var active = resolveSegmentalView(progress.segmentalTrendGroups, fixture.seriesById, fixture.requestedId, progress.segmentalBodyGrid.mergeView);
+      expect(views.map(function (view) { return view.id; })).toEqual(fixture.expectedVisibleIds);
+      expect(active && active.id).toBe(fixture.expectedId);
+      expect(!!(active && active.merged)).toBe(fixture.expectedMerged);
+    });
+  });
+
+  inbodySpec.gridMergeFixtures.forEach(function (fixture) {
+    it('segmental merged overlay: ' + fixture.id, function () {
+      var progress = getPageLayout('progress');
+      var model = buildMergedSegmentalGridModel(progress.segmentalTrendGroups, fixture.seriesById, progress.segmentalBodyGrid);
+      Object.keys(fixture.expectedOverlayKeys).forEach(function (slot) {
+        expect(model.slots[slot].overlays.map(function (overlay) { return overlay.dataKey; })).toEqual(fixture.expectedOverlayKeys[slot]);
+      });
+      expect(model.slots.leftArm.series).toEqual(fixture.expectedMergedLeftArm);
+      Object.keys(fixture.expectedLatest).forEach(function (slot) {
+        var latest = {};
+        model.slots[slot].overlays.forEach(function (overlay) { latest[overlay.dataKey] = overlay.latest; });
+        expect(latest).toEqual(fixture.expectedLatest[slot]);
+      });
+      expect(model.domains).toEqual(fixture.expectedDomains);
+      expect(model.gaps.map(function (gap) { return gap.pairId; })).toEqual(fixture.expectedGapPairIds);
+    });
+  });
+
   it('Progress page wires InBody trend charts from the layout spec', function () {
     var source = readFileSync(resolve(root, 'src/components/ProgressPage.jsx'), 'utf8');
     expect(source.indexOf('buildAllBodyTrendSeries') !== -1).toBe(true);
@@ -174,8 +203,9 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
     expect(source.indexOf('bmrTrends') !== -1).toBe(true);
     expect(source.indexOf('segmentalTrendGroups') !== -1).toBe(true);
     expect(source.indexOf('buildSegmentalGridModel') !== -1).toBe(true);
+    expect(source.indexOf('buildMergedSegmentalGridModel') !== -1).toBe(true);
     expect(source.indexOf('segmentalBodyGrid') !== -1).toBe(true);
-    expect(source.indexOf('resolveSegmentalTrendGroup') !== -1).toBe(true);
+    expect(source.indexOf('resolveSegmentalView') !== -1).toBe(true);
     expect(source.indexOf('pillToggleTrack') !== -1).toBe(true);
     expect(source.indexOf('tooltipValueTemplate') !== -1).toBe(true);
     expect(source.indexOf('compositionTrends') !== -1).toBe(true);
