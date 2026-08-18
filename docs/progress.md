@@ -141,7 +141,7 @@ Side data comes from Smart Parser entries like:
 
 Sets without side info are marked `both` and count toward combined totals.
 
-> **Note:** The per-exercise **Split** toggle applies to any isolation exercise with left/right set data. The **Workout Details** set list and **Session Performance** split view use a stricter rule: only exercises whose **name** contains `single arm` (case-insensitive), e.g. Single Arm Lat Pulldown. Workout or set notes do not trigger that split.
+> **Note:** The per-exercise **Split** toggle, **Workout Details** set list split, and **Session Performance** split view now use the same rule: show split whenever left/right set data exists and the exercise is not in `NO_SPLIT_LIFTS` (bilateral compounds).
 
 ### Left/Right Imbalance Highlighting (Split View)
 
@@ -279,7 +279,7 @@ Each set is one row: **weight × reps** on the left, estimated 1RM on the right 
 
 - **Best** = highest e1RM in that workout session (ties all get the highlight)
 - Values use a fixed min-width column so labels stay right-aligned
-- **Left/right split workouts** — side-by-side **Left** (blue) and **Right** (pink) columns when the exercise **name** contains `single arm` (case-insensitive). Sets without side (`both`) appear in **both** columns; each column computes its own best e1RM. **Compound lifts** use a single-column list
+- **Left/right split workouts** — side-by-side **Left** (blue) and **Right** (pink) columns when left/right set data exists and the exercise is not in `NO_SPLIT_LIFTS`. Sets without side (`both`) appear in **both** columns; each column computes its own best e1RM. **Compound lifts** use a single-column list
 
 **Implementation:** `renderDetailSetRows()`, `getBestE1RM()`, `renderWorkoutSetPanel()` in `ProgressPage.jsx`; `.setRow`, `.setRowE1rm`, `.setRowE1rmBest`, `.setRowBest` in `ProgressPage.module.css` (see [styling.md](./styling.md#workout-detail-set-rows-progress))
 
@@ -293,7 +293,7 @@ Per-workout popup chart for that single logged session:
 | **Metric toggles** | Weight / Volume / e1RM — line morphs smoothly when switching (600ms ease-in-out), same animation model as main exercise charts |
 | **X-axis** | Set number (`S1`, `S2`, …) with `L` / `R` when side data exists; per-set **time** shown below the label when parsed from Smart Parser (`MM:SS` on the set) |
 | **Y-axis** | Selected metric per set (weight, set volume, or set e1RM) |
-| **Split view** | Only when the exercise **name** includes `single arm` and left/right set data exists: side-by-side Left (blue) and Right (pink) mini charts in one row, labels above each chart; compound lifts use one chart |
+| **Split view** | When left/right set data exists and the exercise is not in `NO_SPLIT_LIFTS`: side-by-side Left (blue) and Right (pink) mini charts in one row, labels above each chart; compound lifts use one chart |
 | **Split imbalance** | In split session graphs, each set index on Left is compared to the same index on Right for the active metric. Mismatches get **amber rings** on both dots; a legend appears below when any imbalance exists. Hovering a set shows a **docked comparison panel** below the charts (not over the graph): **set number** centered above, **time** below that, **⚠ Imbalance · Δ** centered at the bottom when sides differ; **Left** / **Right** values and load (`kg × reps`) on the sides. Panel tracks cursor via chart x-position (not tiny dot hit targets) |
 | **Failed sets (0 reps)** | Excluded from the trend line; shown as a red **✕** at the set position (attempted weight on Weight view, bottom on Volume/e1RM). Set label turns red; tooltip shows **Failed attempt** |
 | **Keyboard** | `Esc` closes the graph first, then the day modal |

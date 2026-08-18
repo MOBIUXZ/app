@@ -386,20 +386,13 @@ function getBestE1RM(sets) {
   }, 0);
 }
 
-function isSingleArmWorkout(workout) {
-  return workout && String(workout.exercise || "").toLowerCase().indexOf("single arm") !== -1;
-}
-
 function workoutHasSplitSets(sets) {
   return (sets || []).some(function (st) { return st && (st.side === "left" || st.side === "right"); });
 }
 
 function workoutUsesSplitPanel(workout) {
-  if (!workout || isCompoundLift(workout.exercise) || !isSingleArmWorkout(workout)) return false;
-  var sets = workout.sets || [];
-  return workoutHasSplitSets(sets) || sets.some(function (st) {
-    return st && st.side !== "left" && st.side !== "right";
-  });
+  if (!workout || isNoSplitLift(workout.exercise)) return false;
+  return workoutHasSplitSets(workout.sets || []);
 }
 
 function renderDetailSetRows(sets, bestE1Value, keyPrefix) {
