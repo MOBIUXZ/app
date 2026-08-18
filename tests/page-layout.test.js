@@ -333,7 +333,6 @@ describe('page layout spec (spec/page-layout.json)', function () {
       progress.compositionTrends.charts[0].colorToken,
       progress.bmrTrends.charts[0].colorToken,
       progress.scoreTrends.charts[0].colorToken,
-      progress.segmentalTrendGroups[0].charts[0].colorToken,
     ];
     expect(new Set(stackColors).size).toBe(stackColors.length);
     expect(progress.compositionTrends.tooltipValueTemplate).toBe('{value} {unit}');
@@ -346,8 +345,8 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(progress.segmentalTrendGroups.map(function (g) { return g.toggleLabel; })).toEqual(['Soft Lean Mass', 'Fat Mass']);
     expect(progress.segmentalTrendGroups[0].charts.map(function (c) { return c.id; })).toEqual(['leanLeftArm', 'leanRightArm', 'leanTrunk', 'leanLeftLeg', 'leanRightLeg']);
     expect(progress.segmentalTrendGroups[0].charts.map(function (c) { return c.slot; })).toEqual(['leftArm', 'rightArm', 'trunk', 'leftLeg', 'rightLeg']);
-    expect(progress.segmentalTrendGroups[0].charts.map(function (c) { return c.colorToken; })).toEqual(['teal', 'teal', 'teal', 'teal', 'teal']);
-    expect(progress.segmentalTrendGroups[1].charts.map(function (c) { return c.colorToken; })).toEqual(['teal', 'teal', 'teal', 'teal', 'teal']);
+    expect(progress.segmentalTrendGroups[0].charts.map(function (c) { return c.colorToken; })).toEqual(['crimson', 'crimson', 'crimson', 'crimson', 'crimson']);
+    expect(progress.segmentalTrendGroups[1].charts.map(function (c) { return c.colorToken; })).toEqual(['yellow', 'yellow', 'yellow', 'yellow', 'yellow']);
     expect(progress.segmentalTrendGroups[1].charts.map(function (c) { return c.id; })).toEqual(['fatLeftArm', 'fatRightArm', 'fatTrunk', 'fatLeftLeg', 'fatRightLeg']);
     var source = readFileSync(resolve(root, progress.component), 'utf8');
     expect(source.indexOf('visceralTrends') !== -1).toBe(true);

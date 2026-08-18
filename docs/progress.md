@@ -307,7 +307,7 @@ Body charts start after a **BODY** group label (`spec/page-layout.json` → `pag
 - Series label **Body Weight (kg)** sits above the plot (same style as BMI), from `spec/page-layout.json` → `pages.progress.bodyWeightChart`
 - Extra series from `spec/page-layout.json` → `pages.progress.bodyChartExtras` (hidden when empty):
   - **BMI (kg/m²)** (`BMI`)
-- Charts in the same Progress body stack share one `colorToken`; each body stack uses a different color (workout charts keep their own colors)
+- Charts in the same Progress body stack share one `colorToken`; each stacked body card uses a different color (workout charts keep their own colors). Segmental Analysis is a toggle, not a stack: Soft Lean Mass is crimson, Fat Mass is yellow
 - Lazy-mounted with footer `useInView` (240px root margin); `isAnimationActive={false}` — instant render, no metric toggles
 
 ## Fat Mass & Body Fat %
@@ -383,7 +383,7 @@ One Progress card after Fat-Free Mass & FFMI, with a **Soft Lean Mass / Fat Mass
 | Soft Lean Mass | Trunk, Left Arm, Right Arm, Left Leg, Right Leg (`inbody.lean*Kg`) |
 | Fat Mass | Trunk, Left Arm, Right Arm, Left Leg, Right Leg (`inbody.fat*Kg`) |
 
-Arms share one Y-axis, legs share one Y-axis, trunk keeps its own (trunk kg is much larger than arms). All five region charts use the same teal `colorToken` so the stack stays one color. Latest kg is labeled on each mini-chart. Hovering a point shows **kg** after the value (e.g. `Trunk : 10.5 kg`). A left/right pair that differs by 5% or more of the smaller side shows a gap hint. A region is omitted when it has no points. The card is omitted when both metrics are empty. Same footer lazy-mount as the other health charts. The Body Comp History **segmental map** is the latest-scan snapshot; these Progress charts are the history over time.
+Arms share one Y-axis, legs share one Y-axis, trunk keeps its own (trunk kg is much larger than arms). Soft Lean Mass region charts use the crimson `colorToken`; Fat Mass region charts use yellow. Latest kg is labeled on each mini-chart. Hovering a point shows **kg** after the value (e.g. `Trunk : 10.5 kg`). A left/right pair that differs by 5% or more of the smaller side shows a gap hint. A region is omitted when it has no points. The card is omitted when both metrics are empty. Same footer lazy-mount as the other health charts. The Body Comp History **segmental map** is the latest-scan snapshot; these Progress charts are the history over time.
 
 ## Calorie Intake Trend
 

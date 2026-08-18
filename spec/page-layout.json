@@ -388,11 +388,11 @@
           "metric": "lean",
           "toggleLabel": "Soft Lean Mass",
           "charts": [
-            { "id": "leanLeftArm", "slot": "leftArm", "scaleGroup": "arm", "title": "Left Arm", "colorToken": "teal", "paths": ["inbody.leanLeftArmKg"] },
-            { "id": "leanRightArm", "slot": "rightArm", "scaleGroup": "arm", "title": "Right Arm", "colorToken": "teal", "paths": ["inbody.leanRightArmKg"] },
-            { "id": "leanTrunk", "slot": "trunk", "scaleGroup": "trunk", "showDates": true, "title": "Trunk", "colorToken": "teal", "paths": ["inbody.leanTrunkKg"] },
-            { "id": "leanLeftLeg", "slot": "leftLeg", "scaleGroup": "leg", "title": "Left Leg", "colorToken": "teal", "paths": ["inbody.leanLeftLegKg"] },
-            { "id": "leanRightLeg", "slot": "rightLeg", "scaleGroup": "leg", "title": "Right Leg", "colorToken": "teal", "paths": ["inbody.leanRightLegKg"] }
+            { "id": "leanLeftArm", "slot": "leftArm", "scaleGroup": "arm", "title": "Left Arm", "colorToken": "crimson", "paths": ["inbody.leanLeftArmKg"] },
+            { "id": "leanRightArm", "slot": "rightArm", "scaleGroup": "arm", "title": "Right Arm", "colorToken": "crimson", "paths": ["inbody.leanRightArmKg"] },
+            { "id": "leanTrunk", "slot": "trunk", "scaleGroup": "trunk", "showDates": true, "title": "Trunk", "colorToken": "crimson", "paths": ["inbody.leanTrunkKg"] },
+            { "id": "leanLeftLeg", "slot": "leftLeg", "scaleGroup": "leg", "title": "Left Leg", "colorToken": "crimson", "paths": ["inbody.leanLeftLegKg"] },
+            { "id": "leanRightLeg", "slot": "rightLeg", "scaleGroup": "leg", "title": "Right Leg", "colorToken": "crimson", "paths": ["inbody.leanRightLegKg"] }
           ]
         },
         {
@@ -400,11 +400,11 @@
           "metric": "fat",
           "toggleLabel": "Fat Mass",
           "charts": [
-            { "id": "fatLeftArm", "slot": "leftArm", "scaleGroup": "arm", "title": "Left Arm", "colorToken": "teal", "paths": ["inbody.fatLeftArmKg"] },
-            { "id": "fatRightArm", "slot": "rightArm", "scaleGroup": "arm", "title": "Right Arm", "colorToken": "teal", "paths": ["inbody.fatRightArmKg"] },
-            { "id": "fatTrunk", "slot": "trunk", "scaleGroup": "trunk", "showDates": true, "title": "Trunk", "colorToken": "teal", "paths": ["inbody.fatTrunkKg"] },
-            { "id": "fatLeftLeg", "slot": "leftLeg", "scaleGroup": "leg", "title": "Left Leg", "colorToken": "teal", "paths": ["inbody.fatLeftLegKg"] },
-            { "id": "fatRightLeg", "slot": "rightLeg", "scaleGroup": "leg", "title": "Right Leg", "colorToken": "teal", "paths": ["inbody.fatRightLegKg"] }
+            { "id": "fatLeftArm", "slot": "leftArm", "scaleGroup": "arm", "title": "Left Arm", "colorToken": "yellow", "paths": ["inbody.fatLeftArmKg"] },
+            { "id": "fatRightArm", "slot": "rightArm", "scaleGroup": "arm", "title": "Right Arm", "colorToken": "yellow", "paths": ["inbody.fatRightArmKg"] },
+            { "id": "fatTrunk", "slot": "trunk", "scaleGroup": "trunk", "showDates": true, "title": "Trunk", "colorToken": "yellow", "paths": ["inbody.fatTrunkKg"] },
+            { "id": "fatLeftLeg", "slot": "leftLeg", "scaleGroup": "leg", "title": "Left Leg", "colorToken": "yellow", "paths": ["inbody.fatLeftLegKg"] },
+            { "id": "fatRightLeg", "slot": "rightLeg", "scaleGroup": "leg", "title": "Right Leg", "colorToken": "yellow", "paths": ["inbody.fatRightLegKg"] }
           ]
         }
       ],
