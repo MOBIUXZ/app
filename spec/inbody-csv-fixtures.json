@@ -720,13 +720,25 @@
       "seriesById": {
         "overlaySmm": [{ "date": "01-01-2026", "value": 24 }],
         "overlayFm": [{ "date": "01-01-2026", "value": 16 }],
+        "smmFmDelta": [{ "date": "01-01-2026", "value": 8 }],
         "smmFmRatio": [{ "date": "01-01-2026", "value": 1.5 }]
       },
       "expectedId": "ratio",
-      "expectedVisibleIds": ["overlay", "ratio"]
+      "expectedVisibleIds": ["overlay", "delta", "ratio"]
     },
     {
-      "id": "hides-ratio-when-missing",
+      "id": "resolves-delta-view",
+      "requestedId": "delta",
+      "seriesById": {
+        "overlaySmm": [{ "date": "01-01-2026", "value": 24 }],
+        "overlayFm": [{ "date": "01-01-2026", "value": 16 }],
+        "smmFmDelta": [{ "date": "01-01-2026", "value": 8 }]
+      },
+      "expectedId": "delta",
+      "expectedVisibleIds": ["overlay", "delta"]
+    },
+    {
+      "id": "hides-derived-when-missing",
       "requestedId": "ratio",
       "seriesById": {
         "overlaySmm": [{ "date": "01-01-2026", "value": 24 }]

@@ -318,8 +318,11 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(progress.massOverlayTrends.charts.map(function (c) { return c.title; })).toEqual(['Muscle Mass (kg)', 'Fat Mass (kg)']);
     expect(progress.massOverlayTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['crimson', 'yellow']);
     expect(progress.massOverlayTrends.defaultView).toBe('overlay');
-    expect(progress.massOverlayTrends.views.map(function (v) { return v.id; })).toEqual(['overlay', 'ratio']);
-    expect(progress.massOverlayTrends.views.map(function (v) { return v.toggleLabel; })).toEqual(['Muscle & Fat', 'Muscle : Fat Ratio']);
+    expect(progress.massOverlayTrends.views.map(function (v) { return v.id; })).toEqual(['overlay', 'delta', 'ratio']);
+    expect(progress.massOverlayTrends.views.map(function (v) { return v.toggleLabel; })).toEqual(['Muscle & Fat', 'Muscle - Fat', 'Muscle : Fat Ratio']);
+    expect(progress.massOverlayTrends.deltaChart.id).toBe('smmFmDelta');
+    expect(progress.massOverlayTrends.deltaChart.derive).toBe('smmFmDelta');
+    expect(progress.massOverlayTrends.deltaChart.colorToken).toBe('green');
     expect(progress.massOverlayTrends.ratioChart.id).toBe('smmFmRatio');
     expect(progress.massOverlayTrends.ratioChart.derive).toBe('smmFmRatio');
     expect(progress.massOverlayTrends.ratioChart.colorToken).toBe('accent');

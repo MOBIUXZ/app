@@ -206,7 +206,7 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
 
   it('flattenMassOverlayCharts includes overlay and ratio charts', function () {
     var progress = getPageLayout('progress');
-    expect(flattenMassOverlayCharts(progress.massOverlayTrends).map(function (chart) { return chart.id; })).toEqual(['overlaySmm', 'overlayFm', 'smmFmRatio']);
+    expect(flattenMassOverlayCharts(progress.massOverlayTrends).map(function (chart) { return chart.id; })).toEqual(['overlaySmm', 'overlayFm', 'smmFmDelta', 'smmFmRatio']);
   });
 
   inbodySpec.massOverlayViewFixtures.forEach(function (fixture) {

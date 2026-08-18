@@ -351,12 +351,23 @@
         "defaultView": "overlay",
         "views": [
           { "id": "overlay", "toggleLabel": "Muscle & Fat", "chartIds": ["overlaySmm", "overlayFm"] },
+          { "id": "delta", "toggleLabel": "Muscle - Fat", "chartIds": ["smmFmDelta"] },
           { "id": "ratio", "toggleLabel": "Muscle : Fat Ratio", "chartIds": ["smmFmRatio"] }
         ],
         "charts": [
           { "id": "overlaySmm", "dataKey": "smm", "title": "Muscle Mass (kg)", "unit": "kg", "colorToken": "crimson", "paths": ["SMM", "smm"] },
           { "id": "overlayFm", "dataKey": "fm", "title": "Fat Mass (kg)", "unit": "kg", "colorToken": "yellow", "paths": ["FM", "fm"] }
         ],
+        "deltaChart": {
+          "id": "smmFmDelta",
+          "dataKey": "value",
+          "title": "Muscle Mass - Fat Mass",
+          "unit": "kg",
+          "latestTemplate": "{value} {unit}",
+          "tooltipValueTemplate": "{value} {unit}",
+          "colorToken": "green",
+          "derive": "smmFmDelta"
+        },
         "ratioChart": {
           "id": "smmFmRatio",
           "dataKey": "value",

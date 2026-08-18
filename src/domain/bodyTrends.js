@@ -1,7 +1,7 @@
 /** @file Progress body-trend series — spec/inbody-csv-fixtures.json trendFixtures + spec/page-layout.json visceralTrends / bmrTrends / scoreTrends / segmentalBodyGrid */
 
 import { computeYDomain } from "./chartDomain.js";
-import { deriveFmi, deriveSmmPct, deriveFfm, deriveFfmPct, deriveFfmi, deriveSmmFmRatio } from "./metrics.js";
+import { deriveFmi, deriveSmmPct, deriveFfm, deriveFfmPct, deriveFfmi, deriveSmmFmRatio, deriveSmmFmDelta } from "./metrics.js";
 
 function dateSortKey(date) {
   var parts = String(date || "").split("-");
@@ -41,6 +41,7 @@ var chartDerives = {
   ffmPct: deriveFfmPct,
   ffmi: deriveFfmi,
   smmFmRatio: deriveSmmFmRatio,
+  smmFmDelta: deriveSmmFmDelta,
 };
 
 export function readBodyCompChartValue(entry, chart) {
@@ -91,6 +92,7 @@ export function flattenTrendGroups(groups) {
 
 export function flattenMassOverlayCharts(spec) {
   var charts = spec && spec.charts ? spec.charts.slice() : [];
+  if (spec && spec.deltaChart) charts.push(spec.deltaChart);
   if (spec && spec.ratioChart) charts.push(spec.ratioChart);
   return charts;
 }

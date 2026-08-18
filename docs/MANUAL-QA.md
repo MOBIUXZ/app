@@ -92,7 +92,7 @@ Machine-readable checklist: [`spec/manual-qa-checklist.json`](../spec/manual-qa-
 - [ ] One Skeletal Muscle Mass & SMI card with Skeletal Muscle Mass, Muscle Mass %, and SMI stacked when those fields exist; empty series hidden
 - [ ] One Fat-Free Mass & FFMI card with Fat-Free Mass, Fat-Free Mass %, and FFMI stacked when those fields exist; empty series hidden
 - [ ] One Segmental Analysis card with a Soft Lean Mass / Fat Mass / Merged toggle on a body-shaped grid when those fields exist; Soft Lean Mass charts are rose (reddish pink) and Fat Mass charts are yellow; Merged overlays both lines on each region when both metrics have points; unused metric hidden; arms share a Y-axis and legs share a Y-axis
-- [ ] One Muscle Mass & Fat Mass overlay card just above Visceral Fat Level when skeletal muscle mass or fat mass exists; a Muscle & Fat / Muscle : Fat Ratio pill switches the overlay and the SMM/FM ratio chart; both overlay series share one chart and Y-axis; hidden when overlay and ratio are empty
+- [ ] One Muscle Mass & Fat Mass overlay card just above Visceral Fat Level when skeletal muscle mass or fat mass exists; a Muscle & Fat / Muscle - Fat / Muscle : Fat Ratio pill switches the overlay, SMM−FM delta, and SMM/FM ratio charts; both overlay series share one chart and Y-axis; hidden when overlay, delta, and ratio are empty
 - [ ] One Visceral Fat Level card after Muscle Mass & Fat Mass when visceral exists; hidden when empty
 - [ ] One Water, Protein & Mineral card with Total Body Water, Protein, and Mineral charts stacked when those fields exist; empty series hidden
 - [ ] One BMR card just above InBody Score when BMR exists; hidden when empty

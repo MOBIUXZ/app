@@ -131,7 +131,7 @@ Omitted keys (including `settings`) are kept from current state. If the write fa
 | Progress skeletal muscle / muscle mass % / SMI | `bodyComp` `SMM`/`smm`, `PSMM` (or `SMM / weight × 100`), and `SMI` | One category card; charts stacked; empty series hidden |
 | Progress fat-free mass / fat-free mass % / FFMI | `bodyComp` `FFM`, `PFFM` (or `FFM / weight × 100`), and `FFMI` (or derived) | One category card; charts stacked; empty series hidden |
 | Progress visceral fat | `inbody.visceral` | Own card after Muscle Mass & Fat Mass overlay; hidden when missing |
-| Progress muscle/fat overlay | `SMM`/`smm` and `FM`/`fm` | One overlay card just above Visceral Fat; Muscle & Fat / Muscle : Fat Ratio pill; overlay lines share a Y-axis; hidden when overlay and ratio are empty |
+| Progress muscle/fat overlay | `SMM`/`smm` and `FM`/`fm` | One overlay card just above Visceral Fat; Muscle & Fat / Muscle - Fat / Muscle : Fat Ratio pill; overlay lines share a Y-axis; hidden when overlay, delta, and ratio are empty |
 | Progress water/protein/mineral | `inbody.tbw` / `protein` / `mineral` | One category card; charts stacked; empty series hidden |
 | Progress BMR | `BMR_InBody`, else Mifflin, else Katch | Own card just above InBody Score; hidden when missing |
 | Progress InBody Score | `inbody.score` | Own card after BMR; hidden when missing |
@@ -187,7 +187,7 @@ State is local to `WorkoutPage` — not lifted to App except via `save()`.
 1. COMPOUND LIFTS label + one `MemoExerciseChart` per logged compound (order from `COMPOUND_LIFTS` filter)
 2. Combined Compound Lifts card (if ≥2 compounds)
 3. ISOLATION LIFTS label + charts for non-compound exercises
-4. BODY label (extra space + hairline) then footer: Body Weight card, Fat / Muscle / FFM stacked cards, Segmental Analysis card with Soft Lean / Fat / Merged toggle (if any series), Muscle Mass & Fat Mass overlay card with Muscle & Fat / Muscle : Fat Ratio pill (if either series), Visceral Fat Level card (if any series), Water / Protein / Mineral card (if any series), BMR card (if any series), InBody Score card (if any series), Calorie Intake Trend card
+4. BODY label (extra space + hairline) then footer: Body Weight card, Fat / Muscle / FFM stacked cards, Segmental Analysis card with Soft Lean / Fat / Merged toggle (if any series), Muscle Mass & Fat Mass overlay card with Muscle & Fat / Muscle - Fat / Muscle : Fat Ratio pill (if either series), Visceral Fat Level card (if any series), Water / Protein / Mineral card (if any series), BMR card (if any series), InBody Score card (if any series), Calorie Intake Trend card
 
 ### Modal layers (keyboard)
 

@@ -42,7 +42,7 @@
     {
       "id": "formula-fixtures",
       "path": "spec/formula-fixtures.json",
-      "governs": ["estimate1RM", "computeSessionMetrics", "computeBodyCompEntry", "deriveFmi", "deriveSmmPct", "deriveFfm", "deriveFfmPct", "deriveFfmi", "deriveSmmFmRatio"],
+      "governs": ["estimate1RM", "computeSessionMetrics", "computeBodyCompEntry", "deriveFmi", "deriveSmmPct", "deriveFfm", "deriveFfmPct", "deriveFfmi", "deriveSmmFmRatio", "deriveSmmFmDelta"],
       "docs": ["docs/data-model.md", "docs/progress.md", "docs/body-comp.md"]
     },
     {
