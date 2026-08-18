@@ -711,6 +711,22 @@
         { "date": "04-04-2026", "smm": 24 }
       ],
       "expectedDomain": [20, 27]
+    },
+    {
+      "id": "delta-includes-zero",
+      "chartsKey": "deltaChart",
+      "seriesById": {
+        "smmFmDelta": [
+          { "date": "25-03-2026", "value": 6.6 },
+          { "date": "04-04-2026", "value": 7.5 }
+        ]
+      },
+      "expectedOverlayKeys": ["value"],
+      "expectedSeries": [
+        { "date": "25-03-2026", "value": 6.6 },
+        { "date": "04-04-2026", "value": 7.5 }
+      ],
+      "expectedDomain": [0, 9]
     }
   ],
   "massOverlayViewFixtures": [

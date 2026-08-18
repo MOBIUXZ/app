@@ -1,10 +1,10 @@
 import { useState, useMemo, useRef, useEffect, memo } from "react";
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine } from "recharts";
 import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExerciseName, isNoSplitLift, isCompoundLift, COMPOUND_LIFTS, getExerciseChartColor, useKeyboardLayer, ui, cx } from "./shared";
 import { estimate1RM, roundE1RM, averageE1RM, computeSessionMetrics } from "../domain/metrics.js";
 import { CHART_CURSOR, computeYDomain, getTrendLineAnim, getFirstPaintDuration, FAILED_SET_COLOR } from "../domain/chartDomain.js";
 import { getPageLayout, getPageSection, getThemeColor, formatTemplateLabel } from "../domain/pageLayout.js";
-import { buildAllBodyTrendSeries, flattenTrendGroups, buildSegmentalGridModel, buildMergedSegmentalGridModel, buildOverlayTrendModel, flattenMassOverlayCharts, visibleMassOverlayViews, resolveMassOverlayView, massOverlayChartsForView, visibleSegmentalViews, resolveSegmentalView } from "../domain/bodyTrends.js";
+import { buildAllBodyTrendSeries, flattenTrendGroups, buildSegmentalGridModel, buildMergedSegmentalGridModel, buildOverlayTrendModel, flattenMassOverlayCharts, visibleMassOverlayViews, resolveMassOverlayView, massOverlayChartsForView, overlayZeroLine, visibleSegmentalViews, resolveSegmentalView } from "../domain/bodyTrends.js";
 import { PageHeading } from "./PageIcon";
 import appConfig from "../../spec/app-config.json";
 import s from "./ProgressPage.module.css";
@@ -67,9 +67,11 @@ function FooterTrendChartList({ charts, seriesById, inView, tickStyle, tooltipSt
 }
 
 function FooterOverlayTrendChart({ spec, charts, seriesById, inView, tickStyle, tooltipStyle }) {
-  var model = buildOverlayTrendModel(charts || (spec && spec.charts), seriesById);
+  var overlayCharts = charts || (spec && spec.charts);
+  var model = buildOverlayTrendModel(overlayCharts, seriesById);
   if (!model.overlays.length) return null;
   var height = (spec && spec.chartHeight) || 160;
+  var zeroLine = overlayZeroLine(overlayCharts);
   function formatTooltipValue(value, overlay) {
     var template = overlay.tooltipValueTemplate || spec.tooltipValueTemplate;
     var unit = overlay.unit;
@@ -101,6 +103,9 @@ function FooterOverlayTrendChart({ spec, charts, seriesById, inView, tickStyle, 
               <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
               <XAxis dataKey="date" tick={tickStyle} interval="preserveStartEnd" />
               <YAxis domain={model.domain} tick={tickStyle} width={35} />
+              {zeroLine ? (
+                <ReferenceLine y={zeroLine.y} stroke={CHART_CURSOR.stroke} strokeWidth={zeroLine.strokeWidth || 1} />
+              ) : null}
               <Tooltip
                 contentStyle={tooltipStyle}
                 formatter={function (value, name) {

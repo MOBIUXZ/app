@@ -197,7 +197,10 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
   inbodySpec.overlayTrendFixtures.forEach(function (fixture) {
     it('overlay trend: ' + fixture.id, function () {
       var progress = getPageLayout('progress');
-      var model = buildOverlayTrendModel(progress.massOverlayTrends.charts, fixture.seriesById);
+      var charts = fixture.chartsKey
+        ? [progress.massOverlayTrends[fixture.chartsKey]]
+        : progress.massOverlayTrends.charts;
+      var model = buildOverlayTrendModel(charts, fixture.seriesById);
       expect(model.overlays.map(function (overlay) { return overlay.dataKey; })).toEqual(fixture.expectedOverlayKeys);
       expect(model.series).toEqual(fixture.expectedSeries);
       expect(model.domain).toEqual(fixture.expectedDomain);
@@ -243,6 +246,8 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
     expect(source.indexOf('visibleMassOverlayViews') !== -1).toBe(true);
     expect(source.indexOf('resolveMassOverlayView') !== -1).toBe(true);
     expect(source.indexOf('massOverlayChartsForView') !== -1).toBe(true);
+    expect(source.indexOf('overlayZeroLine') !== -1).toBe(true);
+    expect(source.indexOf('ReferenceLine') !== -1).toBe(true);
     expect(source.indexOf('Skeletal Muscle') === -1).toBe(true);
     expect(source.indexOf('Visceral Fat') === -1).toBe(true);
     expect(source.indexOf('Left Arm') === -1).toBe(true);

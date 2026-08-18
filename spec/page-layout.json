@@ -366,7 +366,12 @@
           "latestTemplate": "{value} {unit}",
           "tooltipValueTemplate": "{value} {unit}",
           "colorToken": "green",
-          "derive": "smmFmDelta"
+          "derive": "smmFmDelta",
+          "includeZero": true,
+          "zeroLine": {
+            "y": 0,
+            "strokeWidth": 1
+          }
         },
         "ratioChart": {
           "id": "smmFmRatio",

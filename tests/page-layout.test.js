@@ -323,6 +323,8 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(progress.massOverlayTrends.deltaChart.id).toBe('smmFmDelta');
     expect(progress.massOverlayTrends.deltaChart.derive).toBe('smmFmDelta');
     expect(progress.massOverlayTrends.deltaChart.colorToken).toBe('green');
+    expect(progress.massOverlayTrends.deltaChart.includeZero).toBe(true);
+    expect(progress.massOverlayTrends.deltaChart.zeroLine.y).toBe(0);
     expect(progress.massOverlayTrends.ratioChart.id).toBe('smmFmRatio');
     expect(progress.massOverlayTrends.ratioChart.derive).toBe('smmFmRatio');
     expect(progress.massOverlayTrends.ratioChart.colorToken).toBe('accent');
@@ -385,6 +387,8 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(source.indexOf('visibleMassOverlayViews') !== -1).toBe(true);
     expect(source.indexOf('resolveMassOverlayView') !== -1).toBe(true);
     expect(source.indexOf('massOverlayChartsForView') !== -1).toBe(true);
+    expect(source.indexOf('overlayZeroLine') !== -1).toBe(true);
+    expect(source.indexOf('ReferenceLine') !== -1).toBe(true);
     expect(source.indexOf('sectionLabelSpaced') !== -1).toBe(true);
     expect(source.indexOf('sectionLabelBody') !== -1).toBe(true);
     expect(source.indexOf('bodySection') !== -1).toBe(true);

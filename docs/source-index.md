@@ -46,7 +46,7 @@ Complete inventory of every project file. Line counts approximate (Aug 2026).
 
 ## `src/domain/bodyTrends.js`
 
-**~140 lines** — `buildAllBodyTrendSeries()` maps `bodyComp` onto Progress visceral, BMR, fat, muscle, fat-free, composition, score, overlay, and segmental trend charts. `buildSegmentalGridModel()` places those series on the Progress body grid with shared arm/leg Y-axes. `buildMergedSegmentalGridModel()` overlays Soft Lean and Fat on each region. `buildOverlayTrendModel()` overlays Muscle Mass and Fat Mass on one Progress chart. `flattenMassOverlayCharts()` / `visibleMassOverlayViews()` / `resolveMassOverlayView()` switch the overlay, SMM−FM delta, and SMM/FM ratio views. `resolveSegmentalView()` picks Soft Lean, Fat, or Merged for the Progress toggle. Spec: `spec/inbody-csv-fixtures.json` `trendFixtures` / `gridFixtures` / `gridToggleFixtures` / `gridViewFixtures` / `gridMergeFixtures` / `overlayTrendFixtures` / `massOverlayViewFixtures` + `spec/page-layout.json` `visceralTrends` / `bmrTrends` / `fatTrends` / `muscleTrends` / `ffmTrends` / `massOverlayTrends` / `compositionTrends` / `scoreTrends` / `segmentalTrendGroups` / `segmentalBodyGrid`.
+**~140 lines** — `buildAllBodyTrendSeries()` maps `bodyComp` onto Progress visceral, BMR, fat, muscle, fat-free, composition, score, overlay, and segmental trend charts. `buildSegmentalGridModel()` places those series on the Progress body grid with shared arm/leg Y-axes. `buildMergedSegmentalGridModel()` overlays Soft Lean and Fat on each region. `buildOverlayTrendModel()` overlays Muscle Mass and Fat Mass on one Progress chart. `flattenMassOverlayCharts()` / `visibleMassOverlayViews()` / `resolveMassOverlayView()` switch the overlay, SMM−FM delta, and SMM/FM ratio views. `overlayZeroLine()` draws the Muscle - Fat y=0 baseline. `resolveSegmentalView()` picks Soft Lean, Fat, or Merged for the Progress toggle. Spec: `spec/inbody-csv-fixtures.json` `trendFixtures` / `gridFixtures` / `gridToggleFixtures` / `gridViewFixtures` / `gridMergeFixtures` / `overlayTrendFixtures` / `massOverlayViewFixtures` + `spec/page-layout.json` `visceralTrends` / `bmrTrends` / `fatTrends` / `muscleTrends` / `ffmTrends` / `massOverlayTrends` / `compositionTrends` / `scoreTrends` / `segmentalTrendGroups` / `segmentalBodyGrid`.
 
 ## `src/domain/bodySegmental.js`
 
@@ -305,7 +305,7 @@ import { ACCENT, GREEN, Card, Collapse, btnPrimary, inp, ui, cx, ... } from "./s
 import s from "./WorkoutPage.module.css";
 
 // Progress only
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine } from "recharts";
 
 // App only
 import { useAppNavKeyboard, useDisableNumberInputWheel } from "./components/shared.jsx";

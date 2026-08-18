@@ -133,6 +133,27 @@ export function sharedYDomain(seriesList) {
   return computeYDomain(values);
 }
 
+export function expandYDomainToValue(domain, value) {
+  if (!domain || value == null) return domain;
+  var lo = domain[0];
+  var hi = domain[1];
+  if (lo > value) lo = value;
+  if (hi < value) hi = value;
+  return [lo, hi];
+}
+
+export function overlayZeroLine(charts) {
+  var found = null;
+  (charts || []).some(function (chart) {
+    if (chart && chart.zeroLine) {
+      found = chart.zeroLine;
+      return true;
+    }
+    return false;
+  });
+  return found;
+}
+
 export function buildSegmentalGridModel(group, seriesById, gridSpec) {
   var slots = {};
   var scaleSeries = {};
@@ -326,9 +347,13 @@ export function buildOverlayTrendModel(charts, seriesById) {
     seriesMap[dataKey] = series;
     allSeries.push(series);
   });
+  var domain = sharedYDomain(allSeries);
+  if ((charts || []).some(function (chart) { return chart && chart.includeZero; })) {
+    domain = expandYDomainToValue(domain, 0);
+  }
   return {
     series: mergeSeriesByDate(seriesMap),
     overlays: overlays,
-    domain: sharedYDomain(allSeries),
+    domain: domain,
   };
 }
