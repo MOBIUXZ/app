@@ -7,6 +7,19 @@
     "strokeDasharray": "4 4"
   },
   "failedSetColor": "#f87171",
+  "overlayZeroAxisFixtures": [
+    {
+      "id": "muscle-fat-delta",
+      "domain": [0, 9],
+      "zero": 0,
+      "expectedTicks": [0, 2, 4, 6, 8]
+    }
+  ],
+  "axisTickFormatFixtures": [
+    { "id": "zero", "value": 0, "expected": "0" },
+    { "id": "integer", "value": 8, "expected": "8" },
+    { "id": "near-zero", "value": 1e-10, "expected": "0" }
+  ],
   "fixtures": [
     {
       "id": "positive-range",

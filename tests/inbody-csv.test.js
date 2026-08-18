@@ -247,6 +247,7 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
     expect(source.indexOf('resolveMassOverlayView') !== -1).toBe(true);
     expect(source.indexOf('massOverlayChartsForView') !== -1).toBe(true);
     expect(source.indexOf('overlayZeroLine') !== -1).toBe(true);
+    expect(source.indexOf('computeOverlayYAxisTicks') !== -1).toBe(true);
     expect(source.indexOf('ReferenceLine') !== -1).toBe(true);
     expect(source.indexOf('Skeletal Muscle') === -1).toBe(true);
     expect(source.indexOf('Visceral Fat') === -1).toBe(true);

@@ -388,6 +388,7 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(source.indexOf('resolveMassOverlayView') !== -1).toBe(true);
     expect(source.indexOf('massOverlayChartsForView') !== -1).toBe(true);
     expect(source.indexOf('overlayZeroLine') !== -1).toBe(true);
+    expect(source.indexOf('computeOverlayYAxisTicks') !== -1).toBe(true);
     expect(source.indexOf('ReferenceLine') !== -1).toBe(true);
     expect(source.indexOf('sectionLabelSpaced') !== -1).toBe(true);
     expect(source.indexOf('sectionLabelBody') !== -1).toBe(true);

@@ -66,7 +66,7 @@
     {
       "id": "chart-domain",
       "path": "spec/chart-domain.json",
-      "governs": ["Progress chart Y-axis domain", "chart cursor styling", "failed set color"],
+      "governs": ["Progress chart Y-axis domain", "computeOverlayYAxisTicks()", "formatChartAxisTick()", "chart cursor styling", "failed set color"],
       "docs": ["docs/progress.md"]
     },
     {
