@@ -1,5 +1,5 @@
 {
-  "description": "InBody CSV parse, date year, measured-field mapping, merge-by-date into bodyComp/bodyLogs, Progress body-trend series, Body Comp segmental map, Progress body-grid model, and Soft Lean / Fat merged overlay view",
+  "description": "InBody CSV parse, date year, measured-field mapping, merge-by-date into bodyComp/bodyLogs, Progress body-trend series, Body Comp segmental map, Progress body-grid model, Soft Lean / Fat merged overlay view, and Muscle Mass / Fat Mass overlay stack",
   "messages": {
     "imported": "Imported InBody scans.",
     "invalidCsv": "That file is not a valid InBody CSV.",
@@ -675,6 +675,42 @@
         "leg": [1, 10]
       },
       "expectedGapPairIds": ["lean-arms", "fat-arms"]
+    }
+  ],
+  "overlayTrendFixtures": [
+    {
+      "id": "muscle-fat-shared-domain",
+      "seriesById": {
+        "overlaySmm": [
+          { "date": "25-03-2026", "value": 23.8 },
+          { "date": "04-04-2026", "value": 24 }
+        ],
+        "overlayFm": [
+          { "date": "25-03-2026", "value": 17.2 },
+          { "date": "04-04-2026", "value": 16.5 }
+        ]
+      },
+      "expectedOverlayKeys": ["smm", "fm"],
+      "expectedSeries": [
+        { "date": "25-03-2026", "smm": 23.8, "fm": 17.2 },
+        { "date": "04-04-2026", "smm": 24, "fm": 16.5 }
+      ],
+      "expectedDomain": [13, 27]
+    },
+    {
+      "id": "keeps-single-series",
+      "seriesById": {
+        "overlaySmm": [
+          { "date": "25-03-2026", "value": 23.8 },
+          { "date": "04-04-2026", "value": 24 }
+        ]
+      },
+      "expectedOverlayKeys": ["smm"],
+      "expectedSeries": [
+        { "date": "25-03-2026", "smm": 23.8 },
+        { "date": "04-04-2026", "smm": 24 }
+      ],
+      "expectedDomain": [20, 27]
     }
   ]
 }

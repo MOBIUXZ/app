@@ -78,7 +78,7 @@
     {
       "id": "inbody-csv",
       "path": "spec/inbody-csv-fixtures.json",
-      "governs": ["parseInbodyCsv()", "buildInbodyEntry()", "mergeInbodyIntoLogs()", "buildAllBodyTrendSeries()", "flattenTrendGroups()", "buildSegmentalGridModel()", "buildMergedSegmentalGridModel()", "resolveSegmentalTrendGroup()", "visibleSegmentalViews()", "resolveSegmentalView()", "buildSegmentalSnapshot()", "InBody CSV column map"],
+      "governs": ["parseInbodyCsv()", "buildInbodyEntry()", "mergeInbodyIntoLogs()", "buildAllBodyTrendSeries()", "flattenTrendGroups()", "buildSegmentalGridModel()", "buildMergedSegmentalGridModel()", "buildOverlayTrendModel()", "resolveSegmentalTrendGroup()", "visibleSegmentalViews()", "resolveSegmentalView()", "buildSegmentalSnapshot()", "InBody CSV column map"],
       "docs": ["docs/body-comp.md", "docs/data-model.md", "docs/progress.md"]
     },
     {

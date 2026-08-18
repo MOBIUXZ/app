@@ -307,12 +307,12 @@ Body charts start after a **BODY** group label (`spec/page-layout.json` → `pag
 - Series label **Body Weight (kg)** sits above the plot (same style as BMI), from `spec/page-layout.json` → `pages.progress.bodyWeightChart`
 - Extra series from `spec/page-layout.json` → `pages.progress.bodyChartExtras` (hidden when empty):
   - **BMI (kg/m²)** (`BMI`)
-- Charts in the same Progress body stack share one `colorToken`; each stacked body card uses a different color (workout charts keep their own colors). Segmental Analysis is a toggle, not a stack: Soft Lean Mass is crimson, Fat Mass is yellow
+- Charts in the same Progress body stack share one `colorToken` (workout charts keep their own colors). Fat Mass & Body Fat % is yellow; Skeletal Muscle Mass & SMI is crimson. Segmental Analysis is a toggle: Soft Lean Mass is rose (reddish pink), Fat Mass is yellow
 - Lazy-mounted with footer `useInView` (240px root margin); `isAnimationActive={false}` — instant render, no metric toggles
 
 ## Fat Mass & Body Fat %
 
-One Progress card after Body Weight. Fat Mass, Body Fat %, and FMI are stacked in this category (not a toggle). An empty series is hidden; the card is omitted when all three are empty. Hovering a point shows the unit after the value (`kg` for fat mass, `%` for body fat, `kg/m²` for FMI). Titles, colors, units, and field paths live in `spec/page-layout.json` → `pages.progress.fatTrends`. Series: `buildAllBodyTrendSeries()` in `src/domain/bodyTrends.js`. FMI uses `deriveFmi()` when the stored field is missing so InBody imports without Settings height still chart.
+One Progress card after Body Weight. Fat Mass, Body Fat %, and FMI are stacked in this category (not a toggle) and share the yellow `colorToken`. An empty series is hidden; the card is omitted when all three are empty. Hovering a point shows the unit after the value (`kg` for fat mass, `%` for body fat, `kg/m²` for FMI). Titles, colors, units, and field paths live in `spec/page-layout.json` → `pages.progress.fatTrends`. Series: `buildAllBodyTrendSeries()` in `src/domain/bodyTrends.js`. FMI uses `deriveFmi()` when the stored field is missing so InBody imports without Settings height still chart.
 
 | Chart | Source | Unit |
 |-------|--------|------|
@@ -322,7 +322,7 @@ One Progress card after Body Weight. Fat Mass, Body Fat %, and FMI are stacked i
 
 ## Skeletal Muscle Mass & SMI
 
-One Progress card after Fat Mass & Body Fat %. Skeletal Muscle Mass, Muscle Mass %, and SMI are stacked in this category (not a toggle). An empty series is hidden; the card is omitted when all three are empty. Hovering a point shows the unit after the value (`kg` for muscle mass, `%` for muscle mass share, `kg/m²` for SMI). Titles, colors, units, and field paths live in `spec/page-layout.json` → `pages.progress.muscleTrends`. Series: `buildAllBodyTrendSeries()` in `src/domain/bodyTrends.js`. Muscle Mass % uses `deriveSmmPct()` (`SMM / weight × 100`) when `PSMM` is not stored.
+One Progress card after Fat Mass & Body Fat %. Skeletal Muscle Mass, Muscle Mass %, and SMI are stacked in this category (not a toggle) and share the crimson `colorToken`. An empty series is hidden; the card is omitted when all three are empty. Hovering a point shows the unit after the value (`kg` for muscle mass, `%` for muscle mass share, `kg/m²` for SMI). Titles, colors, units, and field paths live in `spec/page-layout.json` → `pages.progress.muscleTrends`. Series: `buildAllBodyTrendSeries()` in `src/domain/bodyTrends.js`. Muscle Mass % uses `deriveSmmPct()` (`SMM / weight × 100`) when `PSMM` is not stored.
 
 | Chart | Source | Unit |
 |-------|--------|------|
@@ -340,9 +340,18 @@ One Progress card after Skeletal Muscle Mass & SMI. Fat-Free Mass, Fat-Free Mass
 | Fat-Free Mass % | `PFFM`, or derived `FFM / weight × 100` | % |
 | FFMI (kg/m²) | `FFMI`, or derived `FFM / height²` / `FFM × BMI / weight` | kg/m² |
 
+## Muscle Mass & Fat Mass
+
+One Progress card after Segmental Analysis and just above Visceral Fat Level. Skeletal Muscle Mass and Fat Mass overlay on one chart (crimson muscle, yellow fat) with a shared Y-axis. An empty series is omitted; the card is hidden when both are empty. Titles, colors, units, and field paths live in `spec/page-layout.json` → `pages.progress.massOverlayTrends`. Series: `buildAllBodyTrendSeries()` + `buildOverlayTrendModel()` in `src/domain/bodyTrends.js`.
+
+| Line | Source | Unit |
+|------|--------|------|
+| Muscle Mass (kg) | `SMM` / `smm` | kg |
+| Fat Mass (kg) | `FM` / `fm` | kg |
+
 ## Visceral Fat Level
 
-One Progress card after Segmental Analysis. Visceral Fat Level is its own stack. The card is omitted when the series is empty. Titles, colors, and field paths live in `spec/page-layout.json` → `pages.progress.visceralTrends`. Series: `buildAllBodyTrendSeries()` in `src/domain/bodyTrends.js`. Lazy-mounted with the same footer `useInView`; `isAnimationActive={false}`.
+One Progress card after Muscle Mass & Fat Mass. Visceral Fat Level is its own stack. The card is omitted when the series is empty. Titles, colors, and field paths live in `spec/page-layout.json` → `pages.progress.visceralTrends`. Series: `buildAllBodyTrendSeries()` in `src/domain/bodyTrends.js`. Lazy-mounted with the same footer `useInView`; `isAnimationActive={false}`.
 
 | Chart | Source | Hidden when |
 |-------|--------|-------------|
@@ -376,15 +385,15 @@ One Progress card after BMR. InBody Score is its own stack. The card is omitted 
 
 ## Segmental Analysis
 
-One Progress card after Fat-Free Mass & FFMI, with a **Soft Lean Mass / Fat Mass / Merged** pill toggle (same pattern as the Body Comp History map). The unused metric is hidden; if only one metric has points, the toggle is omitted. **Merged** appears only when both metrics have points and overlays Soft Lean (crimson) and Fat (yellow) on each region chart. Each metric is a **body-shaped grid**: left/right arm beside a figure, trunk full-width in the middle, left/right leg below. Layout, titles, colors, CSV paths, shared Y-axis groups, and the merged pill live in `spec/page-layout.json` → `pages.progress.segmentalTrendGroups` + `segmentalBodyGrid`. View model: `buildSegmentalGridModel()` / `buildMergedSegmentalGridModel()` / `resolveSegmentalView()` in `src/domain/bodyTrends.js`.
+One Progress card after Fat-Free Mass & FFMI, with a **Soft Lean Mass / Fat Mass / Merged** pill toggle (same pattern as the Body Comp History map). The unused metric is hidden; if only one metric has points, the toggle is omitted. **Merged** appears only when both metrics have points and overlays Soft Lean (rose) and Fat (yellow) on each region chart. Each metric is a **body-shaped grid**: left/right arm beside a figure, trunk full-width in the middle, left/right leg below. Layout, titles, colors, CSV paths, shared Y-axis groups, and the merged pill live in `spec/page-layout.json` → `pages.progress.segmentalTrendGroups` + `segmentalBodyGrid`. View model: `buildSegmentalGridModel()` / `buildMergedSegmentalGridModel()` / `resolveSegmentalView()` in `src/domain/bodyTrends.js`.
 
 | Toggle | Regions |
 |--------|---------|
 | Soft Lean Mass | Trunk, Left Arm, Right Arm, Left Leg, Right Leg (`inbody.lean*Kg`) |
 | Fat Mass | Trunk, Left Arm, Right Arm, Left Leg, Right Leg (`inbody.fat*Kg`) |
-| Merged | Same five regions, Soft Lean and Fat lines overlapping (crimson + yellow) |
+| Merged | Same five regions, Soft Lean and Fat lines overlapping (rose + yellow) |
 
-Arms share one Y-axis, legs share one Y-axis, trunk keeps its own (trunk kg is much larger than arms). In Merged, each scale group includes both Soft Lean and Fat values so the two lines share an axis. Soft Lean Mass region charts use the crimson `colorToken`; Fat Mass region charts use yellow. Latest kg is labeled on each mini-chart (both values in Merged). Hovering a point shows **kg** after the value (e.g. `Trunk : 10.5 kg`). A left/right pair that differs by 5% or more of the smaller side shows a gap hint. A region is omitted when it has no points. The card is omitted when both metrics are empty. Same footer lazy-mount as the other health charts. The Body Comp History **segmental map** is the latest-scan snapshot; these Progress charts are the history over time.
+Arms share one Y-axis, legs share one Y-axis, trunk keeps its own (trunk kg is much larger than arms). In Merged, each scale group includes both Soft Lean and Fat values so the two lines share an axis. Soft Lean Mass region charts use the rose `colorToken`; Fat Mass region charts use yellow. Latest kg is labeled on each mini-chart (both values in Merged). Hovering a point shows **kg** after the value (e.g. `Trunk : 10.5 kg`). A left/right pair that differs by 5% or more of the smaller side shows a gap hint. A region is omitted when it has no points. The card is omitted when both metrics are empty. Same footer lazy-mount as the other health charts. The Body Comp History **segmental map** is the latest-scan snapshot; these Progress charts are the history over time.
 
 ## Calorie Intake Trend
 

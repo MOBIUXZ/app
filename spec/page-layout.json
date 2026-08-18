@@ -303,6 +303,7 @@
         { "id": "muscle", "title": "📉 Skeletal Muscle Mass & SMI" },
         { "id": "ffm", "title": "📉 Fat-Free Mass & FFMI" },
         { "id": "segmental", "title": "📉 Segmental Analysis" },
+        { "id": "massOverlay", "title": "📉 Muscle Mass & Fat Mass" },
         { "id": "visceral", "title": "📉 Visceral Fat Level" },
         { "id": "composition", "title": "📉 Water, Protein & Mineral" },
         { "id": "bmr", "title": "📉 BMR (kcal/d)" },
@@ -322,17 +323,17 @@
       "fatTrends": {
         "tooltipValueTemplate": "{value} {unit}",
         "charts": [
-          { "id": "fm", "title": "Fat Mass (kg)", "unit": "kg", "colorToken": "pink", "paths": ["FM", "fm"] },
-          { "id": "bf", "title": "Body Fat %", "unit": "%", "colorToken": "pink", "paths": ["bf", "PBF"] },
-          { "id": "fmi", "title": "FMI (kg/m²)", "unit": "kg/m²", "colorToken": "pink", "paths": ["FMI"], "derive": "fmi" }
+          { "id": "fm", "title": "Fat Mass (kg)", "unit": "kg", "colorToken": "yellow", "paths": ["FM", "fm"] },
+          { "id": "bf", "title": "Body Fat %", "unit": "%", "colorToken": "yellow", "paths": ["bf", "PBF"] },
+          { "id": "fmi", "title": "FMI (kg/m²)", "unit": "kg/m²", "colorToken": "yellow", "paths": ["FMI"], "derive": "fmi" }
         ]
       },
       "muscleTrends": {
         "tooltipValueTemplate": "{value} {unit}",
         "charts": [
-          { "id": "smm", "title": "Skeletal Muscle Mass (kg)", "unit": "kg", "colorToken": "green", "paths": ["SMM", "smm"] },
-          { "id": "smmPct", "title": "Muscle Mass %", "unit": "%", "colorToken": "green", "paths": ["PSMM"], "derive": "smmPct" },
-          { "id": "smi", "title": "SMI (kg/m²)", "unit": "kg/m²", "colorToken": "green", "paths": ["SMI"] }
+          { "id": "smm", "title": "Skeletal Muscle Mass (kg)", "unit": "kg", "colorToken": "crimson", "paths": ["SMM", "smm"] },
+          { "id": "smmPct", "title": "Muscle Mass %", "unit": "%", "colorToken": "crimson", "paths": ["PSMM"], "derive": "smmPct" },
+          { "id": "smi", "title": "SMI (kg/m²)", "unit": "kg/m²", "colorToken": "crimson", "paths": ["SMI"] }
         ]
       },
       "ffmTrends": {
@@ -341,6 +342,15 @@
           { "id": "ffm", "title": "Fat-Free Mass (kg)", "unit": "kg", "colorToken": "cyan", "paths": ["FFM"], "derive": "ffm" },
           { "id": "ffmPct", "title": "Fat-Free Mass %", "unit": "%", "colorToken": "cyan", "paths": ["PFFM"], "derive": "ffmPct" },
           { "id": "ffmi", "title": "FFMI (kg/m²)", "unit": "kg/m²", "colorToken": "cyan", "paths": ["FFMI"], "derive": "ffmi" }
+        ]
+      },
+      "massOverlayTrends": {
+        "chartHeight": 160,
+        "tooltipValueTemplate": "{value} {unit}",
+        "latestTemplate": "{value} {unit}",
+        "charts": [
+          { "id": "overlaySmm", "dataKey": "smm", "title": "Muscle Mass (kg)", "unit": "kg", "colorToken": "crimson", "paths": ["SMM", "smm"] },
+          { "id": "overlayFm", "dataKey": "fm", "title": "Fat Mass (kg)", "unit": "kg", "colorToken": "yellow", "paths": ["FM", "fm"] }
         ]
       },
       "visceralTrends": {
@@ -393,11 +403,11 @@
           "metric": "lean",
           "toggleLabel": "Soft Lean Mass",
           "charts": [
-            { "id": "leanLeftArm", "slot": "leftArm", "scaleGroup": "arm", "title": "Left Arm", "colorToken": "crimson", "paths": ["inbody.leanLeftArmKg"] },
-            { "id": "leanRightArm", "slot": "rightArm", "scaleGroup": "arm", "title": "Right Arm", "colorToken": "crimson", "paths": ["inbody.leanRightArmKg"] },
-            { "id": "leanTrunk", "slot": "trunk", "scaleGroup": "trunk", "showDates": true, "title": "Trunk", "colorToken": "crimson", "paths": ["inbody.leanTrunkKg"] },
-            { "id": "leanLeftLeg", "slot": "leftLeg", "scaleGroup": "leg", "title": "Left Leg", "colorToken": "crimson", "paths": ["inbody.leanLeftLegKg"] },
-            { "id": "leanRightLeg", "slot": "rightLeg", "scaleGroup": "leg", "title": "Right Leg", "colorToken": "crimson", "paths": ["inbody.leanRightLegKg"] }
+            { "id": "leanLeftArm", "slot": "leftArm", "scaleGroup": "arm", "title": "Left Arm", "colorToken": "rose", "paths": ["inbody.leanLeftArmKg"] },
+            { "id": "leanRightArm", "slot": "rightArm", "scaleGroup": "arm", "title": "Right Arm", "colorToken": "rose", "paths": ["inbody.leanRightArmKg"] },
+            { "id": "leanTrunk", "slot": "trunk", "scaleGroup": "trunk", "showDates": true, "title": "Trunk", "colorToken": "rose", "paths": ["inbody.leanTrunkKg"] },
+            { "id": "leanLeftLeg", "slot": "leftLeg", "scaleGroup": "leg", "title": "Left Leg", "colorToken": "rose", "paths": ["inbody.leanLeftLegKg"] },
+            { "id": "leanRightLeg", "slot": "rightLeg", "scaleGroup": "leg", "title": "Right Leg", "colorToken": "rose", "paths": ["inbody.leanRightLegKg"] }
           ]
         },
         {

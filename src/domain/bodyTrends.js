@@ -275,3 +275,28 @@ export function buildMergedSegmentalGridModel(groups, seriesById, gridSpec) {
   });
   return { slots: slots, domains: domains, gaps: gaps };
 }
+
+export function buildOverlayTrendModel(charts, seriesById) {
+  var overlays = [];
+  var seriesMap = {};
+  var allSeries = [];
+  (charts || []).forEach(function (chart) {
+    var series = (seriesById && seriesById[chart.id]) || [];
+    if (!series.length) return;
+    var dataKey = chart.dataKey || chart.id;
+    overlays.push({
+      dataKey: dataKey,
+      name: chart.title,
+      colorToken: chart.colorToken,
+      unit: chart.unit,
+      latest: latestSeriesValue(series),
+    });
+    seriesMap[dataKey] = series;
+    allSeries.push(series);
+  });
+  return {
+    series: mergeSeriesByDate(seriesMap),
+    overlays: overlays,
+    domain: sharedYDomain(allSeries),
+  };
+}

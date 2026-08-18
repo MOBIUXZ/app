@@ -10,7 +10,7 @@ import {
   buildInbodyEntry,
   mergeInbodyIntoLogs,
 } from '../src/domain/inbodyCsv.js';
-import { buildAllBodyTrendSeries, flattenTrendGroups, buildSegmentalGridModel, buildMergedSegmentalGridModel, resolveSegmentalTrendGroup, visibleSegmentalTrendGroups, visibleSegmentalViews, resolveSegmentalView } from '../src/domain/bodyTrends.js';
+import { buildAllBodyTrendSeries, flattenTrendGroups, buildSegmentalGridModel, buildMergedSegmentalGridModel, buildOverlayTrendModel, resolveSegmentalTrendGroup, visibleSegmentalTrendGroups, visibleSegmentalViews, resolveSegmentalView } from '../src/domain/bodyTrends.js';
 import { buildSegmentalSnapshot, latestSegmentalSnapshot } from '../src/domain/bodySegmental.js';
 import { getPageLayout } from '../src/domain/pageLayout.js';
 
@@ -194,6 +194,16 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
     });
   });
 
+  inbodySpec.overlayTrendFixtures.forEach(function (fixture) {
+    it('overlay trend: ' + fixture.id, function () {
+      var progress = getPageLayout('progress');
+      var model = buildOverlayTrendModel(progress.massOverlayTrends.charts, fixture.seriesById);
+      expect(model.overlays.map(function (overlay) { return overlay.dataKey; })).toEqual(fixture.expectedOverlayKeys);
+      expect(model.series).toEqual(fixture.expectedSeries);
+      expect(model.domain).toEqual(fixture.expectedDomain);
+    });
+  });
+
   it('Progress page wires InBody trend charts from the layout spec', function () {
     var source = readFileSync(resolve(root, 'src/components/ProgressPage.jsx'), 'utf8');
     expect(source.indexOf('buildAllBodyTrendSeries') !== -1).toBe(true);
@@ -213,6 +223,8 @@ describe('inbody csv spec (spec/inbody-csv-fixtures.json)', function () {
     expect(source.indexOf('fatTrends') !== -1).toBe(true);
     expect(source.indexOf('muscleTrends') !== -1).toBe(true);
     expect(source.indexOf('ffmTrends') !== -1).toBe(true);
+    expect(source.indexOf('massOverlayTrends') !== -1).toBe(true);
+    expect(source.indexOf('buildOverlayTrendModel') !== -1).toBe(true);
     expect(source.indexOf('Skeletal Muscle') === -1).toBe(true);
     expect(source.indexOf('Visceral Fat') === -1).toBe(true);
     expect(source.indexOf('Left Arm') === -1).toBe(true);

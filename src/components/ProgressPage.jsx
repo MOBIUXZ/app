@@ -4,7 +4,7 @@ import { ACCENT, BLUE, GREEN, ORANGE, PINK, Card, resolveExercise, formatExercis
 import { estimate1RM, roundE1RM, averageE1RM, computeSessionMetrics } from "../domain/metrics.js";
 import { CHART_CURSOR, computeYDomain, getTrendLineAnim, getFirstPaintDuration, FAILED_SET_COLOR } from "../domain/chartDomain.js";
 import { getPageLayout, getPageSection, getThemeColor, formatTemplateLabel } from "../domain/pageLayout.js";
-import { buildAllBodyTrendSeries, flattenTrendGroups, buildSegmentalGridModel, buildMergedSegmentalGridModel, visibleSegmentalViews, resolveSegmentalView } from "../domain/bodyTrends.js";
+import { buildAllBodyTrendSeries, flattenTrendGroups, buildSegmentalGridModel, buildMergedSegmentalGridModel, buildOverlayTrendModel, visibleSegmentalViews, resolveSegmentalView } from "../domain/bodyTrends.js";
 import { PageHeading } from "./PageIcon";
 import appConfig from "../../spec/app-config.json";
 import s from "./ProgressPage.module.css";
@@ -32,6 +32,8 @@ var muscleTrends = progressLayout.muscleTrends || {};
 var muscleCharts = muscleTrends.charts || [];
 var ffmTrends = progressLayout.ffmTrends || {};
 var ffmCharts = ffmTrends.charts || [];
+var massOverlayTrends = progressLayout.massOverlayTrends || {};
+var massOverlayCharts = massOverlayTrends.charts || [];
 
 function FooterTrendChartList({ charts, seriesById, inView, tickStyle, tooltipStyle, tooltipValueTemplate }) {
   return (charts || []).map(function (chart) {
@@ -62,6 +64,69 @@ function FooterTrendChartList({ charts, seriesById, inView, tickStyle, tooltipSt
       </div>
     );
   });
+}
+
+function FooterOverlayTrendChart({ spec, seriesById, inView, tickStyle, tooltipStyle }) {
+  var model = buildOverlayTrendModel(spec && spec.charts, seriesById);
+  if (!model.overlays.length) return null;
+  var height = (spec && spec.chartHeight) || 160;
+  function formatTooltipValue(value, overlay) {
+    var unit = overlay.unit;
+    if (!unit) return value;
+    return formatTemplateLabel(spec.tooltipValueTemplate || "{value} {unit}", { value: value, unit: unit });
+  }
+  return (
+    <div className={s.bfSection}>
+      <div className={cx(ui.flexRowWrap, ui.gap6)}>
+        {model.overlays.map(function (overlay) {
+          var color = getThemeColor(overlay.colorToken);
+          var latest = overlay.latest != null
+            ? formatTemplateLabel(spec.latestTemplate || "{value} {unit}", { value: Number(overlay.latest).toFixed(2), unit: overlay.unit || "kg" })
+            : "";
+          return (
+            <div key={overlay.dataKey} className={s.bfLabel} style={{ color: color }}>
+              {overlay.name}{latest ? " · " + latest : ""}
+            </div>
+          );
+        })}
+      </div>
+      <div className={ui.chartContainer}>
+        {inView ? (
+          <ResponsiveContainer width="100%" height={height}>
+            <LineChart data={model.series}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#3d3d52" />
+              <XAxis dataKey="date" tick={tickStyle} interval="preserveStartEnd" />
+              <YAxis domain={model.domain} tick={tickStyle} width={35} />
+              <Tooltip
+                contentStyle={tooltipStyle}
+                formatter={function (value, name) {
+                  var overlay = model.overlays.find(function (item) { return item.name === name; }) || {};
+                  return [formatTooltipValue(value, overlay), name];
+                }}
+              />
+              {model.overlays.map(function (overlay) {
+                var color = getThemeColor(overlay.colorToken);
+                return (
+                  <Line
+                    key={overlay.dataKey}
+                    type="monotone"
+                    dataKey={overlay.dataKey}
+                    name={overlay.name}
+                    stroke={color}
+                    strokeWidth={2}
+                    dot={{ fill: color, r: 3 }}
+                    connectNulls={false}
+                    isAnimationActive={false}
+                    animationDuration={0}
+                  />
+                );
+              })}
+            </LineChart>
+          </ResponsiveContainer>
+        ) : <div className={s.chartPlaceholder} style={{ minHeight: height }} aria-hidden="true" />}
+      </div>
+    </div>
+  );
 }
 
 function MetricPillToggle({ label, items, activeId, onSelect }) {
@@ -1032,6 +1097,13 @@ export default function ProgressPage({ data }) {
     return (ffmTrendSeries[chart.id] || []).length > 0;
   });
 
+  var massOverlaySeries = useMemo(function () {
+    return buildAllBodyTrendSeries(data.bodyComp, massOverlayCharts);
+  }, [data.bodyComp]);
+  var hasMassOverlay = massOverlayCharts.some(function (chart) {
+    return (massOverlaySeries[chart.id] || []).length > 0;
+  });
+
   var segmentalTrendSeries = useMemo(function () {
     return buildAllBodyTrendSeries(data.bodyComp, segmentalTrendCharts);
   }, [data.bodyComp]);
@@ -1360,6 +1432,18 @@ export default function ProgressPage({ data }) {
           <SegmentalBodyGrid group={activeSegView.group} merged={activeSegView.merged} seriesById={segmentalTrendSeries} inView={footerChartsInView} tickStyle={cs} tooltipStyle={tt} />
         </Card>
         ) : null}
+        {hasMassOverlay && (
+        <Card className={ui.cardChart}>
+          <div className={ui.sectionTitleLg}>{getPageSection("progress", "massOverlay").title}</div>
+          <FooterOverlayTrendChart
+            spec={massOverlayTrends}
+            seriesById={massOverlaySeries}
+            inView={footerChartsInView}
+            tickStyle={cs}
+            tooltipStyle={tt}
+          />
+        </Card>
+        )}
         {hasVisceralTrends && (
         <Card className={ui.cardChart}>
           <div className={ui.sectionTitleLg}>{getPageSection("progress", "visceral").title}</div>

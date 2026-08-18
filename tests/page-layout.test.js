@@ -278,7 +278,7 @@ describe('page layout spec (spec/page-layout.json)', function () {
   it('progress InBody trend charts are spec-driven', function () {
     var progress = getPageLayout('progress');
     expect(progress.sections.map(function (s) { return s.id; })).toEqual([
-      'compoundLifts', 'combinedCompound', 'isolationLifts', 'bodySection', 'bodyCharts', 'fat', 'muscle', 'ffm', 'segmental', 'visceral', 'composition', 'bmr', 'inbodyScore', 'calorieTrend',
+      'compoundLifts', 'combinedCompound', 'isolationLifts', 'bodySection', 'bodyCharts', 'fat', 'muscle', 'ffm', 'segmental', 'massOverlay', 'visceral', 'composition', 'bmr', 'inbodyScore', 'calorieTrend',
     ]);
     expect(getPageSection('progress', 'compoundLifts').label).toBe('🏋️ COMPOUND LIFTS');
     expect(getPageSection('progress', 'isolationLifts').label).toBe('💪 ISOLATION LIFTS');
@@ -295,15 +295,16 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(getPageSection('progress', 'bmr').title).toBe('📉 BMR (kcal/d)');
     expect(getPageSection('progress', 'inbodyScore').title).toBe('📉 InBody Score');
     expect(getPageSection('progress', 'segmental').title).toBe('📉 Segmental Analysis');
+    expect(getPageSection('progress', 'massOverlay').title).toBe('📉 Muscle Mass & Fat Mass');
     expect(progress.bodyChartExtras.map(function (c) { return c.id; })).toEqual(['bmi']);
     expect(progress.fatTrends.charts.map(function (c) { return c.id; })).toEqual(['fm', 'bf', 'fmi']);
     expect(progress.fatTrends.charts.map(function (c) { return c.title; })).toEqual(['Fat Mass (kg)', 'Body Fat %', 'FMI (kg/m²)']);
-    expect(progress.fatTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['pink', 'pink', 'pink']);
+    expect(progress.fatTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['yellow', 'yellow', 'yellow']);
     expect(progress.fatTrends.charts.find(function (c) { return c.id === 'fmi'; }).derive).toBe('fmi');
     expect(progress.fatTrends.tooltipValueTemplate).toBe('{value} {unit}');
     expect(progress.muscleTrends.charts.map(function (c) { return c.id; })).toEqual(['smm', 'smmPct', 'smi']);
     expect(progress.muscleTrends.charts.map(function (c) { return c.title; })).toEqual(['Skeletal Muscle Mass (kg)', 'Muscle Mass %', 'SMI (kg/m²)']);
-    expect(progress.muscleTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['green', 'green', 'green']);
+    expect(progress.muscleTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['crimson', 'crimson', 'crimson']);
     expect(progress.muscleTrends.charts.find(function (c) { return c.id === 'smmPct'; }).derive).toBe('smmPct');
     expect(progress.muscleTrends.tooltipValueTemplate).toBe('{value} {unit}');
     expect(progress.ffmTrends.charts.map(function (c) { return c.id; })).toEqual(['ffm', 'ffmPct', 'ffmi']);
@@ -312,6 +313,11 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(progress.ffmTrends.charts.find(function (c) { return c.id === 'ffmPct'; }).derive).toBe('ffmPct');
     expect(progress.ffmTrends.charts.find(function (c) { return c.id === 'ffmi'; }).derive).toBe('ffmi');
     expect(progress.ffmTrends.tooltipValueTemplate).toBe('{value} {unit}');
+    expect(progress.massOverlayTrends.charts.map(function (c) { return c.id; })).toEqual(['overlaySmm', 'overlayFm']);
+    expect(progress.massOverlayTrends.charts.map(function (c) { return c.dataKey; })).toEqual(['smm', 'fm']);
+    expect(progress.massOverlayTrends.charts.map(function (c) { return c.title; })).toEqual(['Muscle Mass (kg)', 'Fat Mass (kg)']);
+    expect(progress.massOverlayTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['crimson', 'yellow']);
+    expect(progress.massOverlayTrends.tooltipValueTemplate).toBe('{value} {unit}');
     expect(progress.visceralTrends.charts.map(function (c) { return c.id; })).toEqual(['visceral']);
     expect(progress.visceralTrends.charts.map(function (c) { return c.title; })).toEqual(['Visceral Fat Level']);
     expect(progress.visceralTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['orange']);
@@ -326,7 +332,6 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(progress.compositionTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['blue', 'blue', 'blue']);
     var stackColors = [
       progress.bodyWeightChart.colorToken,
-      progress.fatTrends.charts[0].colorToken,
       progress.muscleTrends.charts[0].colorToken,
       progress.ffmTrends.charts[0].colorToken,
       progress.visceralTrends.charts[0].colorToken,
@@ -347,7 +352,7 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(progress.segmentalTrendGroups.map(function (g) { return g.toggleLabel; })).toEqual(['Soft Lean Mass', 'Fat Mass']);
     expect(progress.segmentalTrendGroups[0].charts.map(function (c) { return c.id; })).toEqual(['leanLeftArm', 'leanRightArm', 'leanTrunk', 'leanLeftLeg', 'leanRightLeg']);
     expect(progress.segmentalTrendGroups[0].charts.map(function (c) { return c.slot; })).toEqual(['leftArm', 'rightArm', 'trunk', 'leftLeg', 'rightLeg']);
-    expect(progress.segmentalTrendGroups[0].charts.map(function (c) { return c.colorToken; })).toEqual(['crimson', 'crimson', 'crimson', 'crimson', 'crimson']);
+    expect(progress.segmentalTrendGroups[0].charts.map(function (c) { return c.colorToken; })).toEqual(['rose', 'rose', 'rose', 'rose', 'rose']);
     expect(progress.segmentalTrendGroups[1].charts.map(function (c) { return c.colorToken; })).toEqual(['yellow', 'yellow', 'yellow', 'yellow', 'yellow']);
     expect(progress.segmentalTrendGroups[1].charts.map(function (c) { return c.id; })).toEqual(['fatLeftArm', 'fatRightArm', 'fatTrunk', 'fatLeftLeg', 'fatRightLeg']);
     var source = readFileSync(resolve(root, progress.component), 'utf8');
@@ -366,6 +371,8 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(source.indexOf('fatTrends') !== -1).toBe(true);
     expect(source.indexOf('muscleTrends') !== -1).toBe(true);
     expect(source.indexOf('ffmTrends') !== -1).toBe(true);
+    expect(source.indexOf('massOverlayTrends') !== -1).toBe(true);
+    expect(source.indexOf('buildOverlayTrendModel') !== -1).toBe(true);
     expect(source.indexOf('sectionLabelSpaced') !== -1).toBe(true);
     expect(source.indexOf('sectionLabelBody') !== -1).toBe(true);
     expect(source.indexOf('bodySection') !== -1).toBe(true);
