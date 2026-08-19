@@ -403,8 +403,8 @@
         "tooltipValueTemplate": "{value} {unit}",
         "charts": [
           { "id": "tbw", "title": "Total Body Water (L)", "unit": "L", "colorToken": "blue", "paths": ["inbody.tbw"] },
-          { "id": "protein", "title": "Protein (kg)", "unit": "kg", "colorToken": "blue", "paths": ["inbody.protein"] },
-          { "id": "mineral", "title": "Mineral (kg)", "unit": "kg", "colorToken": "blue", "paths": ["inbody.mineral"] }
+          { "id": "protein", "title": "Protein (kg)", "unit": "kg", "colorToken": "green", "paths": ["inbody.protein"] },
+          { "id": "mineral", "title": "Mineral (kg)", "unit": "kg", "colorToken": "gray", "paths": ["inbody.mineral"] }
         ]
       },
       "segmentalBodyGrid": {

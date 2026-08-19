@@ -340,7 +340,7 @@ describe('page layout spec (spec/page-layout.json)', function () {
     expect(progress.scoreTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['red']);
     expect(progress.compositionTrends.charts.map(function (c) { return c.id; })).toEqual(['tbw', 'protein', 'mineral']);
     expect(progress.compositionTrends.charts.map(function (c) { return c.title; })).toEqual(['Total Body Water (L)', 'Protein (kg)', 'Mineral (kg)']);
-    expect(progress.compositionTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['blue', 'blue', 'blue']);
+    expect(progress.compositionTrends.charts.map(function (c) { return c.colorToken; })).toEqual(['blue', 'green', 'gray']);
     var stackColors = [
       progress.bodyWeightChart.colorToken,
       progress.muscleTrends.charts[0].colorToken,
